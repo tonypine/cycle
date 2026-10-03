@@ -2,7 +2,13 @@
 # Tip: run `symphony workflow preview` to see the fully assembled prompt — managed
 # context, expanded `{% render %}` partials, and sample issue values — exactly as the
 # agent receives it. This comment lives in front matter so it never renders.
-# No hooks yet: the scaffold ticket adds the dependency install step.
+hooks:
+  after_create: |
+    if [ ! -f local.properties ]; then
+      sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}"
+      [ -d "$sdk" ] && echo "sdk.dir=$sdk" > local.properties
+    fi
+    ./gradlew --quiet assembleDebug
 prompts:
   pr: |
     You are working on an existing GitHub pull request.
