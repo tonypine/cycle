@@ -48,6 +48,14 @@ Reusable playbooks live under `.ai/skills/` and are shared between agents throug
 Run from the repo root with JDK 21. Checks are split by cost: cheap, targeted checks run locally
 before every push, and the slow full set runs only in CI, which is the gate.
 
+In the Symphony agent sandbox no JDK is on `PATH`: set
+`JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home`. Robolectric tests need
+nothing else; the build reads Robolectric's runtime from the Gradle cache and keeps temp files under
+`build/tmp`. A Kotlin compile or Android Gradle plugin task can still fail on
+`/var/folders/…: Operation not permitted` until the operator gives the Gradle daemon a writable temp
+dir (`Agent sandbox` in `README.md`); until then, run Gradle with
+`JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Djava.io.tmpdir=$TMPDIR"` and say so in the workpad.
+
 Before a push, run `ktlintCheck` and the unit tests and screenshot checks of each module the change
 touches (`:app`, `:app-catalog`, `:core:designsystem`, `:core:ui`). Each takes seconds:
 
