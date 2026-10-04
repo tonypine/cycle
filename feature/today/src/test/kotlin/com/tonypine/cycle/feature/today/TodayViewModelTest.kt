@@ -1,0 +1,249 @@
+package com.tonypine.cycle.feature.today
+
+import android.content.Context
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.tonypine.cycle.core.data.database.CycleDatabase
+import com.tonypine.cycle.core.data.repository.CycleRepository
+import com.tonypine.cycle.core.data.repository.DayLogRepository
+import com.tonypine.cycle.core.data.settings.SettingsRepository
+import com.tonypine.cycle.core.designsystem.CycleDayState
+import com.tonypine.cycle.core.model.EstimateBasis
+import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.Period
+import java.io.File
+import java.time.LocalDate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.rules.TemporaryFolder
+import org.junit.runner.RunWith
+
+/**
+ * Today's states from a real log: the repositories on an in-memory database and a DataStore file.
+ * Synthetic dates only: made-up days in 2027, never anyone's real cycle.
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(AndroidJUnit4::class)
+class TodayViewModelTest {
+    @get:Rule
+    val folder = TemporaryFolder()
+
+    private val today = day("2027-03-20")
+    private var clock = today
+
+    private val database = Room
+        .inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext<Context>(), CycleDatabase::class.java)
+        .allowMainThreadQueries()
+        .build()
+    private val dayLogs = DayLogRepository(database.dayLogDao())
+
+    @Before
+    fun setMain() = Dispatchers.setMain(UnconfinedTestDispatcher())
+
+    @After
+    fun tearDown() {
+        database.close()
+        Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `with nothing logged, Today is empty`() = today { viewModel, _ ->
+        assertEquals(TodayUiState.Empty(today, periodLength = 5), viewModel.awaitState<TodayUiState.Empty>())
+    }
+
+    @Test
+    fun `logging a period 19 days ago shows day 19 and a typical estimate`() = today { viewModel, _ ->
+        viewModel.onLogPeriod(day("2027-03-02"))
+
+        val state = viewModel.awaitState<TodayUiState.Tracking>()
+        assertEquals(19, state.cycleDay)
+        assertEquals(TodayPhase.BetweenPeriods(daysUntil = 10), state.phase)
+        // A typical 5-day period, marked ended, so it is not still going.
+        assertEquals(listOf(Period(day("2027-03-02"), day("2027-03-06"))), state.periods)
+        assertEquals(
+            NextPeriod(
+                expectedStart = day("2027-03-30"),
+                earliestStart = day("2027-03-26"),
+                latestStart = day("2027-04-03"),
+                lastStart = day("2027-03-02"),
+                cycleLength = 28,
+                daysLate = 0,
+                basis = EstimateBasis.Typical
+            ),
+            state.nextPeriod
+        )
+        assertEquals(CycleDayState.Period, state.dayState(day("2027-03-04")))
+        assertEquals(CycleDayState.PredictedPeriod, state.dayState(day("2027-03-31")))
+        assertEquals(CycleDayState.Plain, state.dayState(today))
+    }
+
+    @Test
+    fun `a period that started recently is still going after it is logged`() = today { viewModel, _ ->
+        viewModel.onLogPeriod(day("2027-03-18"))
+
+        val state = viewModel.awaitState<TodayUiState.Tracking>()
+        assertEquals(TodayPhase.OnPeriod(periodDay = 3), state.phase)
+        assertTrue(state.periods.single().isOpen)
+    }
+
+    @Test
+    fun `inside the range, the next period is due`() = today { viewModel, _ ->
+        viewModel.onLogPeriod(day("2027-02-24"))
+
+        val state = viewModel.awaitState<TodayUiState.Tracking>()
+        assertEquals(25, state.cycleDay)
+        assertEquals(TodayPhase.Due, state.phase)
+    }
+
+    @Test
+    fun `one tap starts a period today and Undo takes it back`() = today { viewModel, _ ->
+        viewModel.onLogPeriod(day("2027-02-24"))
+        val before = viewModel.awaitState<TodayUiState.Tracking> { it.phase == TodayPhase.Due }
+
+        viewModel.onPeriodStarted()
+        val started = viewModel.awaitState<TodayUiState.Tracking> { it.phase == TodayPhase.PeriodStartedToday }
+        assertEquals(1, started.cycleDay)
+        assertEquals(CycleDayState.Period, started.dayState(today))
+        assertTrue(started.onPeriod)
+        // The estimate follows at once: her first full cycle, 24 days.
+        assertEquals(EstimateBasis.Logged(1), started.nextPeriod.basis)
+        assertEquals(day("2027-04-13"), started.nextPeriod.expectedStart)
+
+        viewModel.onUndoPeriodStarted()
+        assertEquals(before, viewModel.awaitState<TodayUiState.Tracking> { it.phase == TodayPhase.Due })
+    }
+
+    @Test
+    fun `during a period, Today counts its days`() = today { viewModel, _ ->
+        logPeriod(day("2027-02-17"), day("2027-02-21"))
+        dayLogs.setPeriodStarted(day("2027-03-17"), started = true)
+
+        val state = viewModel.awaitState<TodayUiState.Tracking> { it.periods.size == 2 }
+        assertEquals(4, state.cycleDay)
+        assertEquals(TodayPhase.OnPeriod(periodDay = 4), state.phase)
+        assertNull(state.stillGoing)
+    }
+
+    @Test
+    fun `one tap ends the period today and Undo takes it back`() = today { viewModel, _ ->
+        logPeriod(day("2027-02-16"), day("2027-02-20"))
+        dayLogs.setPeriodStarted(day("2027-03-16"), started = true)
+        viewModel.awaitState<TodayUiState.Tracking> { it.phase == TodayPhase.OnPeriod(5) }
+
+        viewModel.onPeriodEnded()
+        val ended = viewModel.awaitState<TodayUiState.Tracking> { it.phase is TodayPhase.PeriodEndedToday }
+        assertEquals(TodayPhase.PeriodEndedToday(length = 5), ended.phase)
+        assertEquals(Period(day("2027-03-16"), today), ended.periods.last())
+        assertTrue(ended.onPeriod)
+
+        viewModel.onUndoPeriodEnded()
+        val undone = viewModel.awaitState<TodayUiState.Tracking> { it.phase == TodayPhase.OnPeriod(5) }
+        assertTrue(undone.periods.last().isOpen)
+    }
+
+    @Test
+    fun `past the expected day, the period is late and expected from today`() = today { viewModel, _ ->
+        viewModel.onLogPeriod(day("2027-02-18"))
+
+        val state = viewModel.awaitState<TodayUiState.Tracking>()
+        assertEquals(31, state.cycleDay)
+        assertEquals(TodayPhase.Late(daysLate = 2), state.phase)
+        assertEquals(today, state.nextPeriod.expectedStart)
+        assertEquals(today, state.nextPeriod.earliestStart)
+        assertEquals(28, state.nextPeriod.cycleLength)
+        assertEquals(CycleDayState.PredictedPeriod, state.dayState(today))
+    }
+
+    @Test
+    fun `a long period asks whether it is still going, once`() = today { viewModel, settings ->
+        logPeriod(day("2027-02-13"), day("2027-02-17"))
+        dayLogs.setPeriodStarted(day("2027-03-13"), started = true)
+
+        val asked = viewModel.awaitState<TodayUiState.Tracking> { it.periods.size == 2 && it.stillGoing != null }
+        assertEquals(TodayPhase.OnPeriod(periodDay = 8), asked.phase)
+        assertEquals(day("2027-03-13")..today, asked.stillGoing?.days)
+
+        viewModel.onStillGoing()
+        val answered = viewModel.awaitState<TodayUiState.Tracking> { it.stillGoing == null }
+        assertEquals(TodayPhase.OnPeriod(periodDay = 8), answered.phase)
+        assertEquals(setOf(day("2027-03-13")), settings.settings.first().dismissedStillGoing)
+    }
+
+    @Test
+    fun `it ended earlier marks the day she picks as the last`() = today { viewModel, settings ->
+        logPeriod(day("2027-02-13"), day("2027-02-17"))
+        dayLogs.setPeriodStarted(day("2027-03-13"), started = true)
+        viewModel.awaitState<TodayUiState.Tracking> { it.periods.size == 2 && it.stillGoing != null }
+
+        viewModel.onEndedOn(day("2027-03-17"))
+
+        val state = viewModel.awaitState<TodayUiState.Tracking> { !it.onPeriod }
+        assertEquals(Period(day("2027-03-13"), day("2027-03-17")), state.periods.last())
+        assertNull(state.stillGoing)
+        assertEquals(setOf(day("2027-03-13")), settings.settings.first().dismissedStillGoing)
+    }
+
+    @Test
+    fun `the day log saves today's flow`() = today { viewModel, _ ->
+        viewModel.onLogPeriod(day("2027-03-02"))
+        viewModel.awaitState<TodayUiState.Tracking>()
+
+        viewModel.onFlowChange(FlowLevel.SPOTTING)
+
+        assertEquals(FlowLevel.SPOTTING, viewModel.awaitState<TodayUiState.Tracking> { it.todayFlow != null }.todayFlow)
+    }
+
+    @Test
+    fun `a new day moves Today on`() = today { viewModel, _ ->
+        viewModel.onLogPeriod(day("2027-03-02"))
+        viewModel.awaitState<TodayUiState.Tracking> { it.cycleDay == 19 }
+
+        clock = today.plusDays(1)
+        viewModel.refreshDay()
+
+        assertEquals(
+            TodayPhase.BetweenPeriods(9),
+            viewModel.awaitState<TodayUiState.Tracking> {
+                it.cycleDay == 20
+            }.phase
+        )
+    }
+
+    /** Runs [test] with a ViewModel on the test database, its state collected as the screen would. */
+    private fun today(test: suspend TestScope.(TodayViewModel, SettingsRepository) -> Unit) = runTest {
+        val settings = SettingsRepository(
+            PreferenceDataStoreFactory.create(scope = backgroundScope) { File(folder.root, "test.preferences_pb") }
+        )
+        val viewModel = TodayViewModel(CycleRepository(dayLogs, settings), dayLogs, settings) { clock }
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
+        test(viewModel, settings)
+    }
+
+    private suspend inline fun <reified T : TodayUiState> TodayViewModel.awaitState(
+        crossinline matches: (T) -> Boolean = { true }
+    ): T = uiState.first { it is T && matches(it) } as T
+
+    /** A past period. The end goes first: alone it is ignored, so no state shows the period open. */
+    private suspend fun logPeriod(start: LocalDate, end: LocalDate) {
+        dayLogs.setPeriodEnded(end, ended = true)
+        dayLogs.setPeriodStarted(start, started = true)
+    }
+
+    private fun day(iso: String): LocalDate = LocalDate.parse(iso)
+}

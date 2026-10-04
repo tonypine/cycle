@@ -10,9 +10,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val data = (application as CycleApplication).data
         setContent {
             CycleTheme {
-                HomeScreen()
+                CycleApp(data)
             }
         }
     }

@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Cycle</string>
+
+    <!-- The navigation bar's tabs: one short word each. -->
+    <string name="tab_today">Today</string>
+    <string name="tab_calendar">Calendar</string>
+    <string name="tab_history">History</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- A tab whose screen has not landed yet. -->
+    <string name="placeholder_body">This part of Cycle is on its way.</string>
 </resources>

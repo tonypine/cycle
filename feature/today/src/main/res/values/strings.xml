@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Copy rules: docs/research/product-implications.md. Say "period", read every estimate as an
+         estimate, keep late neutral. StringsTest guards against the words the app never says. -->
+
+    <!-- The big number on Today: her cycle day. -->
+    <string name="today_cycle_day">Day %1$d</string>
+
+    <!-- The line of context under the cycle day. -->
+    <plurals name="today_context_between">
+        <item quantity="one">Your next period is expected in about %1$d day</item>
+        <item quantity="other">Your next period is expected in about %1$d days</item>
+    </plurals>
+    <string name="today_context_due">Your period could start any day now</string>
+    <plurals name="today_context_late">
+        <item quantity="one">Your period is %1$d day later than expected</item>
+        <item quantity="other">Your period is %1$d days later than expected</item>
+    </plurals>
+    <string name="today_context_started">Your period started today</string>
+    <string name="today_context_on_period">Day %1$d of your period</string>
+    <plurals name="today_context_ended">
+        <item quantity="one">Your period lasted %1$d day</item>
+        <item quantity="other">Your period lasted %1$d days</item>
+    </plurals>
+
+    <!-- The one-tap period buttons and the day log. -->
+    <string name="today_period_started">My period started</string>
+    <string name="today_period_ended">My period ended</string>
+    <string name="today_log_feelings">Log how you feel</string>
+    <string name="today_log_flow_and_feelings">Log flow and how you feel</string>
+    <string name="today_undo">Undo</string>
+    <string name="today_started_card">Period started today</string>
+    <string name="today_ended_card">Period ended today</string>
+
+    <!-- Late: calm, no alarm. -->
+    <string name="today_late_title">Cycles vary</string>
+    <string name="today_late_body">Cycle lengths often change by a few days from one month to the next. The estimate below now starts today. Tap My period started when it does.</string>
+
+    <!-- Still going? Asked once per period, when it runs longer than usual. -->
+    <string name="today_still_going_title">Still going?</string>
+    <plurals name="today_still_going_body">
+        <item quantity="one">Your period has lasted %1$d day so far.</item>
+        <item quantity="other">Your period has lasted %1$d days so far.</item>
+    </plurals>
+    <string name="today_still_going_yes">Still going</string>
+    <string name="today_still_going_ended_earlier">It ended earlier</string>
+    <string name="today_last_day_title">When was the last day?</string>
+    <string name="today_last_day_body">Pick the last day of your period.</string>
+    <string name="today_save">Save</string>
+
+    <!-- The next period card. -->
+    <string name="today_next_period">Next period</string>
+    <string name="today_next_around">Around %1$s</string>
+    <string name="today_next_between">Between %1$s and %2$s</string>
+    <string name="today_basis_typical">Estimated from a typical %1$d-day cycle</string>
+    <string name="today_basis_setup">Estimated from the lengths you gave</string>
+    <plurals name="today_basis_logged">
+        <item quantity="one">Estimated from your last cycle</item>
+        <item quantity="other">Estimated from your last %1$d cycles</item>
+    </plurals>
+    <string name="today_how_estimated">How is this estimated?</string>
+
+    <!-- The "How is this estimated?" sheet, in plain words. -->
+    <string name="estimate_sheet_title">How is this estimated?</string>
+    <string name="estimate_date">Your next period is expected around %1$s, %3$d days after your last one started on %2$s: %4$s.</string>
+    <string name="estimate_date_late">Your period was expected around %1$s: the first day of your last period, %2$s, plus %3$d days, %4$s.</string>
+    <string name="estimate_cycle_typical">a typical cycle, until you have logged one of your own</string>
+    <string name="estimate_cycle_setup">the usual cycle length you gave</string>
+    <plurals name="estimate_cycle_logged">
+        <item quantity="one">the length of your last cycle</item>
+        <item quantity="other">the middle length of your last %1$d cycles</item>
+    </plurals>
+    <string name="estimate_range">It may start any day between %1$s and %2$s.</string>
+    <string name="estimate_range_typical">Cycles often change by a few days from one to the next, so the range runs a few days either side.</string>
+    <string name="estimate_range_logged">The range follows how much your recent cycles have varied, and stays a few days wide either side while you have logged only a few.</string>
+    <plurals name="estimate_late">
+        <item quantity="one">It is %1$d day later than that, so the estimate now starts today.</item>
+        <item quantity="other">It is %1$d days later than that, so the estimate now starts today.</item>
+    </plurals>
+    <string name="estimate_late_range">It may start any day from today to %1$s.</string>
+    <string name="estimate_closing">These are estimates, not promises. Stress, travel and illness can move a period, and the more periods you log, the closer the estimates follow your own rhythm.</string>
+    <string name="estimate_done">Got it</string>
+
+    <!-- No period logged yet, and the sheet to log the first one. -->
+    <string name="today_empty_title">No periods logged yet</string>
+    <string name="today_empty_body">Log the first day of your last period and Cycle will estimate the next one.</string>
+    <string name="today_log_period">Log a period</string>
+    <string name="log_period_title">When did it start?</string>
+    <plurals name="log_period_body">
+        <item quantity="one">Pick the first day of your last period. Cycle counts it as %1$d day long.</item>
+        <item quantity="other">Pick the first day of your last period. Cycle counts it as %1$d days long.</item>
+    </plurals>
+    <string name="log_period_confirm">Log it</string>
+
+    <!-- The day log sheet. MOT-36 adds how she feels. -->
+    <string name="day_log_title">Log today</string>
+    <string name="day_log_flow">Flow</string>
+    <string name="day_log_flow_none">None</string>
+    <string name="day_log_flow_spotting">Spotting</string>
+    <string name="day_log_flow_light">Light</string>
+    <string name="day_log_flow_medium">Medium</string>
+    <string name="day_log_flow_heavy">Heavy</string>
+    <string name="day_log_done">Done</string>
+</resources>

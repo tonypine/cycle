@@ -71,7 +71,9 @@ unless a migration changes them.
 ## Consequences
 
 - Screens read `CycleRepository.observeOverview(today)` and write through `DayLogRepository` and
-  `SettingsRepository`; none of them computes a cycle itself.
+  `SettingsRepository`; none of them computes a cycle itself. A screen that also shows what she
+  logged on the day, such as Today's Undo, reads `CycleRepository.observeDay(today)`: the overview
+  and the day's log from one read, so they never disagree for a moment after a write.
 - Life stages (pregnancy, after birth, hormonal contraception) and cycles to exclude are not modelled
   yet. When they are, they are date ranges in their own table, and `CycleCalculator` leaves the
   cycles inside them out of the last six.

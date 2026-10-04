@@ -5,8 +5,10 @@ import com.tonypine.cycle.core.data.day
 import com.tonypine.cycle.core.data.inMemoryDatabase
 import com.tonypine.cycle.core.data.settingsRepository
 import com.tonypine.cycle.core.model.CyclePrompt
+import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.EstimateBasis
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.Period
 import java.time.LocalDate
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -68,5 +70,22 @@ class CycleRepositoryTest {
         assertEquals(EstimateBasis.Setup, after.estimate?.cycleBasis)
         assertEquals(day("2027-04-02"), after.estimate?.next?.expectedStart)
         assertEquals(emptyList<CyclePrompt>(), after.prompts)
+    }
+
+    @Test
+    fun `a day's log and the overview come from the same read`() = runTest {
+        val cycles = CycleRepository(dayLogs, settingsRepository(folder.root, backgroundScope))
+        val today = day("2027-03-10")
+        dayLogs.setPeriodStarted(today, started = true)
+
+        val started = cycles.observeDay(today).first()
+        assertEquals(DayLog(today, periodStarted = true), started.log)
+        assertEquals(today, started.overview.currentPeriod?.start)
+
+        dayLogs.setPeriodStarted(today, started = false)
+
+        val undone = cycles.observeDay(today).first()
+        assertEquals(DayLog(today), undone.log)
+        assertEquals(emptyList<Period>(), undone.overview.periods)
     }
 }
