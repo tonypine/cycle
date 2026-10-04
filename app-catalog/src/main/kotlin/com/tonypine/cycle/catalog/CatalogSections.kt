@@ -9,8 +9,16 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import com.tonypine.cycle.core.designsystem.CycleTheme
 
-/** One entry in the catalog: a page for a group of tokens or for one component. */
-class CatalogSection(val title: String, val description: String, val content: @Composable () -> Unit)
+/**
+ * One entry in the catalog: a page for a group of tokens or for one component. A section with a
+ * [demo] shows a button that opens it full screen; the demo calls `onClose` to come back.
+ */
+class CatalogSection(
+    val title: String,
+    val description: String,
+    val demo: (@Composable (onClose: () -> Unit) -> Unit)? = null,
+    val content: @Composable () -> Unit
+)
 
 /** Every catalog section, in the order the list shows them. Later components add one entry each. */
 val CatalogSections: List<CatalogSection> = listOf(
@@ -45,7 +53,14 @@ val CatalogSections: List<CatalogSection> = listOf(
     CatalogSection("Empty state", "An illustration, a title, a sentence and an optional action, centred.") {
         EmptyStateSection()
     },
-    CatalogSection("Loading", "The inline loading indicator and the full-screen loading state.") { LoadingSection() }
+    CatalogSection("Loading", "The inline loading indicator and the full-screen loading state.") { LoadingSection() },
+    CatalogSection(
+        "App bars",
+        "The top app bar and the floating navigation bar, and a full-screen edge-to-edge demo with both.",
+        demo = { onClose -> AppBarsDemo(onClose) }
+    ) {
+        AppBarsSection()
+    }
 )
 
 @Composable

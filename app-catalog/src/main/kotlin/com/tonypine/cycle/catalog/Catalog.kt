@@ -22,6 +22,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import com.tonypine.cycle.core.designsystem.CycleTheme
+import com.tonypine.cycle.core.designsystem.FilledButton
 
 /**
  * The design system catalog: a list of sections, each opening a page that shows one group of tokens
@@ -30,14 +31,25 @@ import com.tonypine.cycle.core.designsystem.CycleTheme
 @Composable
 fun Catalog(modifier: Modifier = Modifier) {
     var openSection by rememberSaveable { mutableStateOf<String?>(null) }
+    var demoOpen by rememberSaveable { mutableStateOf(false) }
     val section = CatalogSections.firstOrNull { it.title == openSection }
-    BackHandler(enabled = section != null) { openSection = null }
+    val demo = section?.demo?.takeIf { demoOpen }
+    BackHandler(enabled = section != null) {
+        if (demo != null) demoOpen = false else openSection = null
+    }
     // Each page keeps its own saved scroll position, so a section opens at its top.
-    key(openSection) {
-        if (section == null) {
-            SectionList(onOpen = { openSection = it.title }, modifier = modifier)
-        } else {
-            SectionPage(section, onBack = { openSection = null }, modifier = modifier)
+    key(openSection, demo != null) {
+        when {
+            section == null -> SectionList(onOpen = { openSection = it.title }, modifier = modifier)
+
+            demo != null -> demo { demoOpen = false }
+
+            else -> SectionPage(
+                section,
+                onBack = { openSection = null },
+                onOpenDemo = { demoOpen = true },
+                modifier = modifier
+            )
         }
     }
 }
@@ -71,7 +83,12 @@ fun SectionList(onOpen: (CatalogSection) -> Unit, modifier: Modifier = Modifier)
 }
 
 @Composable
-fun SectionPage(section: CatalogSection, onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun SectionPage(
+    section: CatalogSection,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    onOpenDemo: () -> Unit = {}
+) {
     CatalogPage(modifier) {
         CatalogText(
             "Back",
@@ -83,6 +100,7 @@ fun SectionPage(section: CatalogSection, onBack: () -> Unit, modifier: Modifier 
         )
         CatalogText(section.title, CycleTheme.typography.headline, modifier = Modifier.semantics { heading() })
         CatalogText(section.description, CycleTheme.typography.body, color = CycleTheme.colors.onSurfaceVariant)
+        if (section.demo != null) FilledButton("Open the full-screen demo", onOpenDemo)
         section.content()
     }
 }
