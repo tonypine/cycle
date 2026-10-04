@@ -1,6 +1,7 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.tonypine.cycle.buildlogic.configureKotlinAndroid
 import com.tonypine.cycle.buildlogic.configureNoMaterialDependencies
+import com.tonypine.cycle.buildlogic.configureReleaseBuild
 import com.tonypine.cycle.buildlogic.libs
 import com.tonypine.cycle.buildlogic.versionOf
 import org.gradle.api.Plugin
@@ -16,6 +17,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         extensions.configure<ApplicationExtension> {
             configureKotlinAndroid(this)
             defaultConfig.targetSdk = libs.versionOf("targetSdk").toInt()
+            configureReleaseBuild(this)
         }
         configureNoMaterialDependencies()
     }

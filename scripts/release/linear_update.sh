@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 # Posts a release's update to the Linear initiative "Menstrual Cycle App": a heading with the
-# version, a direct APK download link, a link to the GitHub Release and the changelog. See
-# docs/decisions/0002-release-distribution.md.
+# version, a direct APK download link, a link to the GitHub Release, a download link for the
+# design-system catalog APK and the changelog. See docs/decisions/0002-release-distribution.md.
 #
 # Usage:
-#   scripts/release/linear_update.sh body|payload|post <tag> <release-url> <apk-url> <changelog-file>
+#   scripts/release/linear_update.sh body|payload|post <tag> <release-url> <apk-url> \
+#     <catalog-apk-url> <changelog-file>
+#
+#   <catalog-apk-url> may be empty, for a release from before the catalog shipped; the update then
+#   has no catalog link.
 #
 #   body     prints the update's Markdown
 #   payload  prints the GraphQL request as JSON; needs LINEAR_INITIATIVE_ID
@@ -32,16 +36,17 @@ fail() {
 }
 
 usage() {
-  echo "Usage: $0 body|payload|post <tag> <release-url> <apk-url> <changelog-file>" >&2
+  echo "Usage: $0 body|payload|post <tag> <release-url> <apk-url> <catalog-apk-url> <changelog-file>" >&2
   exit 2
 }
 
-[ "$#" -eq 5 ] || usage
+[ "$#" -eq 6 ] || usage
 command="$1"
 tag="$2"
 release_url="$3"
 apk_url="$4"
-changelog_file="$5"
+catalog_apk_url="$5"
+changelog_file="$6"
 [ -n "$tag" ] || fail "the release tag is empty"
 [ -n "$release_url" ] || fail "the release URL is empty"
 [ -n "$apk_url" ] || fail "the APK URL is empty"
@@ -50,6 +55,9 @@ changelog_file="$5"
 body() {
   printf '# Cycle %s\n\n' "$tag"
   printf '**[Download %s](%s)** · [GitHub Release](%s)\n\n' "${apk_url##*/}" "$apk_url" "$release_url"
+  if [ -n "$catalog_apk_url" ]; then
+    printf '[Download the design-system catalog](%s)\n\n' "$catalog_apk_url"
+  fi
   cat "$changelog_file"
 }
 

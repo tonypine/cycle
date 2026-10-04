@@ -27,6 +27,7 @@ check() {
 tag="v0.1.42"
 release_url="https://github.com/example/cycle/releases/tag/v0.1.42"
 apk_url="https://github.com/example/cycle/releases/download/v0.1.42/cycle-v0.1.42.apk"
+catalog_apk_url="https://github.com/example/cycle/releases/download/v0.1.42/cycle-catalog-v0.1.42.apk"
 changelog="$work/changelog.md"
 cat >"$changelog" <<'EOF'
 ## Features
@@ -38,7 +39,7 @@ cat >"$changelog" <<'EOF'
 
 - don't crash on 'quotes' (#9)
 EOF
-args=("$tag" "$release_url" "$apk_url" "$changelog")
+args=("$tag" "$release_url" "$apk_url" "$catalog_apk_url" "$changelog")
 
 # Body ------------------------------------------------------------------------------------------
 
@@ -46,6 +47,8 @@ cat >"$work/expected.md" <<'EOF'
 # Cycle v0.1.42
 
 **[Download cycle-v0.1.42.apk](https://github.com/example/cycle/releases/download/v0.1.42/cycle-v0.1.42.apk)** · [GitHub Release](https://github.com/example/cycle/releases/tag/v0.1.42)
+
+[Download the design-system catalog](https://github.com/example/cycle/releases/download/v0.1.42/cycle-catalog-v0.1.42.apk)
 
 ## Features
 
@@ -59,10 +62,20 @@ EOF
 expected_body="$(cat "$work/expected.md")"
 actual_body="$("$script" body "${args[@]}")"
 if [ "$actual_body" = "$expected_body" ]; then
-  pass "body has the version heading, the APK and release links, and the changelog as is"
+  pass "body has the version heading, the APK, release and catalog links, and the changelog as is"
 else
-  fail "body has the version heading, the APK and release links, and the changelog as is"
+  fail "body has the version heading, the APK, release and catalog links, and the changelog as is"
   diff <(printf '%s\n' "$expected_body") <(printf '%s\n' "$actual_body") | sed 's/^/    /' || true
+fi
+
+# A release from before the catalog shipped has no catalog APK.
+expected_app_only="$(grep --invert-match --fixed-strings 'design-system catalog' "$work/expected.md" | cat -s)"
+actual_app_only="$("$script" body "$tag" "$release_url" "$apk_url" "" "$changelog")"
+if [ "$actual_app_only" = "$expected_app_only" ]; then
+  pass "body leaves out the catalog link when its URL is empty"
+else
+  fail "body leaves out the catalog link when its URL is empty"
+  diff <(printf '%s\n' "$expected_app_only") <(printf '%s\n' "$actual_app_only") | sed 's/^/    /' || true
 fi
 
 # Payload ---------------------------------------------------------------------------------------
@@ -182,7 +195,7 @@ LINEAR_INITIATIVE_ID="$saved_initiative"
 
 # Arguments -------------------------------------------------------------------------------------
 
-if "$script" body "$tag" "$release_url" "$apk_url" "$work/missing.md" >/dev/null 2>&1; then
+if "$script" body "$tag" "$release_url" "$apk_url" "$catalog_apk_url" "$work/missing.md" >/dev/null 2>&1; then
   fail "fails on a missing changelog file"
 else
   pass "fails on a missing changelog file"
@@ -191,6 +204,11 @@ if "$script" publish "${args[@]}" >/dev/null 2>&1; then
   fail "fails on an unknown command"
 else
   pass "fails on an unknown command"
+fi
+if "$script" body "$tag" "$release_url" "$apk_url" "$changelog" >/dev/null 2>&1; then
+  fail "fails without the catalog APK URL argument"
+else
+  pass "fails without the catalog APK URL argument"
 fi
 
 if [ "$failures" -gt 0 ]; then
