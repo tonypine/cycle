@@ -71,7 +71,10 @@ class CatalogScreenshotTest(private val page: Page, private val variant: Variant
             "Text field" to (1280 to 2240),
             "Bottom sheet" to (780 to 1700),
             "Day cell" to (1220 to 2360),
-            "Cycle legend" to (400 to 700)
+            "Cycle legend" to (400 to 700),
+            "Cards" to (1060 to 1720),
+            "Empty state" to (1220 to 1520),
+            "Loading" to (900 to 1400)
         )
 
         @JvmStatic

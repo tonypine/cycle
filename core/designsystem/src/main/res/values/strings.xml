@@ -24,4 +24,7 @@
     <string name="bottom_sheet_expand">Expand</string>
     <string name="bottom_sheet_collapse">Collapse</string>
     <string name="bottom_sheet_dismiss">Dismiss</string>
+
+    <!-- What TalkBack reads for a loading indicator or loading state that has no message of its own. -->
+    <string name="loading">Loading</string>
 </resources>

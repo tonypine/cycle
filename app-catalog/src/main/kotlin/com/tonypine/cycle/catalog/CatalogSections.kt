@@ -43,7 +43,12 @@ val CatalogSections: List<CatalogSection> = listOf(
     CatalogSection("Day cell", "Every cycle state, today on each, the interaction states, a sample week and logging.") {
         DayCellSection()
     },
-    CatalogSection("Cycle legend", "One swatch per cycle state, with its label.") { CycleLegendSection() }
+    CatalogSection("Cycle legend", "One swatch per cycle state, with its label.") { CycleLegendSection() },
+    CatalogSection("Cards", "The static card and the clickable card in every state.") { CardsSection() },
+    CatalogSection("Empty state", "An illustration, a title, a sentence and an optional action, centred.") {
+        EmptyStateSection()
+    },
+    CatalogSection("Loading", "The inline loading indicator and the full-screen loading state.") { LoadingSection() }
 )
 
 @Composable

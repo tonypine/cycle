@@ -1,0 +1,199 @@
+name: Release
+
+# Every merge to main ships a signed APK on GitHub Releases once CI passes on that commit.
+# See docs/decisions/0002-release-distribution.md.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+# Releases go out one after the other, in the order CI finishes on main, which is merge order.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    # Only a green CI run for a push to main in this repository; a fork's branch named main does
+    # not count.
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    # A release created with GITHUB_TOKEN does not trigger `on: release` workflows, so later jobs
+    # read the release from these outputs.
+    outputs:
+      version: ${{ steps.version.outputs.name }}
+      version_code: ${{ steps.version.outputs.code }}
+      tag: ${{ steps.version.outputs.tag }}
+      release_url: ${{ steps.publish.outputs.release_url }}
+      apk_url: ${{ steps.publish.outputs.apk_url }}
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    steps:
+      - name: Check the signing secrets
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          missing=0
+          for secret in RELEASE_KEYSTORE_BASE64 RELEASE_KEYSTORE_PASSWORD RELEASE_KEY_ALIAS RELEASE_KEY_PASSWORD; do
+            if [ -z "${!secret}" ]; then
+              echo "::error title=Missing signing secret::The repository secret $secret is not set. Add it as described in README.md (Releases > One-time setup); no release was created."
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Compute the version
+        id: version
+        run: |
+          code="$(git rev-list --count HEAD)"
+          major_minor="$(sed -n 's/^val versionMajorMinor = "\([0-9]*\.[0-9]*\)"$/\1/p' app/build.gradle.kts)"
+          if [ -z "$major_minor" ]; then
+            echo "::error::Could not read versionMajorMinor from app/build.gradle.kts"
+            exit 1
+          fi
+          name="$major_minor.$code"
+          tag="v$name"
+
+          # versionCode is the last part of every release tag; Android only updates to a higher one.
+          for existing in $(git tag --list 'v*'); do
+            existing_code="${existing##*.}"
+            if [ "$existing" != "$tag" ] && [ "$existing_code" -ge "$code" ] 2>/dev/null; then
+              echo "::error::versionCode $code is not greater than release $existing: a newer commit is already released, or main was rewritten"
+              exit 1
+            fi
+          done
+
+          echo "Releasing $tag (versionCode $code) from $(git rev-parse --short HEAD)"
+          {
+            echo "code=$code"
+            echo "name=$name"
+            echo "tag=$tag"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      # The runner image can lag behind compileSdk in gradle/libs.versions.toml; keep the two in step,
+      # as in ci.yml.
+      - name: Install the Android SDK platform
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-37.0"
+
+      - name: Decode the release keystore
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+        run: |
+          keystore="$RUNNER_TEMP/cycle-release.jks"
+          printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$keystore"
+          if [ ! -s "$keystore" ]; then
+            echo "::error::RELEASE_KEYSTORE_BASE64 did not decode to a keystore"
+            exit 1
+          fi
+          echo "RELEASE_KEYSTORE_PATH=$keystore" >> "$GITHUB_ENV"
+
+      - name: Build the signed release APK
+        env:
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          VERSION_CODE: ${{ steps.version.outputs.code }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+        run: ./gradlew :app:assembleRelease "-Pcycle.versionCode=$VERSION_CODE" "-Pcycle.versionName=$VERSION_NAME"
+
+      - name: Verify the APK signature and version
+        id: apk
+        env:
+          VERSION_CODE: ${{ steps.version.outputs.code }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+        run: |
+          # A signed build writes app-release.apk; app-release-unsigned.apk means signing was skipped.
+          apk=app/build/outputs/apk/release/app-release.apk
+          if [ ! -f "$apk" ]; then
+            echo "::error::$apk is missing; never publish an unsigned APK"
+            ls -l app/build/outputs/apk/release/ || true
+            exit 1
+          fi
+          build_tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          "$build_tools/apksigner" verify --verbose "$apk"
+
+          badging="$("$build_tools/aapt2" dump badging "$apk" | head -n 1)"
+          echo "$badging"
+          case "$badging" in
+            *"versionCode='$VERSION_CODE' versionName='$VERSION_NAME'"*) ;;
+            *)
+              echo "::error::The APK is not versionCode $VERSION_CODE, versionName $VERSION_NAME"
+              exit 1
+              ;;
+          esac
+
+          asset="$RUNNER_TEMP/cycle-v$VERSION_NAME.apk"
+          cp "$apk" "$asset"
+          echo "path=$asset" >> "$GITHUB_OUTPUT"
+
+      - name: Build the changelog
+        id: changelog
+        run: |
+          notes="$RUNNER_TEMP/release-notes.md"
+          scripts/release/changelog.sh HEAD > "$notes"
+          cat "$notes"
+          echo "path=$notes" >> "$GITHUB_OUTPUT"
+          delimiter="changelog-$(openssl rand -hex 16)"
+          {
+            echo "changelog<<$delimiter"
+            cat "$notes"
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publish the GitHub Release
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          APK: ${{ steps.apk.outputs.path }}
+          NOTES: ${{ steps.changelog.outputs.path }}
+        run: |
+          # Re-running the job for the same commit gives the same tag; keep the release it already made.
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "::notice::Release $TAG already exists; leaving it as it is"
+          else
+            gh release create "$TAG" "$APK" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$SHA" \
+              --title "$TAG" \
+              --notes-file "$NOTES" \
+              --latest
+          fi
+          release_url="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json url --jq .url)"
+          apk_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/$TAG/$(basename "$APK")"
+          echo "Published $release_url"
+          {
+            echo "release_url=$release_url"
+            echo "apk_url=$apk_url"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Remove the keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/cycle-release.jks"
