@@ -69,6 +69,7 @@ class CatalogScreenshotTest(private val page: Page, private val variant: Variant
             "Icon buttons" to (1160 to 2240),
             "Chips" to (1040 to 1900),
             "Text field" to (1280 to 2240),
+            "Bottom sheet" to (780 to 1700),
             "Day cell" to (1220 to 2360),
             "Cycle legend" to (400 to 700)
         )
