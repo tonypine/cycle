@@ -23,6 +23,15 @@ do not pick a stack on your own.
 Decisions that shape the whole codebase go in `docs/decisions/` as numbered records
 (`NNNN-short-title.md`): what was decided, the options considered, and why.
 
+## Research on the cycle
+
+Before planning a feature, screen, prediction, notification or copy that touches the cycle itself,
+read `docs/research/`, starting with `docs/research/product-implications.md`: what is normal, what
+can be predicted and how well, what to track, when a pattern is worth a doctor's visit, and the
+questions only she can answer. The app never offers contraception or a diagnosis, and labels every
+estimate as one. When a ticket learns something that changes these notes, update them in the same
+PR.
+
 ## UI and the design system
 
 Feature code uses design system components and tokens from `core:designsystem` (`CycleTheme.colors`,
