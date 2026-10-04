@@ -155,14 +155,24 @@ class CalendarViewModelTest {
     }
 
     @Test
-    fun `days after today are not selected or logged`() = calendar { viewModel, _ ->
+    fun `days after today are not selected, logged or cleared`() = calendar { viewModel, _ ->
+        // Logged before the phone's clock went back a day.
+        dayLogs.setFlow(today.plusDays(2), FlowLevel.LIGHT)
+        viewModel.awaitState()
+
         viewModel.onDayClick(today.plusDays(1))
         viewModel.onLogDay(today.plusDays(1), FlowLevel.HEAVY)
         viewModel.onFillPeriod(today.plusDays(1))
-        viewModel.onClearDay(today.plusDays(1))
+        viewModel.onClearDay(today.plusDays(2))
+        // Written after the others, in order, so once it shows, they have run.
+        viewModel.onLogDay(today, FlowLevel.SPOTTING)
+        viewModel.awaitState { it.days.withoutPeriodFlow.isNotEmpty() }
 
         assertNull(viewModel.awaitState().selected)
-        assertEquals(emptyList<DayLog>(), dayLogs.observeDayLogs().first())
+        assertEquals(
+            listOf(DayLog(today, flow = FlowLevel.SPOTTING), DayLog(today.plusDays(2), flow = FlowLevel.LIGHT)),
+            dayLogs.observeDayLogs().first()
+        )
     }
 
     @Test

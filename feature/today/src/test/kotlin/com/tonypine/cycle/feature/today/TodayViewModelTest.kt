@@ -224,6 +224,24 @@ class TodayViewModelTest {
     }
 
     @Test
+    fun `the day log never clears a day after today`() = today { viewModel, _ ->
+        viewModel.onLogPeriod(day("2027-03-02"))
+        // Logged before the phone's clock went back a day.
+        dayLogs.setFlow(today.plusDays(1), FlowLevel.LIGHT)
+        viewModel.awaitState<TodayUiState.Tracking>()
+
+        viewModel.onClearDay(today.plusDays(1))
+        // Written after the clear, in order, so once it shows, the clear has run.
+        viewModel.onLogDay(today, FlowLevel.SPOTTING)
+        viewModel.awaitState<TodayUiState.Tracking> { it.todayLog.flow != null }
+
+        assertEquals(
+            listOf(DayLog(today.plusDays(1), flow = FlowLevel.LIGHT)),
+            dayLogs.observeDayLogs(today.plusDays(1), today.plusDays(1)).first()
+        )
+    }
+
+    @Test
     fun `clearing today takes the day off the period still going`() = today { viewModel, _ ->
         viewModel.onLogPeriod(day("2027-03-18"))
         viewModel.awaitState<TodayUiState.Tracking> { it.onPeriod }

@@ -79,7 +79,9 @@ class TodayViewModel(
     }
 
     /** "Clear this day" on [date]. */
-    fun onClearDay(date: LocalDate) = write { dayLogs.clearDay(date, day.value) }
+    fun onClearDay(date: LocalDate) = write {
+        if (date <= day.value) dayLogs.clearDay(date, day.value)
+    }
 
     /** "No, I didn't miss one": not asked again in this cycle. */
     fun onNoMissedPeriod() = write {
