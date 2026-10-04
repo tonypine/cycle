@@ -34,9 +34,7 @@ class TodayViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<TodayUiState> = day
         .flatMapLatest { day ->
-            combine(cycles.observeDay(day), settings.settings) { dayOverview, settings ->
-                TodayUiState.from(dayOverview.overview, settings, dayOverview.log)
-            }
+            combine(cycles.observeLog(day), settings.settings) { log, settings -> TodayUiState.from(log, settings) }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), TodayUiState.Loading)
 
@@ -68,8 +66,25 @@ class TodayViewModel(
         dayLogs.setPeriodStarted(start, started = true)
     }
 
-    /** The flow she picked in the day log sheet for today, or null to clear it. */
-    fun onFlowChange(flow: FlowLevel?) = write { dayLogs.setFlow(day.value, flow) }
+    /** "Log it" in the day log sheet: the flow she picked for [date], or null for none. */
+    fun onLogDay(date: LocalDate, flow: FlowLevel?) = write {
+        if (date <= day.value) dayLogs.setFlow(date, flow)
+    }
+
+    /** "Period started this day: fill in N days" on [start], N being her usual period length. */
+    fun onFillPeriod(start: LocalDate) = write {
+        val today = day.value
+        if (start > today) return@write
+        dayLogs.fillPeriod(start, cycles.observeLog(today).first().usualPeriodLength, today)
+    }
+
+    /** "Clear this day" on [date]. */
+    fun onClearDay(date: LocalDate) = write { dayLogs.clearDay(date, day.value) }
+
+    /** "No, I didn't miss one": not asked again in this cycle. */
+    fun onNoMissedPeriod() = write {
+        (uiState.value as? TodayUiState.Tracking)?.missedPeriod?.let { settings.dismiss(it.prompt) }
+    }
 
     /** "Still going": not asked again for this period. */
     fun onStillGoing() = write { stillGoing()?.let { settings.dismiss(it.prompt) } }
