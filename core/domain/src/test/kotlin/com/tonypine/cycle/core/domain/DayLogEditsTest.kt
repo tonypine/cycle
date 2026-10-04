@@ -177,6 +177,31 @@ class DayLogEditsTest {
     }
 
     @Test
+    fun `clearing two days side by side in the middle of a period logged as flow keeps one period`() {
+        var logs = bleed(day("2027-03-02"), 6)
+        logs = apply(logs, DayLogEdits.clear(logs, day("2027-03-04"), today))
+
+        logs = apply(logs, DayLogEdits.clear(logs, day("2027-03-05"), today))
+
+        assertEquals(listOf(Period(day("2027-03-02"), day("2027-03-07"))), periods(logs))
+        assertDrawsPlain(logs, day("2027-03-04"))
+        assertDrawsPlain(logs, day("2027-03-05"))
+    }
+
+    @Test
+    fun `clearing the day she marked started, after a day of flow, keeps the period going`() {
+        val logs = listOf(
+            DayLog(day("2027-03-16"), flow = FlowLevel.MEDIUM),
+            DayLog(day("2027-03-17"), periodStarted = true)
+        )
+
+        val after = apply(logs, DayLogEdits.clear(logs, day("2027-03-17"), today))
+
+        assertEquals(listOf(Period(day("2027-03-16"), today, isOpen = true)), periods(after))
+        assertDrawsPlain(after, day("2027-03-17"))
+    }
+
+    @Test
     fun `clearing a day with no period, or a one-day period, removes it`() {
         val spotting = listOf(DayLog(day("2027-03-12"), flow = FlowLevel.SPOTTING))
         assertEquals(listOf(DayLog(day("2027-03-12"))), DayLogEdits.clear(spotting, day("2027-03-12"), today))

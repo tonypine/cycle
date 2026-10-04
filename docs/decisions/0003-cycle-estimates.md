@@ -88,7 +88,10 @@ unless a migration changes them.
     the nearest such day before is marked ended, which also closes a period still going today. Days
     she cleared before are skipped, so a marker never puts them back on the period. A day in the
     middle is logged as no flow, a gap day: splitting the period instead would invent a cycle of a
-    few days and skew every estimate.
+    few days and skew every estimate. When that gap day would still cut the period short (a second
+    cleared day next to it in a period logged as flow alone, or the day held its "started"), the
+    period's first day is marked started and, unless it is still going, its last day ended, so it
+    keeps the same days.
   - The calendar draws a day logged with no period flow and no marker (none or spotting) as plain,
     even inside a period, so a cleared middle day shows as cleared while the period stays one.
 - Life stages (pregnancy, after birth, hormonal contraception) and cycles to exclude are not modelled

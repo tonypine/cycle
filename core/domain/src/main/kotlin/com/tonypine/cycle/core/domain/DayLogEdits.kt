@@ -50,8 +50,11 @@ object DayLogEdits {
      * that still draws as a period day; on its last, the nearest such day before becomes the last,
      * marked ended, which also closes a period still going today. Days she already cleared are
      * skipped, so they stay cleared; when none is left, the period goes. A day in the middle is
-     * logged as no flow: a gap of one day stays inside the period, so it neither splits it nor
-     * invents a cycle of a few days.
+     * logged as no flow and the period keeps its days, so clearing it neither splits the period nor
+     * invents a cycle of a few days. A gap of one day stays inside a period on its own; when the
+     * cleared day would cut it short (a wider gap in a period logged as flow alone, or the day held
+     * its "started"), its first day is marked started and, unless it is still going, its last day
+     * ended.
      */
     fun clear(logs: List<DayLog>, date: LocalDate, today: LocalDate): List<DayLog> {
         val days = logs.associateBy { it.date }
@@ -84,7 +87,19 @@ object DayLogEdits {
                 listOf(cleared)
             }
 
-            else -> listOf(DayLog(date, flow = FlowLevel.NONE))
+            else -> {
+                val gap = DayLog(date, flow = FlowLevel.NONE)
+                val whole = CycleCalculator.periods(logs.filterNot { it.date == date } + gap, today)
+                    .any { it == period }
+                if (whole) {
+                    listOf(gap)
+                } else {
+                    val first = (days[period.start] ?: DayLog(period.start)).copy(periodStarted = true)
+                    val last = (days[period.end] ?: DayLog(period.end)).copy(periodEnded = true)
+                        .takeUnless { period.isOpen }
+                    listOfNotNull(first, gap, last)
+                }
+            }
         }
     }
 
