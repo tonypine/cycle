@@ -43,20 +43,20 @@ val CycleContrastPairs: List<ContrastPair> = listOf(
         { it.surfaceContainer }
     ),
     ContrastPair(
-        "Secondary text on raised surface",
-        "onSurfaceVariant",
-        "surfaceContainerHigh",
-        TEXT_CONTRAST,
-        { it.onSurfaceVariant },
-        { it.surfaceContainerHigh }
-    ),
-    ContrastPair(
         "Secondary text on card",
         "onSurfaceVariant",
         "surfaceContainer",
         TEXT_CONTRAST,
         { it.onSurfaceVariant },
         { it.surfaceContainer }
+    ),
+    ContrastPair(
+        "Secondary text on raised surface",
+        "onSurfaceVariant",
+        "surfaceContainerHigh",
+        TEXT_CONTRAST,
+        { it.onSurfaceVariant },
+        { it.surfaceContainerHigh }
     ),
     ContrastPair("Text on accent", "onAccent", "accent", TEXT_CONTRAST, { it.onAccent }, { it.accent }),
     ContrastPair(

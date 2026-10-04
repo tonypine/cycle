@@ -355,6 +355,76 @@ under `CycleTheme(reduceMotion = true)`.
 Don't use it for a wait under a second (show nothing), or when you know how far along the work is
 (that needs a determinate progress component, still to come).
 
+## Top app bar
+
+`TopAppBar.kt`. The bar at the top of a screen: an optional navigation icon button, the screen's
+title, and up to two action icon buttons, on `surface`, at least 64dp tall.
+
+```kotlin
+TopAppBar(
+    title = "Calendar",
+    navigation = AppBarAction(CycleIcons.Back, "Back", onBack),
+    actions = listOf(
+        AppBarAction(CycleIcons.Today, "Go to today", onToday),
+        AppBarAction(CycleIcons.Settings, "Settings", onSettings)
+    )
+)
+```
+
+- `AppBarAction(icon, contentDescription, onClick, interactionSource = null)` draws an `IconButton`:
+  name the action, not the icon. `actions` holds at most two (`MAX_TOP_APP_BAR_ACTIONS`); anything
+  more belongs on the screen.
+- The title is `title` type in `onSurface`, with `heading()` semantics so TalkBack users can jump to
+  it. TalkBack reads the navigation button, then the title, then the actions.
+- The title stays on one line and ends in an ellipsis when it runs out of room, at any font scale, so
+  the actions never leave the screen.
+- Edge to edge: put it at the top of a screen drawn with `enableEdgeToEdge()`. It pads itself by
+  `WindowInsets.statusBars`, plus the display cutout and navigation bar on either side, and fills the
+  space behind the status bar with `surface`.
+
+Don't use it inside a page or a card: it is the screen's header, one per screen. Don't add a third
+action; move it onto the screen.
+
+## Navigation bar
+
+`NavigationBar.kt`. The app's top-level navigation: three to five destinations in a floating,
+rounded `surfaceContainer` bar (Zest floats it, with `CycleTheme.elevation.level1` and 32dp
+corners, 12dp in from the screen edges).
+
+```kotlin
+val destinations = listOf(
+    NavigationDestination("Today", CycleIcons.Today),
+    NavigationDestination("Calendar", CycleIcons.Calendar),
+    NavigationDestination("Settings", CycleIcons.Settings)
+)
+NavigationBar(destinations, selectedIndex = selected, onSelect = { selected = it })
+```
+
+- Each destination shows its icon over a one-word label in `labelSmall`. The selected one sits on an
+  `accentContainer` pill with an `onAccentContainer` icon and an `onSurface` label; the others are
+  `onSurfaceVariant` (the "Secondary text on card" contrast pair).
+- When the selection changes, the pill slides to the new destination and stretches on the way: its
+  leading edge moves on the fast spatial spring and its trailing edge on the default spatial spring.
+  Icon and label colours change on the default effects spring. Under reduce motion all of it jumps.
+- Each destination is a tab (`Role.Tab`, in a `selectableGroup`) at least 48dp tall, with its selected
+  state and its position (`CollectionInfo` on the bar, `CollectionItemInfo` on each tab), so TalkBack
+  reads "Calendar, selected, tab, 2 of 4". The icon is decoration.
+- At large font scales, labels that do not fit shrink together, never below their size at 100%, and
+  only then end in an ellipsis. Keep labels to one short word.
+- Edge to edge: put it at the bottom of the screen. It pads itself by `WindowInsets.navigationBars`.
+- `interactionSources` takes one source per destination, for previews and tests to hold a pressed or
+  focused state.
+
+The catalog's App bars page has a full-screen demo with both bars on an edge-to-edge screen, the
+system bars shaded. `AppBarSemanticsTest` checks the heading, tab roles, selected state, positions
+and TalkBack order, `NavigationBarMotionTest` measures the pill mid-spring and under reduce motion,
+`AppBarInsetsTest` and the catalog's `AppBarsDemoScreenshotTest` dispatch system bar insets and check
+both bars stay clear of them.
+
+Don't use the navigation bar for actions (use buttons), for fewer than three destinations (use the
+top app bar's navigation), or for switching views inside one screen (that is a connected button
+group, still to come).
+
 ## Previews
 
 `@Preview` works in every Compose module. The `cycle.android.compose` convention plugin adds
@@ -553,7 +623,8 @@ A whole new token set (motion, for example) gets its own `Immutable` class, a `L
    and a `ComponentStateMatrixRule` test for its screenshots and accessibility checks (see
    [Testing components](#testing-components)).
 4. Add a catalog entry: one `CatalogSection` in `app-catalog`'s `CatalogSections` showing every
-   state. `CatalogScreenshotTest` captures each section in light, dark, 200% font scale and
+   state. A component that needs the whole screen, such as the app bars, also passes a `demo`, which
+   the page opens full screen. `CatalogScreenshotTest` captures each section in light, dark, 200% font scale and
    right-to-left; give the new section a page height there.
 5. Add a section for the component to this file: what it is for, its parameters, and when not to
    use it.

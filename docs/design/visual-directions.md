@@ -291,8 +291,8 @@ Contrast (WCAG 2.x ratios, computed from the hex values above):
 | Body text on surface (`onSurface` on `surface`) | 4.5:1 | 16.88 | 15.23 |
 | Secondary text on surface (`onSurfaceVariant` on `surface`) | 4.5:1 | 8.20 | 10.73 |
 | Text on card (`onSurface` on `surfaceContainer`) | 4.5:1 | 15.62 | 13.90 |
+| Secondary text on card, navigation label, dialog body (`onSurfaceVariant` on `surfaceContainer`) | 4.5:1 | 7.59 | 9.80 |
 | Secondary text on raised surface (`onSurfaceVariant` on `surfaceContainerHigh`) | 4.5:1 | 6.89 | 8.57 |
-| Secondary text on card (dialog body) (`onSurfaceVariant` on `surfaceContainer`) | 4.5:1 | 7.59 | 9.80 |
 | Text on accent (primary button) (`onAccent` on `accent`) | 4.5:1 | 7.17 | 7.72 |
 | Text on accent container (selected chip) (`onAccentContainer` on `accentContainer`) | 4.5:1 | 13.31 | 7.25 |
 | Accent as text/link on surface (`accent` on `surface`) | 4.5:1 | 6.99 | 10.86 |
