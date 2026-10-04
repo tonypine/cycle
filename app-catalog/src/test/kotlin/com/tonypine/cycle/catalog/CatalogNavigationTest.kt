@@ -5,6 +5,7 @@ import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -41,6 +42,21 @@ class CatalogNavigationTest {
 
         composeRule.onNode(isDialog()).assertDoesNotExist()
         composeRule.onNodeWithText("Closed 1 time.").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun theAppBarsDemoOpensFullScreenAndBackReturnsToItsPage() {
+        composeRule.onNodeWithText("App bars").performScrollTo().performClick()
+        composeRule.onNodeWithText("Open the full-screen demo").performClick()
+        composeRule.onNodeWithText("Sample card 1").assertIsDisplayed()
+        composeRule.onNodeWithText("Open the full-screen demo").assertDoesNotExist()
+
+        composeRule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+        composeRule.onNodeWithText("Open the full-screen demo").assertIsDisplayed()
+
+        composeRule.onNodeWithText("Open the full-screen demo").performClick()
+        composeRule.onNodeWithContentDescription("Back to the catalog").performClick()
+        composeRule.onNodeWithText("Open the full-screen demo").assertIsDisplayed()
     }
 
     @Test
