@@ -79,7 +79,6 @@ Can move earlier if she wants them sooner; none depend on the steps above.
 
 - App lock (PIN or biometric), hidden content in the recent-apps preview, delete everything.
 - Import from a CSV export of another tracker, if she has history elsewhere.
-- A backup decision record (see [`apps-and-privacy.md`](apps-and-privacy.md)).
 
 ### 6. Only if she asks
 
@@ -137,7 +136,9 @@ next planning ticket.
    [`tracking-data.md`](tracking-data.md) is a menu, not a requirement.
 5. **Does she want health signal cards**, and a doctor summary?
 6. **Which reminders, if any**, and how discreet should they be?
-7. **Does she want an app lock**, and should backups require end-to-end encryption?
+7. **Does she want an app lock?** Backups already require end-to-end encryption, so a phone without
+   a screen lock gets none ([`0004`](../decisions/0004-backup-encryption.md)); if she would rather
+   have an unencrypted backup than none, that record changes.
 
 ## Effects on what already exists
 
@@ -146,6 +147,6 @@ next planning ticket.
   "estimated" ([MOT-29](https://linear.app/tonypine/issue/MOT-29)).
 - The `Predicted period` day state (dashed edge on a pale fill) already reads as uncertain; the range
   of a predicted period could use the same treatment, with the most likely start emphasised.
-- `allowBackup="true"` with no backup rules sends the database to Google Drive whether or not the
-  backup is end-to-end encrypted ([`apps-and-privacy.md`](apps-and-privacy.md),
+- Backups to Google Drive carry the database and settings only when end-to-end encrypted with the
+  phone's screen lock ([`0004`](../decisions/0004-backup-encryption.md),
   [MOT-28](https://linear.app/tonypine/issue/MOT-28)).
