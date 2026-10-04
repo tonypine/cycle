@@ -28,7 +28,11 @@ val CatalogSections: List<CatalogSection> = listOf(
     CatalogSection("Indication", "The state layer, press scale and focus ring in every state.") {
         IndicationSection()
     },
-    CatalogSection("Icons", "Every Material Symbols Rounded icon the app ships.") { IconsSection() }
+    CatalogSection("Icons", "Every Material Symbols Rounded icon the app ships.") { IconsSection() },
+    CatalogSection("Day cell", "Every cycle state, today on each, the interaction states, a sample week and logging.") {
+        DayCellSection()
+    },
+    CatalogSection("Cycle legend", "One swatch per cycle state, with its label.") { CycleLegendSection() }
 )
 
 @Composable
