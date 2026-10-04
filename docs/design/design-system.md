@@ -84,7 +84,7 @@ content in `onSurface` at `stateAlpha.disabledContent`.
   shape to `background` and `cycleIndication`.
 - `MorphShape(morph, progress)` and `animatedMorphShape(start, end, atEnd)` turn a `graphics-shapes`
   `Morph` between two `RoundedPolygon`s into a Compose `Shape` (`Morph.toPath`, `Outline.Generic`).
-  `CyclePolygons` holds Zest's `circle` and eight-point `sun`. Keep morphs for moments that mean
+  `CyclePolygons` holds Zest's `circle`, period `squircle` and eight-point `sun`. Keep morphs for moments that mean
   something: a day being logged, the ovulation day.
 
 `androidx.graphics:graphics-shapes` is the one extra dependency: Compose Foundation has no polygon
@@ -129,6 +129,66 @@ convert it the same way as the existing files (960 viewport, `translateY="960"` 
 the header comment), and add an entry to `CycleIcons`. The Apache 2.0 text sits next to the assets in
 `res/raw/license_material_symbols.txt`, ships in the APK, and is listed in `OpenSourceNotices`.
 
+## Day cell
+
+`DayCell` draws one day of the calendar in Zest's shape for its cycle state, so no state relies on
+colour alone:
+
+| `CycleDayState` | Shape | Colours |
+| -- | -- | -- |
+| `Plain` | The number on its own | `onSurface` |
+| `Period` | Solid squircle (14dp corners at 36dp) | `period`, number `onPeriod` |
+| `PredictedPeriod` | Pale squircle with a 2dp dashed edge | `predicted`, edge `predictedEdge`, number `onSurface` |
+| `Fertile` | Tinted circle with a marker dot under the number | `fertile`, dot `ovulation`, number `onFertile` |
+| `Ovulation` | Soft eight-point sun (`CyclePolygons.sun`) | `ovulation`, number `onOvulation` |
+
+Three flags combine with every state:
+
+- `isToday` adds a 3dp `today` ring and the bolder `dayNumberEmphasized`. The shape shrinks to 85% to
+  sit inside the ring, so the ring always lies on `surface` and never hides a corner, edge or point.
+- `selected` adds a 2dp `accent` rounded-square frame (`shapes.medium`) on the cell's edge. It is
+  square where the today ring is round, so the two read apart without colour, and the cell exposes
+  `selected` to TalkBack.
+- `enabled = false`, for a day outside the month or in the future, draws the whole cell at
+  `stateAlpha.disabledContent` and ignores taps. The state's shape stays visible.
+
+Pressed and focused come from `cycleIndication` in the `shapes.medium` tile: the state layer, the
+press scale and the focus ring.
+
+```kotlin
+DayCell(
+    date = date,
+    state = CycleDayState.Period,
+    onClick = { onDayClick(date) },
+    isToday = date == today,
+    selected = date == selectedDate,
+    enabled = date.month == shownMonth && !date.isAfter(today)
+)
+```
+
+When `state` changes to `Period`, the fill morphs from the plain circle to the period squircle on
+the default spatial spring (`animatedMorphShape(CyclePolygons.circle, CyclePolygons.squircle, ...)`),
+a small celebration of logging the day. Under reduce motion it jumps to the squircle. A cell that
+starts as a period day shows the squircle straight away.
+
+The cell is at least 48dp square and grows with large text, so the shape always holds the number (58dp
+at 200%). Its geometry scales with the cell's smaller side. It is a `Role.Button` whose content
+description is the date in the locale's day-and-month form, then "today" and the state: "20 March,
+today, period", "14 March, predicted period". The visible number is hidden from TalkBack, so it is
+not read twice. The words live in `core:designsystem`'s `strings.xml`.
+
+Do not use it for a date picker that has no cycle meaning, and do not tint a cell with other colours:
+a new cycle state needs a new `CycleDayState` with its own shape.
+
+## Cycle legend
+
+`CycleLegend()` is the calendar's key: one swatch per state (period, predicted period, fertile
+window, ovulation, today), each drawn by the same code as the cells at 32dp, with its label in
+`bodySmall` `onSurfaceVariant`. It is a `FlowRow`, so the entries wrap when the text is large, and it
+exposes `CollectionInfo` with one `CollectionItemInfo` per entry, so TalkBack reads it as a list of
+five. The swatches are decorative; the label says what each one is. Put it under the calendar it
+explains.
+
 ## Previews
 
 `@Preview` works in every Compose module. The `cycle.android.compose` convention plugin adds
@@ -142,16 +202,18 @@ metadata rule, `DropToolingMaterial`, that removes those two groups from `ui-too
 dependencies and nothing else. `checkNoMaterialDependencies` has **no exception**: it still checks every
 debug, release and unit test classpath, and fails if anything else brings Material in.
 
-The interaction previews live in `core/designsystem/.../InteractionPreviews.kt`.
+The interaction previews live in `core/designsystem/.../InteractionPreviews.kt`; each component keeps
+its previews next to it, in its own file (`DayCell.kt`, `CycleLegend.kt`).
 
 ## Testing components
 
 `core/designsystem/src/test/.../testing/ComponentStateMatrix.kt` is the shared harness every
 component test uses. `ComponentStateMatrix.cases(states)` lists each state (default, pressed,
-focused, disabled, error, and optionally hovered) in light and dark, plus the default state at 200%
-font scale and right-to-left. `ComponentStateMatrixRule.capture(name, case) { ... }` renders the
-component in `CycleTheme`, drives the interaction state through the `interactionSource` it hands
-you, records `src/test/screenshots/<name>_<state>_<appearance>.png`, and checks accessibility:
+focused, disabled, error, and optionally hovered and selected) in light and dark, plus the default
+state at 200% font scale and right-to-left. `ComponentStateMatrixRule.capture(name, case) { ... }`
+renders the component in `CycleTheme`, drives the interaction state through the
+`interactionSource` it hands you (wire `enabled`, `selected` and `isError` for the rest), records
+`src/test/screenshots/<name>_<state>_<appearance>.png`, and checks accessibility:
 
 - every clickable must be laid out at least 48dp in both directions (a JVM check: Compose stretches
   a small clickable's touch bounds to 48dp and reports those to accessibility, so the Accessibility
