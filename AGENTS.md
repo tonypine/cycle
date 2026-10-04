@@ -45,12 +45,29 @@ Reusable playbooks live under `.ai/skills/` and are shared between agents throug
 
 ## Validation
 
-Run from the repo root with JDK 21. Every command must pass before a change is called done; CI
-(`.github/workflows/ci.yml`) runs the same set on every PR:
+Run from the repo root with JDK 21. Checks are split by cost: cheap, targeted checks run locally
+before every push, and the slow full set runs only in CI, which is the gate.
+
+Before a push, run `ktlintCheck` and the unit tests and screenshot checks of each module the change
+touches (`:app`, `:app-catalog`, `:core:designsystem`, `:core:ui`). Each takes seconds:
+
+```sh
+./gradlew ktlintCheck
+./gradlew :core:designsystem:verifyRoborazziDebug   # the module's unit tests, screenshots verified
+# or only the changed test classes, screenshots still verified:
+./gradlew :core:designsystem:testDebugUnitTest --tests '*CycleTextFieldTest' -Proborazzi.test.verify=true
+```
+
+CI only: the `build` job in `.github/workflows/ci.yml` runs the full set on every PR and on `main`,
+and a red check goes through Symphony's CI-fix flow:
 
 ```sh
 ./gradlew ktlintCheck lint testDebugUnitTest verifyRoborazziDebug assembleDebug
 ```
+
+The full set stays available as an optional local run for changes that reach every module, such as
+`build-logic`, `gradle/libs.versions.toml` or an API change in a shared `core` module. Say why in the
+workpad when you run it.
 
 - `ktlintCheck`: formatting, including `build-logic`. `./gradlew ktlintFormat` fixes most issues.
 - `lint`: Android Lint. Errors fail the build.

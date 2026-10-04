@@ -61,8 +61,11 @@ Cycle: a native menstrual cycle tracking app, Android first. Read `AGENTS.md`, `
   need no build. A ticket that scaffolds the app must add its validation commands to `AGENTS.md`
   and a CI workflow that runs them.
 - Builds and test runs can be slow. Use long tool waits and sparse polling rather than tight loops.
-- Match the test command to the loop: a targeted test during iteration, the full validation set
-  before every push.
+- Match the test command to the loop: a targeted test during iteration, and the targeted pre-push
+  checks under `Validation` in `AGENTS.md` (`ktlintCheck` plus the touched modules' unit tests and
+  screenshot checks) before every push. CI runs the full set (`lint`, every module's tests and
+  screenshots, `assembleDebug`) and is the gate. Run the full set locally only for changes that reach
+  every module, such as `build-logic` or `gradle/libs.versions.toml`, and say why in the workpad.
 - Keep tool output focused by default. For broad searches, diffs, and file reads, start with
   targeted `rg` queries, `sed -n` ranges, and modest output caps. Raise caps only after narrowing
   the command to the exact file or hunk needed.
@@ -169,7 +172,7 @@ Cycle: a native menstrual cycle tracking app, Android first. Read `AGENTS.md`, `
 5.  Run validation/tests required for the scope.
     - Mandatory gate: execute all ticket-provided `Validation`/`Test Plan`/ `Testing` requirements when present; treat unmet items as incomplete work.
     - Prefer a targeted proof that directly demonstrates the behavior you changed.
-    - Run every validation command listed in `AGENTS.md` (see `Command and output hygiene`).
+    - Run the pre-push checks listed under `Validation` in `AGENTS.md` for the modules you touched (see `Command and output hygiene`); leave the full set to CI.
     - For long-running validation, use long waits and sparse polling so progress-only terminal output does not create many tiny transcript events.
     - Keep terminal output fed back into the model small: preserve failing command, exit code, and the most relevant error lines; summarize successful or repetitive output instead of pasting complete logs.
     - You may make temporary local proof edits to validate assumptions (for example: tweak a local build input, or hardcode a UI account / response path) when this increases confidence.
