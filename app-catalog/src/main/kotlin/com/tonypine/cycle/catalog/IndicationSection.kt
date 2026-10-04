@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
 import com.tonypine.cycle.core.designsystem.CycleIcons
 import com.tonypine.cycle.core.designsystem.CycleTheme
+import com.tonypine.cycle.core.designsystem.FilledButton
 import com.tonypine.cycle.core.designsystem.PRESSED_SCALE
 
 @Composable
@@ -20,7 +21,7 @@ internal fun IndicationSection() {
         CycleTheme.typography.bodySmall,
         color = CycleTheme.colors.onSurfaceVariant
     )
-    DemoButton("Log it", onClick = {}, icon = CycleIcons.Check)
+    FilledButton("Log it", onClick = {}, icon = CycleIcons.Check)
 
     SubsectionTitle("States")
     listOf<Triple<String, Interaction?, String>>(
@@ -37,13 +38,13 @@ internal fun IndicationSection() {
             "${CycleTheme.stateAlpha.pressed.percent()} layer, ${PRESSED_SCALE.percent()} scale, pill to 14dp."
         )
     ).forEach { (name, interaction, note) ->
-        StateRow(note) { DemoButton(name, onClick = {}, interactionSource = rememberHeldInteraction(interaction)) }
+        StateRow(note) { FilledButton(name, onClick = {}, interactionSource = rememberHeldInteraction(interaction)) }
     }
     StateRow(
         "Container ${CycleTheme.stateAlpha.disabledContainer.percent()}, content " +
             "${CycleTheme.stateAlpha.disabledContent.percent()} onSurface."
     ) {
-        DemoButton("Disabled", onClick = {}, enabled = false)
+        FilledButton("Disabled", onClick = {}, enabled = false)
     }
 }
 

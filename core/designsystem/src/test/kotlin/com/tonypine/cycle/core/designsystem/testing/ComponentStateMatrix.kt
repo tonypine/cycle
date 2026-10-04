@@ -90,6 +90,17 @@ object ComponentStateMatrix {
         ComponentState.Error
     )
 
+    /** The states of a control with no error state: buttons, icon buttons. */
+    val PressableStates = listOf(
+        ComponentState.Default,
+        ComponentState.Pressed,
+        ComponentState.Focused,
+        ComponentState.Disabled
+    )
+
+    /** [PressableStates] plus selected, for chips and toggles. */
+    val SelectableStates = PressableStates + ComponentState.Selected
+
     /** The states a text input covers: empty, filled, focused, disabled and error. */
     val InputStates = listOf(
         ComponentState.Default,
@@ -100,14 +111,20 @@ object ComponentStateMatrix {
     )
 
     /**
-     * Every state in light and dark, plus the default state at 200% font scale and right-to-left.
-     * Return it from a `@ParameterizedRobolectricTestRunner.Parameters` function.
+     * Every state in light and dark, plus [layoutStates] (the default state, unless a selected one
+     * changes the layout too) at 200% font scale and right-to-left. Return it from a
+     * `@ParameterizedRobolectricTestRunner.Parameters` function.
      */
-    fun cases(states: List<ComponentState> = InteractiveStates): List<Array<Any>> {
+    fun cases(
+        states: List<ComponentState> = InteractiveStates,
+        layoutStates: List<ComponentState> = listOf(ComponentState.Default)
+    ): List<Array<Any>> {
         val themed = states.flatMap { state ->
             listOf(Appearance.Light, Appearance.Dark).map { MatrixCase(state, it) }
         }
-        val layout = listOf(Appearance.FontScale200, Appearance.Rtl).map { MatrixCase(ComponentState.Default, it) }
+        val layout = layoutStates.flatMap { state ->
+            listOf(Appearance.FontScale200, Appearance.Rtl).map { MatrixCase(state, it) }
+        }
         return (themed + layout).map { arrayOf<Any>(it) }
     }
 }

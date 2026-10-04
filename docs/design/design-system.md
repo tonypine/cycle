@@ -76,6 +76,12 @@ Row(
 A disabled component draws its container in `onSurface` at `stateAlpha.disabledContainer` and its
 content in `onSurface` at `stateAlpha.disabledContent`.
 
+That is how the [buttons, icon buttons and chips](#buttons) are built; use them rather than
+repeating it. A new control that draws smaller than 48dp puts `Modifier.minimumTouchTarget()` right
+after its `clickable`, `selectable` or `toggleable` (with `indication = null`), and draws the
+indication on its visible container with `Modifier.indication(interactionSource, cycleIndication(shape, color))`,
+so the touch target is 48dp while the state layer, press scale and focus ring follow the container.
+
 ### Shape change
 
 - `animatedCornerShape(active, restingCorner, activeCorner)` springs a rounded rectangle's corners
@@ -128,6 +134,81 @@ To add an icon, download its SVG from
 convert it the same way as the existing files (960 viewport, `translateY="960"` group, black fill,
 the header comment), and add an entry to `CycleIcons`. The Apache 2.0 text sits next to the assets in
 `res/raw/license_material_symbols.txt`, ships in the APK, and is listed in `OpenSourceNotices`.
+
+## Buttons
+
+`Buttons.kt`. One action, with a short verb label ("Log it", "Save", "Nah") and an optional leading
+`icon: CycleIcons`.
+
+| Component | Looks | For |
+| -- | -- | -- |
+| `FilledButton` | `accent` pill, `onAccent` label | The screen's main action. One per screen at most. |
+| `TonalButton` | `accentContainer` pill, `onAccentContainer` label | A secondary action that still needs weight. |
+| `OutlinedButton` | `accent` label in a 1dp `outline` border | The other action next to a filled button ("Cancel" beside "Save"). |
+| `TextButton` | `accent` label, no container | The lightest action: dialogs, "Show all" under a list. |
+
+```kotlin
+FilledButton(text = "Log it", onClick = onLog, icon = CycleIcons.Add)
+TextButton(text = "Nah", onClick = onDismiss, enabled = canDismiss)
+```
+
+Parameters: `text`, `onClick`, `modifier`, `icon` (null), `enabled` (true) and `interactionSource`.
+Each is a 40dp pill in a 48dp touch target (`Modifier.fillMaxWidth()` stretches it). Pressing squashes
+its corners from the pill to 14dp on the default spatial spring, on top of the theme's state layer
+and 94% press scale; under reduce motion the corners jump. TalkBack reads the label and "button";
+the icon is decoration and is not read. Disabled buttons use the disabled alphas (outlined and text
+buttons keep no container).
+
+Don't use a button for an option that stays on (use a `FilterChip`), or for navigation inside a list
+row (make the row clickable).
+
+## Icon buttons
+
+`IconButtons.kt`. An action shown as an icon alone, where a label would not fit: month arrows,
+"Add" in a bar.
+
+| Component | Looks | For |
+| -- | -- | -- |
+| `IconButton` | `onSurface` icon, no container | Most icon actions: previous and next month, close. |
+| `FilledIconButton` | `accent` circle, `onAccent` icon | The main action as an icon. |
+| `TonalIconButton` | `accentContainer` circle, `onAccentContainer` icon | A secondary icon action that needs weight. |
+| `IconToggleButton` | `onSurfaceVariant` icon; `accentContainer` circle when `checked` | A setting turned on and off in place. |
+
+```kotlin
+IconButton(CycleIcons.ChevronEnd, contentDescription = "Next month", onClick = onNextMonth)
+IconToggleButton(CycleIcons.Calendar, "Show the calendar", checked = showCalendar, onCheckedChange = { showCalendar = it })
+```
+
+`contentDescription` is required: name the action ("Next month"), not the icon ("Chevron"). For a
+toggle, describe the setting, not its state: TalkBack adds "checkbox" and "checked" or "not checked"
+from its toggleable semantics (`Role.Checkbox`). Each is a 40dp circle in a 48dp touch target and
+squashes to 14dp corners while pressed, like a button. Prefer a labelled button whenever there is
+room: an icon alone is harder to understand.
+
+## Chips
+
+`Chips.kt`. Small options and suggestions that sit with content, 36dp tall in a 48dp touch target,
+with an `onSurfaceVariant` label in a 1dp `outline` border and 12dp corners
+(`CycleTheme.shapes.small`). Lay them out in a `FlowRow` with `CycleTheme.spacing.small` between.
+
+- `FilterChip(label, selected, onClick)`: one option that stays on, such as a symptom. Selected, it
+  fills with `accentContainer`, shows a check before the label, and its corners grow into a pill:
+  the shape on the fast spatial spring and the colours on the default effects spring, all jumping
+  under reduce motion. The selection never relies on colour alone. TalkBack reads the label,
+  "checkbox" and "selected" or "not selected" (`selectable` with `Role.Checkbox`).
+- `AssistChip(label, onClick, icon = null)`: a suggested next step that acts once, such as "Add a
+  note" under a logged day. It has no selected state; TalkBack reads it as a button.
+
+```kotlin
+FlowRow(horizontalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small)) {
+    symptoms.forEach { symptom ->
+        FilterChip(symptom.label, selected = symptom in logged, onClick = { onToggle(symptom) })
+    }
+}
+```
+
+Don't use chips for the screen's main action (use a `FilledButton`), or for choosing exactly one of
+a few options (that is a connected button group, still to come).
 
 ## Day cell
 
@@ -202,18 +283,22 @@ metadata rule, `DropToolingMaterial`, that removes those two groups from `ui-too
 dependencies and nothing else. `checkNoMaterialDependencies` has **no exception**: it still checks every
 debug, release and unit test classpath, and fails if anything else brings Material in.
 
-The interaction previews live in `core/designsystem/.../InteractionPreviews.kt`; each component keeps
-its previews next to it, in its own file (`DayCell.kt`, `CycleLegend.kt`).
+The interaction previews live in `core/designsystem/.../InteractionPreviews.kt`, with
+`PreviewSurface` and `rememberInteractionSourceIn` for holding a pressed or focused state still. Each
+component keeps its previews next to it, at the bottom of its own file (`Buttons.kt`, `DayCell.kt`,
+`CycleLegend.kt`), in light and dark.
 
 ## Testing components
 
 `core/designsystem/src/test/.../testing/ComponentStateMatrix.kt` is the shared harness every
-component test uses. `ComponentStateMatrix.cases(states)` lists each state (default, pressed,
-focused, disabled, error, and optionally hovered and selected; `InputStates` swaps pressed for
-filled, for text inputs) in light and dark, plus the default state at 200% font scale and
-right-to-left. `ComponentStateMatrixRule.capture(name, case) { ... }` renders the component in
-`CycleTheme`, drives the interaction state through the `interactionSource` it hands you (wire
-`enabled`, `selected` and `isError` for the rest), records
+component test uses. `ComponentStateMatrix.cases(states, layoutStates)` lists each state
+(default, pressed, focused, disabled, error, selected, and optionally hovered) in light and dark,
+plus each of `layoutStates` (the default state unless you pass more) at 200% font scale and
+right-to-left. `PressableStates` suits buttons, `SelectableStates` adds selected for chips and
+toggles, `InteractiveStates` adds error for fields, and `InputStates` swaps pressed for filled, for
+text inputs. `ComponentStateMatrixRule.capture(name, case) { ... }` renders the component in
+`CycleTheme`, drives the interaction state through the `interactionSource` it hands you, along with
+`enabled`, `isError` and `selected` for its parameters, records
 `src/test/screenshots/<name>_<state>_<appearance>.png`, and checks accessibility:
 
 - every clickable must be laid out at least 48dp in both directions (a JVM check: Compose stretches
@@ -231,12 +316,15 @@ class ChipScreenshotTest(private val case: MatrixCase) {
     @get:Rule val matrix = ComponentStateMatrixRule()
 
     @Test fun chip() = matrix.capture("chip", case) {
-        Chip("Cramps", selected = false, onClick = {}, interactionSource = interactionSource, enabled = enabled)
+        FilterChip("Cramps", selected = selected, onClick = {}, enabled = enabled, interactionSource = interactionSource)
     }
 
     companion object {
         @JvmStatic @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
-        fun cases() = ComponentStateMatrix.cases()
+        fun cases() = ComponentStateMatrix.cases(
+            ComponentStateMatrix.SelectableStates,
+            layoutStates = listOf(ComponentState.Default, ComponentState.Selected)
+        )
     }
 }
 ```
@@ -244,6 +332,11 @@ class ChipScreenshotTest(private val case: MatrixCase) {
 `AccessibilityHarnessTest` keeps deliberately broken samples (a 24dp target, a clickable with no
 label, low-contrast text) to prove each check fails. Use `matrix.checkAccessibility()` on its own for
 a screen that needs no screenshot.
+
+Next to the matrix, each component has behaviour tests with the Compose test rule:
+`ControlSemanticsTest` asserts roles, toggle and selected state, content descriptions, the 48dp
+target and the TalkBack order, and `ControlMotionTest` reads the corner radius frame by frame to
+prove shapes spring normally and snap under `CycleTheme(reduceMotion = true)`.
 
 ## Text field
 

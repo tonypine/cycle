@@ -29,6 +29,11 @@ val CatalogSections: List<CatalogSection> = listOf(
         IndicationSection()
     },
     CatalogSection("Icons", "Every Material Symbols Rounded icon the app ships.") { IconsSection() },
+    CatalogSection("Buttons", "Filled, tonal, outlined and text buttons in every state.") { ButtonsSection() },
+    CatalogSection("Icon buttons", "Standard, filled, tonal and toggle icon buttons in every state.") {
+        IconButtonsSection()
+    },
+    CatalogSection("Chips", "Filter and assist chips in every state, and selection.") { ChipsSection() },
     CatalogSection("Text field", "The outlined text field: a form to type in, and every state.") {
         TextFieldSection()
     },
