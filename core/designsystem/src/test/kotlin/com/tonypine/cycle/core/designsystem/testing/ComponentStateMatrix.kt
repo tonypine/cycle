@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -191,11 +192,14 @@ class ComponentStateMatrixRule : TestRule {
      * run on the view and its screenshot, failing on errors and warnings
      * (`AccessibilityViewCheckException`). When [disabled] is true, contrast checks are skipped:
      * WCAG 1.4.3 exempts inactive controls, which draw at the disabled alphas on purpose.
+     *
+     * [root] is the window to check; pass `composeRule.onNode(isDialog())` for a dialog, which opens a
+     * window of its own. The touch target check covers every window.
      */
     @OptIn(ExperimentalRoborazziApi::class)
-    fun checkAccessibility(disabled: Boolean = false) {
+    fun checkAccessibility(disabled: Boolean = false, root: SemanticsNodeInteraction? = null) {
         checkTouchTargets()
-        composeRule.onRoot().checkRoboAccessibility(
+        (root ?: composeRule.onRoot()).checkRoboAccessibility(
             roborazziATFAccessibilityCheckOptions = RoborazziATFAccessibilityCheckOptions(
                 checker = RoborazziATFAccessibilityChecker(
                     preset = AccessibilityCheckPreset.LATEST,
