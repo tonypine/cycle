@@ -100,6 +100,38 @@ class PeriodsTest {
     }
 
     @Test
+    fun `ended alone closes the period before it, filling the days up to it`() {
+        val logs = bleed(day("2027-03-01"), 4, FlowLevel.LIGHT) + DayLog(day("2027-03-07"), periodEnded = true)
+
+        assertEquals(listOf(Period(day("2027-03-01"), day("2027-03-07"))), CycleCalculator.periods(logs, today))
+    }
+
+    @Test
+    fun `ended alone after a period that already ended is ignored`() {
+        val logs = bleed(day("2027-03-01"), 3) + DayLog(day("2027-03-04"), periodEnded = true) +
+            DayLog(day("2027-03-08"), periodEnded = true)
+
+        assertEquals(listOf(Period(day("2027-03-01"), day("2027-03-04"))), CycleCalculator.periods(logs, today))
+    }
+
+    @Test
+    fun `ended alone with no period before it is ignored`() {
+        val logs = listOf(DayLog(day("2027-03-01"), periodEnded = true))
+
+        assertEquals(emptyList<Period>(), CycleCalculator.periods(logs, today))
+    }
+
+    @Test
+    fun `ended with flow after a gap starts and ends its own period`() {
+        val logs = bleed(day("2027-03-01"), 3) + DayLog(day("2027-03-10"), FlowLevel.LIGHT, periodEnded = true)
+
+        assertEquals(
+            listOf(Period(day("2027-03-01"), day("2027-03-03")), Period(day("2027-03-10"), day("2027-03-10"))),
+            CycleCalculator.periods(logs, today)
+        )
+    }
+
+    @Test
     fun `flow logged after ended starts a new period`() {
         val logs = bleed(day("2027-03-01"), 3) + DayLog(day("2027-03-04"), periodEnded = true) +
             bleed(day("2027-03-05"), 2)

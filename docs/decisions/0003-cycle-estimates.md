@@ -24,7 +24,7 @@ unless a migration changes them.
 | Schema changes | Every version is exported to `core/data/schemas/` and committed. A change raises the version, adds a migration to `CycleMigrations.ALL` and goes through `CycleDatabaseMigrationTest`, which migrates every earlier version to the current one, validates the result and reads her log back. The test also pins the hash of each released schema, so a shipped version cannot be edited in place. There is no destructive fallback: a missing migration fails rather than erasing her history. |
 | Settings | DataStore: usual cycle length (default 28), usual period length (default 5), whether setup is done, and the prompts she dismissed, each set keyed by the first day of its cycle. |
 | A period | A run of period days, allowing a gap of one day; spotting alone never starts one. A period day is a day with light or heavier flow, or with either marker. A gap day may be unlogged, `none` or spotting. |
-| Started and ended | "Ended" marks a period's last day: the next period day starts a new period. "Started" without "ended" keeps the period open: it takes in every later day, and the last period runs up to today. A new "started" after more than a day's gap starts a new period, and the open one before it ends on its last logged day. |
+| Started and ended | "Ended" marks a period's last day: the next period day starts a new period. "Ended" alone, with no light or heavier flow and no "started", never starts a period: it closes the period before it if that one has not ended yet, which then runs up to that day however many days lie between, the way "started" and "ended" fill the days between them. When the period before it has already ended, or there is none, the day is ignored. "Started" without "ended" keeps the period open: it takes in every later day, and the last period runs up to today. A new "started" after more than a day's gap starts a new period, and the open one before it ends on its last logged day. |
 | A cycle | From one period's first day to the day before the next. The last cycle is open until the next period is logged. |
 | Her typical lengths | The median, shortest and longest of her last 6 complete cycles, and of her last 6 periods that are over (marked ended, followed by another period, or too long ago for another day to join them). An even count's median is the mean of the two middle values, a half day rounded up. |
 | Expected start | Last period's first day + her median cycle. |
@@ -64,6 +64,9 @@ unless a migration changes them.
   them, as with every other estimate.
 - **Spotting or an explicit "none" ending a period.** A period with one lighter day is still one
   period; only "ended" ends it early.
+- **Ignoring "ended" alone after an unlogged gap.** Safer against a stray tap, but it throws away
+  what she said: that the period ran until that day. Filling the days up to it keeps her period
+  length right, and a mistaken tap is fixed by removing it, which recomputes everything after it.
 
 ## Consequences
 

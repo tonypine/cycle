@@ -53,24 +53,30 @@ object CycleCalculator {
     /**
      * Her periods, oldest first. A period is a run of period days (light or heavier flow, or a
      * period marker) with gaps of at most [MAX_GAP_DAYS]; spotting alone never starts one. "Ended"
-     * marks a period's last day. A period marked "started" and not yet "ended" stays open: it takes
-     * in every later day, and the last one runs up to [today]. A new "started" after a gap starts a
-     * new period, and the one before it ends on its last logged day.
+     * marks a period's last day. "Ended" alone, with no flow and no "started", never starts a
+     * period: it closes the period before it, which then runs up to that day, or is ignored when
+     * that period has already ended or there is none. A period marked "started" and not yet "ended"
+     * stays open: it takes in every later day, and the last one runs up to [today]. A new "started"
+     * after a gap starts a new period, and the one before it ends on its last logged day.
      */
     fun periods(logs: List<DayLog>, today: LocalDate): List<Period> {
         val periods = mutableListOf<Period>()
         var run: Run? = null
         for (day in logs.filter { it.isPeriodDay && it.date <= today }.sortedBy { it.date }) {
             val current = run
-            run = if (current != null && current.continuesTo(day)) {
-                current.copy(
+            run = when {
+                current != null && current.continuesTo(day) -> current.copy(
                     last = day.date,
                     started = current.started || day.periodStarted,
                     ended = day.periodEnded
                 )
-            } else {
-                current?.let { periods += Period(it.start, it.last) }
-                Run(start = day.date, last = day.date, started = day.periodStarted, ended = day.periodEnded)
+
+                day.onlyEnds -> current
+
+                else -> {
+                    current?.let { periods += Period(it.start, it.last) }
+                    Run(start = day.date, last = day.date, started = day.periodStarted, ended = day.periodEnded)
+                }
             }
         }
         run?.let {
@@ -88,8 +94,12 @@ object CycleCalculator {
     /** A run of period days being collected into one period. */
     private data class Run(val start: LocalDate, val last: LocalDate, val started: Boolean, val ended: Boolean) {
         fun continuesTo(day: DayLog): Boolean = !ended &&
-            (daysBetween(last, day.date) <= MAX_GAP_DAYS + 1 || (started && !day.periodStarted))
+            (daysBetween(last, day.date) <= MAX_GAP_DAYS + 1 || day.onlyEnds || (started && !day.periodStarted))
     }
+
+    /** She marked the day "ended" and logged no period flow and no "started": it can only close one. */
+    private val DayLog.onlyEnds: Boolean
+        get() = periodEnded && !periodStarted && flow?.isPeriodFlow != true
 
     /**
      * The periods that are over, for her typical period length: every period but the last, and the
