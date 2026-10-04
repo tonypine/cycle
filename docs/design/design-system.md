@@ -16,7 +16,7 @@ accessors. Each one is a `CompositionLocal`, so previews and tests can provide o
 
 | Accessor | Type | Holds |
 | -- | -- | -- |
-| `CycleTheme.colors` | `CycleColors` | Every Zest colour role: `accent`, `surface`, `onSurface`, the error roles and the cycle roles (`period`, `predicted`, `predictedEdge`, `fertile`, `ovulation`, `today`, each with its `on*` role). Light or dark, from `darkTheme`. No dynamic colour. |
+| `CycleTheme.colors` | `CycleColors` | Every Zest colour role: `accent`, `surface`, `onSurface`, the error roles and the cycle roles (`period`, `predicted`, `predictedEdge`, `fertile`, `ovulation`, `today`, each with its `on*` role), and the translucent `scrim` behind sheets. Light or dark, from `darkTheme`. No dynamic colour. |
 | `CycleTheme.typography` | `CycleTypography` | `display`, `headline`, `title`, `titleSmall`, `body`, `bodySmall`, `label`, `labelSmall`, `dayNumber`, and emphasized variants (`headlineEmphasized`, `titleEmphasized`, `dayNumberEmphasized`) for key numbers. |
 | `CycleTheme.shapes` | `CycleShapes` | Corner scale: `extraSmall` 8dp, `small` 12dp, `medium` 16dp, `large` 24dp, `extraLarge` 32dp, `full` (pill). |
 | `CycleTheme.spacing` | `CycleSpacing` | 4dp grid: `extraSmall` 4, `small` 8, `medium` 12, `large` 16 (screen margin), `extraLarge` 24, `extraExtraLarge` 32, `huge` 48. |
@@ -329,6 +329,11 @@ class ChipScreenshotTest(private val case: MatrixCase) {
 }
 ```
 
+A component with a window of its own, such as the [bottom sheet](#bottom-sheet), passes that window's
+root to `checkAccessibility(root = composeRule.onNode(isDialog()))` and captures the whole screen with
+Roborazzi's `captureScreenRoboImage`. `suppress` drops a framework result that cannot apply, with the
+reason next to the matcher.
+
 `AccessibilityHarnessTest` keeps deliberately broken samples (a 24dp target, a clickable with no
 label, low-contrast text) to prove each check fails. Use `matrix.checkAccessibility()` on its own for
 a screen that needs no screenshot.
@@ -379,6 +384,67 @@ so they snap under reduce motion.
 `imePadding()`, or `safeDrawingPadding()` which includes it. When the keyboard opens, the column
 shrinks above it, and Foundation scrolls the focused field, with its supporting text, back into view.
 `CycleTextFieldImeTest` checks this with Robolectric by dispatching keyboard insets.
+
+## Bottom sheet
+
+`CycleBottomSheet` is the modal bottom sheet (`BottomSheet.kt`): a `surfaceContainer` panel with 32dp
+top corners (`shapes.extraLarge`) and `elevation.level2`, sliding up over the `scrim` in a window of
+its own. It shows a drag handle, the title as a heading, and the content in a column that scrolls when
+the sheet is full. Use it for a short task on top of a screen: logging a day, picking an option, a
+note. Don't use it for a whole flow (that is a screen) or for a message that needs an answer (a
+dialog, still to come).
+
+```kotlin
+val sheet = rememberCycleBottomSheetState()
+val scope = rememberCoroutineScope()
+FilledButton("Log today", onClick = { scope.launch { sheet.show() } })
+CycleBottomSheet(sheet, title = "Log today", onDismiss = { /* closed, however it closed */ }) {
+    CycleTextField(notes, label = "Notes")
+    FilledButton("Log it", onClick = { scope.launch { sheet.hide() } }, modifier = Modifier.fillMaxWidth())
+}
+```
+
+Call `CycleBottomSheet` wherever the screen's content is; it shows nothing until the state opens it.
+`CycleBottomSheetState` is the state holder:
+
+| Member | What it does |
+| -- | -- |
+| `show()` | Opens the sheet partially expanded (its top at half the screen) when it is taller than that, expanded otherwise. |
+| `expand()`, `partialExpand()` | Move an open sheet, or open a closed one, to that anchor. |
+| `hide()` | Slides the sheet away, then closes its window. `onDismiss` runs. |
+| `isVisible`, `currentValue`, `targetValue` | Whether the window is up, and the `CycleSheetValue` (`Hidden`, `PartiallyExpanded`, `Expanded`) it rests at or moves to. |
+
+`rememberCycleBottomSheetState(skipPartiallyExpanded = true)` makes a sheet that only opens expanded.
+The state survives configuration changes.
+
+**Closing.** People close the sheet by dragging it down, tapping the scrim, going back, or with the
+handle's Dismiss accessibility action. Predictive back narrows the sheet and moves it down as the back
+gesture progresses; letting go closes it and cancelling springs it back. `onDismiss` runs once the
+sheet has closed, whichever way it closed, including `hide()`.
+
+**Motion.** Opening, closing and settling after a drag or fling use the slow spatial spring, so the
+sheet bounces a little past its anchor (it fills the gap that opens below it). Under reduce motion
+the spring is `snap()` and the sheet jumps.
+
+**Drag handle.** A 32 by 4dp `onSurfaceVariant` pill in a 48dp target. Tapping it expands a partially
+expanded sheet and collapses an expanded one (or closes it, when there is no partial anchor). TalkBack
+reads "Drag handle", "button" and the state ("Partially expanded", "Expanded"), and offers Expand or
+Collapse, and Dismiss, as custom actions. It shows the focus ring when focused from a keyboard.
+
+**Insets and the keyboard.** The sheet's window draws edge to edge. The sheet stops below the status
+bar, pads its content above the navigation bar, and sits above the keyboard (`imePadding()`). When
+the keyboard opens, a partially expanded sheet expands, and the focused field scrolls into view.
+`BottomSheetImeTest` checks this by dispatching keyboard insets to the sheet's window.
+
+**Focus and TalkBack.** Opening moves focus into the sheet: onto the handle for someone using a
+keyboard, and to the sheet itself for touch. The opener in the screen behind keeps its focus, so it is
+focused again when the sheet closes. The sheet is a pane titled with `title` (`paneTitle`), which
+TalkBack announces when it opens, and it reads the handle, the title, then the content. The scrim is
+hidden from TalkBack: use the handle's Dismiss action or back.
+
+A partially expanded sheet runs off the bottom of the screen, so a control there can show only a
+sliver. `BottomSheetScreenshotTest` suppresses the framework's touch target result for an element cut
+by the bottom of the screen; the 48dp layout check still covers it.
 
 ## Adding a token
 
