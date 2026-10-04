@@ -25,4 +25,19 @@ class OpenSourceNoticesTest {
             assertTrue("$name is missing the OFL terms", "TERMINATION" in text)
         }
     }
+
+    @Test
+    fun materialSymbolsShipTheApacheLicence() {
+        val notice = OpenSourceNotices.single { it.name == "Material Symbols Rounded" }
+        val text = context.resources.openRawResource(notice.text).bufferedReader().use { it.readText() }
+        assertTrue(
+            "Material Symbols is missing its copyright",
+            text.startsWith("Material Symbols Rounded\nCopyright Google LLC")
+        )
+        assertTrue(
+            "Material Symbols is missing the Apache 2.0 text",
+            "Apache License\n                           Version 2.0" in text
+        )
+        assertTrue("Material Symbols is missing the Apache terms", "END OF TERMS AND CONDITIONS" in text)
+    }
 }
