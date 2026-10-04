@@ -22,7 +22,7 @@ accessors. Each one is a `CompositionLocal`, so previews and tests can provide o
 | `CycleTheme.spacing` | `CycleSpacing` | 4dp grid: `extraSmall` 4, `small` 8, `medium` 12, `large` 16 (screen margin), `extraLarge` 24, `extraExtraLarge` 32, `huge` 48. |
 | `CycleTheme.elevation` | `CycleElevation` | Shadow scale `level0` to `level3` (0, 1, 3, 6dp). Zest is flat: cards sit on `surfaceContainer` with no shadow; only floating bars, sheets and dialogs cast one. |
 | `CycleTheme.motion` | `CycleMotion` | Spatial and effects springs in fast, default and slow speeds, as `FiniteAnimationSpec`s. All `snap()` under reduce motion. See [Motion](#motion). |
-| `CycleTheme.stateAlpha` | `CycleStateAlpha` | State layer opacities (`hovered` 8%, `focused` 10%, `pressed` 10%) and disabled ones (`disabledContainer` 12%, `disabledContent` 45%, both on `onSurface`). |
+| `CycleTheme.stateAlpha` | `CycleStateAlpha` | State layer opacities (`hovered` 8%, `focused` 10%, `pressed` 10%), disabled ones (`disabledContainer` 12%, `disabledContent` 45%, both on `onSurface`), and the text `selection` highlight (40% `accent`, which `CycleTheme` installs as `LocalTextSelectionColors`). |
 
 ```kotlin
 BasicText(
@@ -148,7 +148,8 @@ The interaction previews live in `core/designsystem/.../InteractionPreviews.kt`.
 
 `core/designsystem/src/test/.../testing/ComponentStateMatrix.kt` is the shared harness every
 component test uses. `ComponentStateMatrix.cases(states)` lists each state (default, pressed,
-focused, disabled, error, and optionally hovered) in light and dark, plus the default state at 200%
+focused, disabled, error, and optionally hovered; `InputStates` swaps pressed for filled, for text
+inputs) in light and dark, plus the default state at 200%
 font scale and right-to-left. `ComponentStateMatrixRule.capture(name, case) { ... }` renders the
 component in `CycleTheme`, drives the interaction state through the `interactionSource` it hands
 you, records `src/test/screenshots/<name>_<state>_<appearance>.png`, and checks accessibility:
@@ -181,6 +182,48 @@ class ChipScreenshotTest(private val case: MatrixCase) {
 `AccessibilityHarnessTest` keeps deliberately broken samples (a 24dp target, a clickable with no
 label, low-contrast text) to prove each check fails. Use `matrix.checkAccessibility()` on its own for
 a screen that needs no screenshot.
+
+## Text field
+
+`CycleTextField` is the outlined text field (Zest `.field`), on Foundation's `BasicTextField` with a
+`TextFieldState`. Use it for anything typed: notes, names, numbers. Do not use it for picking from a
+fixed set or a date; those get their own components.
+
+```kotlin
+val notes = rememberTextFieldState()
+CycleTextField(
+    state = notes,
+    label = "Notes",
+    placeholder = "Anything else? Spill it here.",
+    supportingText = "Only on this phone.",
+    maxLength = 200,
+    lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 3)
+)
+```
+
+| Parameter | What it does |
+| -- | -- |
+| `label` | Always shown, inside the field above the value, and part of the field's semantics: TalkBack reads the label, then the value. |
+| `placeholder` | Shown in `onSurfaceVariant` while the field is empty. |
+| `supportingText` | A hint below the field. |
+| `errorMessage` | Puts the field in its error state: a 2dp `error` border, the label in `error`, and the `CycleIcons.Error` icon with the sentence below the field, in place of the supporting text. The field announces it to TalkBack through `error()` semantics. Write a sentence that says how to fix the value: "Pick a day up to today." |
+| `leadingIcon` | A decorative `CycleIcons` icon before the value. |
+| `trailingAction` | A `TextFieldAction(icon, contentDescription, onClick)`: a 48dp icon button at the end, such as "Clear". |
+| `maxLength` | Rejects longer text and shows a "12/200" counter, which TalkBack reads as "12 of 200 characters". |
+| `lineLimits` | `TextFieldLineLimits.SingleLine` (the default) or `MultiLine(...)`. |
+| `enabled`, `readOnly` | Disabled draws in `onSurface` at the disabled alphas. Read-only keeps the value readable, selectable and focusable, with an `outlineVariant` border. |
+| `keyboardOptions`, `onKeyboardAction`, `inputTransformation` | Passed to `BasicTextField`. Without a handler, `ImeAction.Next` moves focus to the next field and `ImeAction.Done` closes the keyboard. |
+| `interactionSource` | Receives the field's interactions. Emitting into it (a held focus in a preview or test) only restyles the field. |
+
+The border is `outline` at rest, a 2dp `accent` border while focused, and a 2dp `error` border in
+the error state. The border and label colours change on `CycleTheme.motion`'s default effects spring,
+so they snap under reduce motion.
+
+**Keyboard.** Activities that show text fields draw edge to edge (`enableEdgeToEdge()`) with
+`android:windowSoftInputMode="adjustResize"`. Put the fields in a `verticalScroll` column with
+`imePadding()`, or `safeDrawingPadding()` which includes it. When the keyboard opens, the column
+shrinks above it, and Foundation scrolls the focused field, with its supporting text, back into view.
+`CycleTextFieldImeTest` checks this with Robolectric by dispatching keyboard insets.
 
 ## Adding a token
 

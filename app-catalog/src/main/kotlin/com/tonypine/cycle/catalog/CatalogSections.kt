@@ -28,7 +28,10 @@ val CatalogSections: List<CatalogSection> = listOf(
     CatalogSection("Indication", "The state layer, press scale and focus ring in every state.") {
         IndicationSection()
     },
-    CatalogSection("Icons", "Every Material Symbols Rounded icon the app ships.") { IconsSection() }
+    CatalogSection("Icons", "Every Material Symbols Rounded icon the app ships.") { IconsSection() },
+    CatalogSection("Text field", "The outlined text field: a form to type in, and every state.") {
+        TextFieldSection()
+    }
 )
 
 @Composable
