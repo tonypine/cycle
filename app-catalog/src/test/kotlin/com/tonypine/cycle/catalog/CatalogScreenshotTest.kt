@@ -65,6 +65,7 @@ class CatalogScreenshotTest(private val page: Page, private val variant: Variant
             "Motion" to (1320 to 2300),
             "Indication" to (900 to 1400),
             "Icons" to (1000 to 1900),
+            "Text field" to (1280 to 2240),
             "Day cell" to (1220 to 2360),
             "Cycle legend" to (400 to 700)
         )
@@ -75,7 +76,7 @@ class CatalogScreenshotTest(private val page: Page, private val variant: Variant
             val pages = listOf(Page("list", 540, 840) { SectionList(onOpen = {}) }) +
                 CatalogSections.map { section ->
                     val (height, largeFontHeight) = heights.getValue(section.title)
-                    Page(section.title.lowercase().replace(' ', '_'), height, largeFontHeight) {
+                    Page(section.title.lowercase().replace(' ', '-'), height, largeFontHeight) {
                         SectionPage(section, onBack = {})
                     }
                 }

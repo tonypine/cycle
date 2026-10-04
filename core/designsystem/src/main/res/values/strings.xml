@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- What TalkBack reads for a text field's character counter, such as "12 of 200 characters". -->
+    <string name="cycle_text_field_counter">%1$d of %2$d characters</string>
+
     <!-- Day cell content description parts, read by TalkBack after the date: "20 March, today, period". -->
     <string name="day_cell_today">today</string>
     <string name="day_cell_period">period</string>
