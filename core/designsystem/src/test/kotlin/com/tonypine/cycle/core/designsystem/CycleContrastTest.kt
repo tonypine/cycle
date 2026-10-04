@@ -51,6 +51,7 @@ class CycleContrastTest {
         "Accent as text on card" to (6.47 to 9.91),
         "Outline vs surface" to (4.47 to 5.66),
         "Error text on surface" to (6.38 to 10.90),
+        "Error text on card" to (5.90 to 9.95),
         "Text on error" to (6.54 to 7.72),
         "Text on error container" to (12.77 to 7.24),
         "Day number on period" to (4.96 to 7.48),

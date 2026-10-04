@@ -291,14 +291,15 @@ Contrast (WCAG 2.x ratios, computed from the hex values above):
 | Body text on surface (`onSurface` on `surface`) | 4.5:1 | 16.88 | 15.23 |
 | Secondary text on surface (`onSurfaceVariant` on `surface`) | 4.5:1 | 8.20 | 10.73 |
 | Text on card (`onSurface` on `surfaceContainer`) | 4.5:1 | 15.62 | 13.90 |
-| Secondary text on card, navigation label, sheet handle (`onSurfaceVariant` on `surfaceContainer`) | 4.5:1 | 7.59 | 9.80 |
+| Secondary text on card, navigation label, sheet handle, dialog body (`onSurfaceVariant` on `surfaceContainer`) | 4.5:1 | 7.59 | 9.80 |
 | Secondary text on raised surface (`onSurfaceVariant` on `surfaceContainerHigh`) | 4.5:1 | 6.89 | 8.57 |
 | Text on accent (primary button) (`onAccent` on `accent`) | 4.5:1 | 7.17 | 7.72 |
 | Text on accent container (selected chip) (`onAccentContainer` on `accentContainer`) | 4.5:1 | 13.31 | 7.25 |
 | Accent as text/link on surface (`accent` on `surface`) | 4.5:1 | 6.99 | 10.86 |
-| Accent as text on card, text button in a sheet (`accent` on `surfaceContainer`) | 4.5:1 | 6.47 | 9.91 |
+| Accent as text on card, text button in a sheet or dialog (`accent` on `surfaceContainer`) | 4.5:1 | 6.47 | 9.91 |
 | Outline vs surface (control border) (`outline` on `surface`) | 3:1 | 4.47 | 5.66 |
 | Error text on surface (`error` on `surface`) | 4.5:1 | 6.38 | 10.90 |
+| Error text on card (destructive dialog icon) (`error` on `surfaceContainer`) | 4.5:1 | 5.90 | 9.95 |
 | Text on error (`onError` on `error`) | 4.5:1 | 6.54 | 7.72 |
 | Text on error container (`onErrorContainer` on `errorContainer`) | 4.5:1 | 12.77 | 7.24 |
 | Day number on period (`onPeriod` on `period`) | 4.5:1 | 4.96 | 7.48 |
