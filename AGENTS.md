@@ -58,6 +58,12 @@ touches (`:app`, `:app-catalog`, `:core:designsystem`, `:core:ui`). Each takes s
 ./gradlew :core:designsystem:testDebugUnitTest --tests '*CycleTextFieldTest' -Proborazzi.test.verify=true
 ```
 
+A versioned git hook, `.githooks/pre-push`, runs `./gradlew ktlintCheck` before every push that
+changes Kotlin or Gradle files, and skips it otherwise. Symphony turns it on in each new workspace
+(`after_create` in `WORKFLOW.md`); in your own checkout, run `git config core.hooksPath .githooks`
+once. Never push with `--no-verify`: when the hook fails, run `./gradlew ktlintFormat`, commit and
+push again. A change to the hook runs `.githooks/pre-push_test.sh`, which CI runs too.
+
 A change under `scripts/release/` runs its tests, `scripts/release/changelog_test.sh` and
 `scripts/release/linear_update_test.sh`, which CI runs too. A change to a workflow under
 `.github/workflows/` is checked with `actionlint`.

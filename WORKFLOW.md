@@ -4,6 +4,8 @@
 # agent receives it. This comment lives in front matter so it never renders.
 hooks:
   after_create: |
+    # Versioned git hooks: .githooks/pre-push runs ktlintCheck before every push.
+    git config core.hooksPath .githooks
     if [ ! -f local.properties ]; then
       sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}"
       [ -d "$sdk" ] && echo "sdk.dir=$sdk" > local.properties
@@ -66,6 +68,9 @@ Cycle: a native menstrual cycle tracking app, Android first. Read `AGENTS.md`, `
   screenshot checks) before every push. CI runs the full set (`lint`, every module's tests and
   screenshots, `assembleDebug`) and is the gate. Run the full set locally only for changes that reach
   every module, such as `build-logic` or `gradle/libs.versions.toml`, and say why in the workpad.
+- Every `git push` runs `.githooks/pre-push`, which runs `./gradlew ktlintCheck` when the push
+  changes Kotlin or Gradle files. Never use `git push --no-verify` or skip the hook any other way.
+  When it fails, fix the files it names (`./gradlew ktlintFormat`), commit, and push again.
 - Keep tool output focused by default. For broad searches, diffs, and file reads, start with
   targeted `rg` queries, `sed -n` ranges, and modest output caps. Raise caps only after narrowing
   the command to the exact file or hunk needed.

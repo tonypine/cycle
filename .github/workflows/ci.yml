@@ -26,6 +26,9 @@ jobs:
           scripts/release/changelog_test.sh
           scripts/release/linear_update_test.sh
 
+      - name: Test the git hooks
+        run: .githooks/pre-push_test.sh
+
       - uses: actions/setup-java@v6
         with:
           distribution: temurin

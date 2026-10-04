@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# Runs `./gradlew ktlintCheck` before a push that changes Kotlin or Gradle files, and nothing else.
+# Unit tests, screenshots, lint and assembleDebug stay in CI and the targeted checks in AGENTS.md.
+#
+# Turn it on once per clone: git config core.hooksPath .githooks
+# Never bypass it with `git push --no-verify`: fix the reported files and push again.
+#
+# Timed on 2026-10-04 on an Apple Silicon Mac with a warm Gradle daemon: 1 to 3 s for
+# ktlintCheck, pass or fail, and 0.05 s for a push that skips it.
+#
+# Git passes one line per pushed ref on stdin: <local ref> <local sha> <remote ref> <remote sha>.
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+# Prints the files the pushed commits change, one per line. A ref is compared with what the remote
+# already has, or with its merge-base with origin/main when the remote does not have it (a new
+# branch, or a remote commit missing locally). Without either, it prints `*` so the check runs.
+changed_files() {
+  local local_ref local_sha remote_ref remote_sha base
+  while read -r local_ref local_sha remote_ref remote_sha; do
+    if [[ "$local_sha" =~ ^0+$ ]]; then
+      continue # deleting a remote ref
+    fi
+    base=""
+    if [[ ! "$remote_sha" =~ ^0+$ ]] && git cat-file -e "$remote_sha^{commit}" 2>/dev/null; then
+      base="$remote_sha"
+    else
+      base="$(git merge-base "$local_sha" refs/remotes/origin/main 2>/dev/null || true)"
+    fi
+    if [ -z "$base" ]; then
+      echo "*"
+    else
+      git diff --name-only "$base" "$local_sha"
+    fi
+  done
+}
+
+# Succeeds when a changed file can change ktlint's result: Kotlin sources, build scripts, the
+# convention plugins, and the files that set ktlint's rules (.editorconfig) and version.
+needs_ktlint() {
+  local file
+  while IFS= read -r file; do
+    case "$file" in
+      '*' | *.kt | *.kts | build-logic/* | .editorconfig | gradle/libs.versions.toml) return 0 ;;
+    esac
+  done <<<"$1"
+  return 1
+}
+
+files="$(changed_files)"
+if ! needs_ktlint "$files"; then
+  echo "pre-push: no Kotlin or Gradle files changed, skipping ktlintCheck"
+  exit 0
+fi
+
+log="$(mktemp "${TMPDIR:-/tmp}/pre-push-ktlint.XXXXXX")"
+trap 'rm -f "$log"' EXIT
+
+echo "pre-push: running ./gradlew ktlintCheck"
+# --continue reports the violations of every module, not only the first that fails.
+if ./gradlew --continue ktlintCheck >"$log" 2>&1; then
+  echo "pre-push: ktlintCheck passed"
+  exit 0
+fi
+
+# ktlint prints each violation as `/absolute/path/File.kt:line:column message`.
+violations="$(grep -E '^.+\.kts?:[0-9]+:[0-9]+ ' "$log" || true)"
+if [ -z "$violations" ]; then
+  # Not a style violation (a build-logic compile error, a missing JDK): show Gradle's output.
+  cat "$log" >&2
+  echo "pre-push: ./gradlew ktlintCheck failed, see the output above. Fix it and push again." >&2
+  exit 1
+fi
+
+# Prints a reported path relative to the repository root. A result replayed from Gradle's build
+# cache carries the root of the checkout that stored it, so leading directories are dropped until
+# the rest names a file here.
+root="$(pwd)/"
+relative() {
+  local path="${1#"$root"}" rest
+  rest="$path"
+  while [[ "$rest" == /* || ! -e "$rest" ]]; do
+    if [[ "$rest" != */* ]]; then
+      echo "$path"
+      return
+    fi
+    rest="${rest#*/}"
+  done
+  echo "$rest"
+}
+
+{
+  while IFS= read -r line; do
+    file="${line%%:*}"
+    echo "$(relative "$file")${line#"$file"}"
+  done <<<"$violations"
+  echo
+  echo "pre-push: ktlint found style violations in:"
+  while IFS= read -r line; do
+    echo "  $(relative "${line%%:*}")"
+  done <<<"$violations" | sort -u
+  echo
+  echo "Run ./gradlew ktlintFormat, commit the result and push again. Never use git push --no-verify."
+} >&2
+exit 1
