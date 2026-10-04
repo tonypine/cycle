@@ -58,8 +58,9 @@ touches (`:app`, `:app-catalog`, `:core:designsystem`, `:core:ui`). Each takes s
 ./gradlew :core:designsystem:testDebugUnitTest --tests '*CycleTextFieldTest' -Proborazzi.test.verify=true
 ```
 
-A change under `scripts/release/` runs its test, `scripts/release/changelog_test.sh`, which CI runs
-too. A change to a workflow under `.github/workflows/` is checked with `actionlint`.
+A change under `scripts/release/` runs its tests, `scripts/release/changelog_test.sh` and
+`scripts/release/linear_update_test.sh`, which CI runs too. A change to a workflow under
+`.github/workflows/` is checked with `actionlint`.
 
 CI only: the `build` job in `.github/workflows/ci.yml` runs the full set on every PR and on `main`,
 and a red check goes through Symphony's CI-fix flow:

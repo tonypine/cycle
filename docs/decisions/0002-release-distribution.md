@@ -22,10 +22,10 @@ permanent release key.
 | Tag | `v<versionName>`, e.g. `v0.1.42`, on the merge commit. |
 | Where APKs live | A GitHub Release per tag, with the signed release APK attached. |
 | Changelog | The release notes list the conventional-commit subjects (`feat: …`, `fix: …`) on `main` since the previous release tag, grouped into Features, Fixes and Other changes; one subject per merged PR. The first release lists every commit. `scripts/release/changelog.sh` builds them, and runs the same way locally. |
-| Linear | Each release posts an update to the Linear initiative "Menstrual Cycle App" with the version, the changelog and a link to the GitHub Release. |
+| Linear | Each release posts an update to the Linear initiative "Menstrual Cycle App" (health `onTrack`): a `Cycle v<versionName>` heading, a direct APK download link, a link to the GitHub Release and the changelog. The `linear-update` job in `release.yml` runs after the release job, only when that run created the release, reads the published release by tag, and calls `initiativeUpdateCreate` through `scripts/release/linear_update.sh` (`curl` and `jq`). In its own job, a failed Linear call fails the run with the API error and leaves the release published. Running the workflow by hand (`workflow_dispatch`) with a tag posts, or re-posts, the update for that release. The update holds only the version, commit subjects and links. |
 | Signing | The `release` build type signs with the keystore from the environment variables `RELEASE_KEYSTORE_PATH`, `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS` and `RELEASE_KEY_PASSWORD`. With none set, the release APK is unsigned. With only some set, the build fails, so a missing secret cannot ship an unsigned APK. Debug builds never use the release key. |
 | Release key | Created once with `keytool -genkeypair -v -keystore cycle-release.jks -alias cycle -keyalg RSA -keysize 4096 -validity 10000` (Play requires a key valid until at least 2033). The `.jks` and its passwords go into the password manager before anything else. The same key becomes the Google Play app signing key through Play App Signing, so the sideloaded install keeps updating. Losing it means reinstalling the app. |
-| Secrets | GitHub Actions secrets: `RELEASE_KEYSTORE_BASE64` (the `.jks`, base64-encoded; the job decodes it to a file under `$RUNNER_TEMP` and points `RELEASE_KEYSTORE_PATH` at it), `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD`, and `LINEAR_API_KEY` for the initiative update. |
+| Secrets | GitHub Actions secrets: `RELEASE_KEYSTORE_BASE64` (the `.jks`, base64-encoded; the job decodes it to a file under `$RUNNER_TEMP` and points `RELEASE_KEYSTORE_PATH` at it), `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD`, and `LINEAR_RELEASE_API_KEY` for the initiative update: a Linear API key made only for releases, separate from Symphony's, with the narrowest permissions that still create initiative updates. The job sends it only in the `Authorization` header. The initiative's ID is the repository variable `LINEAR_INITIATIVE_ID`, which is not a secret. |
 
 ## Options considered
 
@@ -39,6 +39,8 @@ permanent release key.
   one user and a pre-1.0 app. Commit count already gives a unique, ordered patch number.
 - **Releases on a manual tag or a schedule.** Delays every change for no benefit while there is one
   user and every PR is reviewed before merge.
+- **The Linear update in a separate `on: release` workflow.** A release created with `GITHUB_TOKEN`
+  does not trigger other workflows, so it would never run.
 - **Signing inputs as Gradle properties.** Passwords on a command line show up in process listings,
   and a `gradle.properties` holding them is one commit away from leaking. Environment variables
   come straight from Actions secrets.

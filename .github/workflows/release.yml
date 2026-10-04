@@ -1,16 +1,25 @@
 name: Release
 
-# Every merge to main ships a signed APK on GitHub Releases once CI passes on that commit.
-# See docs/decisions/0002-release-distribution.md.
+# Every merge to main ships a signed APK on GitHub Releases once CI passes on that commit, then
+# posts an update to the Linear initiative. See docs/decisions/0002-release-distribution.md.
 on:
   workflow_run:
     workflows: [CI]
     types: [completed]
     branches: [main]
+  # Posts, or re-posts, the Linear update for an existing release, for when Linear was down or the
+  # secret was missing. Builds and publishes nothing.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to post the Linear update for, for example v0.1.42
+        required: true
+        type: string
 
-# Releases go out one after the other, in the order CI finishes on main, which is merge order.
+# Releases go out one after the other, in the order CI finishes on main, which is merge order. A
+# manual Linear update has a group of its own, so it never replaces a release waiting in the queue.
 concurrency:
-  group: release
+  group: ${{ github.event_name == 'workflow_dispatch' && format('linear-update-{0}', inputs.tag) || 'release' }}
   cancel-in-progress: false
 
 permissions:
@@ -21,6 +30,7 @@ jobs:
     # Only a green CI run for a push to main in this repository; a fork's branch named main does
     # not count.
     if: >-
+      github.event_name == 'workflow_run' &&
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_repository.full_name == github.repository
@@ -31,6 +41,7 @@ jobs:
     # A release created with GITHUB_TOKEN does not trigger `on: release` workflows, so later jobs
     # read the release from these outputs.
     outputs:
+      created: ${{ steps.publish.outputs.created }}
       version: ${{ steps.version.outputs.name }}
       version_code: ${{ steps.version.outputs.code }}
       tag: ${{ steps.version.outputs.tag }}
@@ -178,6 +189,7 @@ jobs:
           # Re-running the job for the same commit gives the same tag; keep the release it already made.
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
             echo "::notice::Release $TAG already exists; leaving it as it is"
+            created=false
           else
             gh release create "$TAG" "$APK" \
               --repo "$GITHUB_REPOSITORY" \
@@ -185,11 +197,13 @@ jobs:
               --title "$TAG" \
               --notes-file "$NOTES" \
               --latest
+            created=true
           fi
           release_url="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json url --jq .url)"
           apk_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/$TAG/$(basename "$APK")"
           echo "Published $release_url"
           {
+            echo "created=$created"
             echo "release_url=$release_url"
             echo "apk_url=$apk_url"
           } >> "$GITHUB_OUTPUT"
@@ -197,3 +211,59 @@ jobs:
       - name: Remove the keystore
         if: always()
         run: rm -f "$RUNNER_TEMP/cycle-release.jks"
+
+  linear-update:
+    needs: release
+    # After a release this run created, or by hand for an existing tag. In its own job, a failed
+    # Linear call fails here and leaves the published release as it is.
+    if: >-
+      !cancelled() && (
+        github.event_name == 'workflow_dispatch' ||
+        (needs.release.result == 'success' && needs.release.outputs.created == 'true')
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: scripts/release
+
+      # Both triggers read the published release the same way, so a manual re-post runs the code
+      # every merge runs.
+      - name: Read the release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || needs.release.outputs.tag }}
+        run: |
+          release="$RUNNER_TEMP/release.json"
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json url,body,assets > "$release"; then
+            echo "::error::There is no GitHub Release for tag '$TAG'"
+            exit 1
+          fi
+          apk="$(jq --raw-output '[.assets[].name | select(endswith(".apk"))][0] // empty' "$release")"
+          if [ -z "$apk" ]; then
+            echo "::error::Release $TAG has no APK asset"
+            exit 1
+          fi
+          notes="$RUNNER_TEMP/release-notes.md"
+          jq --raw-output .body "$release" > "$notes"
+          {
+            echo "tag=$TAG"
+            echo "release_url=$(jq --raw-output .url "$release")"
+            echo "apk_url=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/$TAG/$apk"
+            echo "notes=$notes"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Post the Linear initiative update
+        env:
+          LINEAR_RELEASE_API_KEY: ${{ secrets.LINEAR_RELEASE_API_KEY }}
+          LINEAR_INITIATIVE_ID: ${{ vars.LINEAR_INITIATIVE_ID }}
+          TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_URL: ${{ steps.release.outputs.release_url }}
+          APK_URL: ${{ steps.release.outputs.apk_url }}
+          NOTES: ${{ steps.release.outputs.notes }}
+        run: |
+          scripts/release/linear_update.sh body "$TAG" "$RELEASE_URL" "$APK_URL" "$NOTES"
+          scripts/release/linear_update.sh post "$TAG" "$RELEASE_URL" "$APK_URL" "$NOTES"
