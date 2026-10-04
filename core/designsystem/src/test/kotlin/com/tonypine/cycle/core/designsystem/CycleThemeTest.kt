@@ -2,6 +2,8 @@ package com.tonypine.cycle.core.designsystem
 
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.ui.test.junit4.createComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -71,5 +73,15 @@ class CycleThemeTest {
         assertEquals(DarkCycleColors.accent, cycle.focusRingColor)
         assertEquals(PRESSED_SCALE, cycle.pressedScale)
         assertEquals(ZestMotion, cycle.motion)
+    }
+
+    @Test
+    fun colorsTextSelectionInAccent() {
+        var selection: TextSelectionColors? = null
+        composeRule.setContent {
+            CycleTheme(darkTheme = false) { selection = LocalTextSelectionColors.current }
+        }
+        assertEquals(LightCycleColors.accent, selection?.handleColor)
+        assertEquals(LightCycleColors.accent.copy(alpha = DefaultCycleStateAlpha.selection), selection?.backgroundColor)
     }
 }

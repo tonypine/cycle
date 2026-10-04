@@ -2,6 +2,8 @@ package com.tonypine.cycle.core.designsystem
 
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
@@ -20,7 +22,8 @@ val LocalCycleStateAlpha = staticCompositionLocalOf { DefaultCycleStateAlpha }
  * The app's theme, built on Compose Foundation only: no Material and no dynamic colour. It provides
  * its tokens through CompositionLocals; read them with `CycleTheme.colors`, `.typography`, `.shapes`,
  * `.spacing`, `.elevation`, `.motion` and `.stateAlpha`. It also installs [CycleIndication] as
- * `LocalIndication`, so every `clickable` gets Cycle's state layer, press scale and focus ring.
+ * `LocalIndication`, so every `clickable` gets Cycle's state layer, press scale and focus ring, and
+ * colours text selection handles and highlights in `accent`.
  *
  * [reduceMotion] follows the system's animator duration scale; when it is on, every motion spec is
  * `snap()`.
@@ -47,6 +50,10 @@ fun CycleTheme(
             shape = RectangleShape,
             stateAlpha = DefaultCycleStateAlpha,
             motion = motion
+        ),
+        LocalTextSelectionColors provides TextSelectionColors(
+            handleColor = colors.accent,
+            backgroundColor = colors.accent.copy(alpha = DefaultCycleStateAlpha.selection)
         ),
         content = content
     )
