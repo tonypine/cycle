@@ -32,6 +32,20 @@ class DayLogRepository(private val dao: DayLogDao) {
     /** The one-tap "period ended" on [date], or its undo. */
     suspend fun setPeriodEnded(date: LocalDate, ended: Boolean) = update(date) { it.copy(periodEnded = ended) }
 
+    /**
+     * Logs a period that started on [start] and lasts [length] days, such as from setup or Today's
+     * empty state. When it is over before [today], its last day is marked ended; otherwise it is
+     * still going. A [start] after [today] is ignored.
+     */
+    suspend fun logPeriod(start: LocalDate, length: Int, today: LocalDate) {
+        require(length > 0) { "A period lasts at least a day, got $length" }
+        if (start > today) return
+        val end = start.plusDays(length - 1L)
+        // The end first: alone it is ignored, so no reader sees the period open in between.
+        if (end < today) setPeriodEnded(end, ended = true)
+        setPeriodStarted(start, started = true)
+    }
+
     /** Removes everything logged on [date]. */
     suspend fun clear(date: LocalDate) = dao.delete(date)
 
