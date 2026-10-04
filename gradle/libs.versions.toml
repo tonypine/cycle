@@ -5,6 +5,10 @@ ktlintGradle = "14.2.0"
 ktlint = "1.8.0"
 roborazzi = "1.76.0"
 robolectric = "4.17"
+# The Android runtime Robolectric runs for `sdk` in build-logic/robolectric/robolectric.properties.
+# Gradle resolves it (see RobolectricRuntime.kt), so it must match what this Robolectric version
+# asks for: after bumping either, a failing test names the new one ("no artifacts found for ...").
+robolectricAndroidAll = "16-robolectric-13921718-i7"
 composeBom = "2026.09.00"
 activityCompose = "1.13.0"
 coreKtx = "1.19.1"
@@ -33,6 +37,7 @@ androidx-graphics-shapes = { module = "androidx.graphics:graphics-shapes", versi
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExtJunit" }
 junit = { module = "junit:junit", version.ref = "junit" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+robolectric-android-all-instrumented = { module = "org.robolectric:android-all-instrumented", version.ref = "robolectricAndroidAll" }
 roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = "roborazzi" }
 roborazzi-accessibility-check = { module = "io.github.takahirom.roborazzi:roborazzi-accessibility-check", version.ref = "roborazzi" }
 roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi" }

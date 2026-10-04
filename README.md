@@ -68,6 +68,36 @@ images are committed under each module's `src/test/screenshots/`.
 On failure, the comparison images are in `<module>/build/outputs/roborazzi/`. Robolectric emulates the
 SDK set in `build-logic/robolectric/robolectric.properties` for every module.
 
+## Agent sandbox
+
+Symphony runs agents in a macOS sandbox: `$HOME` is read-only except `~/.gradle`, temp files belong
+in the sandbox's own `$TMPDIR`, and Gradle has no network (the sandbox's proxy is only in
+environment variables, which Java ignores). The build handles the Robolectric side itself:
+
+- Gradle resolves Robolectric's `android-all` runtime into its cache, and Robolectric reads it from
+  there through `robolectric-deps.properties`, instead of downloading it into `~/.m2` under a lock
+  file in `$HOME`. `after_create` in `WORKFLOW.md` runs `writeRobolectricDeps`, which downloads it
+  before an agent starts. The version is pinned as `robolectricAndroidAll` in
+  `gradle/libs.versions.toml`; after a Robolectric or SDK bump, a test fails with
+  `no artifacts found for DependencyJar{…}`, naming the version to pin.
+- Tests write temp files under each module's `build/tmp`, not the system temp dir.
+
+The sandbox config still has to provide:
+
+- A JDK 21. None is on the sandbox `PATH` and `/usr/libexec/java_home` fails there, so agents set
+  `JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home` by hand. Exporting
+  `JAVA_HOME` in the sandbox environment removes that step.
+- A writable temp dir for the Gradle daemon. Java on macOS ignores `$TMPDIR` and uses the per-user
+  `/var/folders/…/T`, which the sandbox makes read-only, and every Kotlin compile writes a
+  `kotlin-compiler-in-*.alive` file there. Add `-Djava.io.tmpdir=$TMPDIR` to the sandbox's
+  `JAVA_TOOL_OPTIONS` (it already sets `-Djava.net.preferIPv4Stack=true`), or allow writes to
+  `$(getconf DARWIN_USER_TEMP_DIR)`. The Kotlin daemon cannot write to
+  `~/Library/Application Support/kotlin` either, so Kotlin compiles in the Gradle daemon instead:
+  slower, but it works. The same temp dir also blocks Android Gradle plugin tasks such as
+  `mergeDebugJavaResource`.
+- A debug keystore. `assembleDebug` creates `~/.android/debug.keystore` when it is missing, and
+  `~/.android` is read-only in the sandbox: create it once outside, or allow writes there.
+
 ## Releases
 
 Every merge to `main` ships a signed release APK on GitHub Releases, tagged `v<versionName>`

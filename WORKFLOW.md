@@ -15,7 +15,9 @@ hooks:
     if [ -x "$sdkmanager" ]; then
       "$sdkmanager" --install "platforms;android-37.0" > /dev/null
     fi
-    ./gradlew --quiet assembleDebug
+    # writeRobolectricDeps downloads Robolectric's android-all runtime into the Gradle cache: Gradle
+    # has no network inside the agent sandbox, and the tests read the jar from there.
+    ./gradlew --quiet assembleDebug writeRobolectricDeps
 prompts:
   pr: |
     You are working on an existing GitHub pull request.
