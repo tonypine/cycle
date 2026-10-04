@@ -92,7 +92,7 @@ internal fun rememberInteractionSourceIn(interaction: Interaction?): MutableInte
     return source
 }
 
-/** [CycleTheme] on its `surface`, padded, for every component's previews. */
+/** [CycleTheme] in light or dark, with [content] padded on `surface`: the frame for every preview. */
 @Composable
 internal fun PreviewSurface(darkTheme: Boolean, content: @Composable () -> Unit) {
     CycleTheme(darkTheme = darkTheme) {

@@ -50,11 +50,9 @@ enum class ComponentState(val slug: String) {
     Pressed("pressed"),
     Focused("focused"),
     Hovered("hovered"),
+    Selected("selected"),
     Disabled("disabled"),
-    Error("error"),
-
-    /** Selected or checked: chips, toggles. */
-    Selected("selected")
+    Error("error")
 }
 
 /** How the screen around the component is set up. */
@@ -71,15 +69,15 @@ data class MatrixCase(val state: ComponentState, val appearance: Appearance) {
 }
 
 /**
- * What the component under test receives. Wire [interactionSource], [enabled], [isError] and
- * [selected] into its parameters; the harness drives the interaction states through the source.
+ * What the component under test receives. Wire [interactionSource], [enabled], [selected] and
+ * [isError] into its parameters; the harness drives the interaction states through the source.
  * [state] tells a component with a value, such as a text field, whether to show it
  * ([ComponentState.Filled]).
  */
 class StateScope(val state: ComponentState, val interactionSource: MutableInteractionSource) {
     val enabled: Boolean get() = state != ComponentState.Disabled
-    val isError: Boolean get() = state == ComponentState.Error
     val selected: Boolean get() = state == ComponentState.Selected
+    val isError: Boolean get() = state == ComponentState.Error
 }
 
 object ComponentStateMatrix {
