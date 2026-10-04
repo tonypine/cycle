@@ -158,6 +158,10 @@ class TodayScreenTest {
             "It may start any day between March 26 and April 3.",
             substring = true
         ).assertExists()
+        // The sheet opens all the way: its last line and button are on screen, not below it.
+        composeRule.onNodeWithText("the closer the estimates follow your own rhythm", substring = true)
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Got it").assertIsDisplayed()
         composeRule.waitForIdle()
         captureScreenRoboImage("src/test/screenshots/today_sheet_estimate.png")
     }
@@ -174,6 +178,7 @@ class TodayScreenTest {
         ).assertExists()
         composeRule.onNodeWithText("It is 2 days later than that, so the estimate now starts today.").assertExists()
         composeRule.onNodeWithText("It may start any day from today to March 21.").assertExists()
+        composeRule.onNodeWithText("Got it").assertIsDisplayed()
         composeRule.waitForIdle()
         captureScreenRoboImage("src/test/screenshots/today_sheet_estimate_late.png")
     }

@@ -120,7 +120,7 @@ private fun EmptyToday(state: TodayUiState.Empty, actions: TodayActions, modifie
 
 @Composable
 private fun TrackingToday(state: TodayUiState.Tracking, actions: TodayActions, modifier: Modifier) {
-    val estimateSheet = rememberCycleBottomSheetState()
+    val estimateSheet = rememberCycleBottomSheetState(skipPartiallyExpanded = true)
     val dayLogSheet = rememberCycleBottomSheetState(skipPartiallyExpanded = true)
     val lastDaySheet = rememberCycleBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
