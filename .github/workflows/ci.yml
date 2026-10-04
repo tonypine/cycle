@@ -22,7 +22,9 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Test the release scripts
-        run: scripts/release/changelog_test.sh
+        run: |
+          scripts/release/changelog_test.sh
+          scripts/release/linear_update_test.sh
 
       - uses: actions/setup-java@v6
         with:

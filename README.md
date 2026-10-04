@@ -77,13 +77,27 @@ in [`docs/decisions/0002-release-distribution.md`](docs/decisions/0002-release-d
 [`.github/workflows/release.yml`](.github/workflows/release.yml) runs after `CI` passes on a push
 to `main`: it builds `:app:assembleRelease` with the version and signing secrets, checks the APK
 with `apksigner verify`, and creates the tag and the GitHub Release with the APK and the changelog.
-If a signing secret is missing, the job fails naming it and publishes nothing.
+If a signing secret is missing, the job fails naming it and publishes nothing. A second job then
+posts an update to the Linear initiative "Menstrual Cycle App" with the version, the changelog and
+links to the APK and the release. If that call fails, the job fails with Linear's error and the
+release stays published.
 
 The release notes come from `scripts/release/changelog.sh`, which works the same locally:
 
 ```sh
 scripts/release/changelog.sh        # notes for HEAD since the previous v* tag
 scripts/release/changelog_test.sh   # its test, on a throwaway repository in $TMPDIR
+```
+
+The Linear update comes from `scripts/release/linear_update.sh`. Its `body` command prints the
+update's Markdown and needs no key:
+
+```sh
+scripts/release/changelog.sh > notes.md
+scripts/release/linear_update.sh body v0.1.42 \
+  https://github.com/tonypine/cycle/releases/tag/v0.1.42 \
+  https://github.com/tonypine/cycle/releases/download/v0.1.42/cycle-v0.1.42.apk notes.md
+scripts/release/linear_update_test.sh   # its test, against a stub curl: nothing reaches Linear
 ```
 
 ### One-time setup
@@ -111,6 +125,28 @@ installed app keeps updating. If it is lost, the app has to be uninstalled and r
    ```
 
 4. Delete the local `cycle-release.jks`. Never commit it: `*.jks` and `*.keystore` are ignored.
+5. For the Linear initiative update, create a Linear API key made only for releases. Do not reuse
+   Symphony's key: give this one the narrowest permissions Linear allows that still create
+   initiative updates (write access, no admin). Save it as a secret, and the initiative's ID as a
+   repository variable:
+
+   ```sh
+   gh secret set LINEAR_RELEASE_API_KEY   # the release-only Linear API key
+   gh variable set LINEAR_INITIATIVE_ID --body ce3b72fb-b27e-426b-85dd-efb922893a71   # "Menstrual Cycle App"
+   ```
+
+### Re-posting a Linear update
+
+When the Linear update failed (Linear was down, or the secret or variable was missing), fix the
+cause and post it for the existing release by hand. Re-running the whole release run does not
+post, because the release already exists. This builds and publishes nothing:
+
+```sh
+gh workflow run release.yml -f tag=v0.1.42
+```
+
+Or in GitHub: **Actions > Release > Run workflow**, with the tag. Running it again for a tag that
+already has an update posts a second one.
 
 ### Building a release locally
 
