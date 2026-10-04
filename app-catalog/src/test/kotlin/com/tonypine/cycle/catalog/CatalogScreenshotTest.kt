@@ -58,7 +58,7 @@ class CatalogScreenshotTest(private val page: Page, private val variant: Variant
     companion object {
         // Page heights in dp at 100% and 200% font scale. Raise them when a section grows.
         private val heights = mapOf(
-            "Colours" to (4300 to 8600),
+            "Colours" to (4440 to 8880),
             "Typography" to (1200 to 2240),
             "Shapes" to (720 to 840),
             "Spacing" to (860 to 1120),
@@ -70,7 +70,8 @@ class CatalogScreenshotTest(private val page: Page, private val variant: Variant
             "Chips" to (1040 to 1900),
             "Text field" to (1280 to 2240),
             "Day cell" to (1220 to 2360),
-            "Cycle legend" to (400 to 700)
+            "Cycle legend" to (400 to 700),
+            "App bars" to (1740 to 2660)
         )
 
         @JvmStatic
