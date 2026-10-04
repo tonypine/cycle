@@ -21,7 +21,14 @@ val CatalogSections: List<CatalogSection> = listOf(
         TypographySection()
     },
     CatalogSection("Shapes", "The corner scale, from extra small to full.") { ShapesSection() },
-    CatalogSection("Spacing", "The 4dp spacing grid, and the elevation scale.") { SpacingSection() }
+    CatalogSection("Spacing", "The 4dp spacing grid, and the elevation scale.") { SpacingSection() },
+    CatalogSection("Motion", "The spatial and effects springs, a spring demo, a shape morph and reduce motion.") {
+        MotionSection()
+    },
+    CatalogSection("Indication", "The state layer, press scale and focus ring in every state.") {
+        IndicationSection()
+    },
+    CatalogSection("Icons", "Every Material Symbols Rounded icon the app ships.") { IconsSection() }
 )
 
 @Composable

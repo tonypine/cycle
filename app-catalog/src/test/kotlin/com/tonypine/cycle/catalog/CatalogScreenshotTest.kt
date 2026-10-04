@@ -61,7 +61,10 @@ class CatalogScreenshotTest(private val page: Page, private val variant: Variant
             "Colours" to (4300 to 8600),
             "Typography" to (1200 to 2240),
             "Shapes" to (720 to 840),
-            "Spacing" to (860 to 1120)
+            "Spacing" to (860 to 1120),
+            "Motion" to (1320 to 2300),
+            "Indication" to (900 to 1400),
+            "Icons" to (1000 to 1900)
         )
 
         @JvmStatic

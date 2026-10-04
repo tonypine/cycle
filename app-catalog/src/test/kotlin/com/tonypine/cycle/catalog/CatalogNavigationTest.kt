@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,7 +18,7 @@ class CatalogNavigationTest {
     @Test
     fun everySectionOpensFromTheListAndBackReturnsToIt() {
         CatalogSections.forEach { section ->
-            composeRule.onNodeWithText(section.title).performClick()
+            composeRule.onNodeWithText(section.title).performScrollTo().performClick()
             composeRule.onNodeWithText(section.description).assertIsDisplayed()
             composeRule.onNodeWithText("Cycle catalog").assertDoesNotExist()
 
