@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Cycle</string>
-    <string name="home_empty">Nothing logged yet.</string>
 </resources>

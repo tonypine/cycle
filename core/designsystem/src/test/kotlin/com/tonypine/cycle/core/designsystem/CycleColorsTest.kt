@@ -2,24 +2,14 @@ package com.tonypine.cycle.core.designsystem
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CycleColorsTest {
     @Test
-    fun lightAndDarkPalettesReportTheirMode() {
-        assertFalse(LightCycleColors.isDark)
-        assertTrue(DarkCycleColors.isDark)
-    }
-
-    @Test
-    fun textMeetsWcagAaContrastInBothPalettes() {
+    fun contentMeetsWcagAaContrastInBothPalettes() {
         listOf(LightCycleColors, DarkCycleColors).forEach { colors ->
-            assertContrast(colors.onBackground, colors.background)
-            assertContrast(colors.onSurface, colors.surface)
-            assertContrast(colors.onAccent, colors.accent)
-            assertContrast(colors.muted, colors.background)
+            assertContrast(colors.content, colors.background)
         }
     }
 

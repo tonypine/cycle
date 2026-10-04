@@ -14,8 +14,7 @@ class MainActivityTest {
     val composeRule = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun launchShowsHomeScreen() {
+    fun launchShowsTitle() {
         composeRule.onNodeWithText("Cycle").assertIsDisplayed()
-        composeRule.onNodeWithText("Nothing logged yet.").assertIsDisplayed()
     }
 }

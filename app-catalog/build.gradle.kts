@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.cycle.screenshot.tests)
 }
 
-// A standalone app that shows every design system piece, for building and reviewing UI in isolation.
+// A standalone app that will show every design system component, for building and reviewing UI in isolation.
 android {
     namespace = "com.tonypine.cycle.catalog"
 
@@ -17,6 +17,5 @@ android {
 
 dependencies {
     implementation(projects.core.designsystem)
-    implementation(projects.core.ui)
     implementation(libs.androidx.activity.compose)
 }
