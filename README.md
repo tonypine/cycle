@@ -6,7 +6,9 @@ Work is planned in Linear (team Momot, initiative "Menstrual Cycle App") and bui
 through [Symphony](https://github.com/tonypine/symphony).
 
 **Status:** the Android app is scaffolded; the MVP scope is still being planned. The stack is
-recorded in [`docs/decisions/0001-stack.md`](docs/decisions/0001-stack.md).
+recorded in [`docs/decisions/0001-stack.md`](docs/decisions/0001-stack.md). Research on the menstrual
+cycle (normal ranges, predictions, what to track, health signals, other apps) and what it means for
+the app's features is in [`docs/research/`](docs/research/README.md).
 
 ## Install on the phone
 
