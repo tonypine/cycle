@@ -36,6 +36,16 @@ prompts:
 
     Follow the managed Symphony PR runtime context, complete the requested PR
     intent in this repository, and validate before handoff.
+auto_review:
+  playbooks:
+    # Symphony's Android QA (docs/configuration.md "Android app QA" in the symphony repo): the QA
+    # agent runs `build` in its own sandbox, then Symphony installs `apk_path` on a host-side
+    # emulator. The env vars point Gradle and the debug keystore at paths the sandbox can use, and
+    # --no-daemon keeps a sandboxed Gradle daemon from outliving the pass.
+    android_app:
+      build: ANDROID_HOME="$HOME/Library/Android/sdk" ANDROID_USER_HOME="$TMPDIR/android-home" JAVA_TOOL_OPTIONS="-Djava.io.tmpdir=$TMPDIR" ./gradlew --no-daemon :app:assembleDebug
+      apk_path: app/build/outputs/apk/debug/app-debug.apk
+      application_ids: ["com.tonypine.cycle"]
 ---
 
 You are working on a Linear ticket `{{ issue.identifier }}`
