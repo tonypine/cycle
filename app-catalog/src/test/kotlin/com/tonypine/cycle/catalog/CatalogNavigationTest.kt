@@ -81,8 +81,8 @@ class CatalogNavigationTest {
         composeRule.onNodeWithText("April 2027").assertIsDisplayed()
 
         listOf("Period", "Predicted period", "Today").forEach { composeRule.onNodeWithText(it).assertExists() }
-        composeRule.onNodeWithText("Fertile window").assertDoesNotExist()
-        composeRule.onNodeWithText("Ovulation").assertDoesNotExist()
+        composeRule.onNodeWithText("Estimated fertile window").assertDoesNotExist()
+        composeRule.onNodeWithText("Estimated ovulation").assertDoesNotExist()
     }
 
     @Test

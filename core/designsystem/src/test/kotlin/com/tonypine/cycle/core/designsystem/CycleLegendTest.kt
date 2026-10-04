@@ -29,7 +29,8 @@ class CycleLegendTest {
     @get:Rule
     val composeRule = createComposeRule()
 
-    private val labels = listOf("Period", "Predicted period", "Fertile window", "Ovulation", "Today")
+    private val labels =
+        listOf("Period", "Predicted period", "Estimated fertile window", "Estimated ovulation", "Today")
 
     @Test
     fun readsAsAListOfEveryState() {
@@ -66,8 +67,8 @@ class CycleLegendTest {
                 }
             )
         }
-        composeRule.onNodeWithText("Fertile window").assertDoesNotExist()
-        composeRule.onNodeWithText("Ovulation").assertDoesNotExist()
+        composeRule.onNodeWithText("Estimated fertile window").assertDoesNotExist()
+        composeRule.onNodeWithText("Estimated ovulation").assertDoesNotExist()
     }
 
     @Test
