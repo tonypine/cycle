@@ -44,6 +44,9 @@ import org.junit.runners.model.Statement
 /** The states a component is captured in. Pass the ones it supports to [ComponentStateMatrix.cases]. */
 enum class ComponentState(val slug: String) {
     Default("default"),
+
+    /** Holding a value, such as a text field with text in it. Default is the empty state. */
+    Filled("filled"),
     Pressed("pressed"),
     Focused("focused"),
     Hovered("hovered"),
@@ -70,6 +73,8 @@ data class MatrixCase(val state: ComponentState, val appearance: Appearance) {
 /**
  * What the component under test receives. Wire [interactionSource], [enabled], [isError] and
  * [selected] into its parameters; the harness drives the interaction states through the source.
+ * [state] tells a component with a value, such as a text field, whether to show it
+ * ([ComponentState.Filled]).
  */
 class StateScope(val state: ComponentState, val interactionSource: MutableInteractionSource) {
     val enabled: Boolean get() = state != ComponentState.Disabled
@@ -97,6 +102,15 @@ object ComponentStateMatrix {
 
     /** [PressableStates] plus selected, for chips and toggles. */
     val SelectableStates = PressableStates + ComponentState.Selected
+
+    /** The states a text input covers: empty, filled, focused, disabled and error. */
+    val InputStates = listOf(
+        ComponentState.Default,
+        ComponentState.Filled,
+        ComponentState.Focused,
+        ComponentState.Disabled,
+        ComponentState.Error
+    )
 
     /**
      * Every state in light and dark, plus [layoutStates] (the default state, unless a selected one

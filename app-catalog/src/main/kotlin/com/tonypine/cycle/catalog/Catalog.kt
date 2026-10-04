@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -31,10 +32,13 @@ fun Catalog(modifier: Modifier = Modifier) {
     var openSection by rememberSaveable { mutableStateOf<String?>(null) }
     val section = CatalogSections.firstOrNull { it.title == openSection }
     BackHandler(enabled = section != null) { openSection = null }
-    if (section == null) {
-        SectionList(onOpen = { openSection = it.title }, modifier = modifier)
-    } else {
-        SectionPage(section, onBack = { openSection = null }, modifier = modifier)
+    // Each page keeps its own saved scroll position, so a section opens at its top.
+    key(openSection) {
+        if (section == null) {
+            SectionList(onOpen = { openSection = it.title }, modifier = modifier)
+        } else {
+            SectionPage(section, onBack = { openSection = null }, modifier = modifier)
+        }
     }
 }
 

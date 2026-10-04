@@ -33,7 +33,10 @@ val CatalogSections: List<CatalogSection> = listOf(
     CatalogSection("Icon buttons", "Standard, filled, tonal and toggle icon buttons in every state.") {
         IconButtonsSection()
     },
-    CatalogSection("Chips", "Filter and assist chips in every state, and selection.") { ChipsSection() }
+    CatalogSection("Chips", "Filter and assist chips in every state, and selection.") { ChipsSection() },
+    CatalogSection("Text field", "The outlined text field: a form to type in, and every state.") {
+        TextFieldSection()
+    }
 )
 
 @Composable

@@ -6,7 +6,8 @@ import androidx.compose.runtime.Immutable
  * Opacities for interaction states. The state layer is the content colour (`onSurface`,
  * `onAccent`...) at [hovered], [focused] or [pressed] over the component. A disabled component
  * draws its container in `onSurface` at [disabledContainer] and its content in `onSurface` at
- * [disabledContent]. Read it through [CycleTheme.stateAlpha].
+ * [disabledContent]. Selected text is highlighted in `accent` at [selection]. Read it through
+ * [CycleTheme.stateAlpha].
  */
 @Immutable
 data class CycleStateAlpha(
@@ -19,11 +20,13 @@ data class CycleStateAlpha(
     /** 12%: the container of a disabled component. */
     val disabledContainer: Float,
     /** 45%: the label and icon of a disabled component. */
-    val disabledContent: Float
+    val disabledContent: Float,
+    /** 40%: the highlight behind selected text, in `accent`. */
+    val selection: Float
 )
 
 /**
- * The state layer opacities follow Material 3; the disabled ones are the Zest board's
+ * The state layer and selection opacities follow Material 3; the disabled ones are the Zest board's
  * (`directions/zest.html`, `.btn:disabled`).
  */
 val DefaultCycleStateAlpha = CycleStateAlpha(
@@ -31,5 +34,6 @@ val DefaultCycleStateAlpha = CycleStateAlpha(
     focused = 0.10f,
     pressed = 0.10f,
     disabledContainer = 0.12f,
-    disabledContent = 0.45f
+    disabledContent = 0.45f,
+    selection = 0.40f
 )

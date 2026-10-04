@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.geometry.Offset
 import com.tonypine.cycle.core.designsystem.CycleTheme
@@ -18,7 +19,11 @@ import com.tonypine.cycle.core.designsystem.CycleTheme
 @Composable
 internal fun rememberHeldInteraction(interaction: Interaction?): MutableInteractionSource {
     val source = remember { MutableInteractionSource() }
-    LaunchedEffect(interaction) { interaction?.let { source.emit(it) } }
+    LaunchedEffect(interaction) {
+        // Wait a frame, so components that collect the source once composed (a text field) see it.
+        withFrameNanos { }
+        interaction?.let { source.emit(it) }
+    }
     return source
 }
 
