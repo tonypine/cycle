@@ -1,67 +1,19 @@
 package com.tonypine.cycle.catalog
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
-import com.tonypine.cycle.core.designsystem.CycleIcon
-import com.tonypine.cycle.core.designsystem.CycleIcons
+import androidx.compose.ui.geometry.Offset
 import com.tonypine.cycle.core.designsystem.CycleTheme
-import com.tonypine.cycle.core.designsystem.animatedCornerShape
-import com.tonypine.cycle.core.designsystem.cycleIndication
-
-/**
- * A stand-in pill button for the catalog's demos, built from the interaction foundations: the
- * indication, the press squash and the disabled alphas. The real buttons come with their own ticket.
- */
-@Composable
-internal fun DemoButton(
-    label: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    icon: CycleIcons? = null,
-    enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
-) {
-    val colors = CycleTheme.colors
-    val alpha = CycleTheme.stateAlpha
-    val pressed by interactionSource.collectIsPressedAsState()
-    val shape = animatedCornerShape(active = pressed)
-    val container = if (enabled) colors.accent else colors.onSurface.copy(alpha = alpha.disabledContainer)
-    val content = if (enabled) colors.onAccent else colors.onSurface.copy(alpha = alpha.disabledContent)
-    Row(
-        modifier = modifier
-            .clickable(
-                interactionSource = interactionSource,
-                indication = cycleIndication(shape, color = content),
-                enabled = enabled,
-                role = Role.Button,
-                onClick = onClick
-            )
-            .background(container, shape)
-            .heightIn(min = 48.dp)
-            .padding(horizontal = CycleTheme.spacing.extraLarge, vertical = CycleTheme.spacing.medium),
-        horizontalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        icon?.let { CycleIcon(it, contentDescription = null, tint = content) }
-        CatalogText(label, CycleTheme.typography.label, color = content)
-    }
-}
 
 /** An interaction source held in [interaction], to show a hovered, focused or pressed state still. */
 @Composable
@@ -73,4 +25,35 @@ internal fun rememberHeldInteraction(interaction: Interaction?): MutableInteract
         interaction?.let { source.emit(it) }
     }
     return source
+}
+
+/** The interaction states a control page shows, by name, with the interaction that holds each one. */
+internal val HeldStates: List<Pair<String, Interaction?>> = listOf(
+    "Default" to null,
+    "Pressed" to PressInteraction.Press(Offset.Zero),
+    "Focused" to FocusInteraction.Focus()
+)
+
+/** One variant of a control: its name, what it is for, and its states in a wrapping row. */
+@Composable
+internal fun VariantStates(name: String, note: String, states: @Composable () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small)) {
+        CatalogText(name, CycleTheme.typography.titleSmall)
+        CatalogText(note, CycleTheme.typography.bodySmall, color = CycleTheme.colors.onSurfaceVariant)
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small),
+            itemVerticalAlignment = Alignment.CenterVertically
+        ) {
+            states()
+        }
+    }
+}
+
+/** A control with its state named underneath, for controls with no label of their own. */
+@Composable
+internal fun Captioned(caption: String, control: @Composable () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        control()
+        CatalogText(caption, CycleTheme.typography.labelSmall, color = CycleTheme.colors.onSurfaceVariant)
+    }
 }
