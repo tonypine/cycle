@@ -32,6 +32,14 @@ gradlePlugin {
             id = libs.plugins.cycle.android.compose.get().pluginId
             implementationClass = "AndroidComposeConventionPlugin"
         }
+        register("jvmLibrary") {
+            id = libs.plugins.cycle.jvm.library.get().pluginId
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
+        register("robolectricTests") {
+            id = libs.plugins.cycle.robolectric.tests.get().pluginId
+            implementationClass = "RobolectricTestsConventionPlugin"
+        }
         register("screenshotTests") {
             id = libs.plugins.cycle.screenshot.tests.get().pluginId
             implementationClass = "ScreenshotTestsConventionPlugin"
