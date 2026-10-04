@@ -151,8 +151,8 @@ class TodayScreenTest {
 
         composeRule.onNode(isDialog()).assertExists()
         composeRule.onNodeWithText(
-            "March 30 is the first day of your last period, March 2, plus 28 days: a typical cycle, until you " +
-                "have logged one of your own."
+            "Your next period is expected around March 30, 28 days after your last one started on March 2: " +
+                "a typical cycle, until you have logged one of your own."
         ).assertExists()
         composeRule.onNodeWithText(
             "It may start any day between March 26 and April 3.",

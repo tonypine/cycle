@@ -62,7 +62,7 @@
 
     <!-- The "How is this estimated?" sheet, in plain words. -->
     <string name="estimate_sheet_title">How is this estimated?</string>
-    <string name="estimate_date">%1$s is the first day of your last period, %2$s, plus %3$d days: %4$s.</string>
+    <string name="estimate_date">Your next period is expected around %1$s, %3$d days after your last one started on %2$s: %4$s.</string>
     <string name="estimate_date_late">Your period was expected around %1$s: the first day of your last period, %2$s, plus %3$d days, %4$s.</string>
     <string name="estimate_cycle_typical">a typical cycle, until you have logged one of your own</string>
     <string name="estimate_cycle_setup">the usual cycle length you gave</string>
