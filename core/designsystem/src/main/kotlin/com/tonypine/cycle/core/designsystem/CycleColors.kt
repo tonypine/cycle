@@ -31,6 +31,8 @@ data class CycleColors(
     val outline: Color,
     /** Dividers, decorative borders. */
     val outlineVariant: Color,
+    /** Dims the screen behind a dialog. Translucent; nothing is drawn on it directly. */
+    val scrim: Color,
     /** Error text and borders. Always paired with an icon and a sentence, never colour alone. */
     val error: Color,
     /** Text on [error]. */
@@ -71,6 +73,7 @@ val LightCycleColors = CycleColors(
     onSurfaceVariant = Color(0xFF584C33),
     outline = Color(0xFF827455),
     outlineVariant = Color(0xFFE1D0AA),
+    scrim = Color(0x661F1A10),
     error = Color(0xFFB3261E),
     onError = Color(0xFFFFFFFF),
     errorContainer = Color(0xFFF9DEDC),
@@ -98,6 +101,7 @@ val DarkCycleColors = CycleColors(
     onSurfaceVariant = Color(0xFFD2C4A5),
     outline = Color(0xFF9B8D6E),
     outlineVariant = Color(0xFF4D4430),
+    scrim = Color(0x99000000),
     error = Color(0xFFFFB4AB),
     onError = Color(0xFF690005),
     errorContainer = Color(0xFF93000A),

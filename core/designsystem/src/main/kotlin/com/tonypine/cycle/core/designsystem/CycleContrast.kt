@@ -50,6 +50,14 @@ val CycleContrastPairs: List<ContrastPair> = listOf(
         { it.onSurfaceVariant },
         { it.surfaceContainerHigh }
     ),
+    ContrastPair(
+        "Secondary text on card",
+        "onSurfaceVariant",
+        "surfaceContainer",
+        TEXT_CONTRAST,
+        { it.onSurfaceVariant },
+        { it.surfaceContainer }
+    ),
     ContrastPair("Text on accent", "onAccent", "accent", TEXT_CONTRAST, { it.onAccent }, { it.accent }),
     ContrastPair(
         "Text on accent container",
@@ -60,8 +68,24 @@ val CycleContrastPairs: List<ContrastPair> = listOf(
         { it.accentContainer }
     ),
     ContrastPair("Accent as text on surface", "accent", "surface", TEXT_CONTRAST, { it.accent }, { it.surface }),
+    ContrastPair(
+        "Accent as text on card",
+        "accent",
+        "surfaceContainer",
+        TEXT_CONTRAST,
+        { it.accent },
+        { it.surfaceContainer }
+    ),
     ContrastPair("Outline vs surface", "outline", "surface", GRAPHIC_CONTRAST, { it.outline }, { it.surface }),
     ContrastPair("Error text on surface", "error", "surface", TEXT_CONTRAST, { it.error }, { it.surface }),
+    ContrastPair(
+        "Error text on card",
+        "error",
+        "surfaceContainer",
+        TEXT_CONTRAST,
+        { it.error },
+        { it.surfaceContainer }
+    ),
     ContrastPair("Text on error", "onError", "error", TEXT_CONTRAST, { it.onError }, { it.error }),
     ContrastPair(
         "Text on error container",
