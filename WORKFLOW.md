@@ -66,10 +66,11 @@ Cycle: a native menstrual cycle tracking app, Android first. Read `AGENTS.md`, `
   and a CI workflow that runs them.
 - Builds and test runs can be slow. Use long tool waits and sparse polling rather than tight loops.
 - Match the test command to the loop: a targeted test during iteration, and the targeted pre-push
-  checks under `Validation` in `AGENTS.md` (`ktlintCheck` plus the touched modules' unit tests and
-  screenshot checks) before every push. CI runs the full set (`lint`, every module's tests and
-  screenshots, `assembleDebug`) and is the gate. Run the full set locally only for changes that reach
-  every module, such as `build-logic` or `gradle/libs.versions.toml`, and say why in the workpad.
+  checks under `Validation` in `AGENTS.md` (`ktlintCheck` plus the unit tests and screenshot checks
+  of the touched modules and the modules that depend on them) before every push. CI runs the full
+  set (`lint`, every module's tests and screenshots, `assembleDebug`) and is the gate. Run the full
+  set locally only for changes that reach every module, such as `build-logic` or
+  `gradle/libs.versions.toml`, and say why in the workpad.
 - Every `git push` runs `.githooks/pre-push`, which runs `./gradlew ktlintCheck` when the push
   changes Kotlin or Gradle files. Never use `git push --no-verify` or skip the hook any other way.
   When it fails, fix the files it names (`./gradlew ktlintFormat`), commit, and push again.
@@ -179,7 +180,7 @@ Cycle: a native menstrual cycle tracking app, Android first. Read `AGENTS.md`, `
 5.  Run validation/tests required for the scope.
     - Mandatory gate: execute all ticket-provided `Validation`/`Test Plan`/ `Testing` requirements when present; treat unmet items as incomplete work.
     - Prefer a targeted proof that directly demonstrates the behavior you changed.
-    - Run the pre-push checks listed under `Validation` in `AGENTS.md` for the modules you touched (see `Command and output hygiene`); leave the full set to CI.
+    - Run the pre-push checks listed under `Validation` in `AGENTS.md` for the modules you touched and the modules that depend on them (see `Command and output hygiene`); leave the full set to CI.
     - For long-running validation, use long waits and sparse polling so progress-only terminal output does not create many tiny transcript events.
     - Keep terminal output fed back into the model small: preserve failing command, exit code, and the most relevant error lines; summarize successful or repetitive output instead of pasting complete logs.
     - You may make temporary local proof edits to validate assumptions (for example: tweak a local build input, or hardcode a UI account / response path) when this increases confidence.

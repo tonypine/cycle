@@ -57,13 +57,34 @@ dir (`Agent sandbox` in `README.md`); until then, run Gradle with
 `JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Djava.io.tmpdir=$TMPDIR"` and say so in the workpad.
 
 Before a push, run `ktlintCheck` and the unit tests and screenshot checks of each module the change
-touches (`:app`, `:app-catalog`, `:core:designsystem`, `:core:ui`). Each takes seconds:
+touches, plus every module that depends on it: those render the changed code too, so their
+screenshots change with it. The map follows the `projects.*` dependencies in each module's
+`build.gradle.kts`; update it when a module is added:
+
+- `:core:designsystem`: also `:core:ui`, `:app-catalog` and `:app`. The catalog renders every
+  component and `app` renders the theme.
+- `:core:ui`: also `:app`.
+- `:app-catalog`, `:app`: nothing depends on them.
+
+`verifyRoborazziDebug` runs a module's unit tests and verifies its screenshots. `:core:ui` has no
+screenshot tests yet, so its check is `testDebugUnitTest`. Each takes seconds:
 
 ```sh
 ./gradlew ktlintCheck
-./gradlew :core:designsystem:verifyRoborazziDebug   # the module's unit tests, screenshots verified
-# or only the changed test classes, screenshots still verified:
+# a core:designsystem change, with the modules that depend on it:
+./gradlew :core:designsystem:verifyRoborazziDebug :core:ui:testDebugUnitTest \
+  :app-catalog:verifyRoborazziDebug :app:verifyRoborazziDebug
+# in the touched module, only the changed test classes, screenshots still verified
+# (the dependent modules still run their full check):
 ./gradlew :core:designsystem:testDebugUnitTest --tests '*CycleTextFieldTest' -Proborazzi.test.verify=true
+```
+
+After an intended UI change, re-record the screenshots of the same modules, not the whole build, and
+commit the new images:
+
+```sh
+./gradlew :core:designsystem:recordRoborazziDebug :app-catalog:recordRoborazziDebug \
+  :app:recordRoborazziDebug
 ```
 
 A versioned git hook, `.githooks/pre-push`, runs `./gradlew ktlintCheck` before every push that
@@ -91,8 +112,8 @@ workpad when you run it.
 - `lint`: Android Lint. Errors fail the build.
 - `testDebugUnitTest`: JUnit and Robolectric tests, all on the JVM.
 - `verifyRoborazziDebug`: compares screenshots with the references in each module's
-  `src/test/screenshots/`. After an intended UI change, run `./gradlew recordRoborazziDebug` and
-  commit the new images.
+  `src/test/screenshots/`. After an intended UI change, run `recordRoborazziDebug` for the touched
+  modules and the modules that depend on them (see above) and commit the new images.
 - `assembleDebug`: builds `app` and `app-catalog`. Every build also runs
   `checkNoMaterialDependencies`, which fails if `androidx.compose.material` or `material3` reaches a
   classpath, even transitively. UI is built on Compose Foundation and `core:designsystem`.
