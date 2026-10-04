@@ -15,6 +15,9 @@ dependencies {
     // RoundedPolygon and Morph, for shape morphing. Compose Foundation has no equivalent, and the
     // library depends only on Kotlin, collection and core, never Material.
     api(libs.androidx.graphics.shapes)
+    // PredictiveBackHandler, for the bottom sheet's predictive back. Compose UI has no back API of
+    // its own, and activity-compose brings no Material.
+    implementation(libs.androidx.activity.compose)
 
     testImplementation(libs.roborazzi.accessibility.check)
 }

@@ -48,6 +48,9 @@ val CatalogSections: List<CatalogSection> = listOf(
     CatalogSection("Dialogs", "Alert, destructive and text field dialogs: open each one, and turn dismissal off.") {
         DialogsSection()
     },
+    CatalogSection("Bottom sheet", "A modal sheet to open, drag, type in and dismiss.") {
+        BottomSheetSection()
+    },
     CatalogSection("Day cell", "Every cycle state, today on each, the interaction states, a sample week and logging.") {
         DayCellSection()
     },

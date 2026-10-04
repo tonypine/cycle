@@ -37,6 +37,8 @@ import com.google.android.apps.common.testing.accessibility.framework.Accessibil
 import com.google.android.apps.common.testing.accessibility.framework.checks.ImageContrastCheck
 import com.google.android.apps.common.testing.accessibility.framework.checks.TextContrastCheck
 import com.tonypine.cycle.core.designsystem.CycleTheme
+import org.hamcrest.CoreMatchers.anyOf
+import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeMatcher
 import org.junit.rules.TestRule
 import org.junit.runner.Description
@@ -193,17 +195,25 @@ class ComponentStateMatrixRule : TestRule {
      * (`AccessibilityViewCheckException`). When [disabled] is true, contrast checks are skipped:
      * WCAG 1.4.3 exempts inactive controls, which draw at the disabled alphas on purpose.
      *
-     * [root] is the window to check; pass `composeRule.onNode(isDialog())` for a dialog, which opens a
-     * window of its own. The touch target check covers every window.
+     * The framework checks the window of [root]: pass `composeRule.onNode(isDialog())` for a
+     * component with a window of its own, such as a bottom sheet. Touch targets are checked in every
+     * window. [suppress] drops other framework results that do not apply to the component, with a
+     * reason at the call site.
      */
     @OptIn(ExperimentalRoborazziApi::class)
-    fun checkAccessibility(disabled: Boolean = false, root: SemanticsNodeInteraction? = null) {
+    fun checkAccessibility(
+        disabled: Boolean = false,
+        root: SemanticsNodeInteraction = composeRule.onRoot(),
+        suppress: Matcher<AccessibilityViewCheckResult>? = null
+    ) {
         checkTouchTargets()
-        (root ?: composeRule.onRoot()).checkRoboAccessibility(
+        root.checkRoboAccessibility(
             roborazziATFAccessibilityCheckOptions = RoborazziATFAccessibilityCheckOptions(
                 checker = RoborazziATFAccessibilityChecker(
                     preset = AccessibilityCheckPreset.LATEST,
-                    suppressions = contrastResults(suppress = disabled)
+                    suppressions = contrastResults(suppress = disabled).let { contrast ->
+                        if (suppress == null) contrast else anyOf(contrast, suppress)
+                    }
                 ),
                 failureLevel = RoborazziATFAccessibilityChecker.CheckLevel.Warning
             )

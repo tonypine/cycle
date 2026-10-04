@@ -31,8 +31,6 @@ data class CycleColors(
     val outline: Color,
     /** Dividers, decorative borders. */
     val outlineVariant: Color,
-    /** Dims the screen behind a dialog. Translucent; nothing is drawn on it directly. */
-    val scrim: Color,
     /** Error text and borders. Always paired with an icon and a sentence, never colour alone. */
     val error: Color,
     /** Text on [error]. */
@@ -58,7 +56,9 @@ data class CycleColors(
     /** Day number on [ovulation]. */
     val onOvulation: Color,
     /** Today ring. */
-    val today: Color
+    val today: Color,
+    /** Dims the screen behind a bottom sheet or dialog. Translucent: its alpha is part of the role. */
+    val scrim: Color
 )
 
 val LightCycleColors = CycleColors(
@@ -73,7 +73,6 @@ val LightCycleColors = CycleColors(
     onSurfaceVariant = Color(0xFF584C33),
     outline = Color(0xFF827455),
     outlineVariant = Color(0xFFE1D0AA),
-    scrim = Color(0x661F1A10),
     error = Color(0xFFB3261E),
     onError = Color(0xFFFFFFFF),
     errorContainer = Color(0xFFF9DEDC),
@@ -86,7 +85,8 @@ val LightCycleColors = CycleColors(
     onFertile = Color(0xFF00391F),
     ovulation = Color(0xFFB35A00),
     onOvulation = Color(0xFFFFFFFF),
-    today = Color(0xFF1F1A10)
+    today = Color(0xFF1F1A10),
+    scrim = Color(0x521F1A10)
 )
 
 val DarkCycleColors = CycleColors(
@@ -101,7 +101,6 @@ val DarkCycleColors = CycleColors(
     onSurfaceVariant = Color(0xFFD2C4A5),
     outline = Color(0xFF9B8D6E),
     outlineVariant = Color(0xFF4D4430),
-    scrim = Color(0x99000000),
     error = Color(0xFFFFB4AB),
     onError = Color(0xFF690005),
     errorContainer = Color(0xFF93000A),
@@ -114,5 +113,6 @@ val DarkCycleColors = CycleColors(
     onFertile = Color(0xFFB4F2CE),
     ovulation = Color(0xFFFFC24A),
     onOvulation = Color(0xFF2B1F00),
-    today = Color(0xFFF2E8D5)
+    today = Color(0xFFF2E8D5),
+    scrim = Color(0x99000000)
 )

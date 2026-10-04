@@ -22,7 +22,6 @@ import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.DarkCycleColors
 import com.tonypine.cycle.core.designsystem.LightCycleColors
 import java.util.Locale
-import kotlin.math.roundToInt
 
 @Composable
 internal fun ColorsSection() {
@@ -115,7 +114,6 @@ private fun CycleColors.roles(): List<Pair<String, Color>> = listOf(
     "onSurfaceVariant" to onSurfaceVariant,
     "outline" to outline,
     "outlineVariant" to outlineVariant,
-    "scrim" to scrim,
     "error" to error,
     "onError" to onError,
     "errorContainer" to errorContainer,
@@ -128,13 +126,12 @@ private fun CycleColors.roles(): List<Pair<String, Color>> = listOf(
     "onFertile" to onFertile,
     "ovulation" to ovulation,
     "onOvulation" to onOvulation,
-    "today" to today
+    "today" to today,
+    "scrim" to scrim
 )
 
-/** `#RRGGBB`, followed by the opacity when the colour is translucent (the scrim). */
-private fun Color.hex(): String {
-    val rgb = "#%06X".format(Locale.ROOT, toArgb() and 0xFFFFFF)
-    return if (alpha < 1f) "$rgb at ${(alpha * 100).roundToInt()}%" else rgb
-}
+/** `#RRGGBB`, or `#AARRGGBB` for a translucent role such as the scrim. */
+private fun Color.hex(): String =
+    if (alpha < 1f) "#%08X".format(Locale.ROOT, toArgb()) else "#%06X".format(Locale.ROOT, toArgb() and 0xFFFFFF)
 
 private fun Double.format(decimals: Int): String = "%.${decimals}f".format(Locale.ROOT, this)

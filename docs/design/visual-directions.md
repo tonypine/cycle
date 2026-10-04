@@ -269,7 +269,6 @@ Sunshine and colour: grape violet, tomato red, sunflower amber and mint on warm 
 | `onSurfaceVariant` | Secondary text, captions | `#584C33` | `#D2C4A5` |
 | `outline` | Control borders (chips, fields) | `#827455` | `#9B8D6E` |
 | `outlineVariant` | Dividers, decorative borders | `#E1D0AA` | `#4D4430` |
-| `scrim` | Dims the screen behind a dialog | `#1F1A10` at 40% | `#000000` at 60% |
 | `error` | Error text and borders | `#B3261E` | `#FFB4AB` |
 | `onError` | Text on error | `#FFFFFF` | `#690005` |
 | `errorContainer` | Error banners | `#F9DEDC` | `#93000A` |
@@ -283,6 +282,7 @@ Sunshine and colour: grape violet, tomato red, sunflower amber and mint on warm 
 | `ovulation` | Ovulation day (fill), fertile marker dot | `#B35A00` | `#FFC24A` |
 | `onOvulation` | Day number on ovulation | `#FFFFFF` | `#2B1F00` |
 | `today` | Today ring | `#1F1A10` | `#F2E8D5` |
+| `scrim` | Dims the screen behind a sheet or dialog | `#1F1A10` at 32% | `#000000` at 60% |
 
 Contrast (WCAG 2.x ratios, computed from the hex values above):
 
@@ -291,12 +291,12 @@ Contrast (WCAG 2.x ratios, computed from the hex values above):
 | Body text on surface (`onSurface` on `surface`) | 4.5:1 | 16.88 | 15.23 |
 | Secondary text on surface (`onSurfaceVariant` on `surface`) | 4.5:1 | 8.20 | 10.73 |
 | Text on card (`onSurface` on `surfaceContainer`) | 4.5:1 | 15.62 | 13.90 |
-| Secondary text on card, navigation label, dialog body (`onSurfaceVariant` on `surfaceContainer`) | 4.5:1 | 7.59 | 9.80 |
+| Secondary text on card, navigation label, sheet handle, dialog body (`onSurfaceVariant` on `surfaceContainer`) | 4.5:1 | 7.59 | 9.80 |
 | Secondary text on raised surface (`onSurfaceVariant` on `surfaceContainerHigh`) | 4.5:1 | 6.89 | 8.57 |
 | Text on accent (primary button) (`onAccent` on `accent`) | 4.5:1 | 7.17 | 7.72 |
 | Text on accent container (selected chip) (`onAccentContainer` on `accentContainer`) | 4.5:1 | 13.31 | 7.25 |
 | Accent as text/link on surface (`accent` on `surface`) | 4.5:1 | 6.99 | 10.86 |
-| Accent as text on card (dialog actions) (`accent` on `surfaceContainer`) | 4.5:1 | 6.47 | 9.91 |
+| Accent as text on card, text button in a sheet or dialog (`accent` on `surfaceContainer`) | 4.5:1 | 6.47 | 9.91 |
 | Outline vs surface (control border) (`outline` on `surface`) | 3:1 | 4.47 | 5.66 |
 | Error text on surface (`error` on `surface`) | 4.5:1 | 6.38 | 10.90 |
 | Error text on card (destructive dialog icon) (`error` on `surfaceContainer`) | 4.5:1 | 5.90 | 9.95 |
