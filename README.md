@@ -31,7 +31,8 @@ You need JDK 21 and the Android SDK. Point Gradle at the SDK with `ANDROID_HOME`
 
 ## Checks
 
-The full set, run by CI on every PR:
+Before a push, run the targeted checks listed under `Validation` in `AGENTS.md`. The full set, run by
+CI on every PR:
 
 ```sh
 ./gradlew ktlintCheck lint testDebugUnitTest verifyRoborazziDebug assembleDebug
