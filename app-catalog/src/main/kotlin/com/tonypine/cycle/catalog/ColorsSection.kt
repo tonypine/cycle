@@ -126,9 +126,12 @@ private fun CycleColors.roles(): List<Pair<String, Color>> = listOf(
     "onFertile" to onFertile,
     "ovulation" to ovulation,
     "onOvulation" to onOvulation,
-    "today" to today
+    "today" to today,
+    "scrim" to scrim
 )
 
-private fun Color.hex(): String = "#%06X".format(Locale.ROOT, toArgb() and 0xFFFFFF)
+/** `#RRGGBB`, or `#AARRGGBB` for a translucent role such as the scrim. */
+private fun Color.hex(): String =
+    if (alpha < 1f) "#%08X".format(Locale.ROOT, toArgb()) else "#%06X".format(Locale.ROOT, toArgb() and 0xFFFFFF)
 
 private fun Double.format(decimals: Int): String = "%.${decimals}f".format(Locale.ROOT, this)
