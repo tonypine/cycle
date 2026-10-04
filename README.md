@@ -116,9 +116,9 @@ The flow and its options are recorded in
 
 [`.github/workflows/release.yml`](.github/workflows/release.yml) runs after `CI` passes on a push
 to `main`: it builds `:app:assembleRelease` and `:app-catalog:assembleRelease` with the version and
-signing secrets, checks each APK with `apksigner verify` and its package and version with
+signing inputs, checks each APK with `apksigner verify` and its package and version with
 `aapt2 dump badging`, and creates the tag and the GitHub Release with both APKs and the changelog.
-If a signing secret is missing, the job fails naming it and publishes nothing. A second job then
+If a signing input is missing, the job fails naming it and publishes nothing. A second job then
 posts an update to the Linear initiative "Menstrual Cycle App" with the version, the changelog and
 links to both APKs and the release. If that call fails, the job fails with Linear's error and the
 release stays published.
@@ -157,13 +157,15 @@ installed app keeps updating. If it is lost, the app has to be uninstalled and r
    **before** adding the secrets. With keytool's default PKCS12 format, the key password is the
    store password.
 3. Add the GitHub Actions secrets. `gh secret set` prompts for the values, so the passwords stay
-   out of your shell history:
+   out of your shell history. The key alias is not sensitive, so it is a repository variable:
+   GitHub masks every occurrence of a secret's value, and a secret `cycle` would turn
+   `tonypine/cycle` into `tonypine/***` in the logs and drop the release job's outputs.
 
    ```sh
    base64 -i cycle-release.jks | gh secret set RELEASE_KEYSTORE_BASE64
    gh secret set RELEASE_KEYSTORE_PASSWORD   # the store password
-   gh secret set RELEASE_KEY_ALIAS           # cycle
    gh secret set RELEASE_KEY_PASSWORD        # the key password
+   gh variable set RELEASE_KEY_ALIAS --body cycle
    ```
 
 4. Delete the local `cycle-release.jks`. Never commit it: `*.jks` and `*.keystore` are ignored.
