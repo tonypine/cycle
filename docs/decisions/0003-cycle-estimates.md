@@ -81,11 +81,14 @@ unless a migration changes them.
   - "Period started this day: fill in N days" (N her usual period length, as the estimates use it)
     is offered on a day up to today with no period within a day's gap of the days it would fill. It
     marks the day started and the Nth day ended, as Today's "Log a period" does; a fill that reaches
-    today is still going.
+    today is still going. A stray "ended" on a day before the Nth, left by earlier clears, is removed
+    so it cannot close the period early.
   - "Clear this day" removes what she logged and takes the day off its period while the rest stays:
-    on the first day, "started" moves to the next day; on the last, the day before is marked ended,
-    which also closes a period still going today. A day in the middle is logged as no flow, a gap
-    day: splitting the period instead would invent a cycle of a few days and skew every estimate.
+    on the first day, "started" moves to the next day that still draws as a period day; on the last,
+    the nearest such day before is marked ended, which also closes a period still going today. Days
+    she cleared before are skipped, so a marker never puts them back on the period. A day in the
+    middle is logged as no flow, a gap day: splitting the period instead would invent a cycle of a
+    few days and skew every estimate.
   - The calendar draws a day logged with no period flow and no marker (none or spotting) as plain,
     even inside a period, so a cleared middle day shows as cleared while the period stays one.
 - Life stages (pregnancy, after birth, hormonal contraception) and cycles to exclude are not modelled

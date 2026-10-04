@@ -3,6 +3,7 @@ package com.tonypine.cycle.core.domain
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.model.Period
+import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -64,6 +65,18 @@ class DayLogEditsTest {
     }
 
     @Test
+    fun `a stray ended inside the filled days does not cut the period short`() {
+        // Left by clearing the first day of a two-day period that had only flow on it.
+        val logs = listOf(DayLog(day("2027-02-12"), periodEnded = true))
+        assertTrue(DayLogEdits.canFill(logs, day("2027-02-10"), 5, today))
+
+        val edits = DayLogEdits.fill(logs, day("2027-02-10"), 5, today)
+
+        assertEquals(listOf(Period(day("2027-02-10"), day("2027-02-14"))), periods(apply(logs, edits)))
+        assertTrue(edits.contains(DayLog(day("2027-02-12"))))
+    }
+
+    @Test
     fun `a period filled across two months spans both`() {
         val edits = DayLogEdits.fill(emptyList(), day("2027-02-26"), 5, today)
 
@@ -103,6 +116,42 @@ class DayLogEditsTest {
         val after = apply(logs, DayLogEdits.clear(logs, day("2027-03-06"), today))
 
         assertEquals(listOf(Period(day("2027-03-02"), day("2027-03-05"))), periods(after))
+    }
+
+    @Test
+    fun `clearing a period's last day skips a day she cleared before, which stays plain`() {
+        var logs = DayLogEdits.fill(emptyList(), day("2027-02-02"), 5, today)
+        logs = apply(logs, DayLogEdits.clear(logs, day("2027-02-05"), today))
+
+        logs = apply(logs, DayLogEdits.clear(logs, day("2027-02-06"), today))
+
+        assertEquals(listOf(Period(day("2027-02-02"), day("2027-02-04"))), periods(logs))
+        assertDrawsPlain(logs, day("2027-02-05"))
+    }
+
+    @Test
+    fun `clearing a period's first day skips a day she cleared before, which stays plain`() {
+        var logs = DayLogEdits.fill(emptyList(), day("2027-02-02"), 5, today)
+        logs = apply(logs, DayLogEdits.clear(logs, day("2027-02-03"), today))
+
+        logs = apply(logs, DayLogEdits.clear(logs, day("2027-02-02"), today))
+
+        assertEquals(listOf(Period(day("2027-02-04"), day("2027-02-06"))), periods(logs))
+        assertDrawsPlain(logs, day("2027-02-03"))
+    }
+
+    @Test
+    fun `clearing the first day of a period still going whose other days are all cleared ends it`() {
+        val logs = listOf(
+            DayLog(day("2027-03-18"), periodStarted = true),
+            DayLog(day("2027-03-19"), flow = FlowLevel.NONE),
+            DayLog(today, flow = FlowLevel.NONE)
+        )
+
+        val after = apply(logs, DayLogEdits.clear(logs, day("2027-03-18"), today))
+
+        assertEquals(emptyList<Period>(), periods(after))
+        assertDrawsPlain(after, day("2027-03-19"))
     }
 
     @Test
@@ -153,5 +202,15 @@ class DayLogEditsTest {
         val none = CycleCalculator.overview(emptyList(), setUp(periodLength = 6), today).typical
         assertEquals(6, CycleCalculator.usualPeriodLength(none, setUp(periodLength = 6)))
         assertEquals(5, CycleCalculator.usualPeriodLength(none, notSetUp))
+    }
+
+    /**
+     * She logged [date] with no period flow and no marker, which the calendar draws plain even
+     * inside a period (`CalendarDays.withoutPeriodFlow`).
+     */
+    private fun assertDrawsPlain(logs: List<DayLog>, date: LocalDate) {
+        val log = logs.single { it.date == date }
+        assertFalse(log.isEmpty)
+        assertFalse(log.isPeriodDay)
     }
 }
