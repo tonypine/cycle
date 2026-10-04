@@ -23,6 +23,14 @@ do not pick a stack on your own.
 Decisions that shape the whole codebase go in `docs/decisions/` as numbered records
 (`NNNN-short-title.md`): what was decided, the options considered, and why.
 
+## UI and the design system
+
+Feature code uses design system components and tokens from `core:designsystem` (`CycleTheme.colors`,
+`.typography`, `.shapes`, `.spacing`, `.elevation`), never ad-hoc styled Foundation code or
+hard-coded colours, sizes and text styles. If a screen needs something the design system lacks, add
+the token or component there first, with its catalog entry, previews and tests. How to do that is in
+`docs/design/design-system.md`.
+
 ## Commits and branches
 
 - Commits: `type: message`, e.g. `feat: log period start date`. Types: `feat`, `fix`, `refactor`,

@@ -13,8 +13,8 @@ recorded in [`docs/decisions/0001-stack.md`](docs/decisions/0001-stack.md).
 | Module | What it holds |
 | -- | -- |
 | `app` | The Cycle app (`com.tonypine.cycle`, minSdk 29). For now, one placeholder screen. |
-| `app-catalog` | A separate app (`com.tonypine.cycle.catalog`) that shows every design system component, for building UI in isolation. |
-| `core:designsystem` | `CycleTheme` on Compose Foundation, no Material. A placeholder until the real tokens and components land. |
+| `app-catalog` | A separate app (`com.tonypine.cycle.catalog`) that shows every design system token and component, one section per page, for building UI in isolation. |
+| `core:designsystem` | `CycleTheme` and the Zest tokens (colour, type, shape, spacing, elevation) on Compose Foundation, no Material. See [`docs/design/design-system.md`](docs/design/design-system.md). |
 | `core:ui` | Shared app-level UI built on the design system. Empty for now. |
 | `build-logic` | Gradle convention plugins shared by every module. |
 
