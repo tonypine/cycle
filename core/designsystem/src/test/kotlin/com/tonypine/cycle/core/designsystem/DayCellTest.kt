@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
@@ -144,6 +145,31 @@ class DayCellTest {
         }
         composeRule.onNodeWithTag(CELL).assertIsNotEnabled().performClick()
         assertEquals(0, clicks)
+    }
+
+    @Test
+    @Config(qualifiers = "+xxxhdpi")
+    fun aDayWithoutOnClickKeepsItsFullColourAndIgnoresTaps() {
+        composeRule.setContent {
+            CycleTheme(darkTheme = false) {
+                Box(Modifier.background(CycleTheme.colors.surface)) {
+                    DayCell(
+                        today.plusDays(10),
+                        CycleDayState.Period,
+                        onClick = null,
+                        Modifier.testTag(CELL),
+                        selected = true
+                    )
+                }
+            }
+        }
+        composeRule.onNodeWithTag(CELL)
+            .assertContentDescriptionEquals("30 March, period")
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.OnClick))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Role))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Disabled))
+            .assertIsSelected()
+        assertColor(LightCycleColors.period, fillPixel())
     }
 
     @Test

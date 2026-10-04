@@ -10,6 +10,10 @@
     <string name="day_cell_fertile">fertile window</string>
     <string name="day_cell_ovulation">ovulation</string>
 
+    <!-- Calendar header buttons, read by TalkBack: they move the calendar a month back or forward. -->
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+
     <!-- Cycle phase legend labels, one per day cell state. -->
     <string name="legend_period">Period</string>
     <string name="legend_predicted_period">Predicted period</string>

@@ -24,6 +24,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -159,9 +160,10 @@ class ComponentStateMatrixRule : TestRule {
 
     /**
      * Captures `src/test/screenshots/<name>_<state>_<appearance>.png` and checks accessibility.
-     * The component is padded so the focus ring and press scale show in full.
+     * The component is padded so the focus ring and press scale show in full: by [margin], or
+     * `spacing.large` when it is null.
      */
-    fun capture(name: String, case: MatrixCase, content: @Composable StateScope.() -> Unit) {
+    fun capture(name: String, case: MatrixCase, margin: Dp? = null, content: @Composable StateScope.() -> Unit) {
         lateinit var scope: StateScope
         composeRule.setContent {
             val source = remember { MutableInteractionSource() }
@@ -171,7 +173,7 @@ class ComponentStateMatrixRule : TestRule {
                     Modifier
                         .testTag(CAPTURE_TAG)
                         .background(CycleTheme.colors.surface)
-                        .padding(CycleTheme.spacing.large)
+                        .padding(margin ?: CycleTheme.spacing.large)
                 ) {
                     scope.content()
                 }
