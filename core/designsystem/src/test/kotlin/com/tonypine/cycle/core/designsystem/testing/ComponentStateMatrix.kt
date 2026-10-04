@@ -48,7 +48,10 @@ enum class ComponentState(val slug: String) {
     Focused("focused"),
     Hovered("hovered"),
     Disabled("disabled"),
-    Error("error")
+    Error("error"),
+
+    /** Selected or checked: chips, toggles. */
+    Selected("selected")
 }
 
 /** How the screen around the component is set up. */
@@ -65,12 +68,13 @@ data class MatrixCase(val state: ComponentState, val appearance: Appearance) {
 }
 
 /**
- * What the component under test receives. Wire [interactionSource], [enabled] and [isError] into its
- * parameters; the harness drives the interaction states through the source.
+ * What the component under test receives. Wire [interactionSource], [enabled], [isError] and
+ * [selected] into its parameters; the harness drives the interaction states through the source.
  */
 class StateScope(val state: ComponentState, val interactionSource: MutableInteractionSource) {
     val enabled: Boolean get() = state != ComponentState.Disabled
     val isError: Boolean get() = state == ComponentState.Error
+    val selected: Boolean get() = state == ComponentState.Selected
 }
 
 object ComponentStateMatrix {
@@ -83,15 +87,32 @@ object ComponentStateMatrix {
         ComponentState.Error
     )
 
+    /** The states of a control with no error state: buttons, icon buttons. */
+    val PressableStates = listOf(
+        ComponentState.Default,
+        ComponentState.Pressed,
+        ComponentState.Focused,
+        ComponentState.Disabled
+    )
+
+    /** [PressableStates] plus selected, for chips and toggles. */
+    val SelectableStates = PressableStates + ComponentState.Selected
+
     /**
-     * Every state in light and dark, plus the default state at 200% font scale and right-to-left.
-     * Return it from a `@ParameterizedRobolectricTestRunner.Parameters` function.
+     * Every state in light and dark, plus [layoutStates] (the default state, unless a selected one
+     * changes the layout too) at 200% font scale and right-to-left. Return it from a
+     * `@ParameterizedRobolectricTestRunner.Parameters` function.
      */
-    fun cases(states: List<ComponentState> = InteractiveStates): List<Array<Any>> {
+    fun cases(
+        states: List<ComponentState> = InteractiveStates,
+        layoutStates: List<ComponentState> = listOf(ComponentState.Default)
+    ): List<Array<Any>> {
         val themed = states.flatMap { state ->
             listOf(Appearance.Light, Appearance.Dark).map { MatrixCase(state, it) }
         }
-        val layout = listOf(Appearance.FontScale200, Appearance.Rtl).map { MatrixCase(ComponentState.Default, it) }
+        val layout = layoutStates.flatMap { state ->
+            listOf(Appearance.FontScale200, Appearance.Rtl).map { MatrixCase(state, it) }
+        }
         return (themed + layout).map { arrayOf<Any>(it) }
     }
 }

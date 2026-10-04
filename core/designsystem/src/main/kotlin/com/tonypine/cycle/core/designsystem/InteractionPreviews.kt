@@ -33,8 +33,9 @@ import androidx.graphics.shapes.Morph
 
 /**
  * A pill control that shows every interaction foundation at once: [cycleIndication], an
- * [animatedCornerShape] that squashes on press, a [CycleIcon] and the disabled alphas. Previews, the
- * state matrix tests and the docs use it until real buttons exist; it is not a component.
+ * [animatedCornerShape] that squashes on press, a [CycleIcon] and the disabled alphas, plus an error
+ * state no button has. The indication's previews and state matrix test use it; it is not a component:
+ * screens use [FilledButton] and the other controls.
  */
 @Composable
 internal fun InteractionSample(
@@ -86,8 +87,9 @@ internal fun rememberInteractionSourceIn(interaction: Interaction?): MutableInte
     return source
 }
 
+/** [CycleTheme] on its `surface`, padded, for every component's previews. */
 @Composable
-private fun PreviewSurface(darkTheme: Boolean, content: @Composable () -> Unit) {
+internal fun PreviewSurface(darkTheme: Boolean, content: @Composable () -> Unit) {
     CycleTheme(darkTheme = darkTheme) {
         Box(Modifier.background(CycleTheme.colors.surface).padding(CycleTheme.spacing.large)) { content() }
     }
