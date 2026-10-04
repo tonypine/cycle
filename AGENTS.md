@@ -70,12 +70,14 @@ touches, plus every module that depends on it: those render the changed code too
 screenshots change with it. The map follows the `projects.*` dependencies in each module's
 `build.gradle.kts`; update it when a module is added:
 
-- `:core:designsystem`: also `:core:ui`, `:app-catalog` and `:app`. The catalog renders every
-  component and `app` renders the theme.
-- `:core:ui`: also `:app`.
-- `:core:model`: also `:core:domain` and `:core:data`.
-- `:core:domain`: also `:core:data`.
-- `:core:data`, `:app-catalog`, `:app`: nothing depends on them.
+- `:core:designsystem`: also `:core:ui`, `:feature:today`, `:app-catalog` and `:app`. The catalog
+  renders every component and `app` renders the theme.
+- `:core:ui`: also `:feature:today` and `:app`.
+- `:core:model`: also `:core:domain`, `:core:data`, `:feature:today` and `:app`.
+- `:core:domain`: also `:core:data`, `:feature:today` and `:app`.
+- `:core:data`: also `:feature:today` and `:app`.
+- `:feature:today`: also `:app`.
+- `:app-catalog`, `:app`: nothing depends on them.
 
 `verifyRoborazziDebug` runs a module's unit tests and verifies its screenshots. `:core:ui` has no
 screenshot tests yet, so its check is `testDebugUnitTest`. `:core:model`, `:core:domain` and
