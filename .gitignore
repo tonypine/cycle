@@ -9,3 +9,16 @@
 # Local secrets
 .env
 .env.*
+
+# Gradle and Android
+.gradle/
+.kotlin/
+build/
+local.properties
+captures/
+*.apk
+*.aab
+
+# Signing keys stay out of the repo
+*.keystore
+*.jks

@@ -37,5 +37,19 @@ Reusable playbooks live under `.ai/skills/` and are shared between agents throug
 
 ## Validation
 
-No app code exists yet, so there are no validation commands. The scaffold ticket defines them here:
-the commands to build, lint and test, which must all pass before a change is called done.
+Run from the repo root with JDK 21. Every command must pass before a change is called done; CI
+(`.github/workflows/ci.yml`) runs the same set on every PR:
+
+```sh
+./gradlew ktlintCheck lint testDebugUnitTest verifyRoborazziDebug assembleDebug
+```
+
+- `ktlintCheck`: formatting, including `build-logic`. `./gradlew ktlintFormat` fixes most issues.
+- `lint`: Android Lint. Errors fail the build.
+- `testDebugUnitTest`: JUnit and Robolectric tests, all on the JVM.
+- `verifyRoborazziDebug`: compares screenshots with the references in each module's
+  `src/test/screenshots/`. After an intended UI change, run `./gradlew recordRoborazziDebug` and
+  commit the new images.
+- `assembleDebug`: builds `app` and `app-catalog`. Every build also runs
+  `checkNoMaterialDependencies`, which fails if `androidx.compose.material` or `material3` reaches a
+  classpath, even transitively. UI is built on Compose Foundation and `core:designsystem`.
