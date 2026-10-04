@@ -77,6 +77,14 @@ val CycleContrastPairs: List<ContrastPair> = listOf(
         { it.surfaceContainer }
     ),
     ContrastPair("Outline vs surface", "outline", "surface", GRAPHIC_CONTRAST, { it.outline }, { it.surface }),
+    ContrastPair(
+        "Outline vs card",
+        "outline",
+        "surfaceContainer",
+        GRAPHIC_CONTRAST,
+        { it.outline },
+        { it.surfaceContainer }
+    ),
     ContrastPair("Error text on surface", "error", "surface", TEXT_CONTRAST, { it.error }, { it.surface }),
     ContrastPair(
         "Error text on card",

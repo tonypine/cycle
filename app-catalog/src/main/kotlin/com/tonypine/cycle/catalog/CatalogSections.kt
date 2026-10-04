@@ -42,6 +42,12 @@ val CatalogSections: List<CatalogSection> = listOf(
         IconButtonsSection()
     },
     CatalogSection("Chips", "Filter and assist chips in every state, and selection.") { ChipsSection() },
+    CatalogSection("Button groups", "Connected single-choice groups: flow and pain, and every state.") {
+        ButtonGroupsSection()
+    },
+    CatalogSection("Switches", "The switch and the switch row: toggle a few, and every state.") {
+        SwitchesSection()
+    },
     CatalogSection("Text field", "The outlined text field: a form to type in, and every state.") {
         TextFieldSection()
     },

@@ -48,9 +48,10 @@ fun Modifier.minimumTouchTarget(): Modifier = layout { measurable, constraints -
 internal data class ControlColors(val container: Color, val content: Color, val border: Color = container)
 
 /**
- * The visible part of a button, icon button or chip: [colors] faded on the default effects spring,
- * a 1dp border, and the theme's indication drawn in [shape] from [interactionSource]. The caller puts
- * the interaction (`clickable`, `selectable`, `toggleable`, with no indication of its own) and
+ * The visible part of a button, icon button, chip or button group segment: [colors] faded on the
+ * default effects spring, a 1dp border, and the theme's indication drawn in [shape] from
+ * [interactionSource]. It is at least [height] tall and [minWidth] wide. The caller puts the
+ * interaction (`clickable`, `selectable`, `toggleable`, with no indication of its own) and
  * [minimumTouchTarget] in [modifier], in front of this.
  */
 @Composable
@@ -61,6 +62,7 @@ internal fun ControlContainer(
     height: Dp,
     padding: PaddingValues,
     modifier: Modifier = Modifier,
+    minWidth: Dp = height,
     content: @Composable RowScope.(contentColor: Color) -> Unit
 ) {
     val motion = CycleTheme.motion
@@ -73,7 +75,7 @@ internal fun ControlContainer(
             .background(container, shape)
             .border(ControlBorderWidth, border, shape)
             .heightIn(min = height)
-            .widthIn(min = height)
+            .widthIn(min = minWidth)
             .padding(padding),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
