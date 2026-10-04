@@ -231,8 +231,14 @@ Three flags combine with every state:
 - `selected` adds a 2dp `accent` rounded-square frame (`shapes.medium`) on the cell's edge. It is
   square where the today ring is round, so the two read apart without colour, and the cell exposes
   `selected` to TalkBack.
-- `enabled = false`, for a day outside the month or in the future, draws the whole cell at
-  `stateAlpha.disabledContent` and ignores taps. The state's shape stays visible.
+- `enabled = false` draws the whole cell at `stateAlpha.disabledContent` and ignores taps. The
+  state's shape stays visible.
+
+A day that shows but cannot be tapped, such as a future day in the calendar, passes
+`onClick = null` instead of `enabled = false`: it keeps its full colour, so a predicted period stays
+readable, and ignores taps. TalkBack reads its date and state without "button" and with no "double
+tap to activate"; it still exposes `selected`. Calendars do this for every day their caller marks
+as not enabled.
 
 Pressed and focused come from `cycleIndication` in the `shapes.medium` tile: the state layer, the
 press scale and the focus ring.
@@ -241,10 +247,9 @@ press scale and the focus ring.
 DayCell(
     date = date,
     state = CycleDayState.Period,
-    onClick = { onDayClick(date) },
+    onClick = if (date.isAfter(today)) null else ({ onDayClick(date) }),
     isToday = date == today,
-    selected = date == selectedDate,
-    enabled = date.month == shownMonth && !date.isAfter(today)
+    selected = date == selectedDate
 )
 ```
 
@@ -262,14 +267,66 @@ not read twice. The words live in `core:designsystem`'s `strings.xml`.
 Do not use it for a date picker that has no cycle meaning, and do not tint a cell with other colours:
 a new cycle state needs a new `CycleDayState` with its own shape.
 
+## Month calendar and week row
+
+`Calendar.kt`. Feature code never lays out `DayCell`s itself: a month goes in a `MonthCalendar`, a
+week in a `WeekRow`.
+
+- `MonthCalendar(month, stateOf, onDayClick, today, onPreviousMonth, onNextMonth, selected = null,
+  isEnabled = { true })`: a header with the previous and next `IconButton`s ("Previous month", "Next
+  month", `ChevronStart` and `ChevronEnd`, so they mirror in right-to-left) around the month name in
+  `title`; the narrow weekday names in `labelSmall` `onSurfaceVariant`; then a seven-column grid of
+  `DayCell`s. The days outside `month` are left blank, so a month takes four to six rows.
+- `WeekRow(weekOf, stateOf, onDayClick, today, selected = null, isEnabled = { true })`: the weekday
+  names and the seven days of the week around `weekOf`, for Today and for picking a recent day. Days
+  of the previous or next month show like any other.
+
+`stateOf` gives each day's `CycleDayState`, `today` gets the ring, `selected` the frame. A day where
+`isEnabled` returns false keeps its full colour and ignores taps (`DayCell` with `onClick = null`), so
+pass `{ !it.isAfter(today) }` to keep a predicted period readable while only past days can be
+logged. The week starts on the locale's first day (`WeekFields.of(locale)`): Monday in the UK, Sunday
+in the US, and the columns run right to left in right-to-left layouts. Each cell is keyed by its date,
+so moving to another month never replays the logging morph.
+
+```kotlin
+var month by rememberSaveable { mutableStateOf(YearMonth.from(today)) }
+MonthCalendar(
+    month = month,
+    stateOf = { date -> dayStates[date] ?: CycleDayState.Plain },
+    onDayClick = onOpenDay,
+    today = today,
+    onPreviousMonth = { month = month.minusMonths(1) },
+    onNextMonth = { month = month.plusMonths(1) },
+    modifier = Modifier.padding(horizontal = CycleTheme.spacing.medium),
+    selected = selectedDay,
+    isEnabled = { !it.isAfter(today) }
+)
+CycleLegend(entries = CycleLegendEntry.WithoutFertility)
+```
+
+Layout: every cell is the size of the largest and each column is at least that wide; the columns
+share the width left over. Lay a calendar out with `spacing.medium` (12dp) margins, not the 16dp
+screen margin: seven 48dp cells need 336dp, exactly what a 360dp screen leaves inside 12dp margins.
+With large text the cells grow (58dp at 200%), and seven no longer fit even a 412dp screen, so the
+weekday names and the days **scroll sideways together** while the header stays put. Shrinking the
+margins would not be enough (seven 58dp cells are 406dp). When it scrolls, the grid starts with
+today's column in view, since today is often at the weekend end of the week.
+
+TalkBack: the month name is a heading and a polite live region, so it is read again when the month
+changes. The grid exposes `CollectionInfo` (as many rows as the month has weeks, seven columns; one
+row for a `WeekRow`) and each day a `CollectionItemInfo`, and reads as in `DayCell` ("20 March,
+today"). Each weekday initial reads as the day's full name ("Monday").
+
 ## Cycle legend
 
-`CycleLegend()` is the calendar's key: one swatch per state (period, predicted period, fertile
-window, ovulation, today), each drawn by the same code as the cells at 32dp, with its label in
-`bodySmall` `onSurfaceVariant`. It is a `FlowRow`, so the entries wrap when the text is large, and it
-exposes `CollectionInfo` with one `CollectionItemInfo` per entry, so TalkBack reads it as a list of
-five. The swatches are decorative; the label says what each one is. Put it under the calendar it
-explains.
+`CycleLegend(entries = CycleLegendEntry.entries)` is the calendar's key: one swatch per entry
+(`Period`, `PredictedPeriod`, `Fertile`, `Ovulation`, `Today`), each drawn by the same code as the
+cells at 32dp, with its label in `bodySmall` `onSurfaceVariant`. Show only the entries the calendar
+above it can draw: `CycleLegendEntry.WithoutFertility` (period, predicted period, today) while
+fertility estimates are off, as in the MVP. The default is all five. It is a `FlowRow`, so the entries
+wrap when the text is large, and it exposes `CollectionInfo` with one `CollectionItemInfo` per entry,
+so TalkBack reads it as a list of as many items as it shows. The swatches are decorative; the label
+says what each one is. Put it under the calendar it explains.
 
 ## Cards
 
@@ -442,7 +499,7 @@ debug, release and unit test classpath, and fails if anything else brings Materi
 The interaction previews live in `core/designsystem/.../InteractionPreviews.kt`, with
 `PreviewSurface` and `rememberInteractionSourceIn` for holding a pressed or focused state still. Each
 component keeps its previews next to it, at the bottom of its own file (`Buttons.kt`, `DayCell.kt`,
-`CycleLegend.kt`, `Cards.kt`, `EmptyState.kt`, `LoadingIndicator.kt`), in light and dark.
+`Calendar.kt`, `CycleLegend.kt`, `Cards.kt`, `EmptyState.kt`, `LoadingIndicator.kt`), in light and dark.
 
 ## Testing components
 
@@ -454,7 +511,8 @@ right-to-left. `PressableStates` suits buttons, `SelectableStates` adds selected
 toggles, `InteractiveStates` adds error for fields, and `InputStates` swaps pressed for filled, for
 text inputs. `ComponentStateMatrixRule.capture(name, case) { ... }` renders the component in
 `CycleTheme`, drives the interaction state through the `interactionSource` it hands you, along with
-`enabled`, `isError` and `selected` for its parameters, records
+`enabled`, `isError` and `selected` for its parameters, pads it by `spacing.large` (or the `margin`
+you pass, such as a calendar's 12dp), records
 `src/test/screenshots/<name>_<state>_<appearance>.png`, and checks accessibility:
 
 - every clickable must be laid out at least 48dp in both directions (a JVM check: Compose stretches

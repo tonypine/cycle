@@ -50,6 +50,27 @@ class CycleLegendTest {
     }
 
     @Test
+    fun showsOnlyTheChosenEntriesAndReadsAsAListOfThem() {
+        show(Appearance.Light, CycleLegendEntry.WithoutFertility)
+        val chosen = listOf("Period", "Predicted period", "Today")
+        composeRule.onNodeWithTag(LEGEND).assert(
+            SemanticsMatcher("a list of ${chosen.size}") {
+                val info = it.config.getOrNull(SemanticsProperties.CollectionInfo)
+                info?.rowCount == chosen.size && info.columnCount == 1
+            }
+        )
+        chosen.forEachIndexed { index, label ->
+            composeRule.onNodeWithText(label).assert(
+                SemanticsMatcher("item $index of the list") {
+                    it.config.getOrNull(SemanticsProperties.CollectionItemInfo)?.rowIndex == index
+                }
+            )
+        }
+        composeRule.onNodeWithText("Fertile window").assertDoesNotExist()
+        composeRule.onNodeWithText("Ovulation").assertDoesNotExist()
+    }
+
+    @Test
     fun wrapsAtDoubleFontScaleWithoutClipping() {
         show(Appearance.FontScale200)
         val legend = composeRule.onNodeWithTag(LEGEND).getBoundsInRoot()
@@ -64,10 +85,10 @@ class CycleLegendTest {
         }
     }
 
-    private fun show(appearance: Appearance) {
+    private fun show(appearance: Appearance, entries: List<CycleLegendEntry> = CycleLegendEntry.entries) {
         composeRule.setContent {
             Themed(appearance) {
-                Box(Modifier.padding(CycleTheme.spacing.large)) { CycleLegend(Modifier.testTag(LEGEND)) }
+                Box(Modifier.padding(CycleTheme.spacing.large)) { CycleLegend(Modifier.testTag(LEGEND), entries) }
             }
         }
     }

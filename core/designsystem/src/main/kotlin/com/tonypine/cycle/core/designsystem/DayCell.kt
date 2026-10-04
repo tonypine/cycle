@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
@@ -77,8 +78,11 @@ enum class CycleDayState {
  * One day of the calendar, drawn in Zest's shape for its cycle [state] so no state relies on colour
  * alone: a squircle for period days (dashed when predicted), a circle with a dot for the fertile
  * window, a sun for ovulation. [isToday] adds a `today` ring and a bolder number, [selected] a 2dp
- * `accent` rounded-square frame, and a disabled day (outside the month, or in the future) draws at
- * the disabled alpha and ignores taps.
+ * `accent` rounded-square frame, and a disabled day draws at the disabled alpha and ignores taps.
+ *
+ * Pass a null [onClick] for a day that shows but cannot be tapped, such as a future day in the
+ * calendar: unlike a disabled day it keeps its full colour, so a predicted period stays readable.
+ * TalkBack reads its date and state, without "button".
  *
  * When [state] becomes [CycleDayState.Period], the shape morphs from the plain circle to the period
  * squircle on the spatial spring, a small celebration of logging the day; under reduce motion it
@@ -92,7 +96,7 @@ enum class CycleDayState {
 fun DayCell(
     date: LocalDate,
     state: CycleDayState,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     isToday: Boolean = false,
     selected: Boolean = false,
@@ -109,13 +113,19 @@ fun DayCell(
     val description = dayDescription(date, state, isToday)
     Box(
         modifier = modifier
-            .selectable(
-                selected = selected,
-                interactionSource = interactionSource,
-                indication = cycleIndication(tile),
-                enabled = enabled,
-                role = Role.Button,
-                onClick = onClick
+            .then(
+                if (onClick != null) {
+                    Modifier.selectable(
+                        selected = selected,
+                        interactionSource = interactionSource,
+                        indication = cycleIndication(tile),
+                        enabled = enabled,
+                        role = Role.Button,
+                        onClick = onClick
+                    )
+                } else {
+                    Modifier.semantics { this.selected = selected }
+                }
             )
             .semantics { contentDescription = description }
             .sizeIn(minWidth = DayCellMinSize, minHeight = DayCellMinSize)
@@ -268,7 +278,7 @@ private fun CycleDayState.numberColor(colors: CycleColors): Color = when (this) 
 }
 
 @Composable
-private fun locale(): Locale = LocalConfiguration.current.locales[0]
+internal fun locale(): Locale = LocalConfiguration.current.locales[0]
 
 @Composable
 private fun dayNumber(date: LocalDate): String {
@@ -305,7 +315,7 @@ internal val SampleWeek: List<Pair<LocalDate, CycleDayState>> = listOf(
     CycleDayState.Plain
 ).mapIndexed { index, state -> LocalDate.of(2027, 3, 15 + index) to state }
 
-/** Today in [SampleWeek]: the days after it are in the future, so disabled. */
+/** Today in [SampleWeek]: the days after it are in the future, so they show but cannot be tapped. */
 internal val SampleToday: LocalDate = LocalDate.of(2027, 3, 20)
 
 /** [SampleWeek] as a row of cells, with today on the 20th and the 19th selected. */
@@ -316,10 +326,9 @@ internal fun SampleWeekRow(modifier: Modifier = Modifier) {
             DayCell(
                 date = date,
                 state = state,
-                onClick = {},
+                onClick = if (date.isAfter(SampleToday)) null else ({}),
                 isToday = date == SampleToday,
-                selected = date == SampleToday.minusDays(1),
-                enabled = !date.isAfter(SampleToday)
+                selected = date == SampleToday.minusDays(1)
             )
         }
     }
@@ -344,6 +353,7 @@ private fun DayCellStates() {
                 DayCell(date, state, onClick = {}, isToday = true)
                 DayCell(date, state, onClick = {}, selected = true)
                 DayCell(date, state, onClick = {}, enabled = false)
+                DayCell(date, state, onClick = null)
                 listOf<Interaction>(PressInteraction.Press(Offset.Zero), FocusInteraction.Focus()).forEach {
                     DayCell(date, state, onClick = {}, interactionSource = rememberInteractionSourceIn(it))
                 }

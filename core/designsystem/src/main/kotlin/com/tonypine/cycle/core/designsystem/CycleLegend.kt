@@ -19,23 +19,32 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-/** The legend's entries, in reading order: each day cell state, and today. */
-private enum class LegendEntry(@StringRes val label: Int, val state: CycleDayState, val isToday: Boolean = false) {
+/** An entry of [CycleLegend]: a day cell state, or today. [entries] lists them in reading order. */
+enum class CycleLegendEntry(
+    @param:StringRes internal val label: Int,
+    internal val state: CycleDayState,
+    internal val isToday: Boolean = false
+) {
     Period(R.string.legend_period, CycleDayState.Period),
     PredictedPeriod(R.string.legend_predicted_period, CycleDayState.PredictedPeriod),
     Fertile(R.string.legend_fertile, CycleDayState.Fertile),
     Ovulation(R.string.legend_ovulation, CycleDayState.Ovulation),
-    Today(R.string.legend_today, CycleDayState.Plain, isToday = true)
+    Today(R.string.legend_today, CycleDayState.Plain, isToday = true);
+
+    companion object {
+        /** Period, predicted period and today: the legend for a calendar with fertility estimates off. */
+        val WithoutFertility: List<CycleLegendEntry> = listOf(Period, PredictedPeriod, Today)
+    }
 }
 
 /**
- * The key to the calendar: one swatch per cycle state (period, predicted period, fertile window,
- * ovulation, today), drawn with the same shapes as [DayCell], each with its label. The entries wrap
- * onto more lines when the text is large, and TalkBack reads them as a list of five.
+ * The key to the calendar: one swatch per entry, drawn with the same shapes as [DayCell], each with
+ * its label. Show only the [entries] the calendar can draw: [CycleLegendEntry.WithoutFertility] when
+ * fertility estimates are off. The default is all five. The entries wrap onto more lines when the text
+ * is large, and TalkBack reads them as a list of as many items as there are entries.
  */
 @Composable
-fun CycleLegend(modifier: Modifier = Modifier) {
-    val entries = LegendEntry.entries
+fun CycleLegend(modifier: Modifier = Modifier, entries: List<CycleLegendEntry> = CycleLegendEntry.entries) {
     FlowRow(
         modifier = modifier.semantics { collectionInfo = CollectionInfo(rowCount = entries.size, columnCount = 1) },
         horizontalArrangement = Arrangement.spacedBy(CycleTheme.spacing.medium),
@@ -81,3 +90,15 @@ private fun CycleLegendDarkPreview() = PreviewSurface(darkTheme = true) { CycleL
 @Preview(name = "Cycle legend · 200%", widthDp = 360, fontScale = 2f)
 @Composable
 private fun CycleLegendLargeTextPreview() = PreviewSurface(darkTheme = false) { CycleLegend() }
+
+@Preview(name = "Cycle legend · without fertility · light", widthDp = 360)
+@Composable
+private fun CycleLegendWithoutFertilityLightPreview() = PreviewSurface(darkTheme = false) {
+    CycleLegend(entries = CycleLegendEntry.WithoutFertility)
+}
+
+@Preview(name = "Cycle legend · without fertility · dark", widthDp = 360)
+@Composable
+private fun CycleLegendWithoutFertilityDarkPreview() = PreviewSurface(darkTheme = true) {
+    CycleLegend(entries = CycleLegendEntry.WithoutFertility)
+}
