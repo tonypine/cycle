@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Symbols Rounded "smartphone", weight 600, filled, grade 0, optical size 24. Apache 2.0, see res/raw/license_material_symbols.txt. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <group android:translateY="960">
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M288.48-22.48q-44.31 0-75.15-30.85-30.85-30.84-30.85-75.15v-703.04q0-44.31 30.85-75.15 30.84-30.85 75.15-30.85h383.04q44.31 0 75.15 30.85 30.85 30.84 30.85 75.15v703.04q0 44.31-30.85 75.15-30.84 30.85-75.15 30.85H288.48Zm0-226h383.04v-463.04H288.48v463.04Z" />
+    </group>
+</vector>

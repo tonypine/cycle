@@ -36,7 +36,46 @@ enum class CycleIcons(@param:DrawableRes val drawable: Int, val symbol: String) 
     /** Points to the end: right in LTR, left in RTL. Next month, or a row that opens a page. */
     ChevronEnd(R.drawable.ic_symbol_chevron_right, "chevron_right"),
     ChevronUp(R.drawable.ic_symbol_expand_less, "expand_less"),
-    ChevronDown(R.drawable.ic_symbol_expand_more, "expand_more")
+    ChevronDown(R.drawable.ic_symbol_expand_more, "expand_more"),
+
+    /** Period flow. */
+    WaterDrop(R.drawable.ic_symbol_water_drop, "water_drop"),
+
+    /** A note on a day. */
+    EditNote(R.drawable.ic_symbol_edit_note, "edit_note"),
+    Mood(R.drawable.ic_symbol_mood, "mood"),
+
+    /** Past cycles. */
+    History(R.drawable.ic_symbol_history, "history"),
+
+    /** Pain. */
+    Healing(R.drawable.ic_symbol_healing, "healing"),
+
+    /** Energy. */
+    Bolt(R.drawable.ic_symbol_bolt, "bolt"),
+
+    /** Sleep. */
+    Bedtime(R.drawable.ic_symbol_bedtime, "bedtime"),
+
+    /** Sex. */
+    Favorite(R.drawable.ic_symbol_favorite, "favorite"),
+    Edit(R.drawable.ic_symbol_edit, "edit"),
+
+    /** Choosing what to log. */
+    Tune(R.drawable.ic_symbol_tune, "tune"),
+
+    /** This device: where the data lives. */
+    Smartphone(R.drawable.ic_symbol_smartphone, "smartphone"),
+
+    /** Export. */
+    Download(R.drawable.ic_symbol_download, "download"),
+
+    /** Import. */
+    Upload(R.drawable.ic_symbol_upload, "upload"),
+
+    /** Deleting data. Pair it with a destructive dialog. */
+    Delete(R.drawable.ic_symbol_delete, "delete"),
+    Info(R.drawable.ic_symbol_info, "info")
 }
 
 /**
