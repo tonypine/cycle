@@ -8,6 +8,11 @@ hooks:
       sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}"
       [ -d "$sdk" ] && echo "sdk.dir=$sdk" > local.properties
     fi
+    # Same SDK platform as CI; keep it in step with compileSdk in gradle/libs.versions.toml.
+    sdkmanager="$(sed -n 's/^sdk.dir=//p' local.properties 2> /dev/null)/cmdline-tools/latest/bin/sdkmanager"
+    if [ -x "$sdkmanager" ]; then
+      "$sdkmanager" --install "platforms;android-37.0" > /dev/null
+    fi
     ./gradlew --quiet assembleDebug
 prompts:
   pr: |
