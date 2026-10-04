@@ -8,6 +8,19 @@ through [Symphony](https://github.com/tonypine/symphony).
 **Status:** the Android app is scaffolded; the MVP scope is still being planned. The stack is
 recorded in [`docs/decisions/0001-stack.md`](docs/decisions/0001-stack.md).
 
+## Install on the phone
+
+Every merge to `main` publishes a signed APK. The newest one is always at
+**<https://github.com/tonypine/cycle/releases/latest>**.
+
+1. Open that link on the phone. The page shows the version (for example `v0.1.42`), what changed,
+   and under **Assets** a file named `cycle-v0.1.42.apk`.
+2. Tap the APK to download it.
+3. Open the downloaded file and tap **Install**. The first time, Android asks to allow installs from
+   the browser (or Files app): allow it, go back, and install.
+4. For an update, do the same with the newest release. It installs over the current app and keeps
+   its data, because every release is signed with the same key and has a higher version.
+
 ## Project layout
 
 | Module | What it holds |
@@ -20,8 +33,9 @@ recorded in [`docs/decisions/0001-stack.md`](docs/decisions/0001-stack.md).
 
 ## Build and run
 
-You need JDK 21 and the Android SDK. Point Gradle at the SDK with `ANDROID_HOME` or a
-`local.properties` file containing `sdk.dir=/path/to/Android/sdk` (never commit it).
+To develop on the app, build and install it from source. You need JDK 21 and the Android SDK. Point
+Gradle at the SDK with `ANDROID_HOME` or a `local.properties` file containing
+`sdk.dir=/path/to/Android/sdk` (never commit it).
 
 ```sh
 ./gradlew assembleDebug                       # build both apps
@@ -59,6 +73,18 @@ SDK set in `build-logic/robolectric/robolectric.properties` for every module.
 Every merge to `main` ships a signed release APK on GitHub Releases, tagged `v<versionName>`
 (e.g. `v0.1.42`, where `42` is the commit count on `main`). The flow and its options are recorded
 in [`docs/decisions/0002-release-distribution.md`](docs/decisions/0002-release-distribution.md).
+
+[`.github/workflows/release.yml`](.github/workflows/release.yml) runs after `CI` passes on a push
+to `main`: it builds `:app:assembleRelease` with the version and signing secrets, checks the APK
+with `apksigner verify`, and creates the tag and the GitHub Release with the APK and the changelog.
+If a signing secret is missing, the job fails naming it and publishes nothing.
+
+The release notes come from `scripts/release/changelog.sh`, which works the same locally:
+
+```sh
+scripts/release/changelog.sh        # notes for HEAD since the previous v* tag
+scripts/release/changelog_test.sh   # its test, on a throwaway repository in $TMPDIR
+```
 
 ### One-time setup
 
