@@ -209,7 +209,86 @@ FlowRow(horizontalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small)) 
 ```
 
 Don't use chips for the screen's main action (use a `FilledButton`), or for choosing exactly one of
-a few options (that is a connected button group, still to come).
+a few options (use a [`ButtonGroup`](#button-group)).
+
+## Button group
+
+`ButtonGroup.kt`. A connected, single-choice group: a few short options side by side, of which one
+or none is chosen, such as period flow (None, Spotting, Light, Medium, Heavy) or pain (None, Mild,
+Moderate, Severe).
+
+```kotlin
+var flow by rememberSaveable { mutableStateOf<Int?>(null) }
+ButtonGroup(
+    label = "Flow",
+    options = listOf("None", "Spotting", "Light", "Medium", "Heavy"),
+    selectedIndex = flow,
+    onSelectedChange = { flow = it }
+)
+```
+
+| Parameter | What it does |
+| -- | -- |
+| `label` | Names what the group chooses. It is not drawn: show it as a title above the group. TalkBack reads it after each option ("Medium, Flow"), so two groups that both offer "None" still sound different. |
+| `options` | Two or more short labels, one word each where you can. |
+| `selectedIndex` | The chosen option, or null while nothing is chosen. |
+| `onSelectedChange` | Called with the tapped option's index, or with null when the selected option is tapped again, so a choice can be cleared. |
+| `modifier`, `enabled` | A disabled group draws at the disabled alphas, keeps its selection and ignores taps. |
+| `interactionSources` | One per option, for previews and tests to hold a pressed or focused segment. |
+
+- **Looks.** Segments are 48dp tall and 2dp apart, with a pill at the group's two outer ends and 8dp
+  corners (`shapes.extraSmall`) inside. Unselected, a segment is an `onSurfaceVariant` label in a 1dp
+  `outline` border. The selected one fills with `accent`, shows a check before its `onAccent` label
+  and turns into a pill, so the choice never relies on colour alone.
+- **Motion.** The corners and the check's width move on the default spatial spring, so the chosen
+  segment grows and its neighbours make room; colours change on the default effects spring. Under
+  reduce motion all of it jumps. Pressed, focused and hovered come from `cycleIndication` in the
+  segment's shape: the state layer, the 94% press squash and the focus ring.
+- **Width.** The group fills the width it is given and shares the space left over between the
+  segments. When the labels do not fit, the segments' padding shrinks to 4dp a side, and then the
+  group scrolls sideways, as at 200% font scale. Labels stay on one line and never wrap.
+- **TalkBack.** Each segment is a radio button (`Role.RadioButton`) with its selected state, in a
+  `selectableGroup`, read in order: "Medium, Flow, radio button, selected".
+
+Don't use it for options that can be on together (use `FilterChip`s), for more than five options or
+labels longer than a word or two (use a list on its own screen or in a sheet), or for an action (use
+buttons).
+
+## Switch
+
+`Switch.kt`. A setting that is on or off and takes effect at once, such as whether a category shows
+in the day log.
+
+```kotlin
+SwitchRow(
+    title = "Sleep",
+    body = "How long you slept and how well.",
+    icon = CycleIcons.Bedtime,
+    checked = logSleep,
+    onCheckedChange = { logSleep = it }
+)
+Switch(checked = logSleep, onCheckedChange = { logSleep = it }, contentDescription = "Log sleep")
+```
+
+- `SwitchRow(title, checked, onCheckedChange, modifier, body = null, icon = null, enabled = true, interactionSource)`
+  is the one to reach for: a full-width row on `surfaceContainer` with 24dp corners
+  (`shapes.large`), an optional decorative `icon` in `onSurfaceVariant`, the `title` in `titleSmall`
+  `onSurface`, an optional one-sentence `body` in `bodySmall` `onSurfaceVariant`, and the switch at
+  the end. The whole row is the target (`toggleable`, `Role.Switch`), at least 56dp tall, and
+  TalkBack reads it once: the title, the body, "switch" and "on" or "off". Pressed, focused and
+  hovered come from `cycleIndication` in the row's shape.
+- `Switch(checked, onCheckedChange, contentDescription, modifier, enabled = true, interactionSource)`
+  is the switch alone, for a place that already has its label beside it. A 52 by 32dp pill track in
+  a 48dp target. `contentDescription` names the setting ("Log sleep"), not its state.
+
+On, the track is `accent` and a 24dp `onAccent` thumb with an `accent` check sits at the end. Off,
+the track is a 2dp `outline` border with a 16dp `outline` thumb at the start: the thumb's size and
+the check say the state without colour. The thumb slides and grows on the default spatial spring and
+the colours change on the default effects spring; under reduce motion they jump. Disabled, the text,
+icon and switch draw at the disabled alphas, the state stays visible and taps are ignored.
+
+Don't use a switch for choosing between options (use a `ButtonGroup`), for picking several items
+such as symptoms (use `FilterChip`s), or for an action that happens once (use a button).
 
 ## Day cell
 
@@ -480,8 +559,8 @@ and TalkBack order, `NavigationBarMotionTest` measures the pill mid-spring and u
 both bars stay clear of them.
 
 Don't use the navigation bar for actions (use buttons), for fewer than three destinations (use the
-top app bar's navigation), or for switching views inside one screen (that is a connected button
-group, still to come).
+top app bar's navigation), or for switching views inside one screen (use a
+[`ButtonGroup`](#button-group)).
 
 ## Previews
 
@@ -498,8 +577,9 @@ debug, release and unit test classpath, and fails if anything else brings Materi
 
 The interaction previews live in `core/designsystem/.../InteractionPreviews.kt`, with
 `PreviewSurface` and `rememberInteractionSourceIn` for holding a pressed or focused state still. Each
-component keeps its previews next to it, at the bottom of its own file (`Buttons.kt`, `DayCell.kt`,
-`Calendar.kt`, `CycleLegend.kt`, `Cards.kt`, `EmptyState.kt`, `LoadingIndicator.kt`), in light and dark.
+component keeps its previews next to it, at the bottom of its own file (`Buttons.kt`,
+`ButtonGroup.kt`, `Switch.kt`, `DayCell.kt`, `Calendar.kt`, `CycleLegend.kt`, `Cards.kt`,
+`EmptyState.kt`, `LoadingIndicator.kt`), in light and dark.
 
 ## Testing components
 
@@ -554,8 +634,9 @@ a screen that needs no screenshot.
 
 Next to the matrix, each component has behaviour tests with the Compose test rule:
 `ControlSemanticsTest` asserts roles, toggle and selected state, content descriptions, the 48dp
-target and the TalkBack order, and `ControlMotionTest` reads the corner radius frame by frame to
-prove shapes spring normally and snap under `CycleTheme(reduceMotion = true)`. `ContainerSemanticsTest`
+target and the TalkBack order (and that a button group's labels stay on one line and scroll at
+200%), and `ControlMotionTest` reads the corner radius and the switch thumb's position frame by frame
+to prove they spring normally and snap under `CycleTheme(reduceMotion = true)`. `ContainerSemanticsTest`
 does the same for cards, the empty state (one heading group, scrolling at 200%) and the loading
 state (progress semantics), and `LoadingMotionTest` compares frames of the loading indicator.
 

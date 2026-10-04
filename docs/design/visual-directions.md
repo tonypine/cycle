@@ -298,6 +298,7 @@ Contrast (WCAG 2.x ratios, computed from the hex values above):
 | Accent as text/link on surface (`accent` on `surface`) | 4.5:1 | 6.99 | 10.86 |
 | Accent as text on card, text button in a sheet or dialog (`accent` on `surfaceContainer`) | 4.5:1 | 6.47 | 9.91 |
 | Outline vs surface (control border) (`outline` on `surface`) | 3:1 | 4.47 | 5.66 |
+| Outline vs card (switch border and thumb in a switch row) (`outline` on `surfaceContainer`) | 3:1 | 4.14 | 5.17 |
 | Error text on surface (`error` on `surface`) | 4.5:1 | 6.38 | 10.90 |
 | Error text on card (destructive dialog icon) (`error` on `surfaceContainer`) | 4.5:1 | 5.90 | 9.95 |
 | Text on error (`onError` on `error`) | 4.5:1 | 6.54 | 7.72 |
