@@ -86,8 +86,9 @@ internal fun rememberInteractionSourceIn(interaction: Interaction?): MutableInte
     return source
 }
 
+/** [CycleTheme] in light or dark, with [content] padded on `surface`: the frame for every preview. */
 @Composable
-private fun PreviewSurface(darkTheme: Boolean, content: @Composable () -> Unit) {
+internal fun PreviewSurface(darkTheme: Boolean, content: @Composable () -> Unit) {
     CycleTheme(darkTheme = darkTheme) {
         Box(Modifier.background(CycleTheme.colors.surface).padding(CycleTheme.spacing.large)) { content() }
     }

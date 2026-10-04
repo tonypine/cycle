@@ -47,6 +47,7 @@ enum class ComponentState(val slug: String) {
     Pressed("pressed"),
     Focused("focused"),
     Hovered("hovered"),
+    Selected("selected"),
     Disabled("disabled"),
     Error("error")
 }
@@ -65,11 +66,12 @@ data class MatrixCase(val state: ComponentState, val appearance: Appearance) {
 }
 
 /**
- * What the component under test receives. Wire [interactionSource], [enabled] and [isError] into its
- * parameters; the harness drives the interaction states through the source.
+ * What the component under test receives. Wire [interactionSource], [enabled], [selected] and
+ * [isError] into its parameters; the harness drives the interaction states through the source.
  */
 class StateScope(val state: ComponentState, val interactionSource: MutableInteractionSource) {
     val enabled: Boolean get() = state != ComponentState.Disabled
+    val selected: Boolean get() = state == ComponentState.Selected
     val isError: Boolean get() = state == ComponentState.Error
 }
 

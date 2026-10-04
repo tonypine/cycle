@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Day cell content description parts, read by TalkBack after the date: "20 March, today, period". -->
+    <string name="day_cell_today">today</string>
+    <string name="day_cell_period">period</string>
+    <string name="day_cell_predicted_period">predicted period</string>
+    <string name="day_cell_fertile">fertile window</string>
+    <string name="day_cell_ovulation">ovulation</string>
+
+    <!-- Cycle phase legend labels, one per day cell state. -->
+    <string name="legend_period">Period</string>
+    <string name="legend_predicted_period">Predicted period</string>
+    <string name="legend_fertile">Fertile window</string>
+    <string name="legend_ovulation">Ovulation</string>
+    <string name="legend_today">Today</string>
+</resources>

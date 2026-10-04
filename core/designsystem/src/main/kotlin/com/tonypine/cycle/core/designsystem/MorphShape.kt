@@ -19,6 +19,7 @@ import androidx.graphics.shapes.CornerRounding
 import androidx.graphics.shapes.Morph
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.circle
+import androidx.graphics.shapes.rectangle
 import androidx.graphics.shapes.star
 import androidx.graphics.shapes.toPath
 
@@ -59,6 +60,13 @@ fun animatedMorphShape(
 object CyclePolygons {
     /** A circle: the today, fertile and default day cell. */
     val circle: RoundedPolygon = RoundedPolygon.circle(numVertices = 8)
+
+    /** A squircle with 14dp corners at the day cell's 36dp: the logged and predicted period day. */
+    val squircle: RoundedPolygon = RoundedPolygon.rectangle(
+        width = 1f,
+        height = 1f,
+        rounding = CornerRounding(radius = 14f / 36f)
+    )
 
     /** A soft eight-point sun: the ovulation day. */
     val sun: RoundedPolygon = RoundedPolygon.star(
