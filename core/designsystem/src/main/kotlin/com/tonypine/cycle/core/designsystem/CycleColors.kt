@@ -56,7 +56,9 @@ data class CycleColors(
     /** Day number on [ovulation]. */
     val onOvulation: Color,
     /** Today ring. */
-    val today: Color
+    val today: Color,
+    /** Dims the screen behind a bottom sheet or dialog. Translucent: its alpha is part of the role. */
+    val scrim: Color
 )
 
 val LightCycleColors = CycleColors(
@@ -83,7 +85,8 @@ val LightCycleColors = CycleColors(
     onFertile = Color(0xFF00391F),
     ovulation = Color(0xFFB35A00),
     onOvulation = Color(0xFFFFFFFF),
-    today = Color(0xFF1F1A10)
+    today = Color(0xFF1F1A10),
+    scrim = Color(0x521F1A10)
 )
 
 val DarkCycleColors = CycleColors(
@@ -110,5 +113,6 @@ val DarkCycleColors = CycleColors(
     onFertile = Color(0xFFB4F2CE),
     ovulation = Color(0xFFFFC24A),
     onOvulation = Color(0xFF2B1F00),
-    today = Color(0xFFF2E8D5)
+    today = Color(0xFFF2E8D5),
+    scrim = Color(0x99000000)
 )

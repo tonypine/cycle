@@ -17,6 +17,14 @@
     <string name="legend_ovulation">Ovulation</string>
     <string name="legend_today">Today</string>
 
+    <!-- Bottom sheet drag handle: what TalkBack reads for it, its state and its actions. -->
+    <string name="bottom_sheet_handle">Drag handle</string>
+    <string name="bottom_sheet_expanded">Expanded</string>
+    <string name="bottom_sheet_partially_expanded">Partially expanded</string>
+    <string name="bottom_sheet_expand">Expand</string>
+    <string name="bottom_sheet_collapse">Collapse</string>
+    <string name="bottom_sheet_dismiss">Dismiss</string>
+
     <!-- What TalkBack reads for a loading indicator or loading state that has no message of its own. -->
     <string name="loading">Loading</string>
 </resources>

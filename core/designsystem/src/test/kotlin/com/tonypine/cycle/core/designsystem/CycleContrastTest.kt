@@ -48,6 +48,7 @@ class CycleContrastTest {
         "Text on accent" to (7.17 to 7.72),
         "Text on accent container" to (13.31 to 7.25),
         "Accent as text on surface" to (6.99 to 10.86),
+        "Accent as text on card" to (6.47 to 9.91),
         "Outline vs surface" to (4.47 to 5.66),
         "Error text on surface" to (6.38 to 10.90),
         "Text on error" to (6.54 to 7.72),
