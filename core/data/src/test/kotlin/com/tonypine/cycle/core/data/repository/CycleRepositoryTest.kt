@@ -88,4 +88,24 @@ class CycleRepositoryTest {
         assertEquals(DayLog(today), undone.log)
         assertEquals(emptyList<Period>(), undone.overview.periods)
     }
+
+    @Test
+    fun `every logged day and the overview come from the same read`() = runTest {
+        val cycles = CycleRepository(dayLogs, settingsRepository(folder.root, backgroundScope))
+        val today = day("2027-03-10")
+        logPeriod(day("2027-03-02"), days = 2)
+
+        val log = cycles.observeLog(today).first()
+        assertEquals(
+            listOf(DayLog(day("2027-03-02"), FlowLevel.MEDIUM), DayLog(day("2027-03-03"), FlowLevel.MEDIUM)),
+            log.logs
+        )
+        assertEquals(listOf(Period(day("2027-03-02"), day("2027-03-03"))), log.overview.periods)
+
+        dayLogs.setFlow(day("2027-03-04"), FlowLevel.LIGHT)
+
+        val edited = cycles.observeLog(today).first()
+        assertEquals(day("2027-03-04"), edited.logs.last().date)
+        assertEquals(listOf(Period(day("2027-03-02"), day("2027-03-04"))), edited.overview.periods)
+    }
 }

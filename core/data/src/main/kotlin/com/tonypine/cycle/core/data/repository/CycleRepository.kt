@@ -25,14 +25,22 @@ class CycleRepository(private val dayLogs: DayLogRepository, private val setting
      * they always agree: a screen never sees today's log from before a write next to an overview
      * from after it.
      */
-    fun observeDay(today: LocalDate): Flow<DayOverview> =
+    fun observeDay(today: LocalDate): Flow<DayOverview> = observeLog(today).map { log ->
+        DayOverview(overview = log.overview, log = log.logs.firstOrNull { it.date == today } ?: DayLog(today))
+    }
+
+    /**
+     * The overview on [today] with every day she logged, both from the same read of the log, for a
+     * screen that shows the days behind a cycle, such as each period day's flow.
+     */
+    fun observeLog(today: LocalDate): Flow<LogOverview> =
         combine(dayLogs.observeDayLogs(), settings.settings) { logs, settings ->
-            DayOverview(
-                overview = CycleCalculator.overview(logs, settings, today),
-                log = logs.firstOrNull { it.date == today } ?: DayLog(today)
-            )
+            LogOverview(overview = CycleCalculator.overview(logs, settings, today), logs = logs)
         }
 }
 
 /** The [overview] on a day and the [log] of that day. */
 data class DayOverview(val overview: CycleOverview, val log: DayLog)
+
+/** The [overview] on a day and every logged day, oldest first: [logs]. */
+data class LogOverview(val overview: CycleOverview, val logs: List<DayLog>)
