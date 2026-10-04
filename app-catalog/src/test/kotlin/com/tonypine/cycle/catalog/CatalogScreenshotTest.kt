@@ -71,6 +71,9 @@ class CatalogScreenshotTest(private val page: Page, private val variant: Variant
             "Text field" to (1280 to 2240),
             "Day cell" to (1220 to 2360),
             "Cycle legend" to (400 to 700),
+            "Cards" to (1060 to 1720),
+            "Empty state" to (1220 to 1520),
+            "Loading" to (900 to 1400),
             "App bars" to (1740 to 2660)
         )
 

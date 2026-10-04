@@ -270,6 +270,91 @@ exposes `CollectionInfo` with one `CollectionItemInfo` per entry, so TalkBack re
 five. The swatches are decorative; the label says what each one is. Put it under the calendar it
 explains.
 
+## Cards
+
+`Cards.kt`. Content containers on `surfaceContainer` with 32dp corners (`CycleTheme.shapes.extraLarge`)
+and `spacing.large` padding. The content slot is a column with `spacing.small` between children; put
+text in `onSurface` and `onSurfaceVariant`, which keep their contrast on `surfaceContainer`.
+
+- `Card { ... }`: a panel that does nothing on tap, such as a cycle summary. It is a traversal group,
+  so TalkBack reads its children in order before moving on.
+- `ClickableCard(onClick, enabled = true, onClickLabel = null) { ... }`: a card that opens something,
+  such as last cycle's details. The whole card is one `Role.Button`: TalkBack reads its content as one
+  item, then "button" and the `onClickLabel` ("Open"). Pressed, focused and hovered come from
+  `cycleIndication` in the 32dp shape: the state layer, the 94% press scale and the focus ring. A
+  disabled card draws at `stateAlpha.disabledContent` and ignores taps. It is at least 48dp in both
+  directions.
+
+```kotlin
+ClickableCard(onClick = { onOpenCycle(cycle) }, onClickLabel = "Open") {
+    BasicText("Last cycle", style = CycleTheme.typography.titleSmall.copy(color = CycleTheme.colors.onSurface))
+    BasicText("29 days", style = CycleTheme.typography.bodySmall.copy(color = CycleTheme.colors.onSurfaceVariant))
+}
+```
+
+Don't put a button, chip or other clickable inside a `ClickableCard`: its content merges into one
+button, so TalkBack could not reach the inner control. Use a `Card` with the controls in it instead.
+
+## Empty state
+
+`EmptyState.kt`. What a screen or list shows when it has nothing yet: an illustration, a title, one
+sentence of body and an optional action, centred one above the other.
+
+```kotlin
+EmptyState(
+    title = "No periods logged yet",
+    body = "Log the first day of your last period and Cycle will start predicting the next one.",
+    modifier = Modifier.fillMaxSize(),
+    illustration = { EmptyStateIcon(CycleIcons.Calendar) },
+    action = EmptyStateAction("Log a period", onClick = onLogPeriod, icon = CycleIcons.Add)
+)
+```
+
+| Parameter | What it does |
+| -- | -- |
+| `title` | `title` style in `onSurface`. Marked as a heading. |
+| `body` | One sentence in `body` `onSurfaceVariant`: what will appear here, or how to start. |
+| `illustration` | Any composable above the title. `EmptyStateIcon(icon)` draws the icon at 48dp in `onAccentContainer` in a 96dp `accentContainer` circle. It is decoration and is not read. |
+| `action` | `EmptyStateAction(label, onClick, icon = null)`, shown as a `FilledButton`. Leave it out when there is nothing to do yet. |
+
+Given a bounded height (a screen, or a box with a size) it fills it, centres its content and scrolls
+when the content is taller, as at 200% font scale, so it never clips. In a column that already
+scrolls, it takes its content's height and leaves scrolling to the column. TalkBack reads the
+illustration, title and body as one item marked as a heading, then the action as a button.
+
+Don't use it for an error (say what went wrong and how to fix it, next to where it happened), or
+while content is loading (use `LoadingState`).
+
+## Loading
+
+`LoadingIndicator.kt`. Built on graphics-shapes: an `accent` shape that morphs from the sun to a
+clover, a pentagon and a 9-point cookie and back, turning a quarter at each step, on
+`CycleTheme.motion`'s slow spatial spring. Under reduce motion it does not animate: it holds a static
+frame of the sun.
+
+- `LoadingIndicator(contentDescription = "Loading")`: 48dp (the shape fills 38dp of it), in line
+  with other content, such as inside a card.
+- `LoadingState(message = null)`: fills the space it is given and centres the indicator, with an
+  optional `message` under it in `body` `onSurfaceVariant`. Use it for a screen, or the part of one,
+  that has nothing to show until something loads.
+
+```kotlin
+if (cycles == null) LoadingState(message = "Loading your cycle") else CycleList(cycles)
+```
+
+Both read to TalkBack as an indeterminate progress bar (`ProgressBarRangeInfo.Indeterminate`)
+described by `contentDescription`, the `message`, or "Loading", and are a polite live region so they
+are announced. `LoadingState` reads its message once, as the description. Say what is loading when
+you can. The "Loading" string lives in `core:designsystem`'s `strings.xml`.
+
+The loop runs through the coroutine's `InfiniteAnimationPolicy`, so a Compose test whose clock
+advances on its own holds the first frame instead of waiting forever; screenshots show the sun.
+`LoadingMotionTest` drives the clock by hand to check that it animates normally and holds still
+under `CycleTheme(reduceMotion = true)`.
+
+Don't use it for a wait under a second (show nothing), or when you know how far along the work is
+(that needs a determinate progress component, still to come).
+
 ## Top app bar
 
 `TopAppBar.kt`. The bar at the top of a screen: an optional navigation icon button, the screen's
@@ -356,7 +441,7 @@ debug, release and unit test classpath, and fails if anything else brings Materi
 The interaction previews live in `core/designsystem/.../InteractionPreviews.kt`, with
 `PreviewSurface` and `rememberInteractionSourceIn` for holding a pressed or focused state still. Each
 component keeps its previews next to it, at the bottom of its own file (`Buttons.kt`, `DayCell.kt`,
-`CycleLegend.kt`), in light and dark.
+`CycleLegend.kt`, `Cards.kt`, `EmptyState.kt`, `LoadingIndicator.kt`), in light and dark.
 
 ## Testing components
 
@@ -406,7 +491,9 @@ a screen that needs no screenshot.
 Next to the matrix, each component has behaviour tests with the Compose test rule:
 `ControlSemanticsTest` asserts roles, toggle and selected state, content descriptions, the 48dp
 target and the TalkBack order, and `ControlMotionTest` reads the corner radius frame by frame to
-prove shapes spring normally and snap under `CycleTheme(reduceMotion = true)`.
+prove shapes spring normally and snap under `CycleTheme(reduceMotion = true)`. `ContainerSemanticsTest`
+does the same for cards, the empty state (one heading group, scrolling at 200%) and the loading
+state (progress semantics), and `LoadingMotionTest` compares frames of the loading indicator.
 
 ## Text field
 
