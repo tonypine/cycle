@@ -20,7 +20,11 @@ class ScreenshotTestsConventionPlugin : Plugin<Project> {
             testOptions.unitTests.isIncludeAndroidResources = true
             testOptions.unitTests.all { test ->
                 test.systemProperty("robolectric.graphicsMode", "NATIVE")
+                // Robolectric sets FileDescriptor internals through the JDK's SharedSecrets.
+                test.jvmArgs("--add-exports=java.base/jdk.internal.access=ALL-UNNAMED")
             }
+            // One robolectric.properties for every module, so they all emulate the same SDK.
+            sourceSets.getByName("test").resources.srcDir(rootDir.resolve("build-logic/robolectric"))
         }
 
         extensions.configure<RoborazziExtension> {

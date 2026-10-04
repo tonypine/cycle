@@ -7,27 +7,20 @@ import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
 /** Shared Android and Kotlin settings for every Android module. */
-internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, *, *>) {
+internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension) {
     val jvmToolchain = libs.versionOf("jvmToolchain").toInt()
 
     commonExtension.apply {
         compileSdk = libs.versionOf("compileSdk").toInt()
+        defaultConfig.minSdk = libs.versionOf("minSdk").toInt()
 
-        defaultConfig {
-            minSdk = libs.versionOf("minSdk").toInt()
-        }
+        compileOptions.sourceCompatibility = JavaVersion.toVersion(jvmToolchain)
+        compileOptions.targetCompatibility = JavaVersion.toVersion(jvmToolchain)
 
-        compileOptions {
-            sourceCompatibility = JavaVersion.toVersion(jvmToolchain)
-            targetCompatibility = JavaVersion.toVersion(jvmToolchain)
-        }
-
-        lint {
-            // Errors fail the build; warnings are reported but do not.
-            abortOnError = true
-            warningsAsErrors = false
-            checkReleaseBuilds = true
-        }
+        // Errors fail the build; warnings are reported but do not.
+        lint.abortOnError = true
+        lint.warningsAsErrors = false
+        lint.checkReleaseBuilds = true
     }
 
     extensions.configure<KotlinAndroidProjectExtension> {
