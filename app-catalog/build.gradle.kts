@@ -4,14 +4,13 @@ plugins {
     alias(libs.plugins.cycle.screenshot.tests)
 }
 
-// A standalone app that will show every design system component, for building and reviewing UI in isolation.
+// A standalone app that shows every design system component, for building and reviewing UI in isolation.
+// Every release ships it next to the app, with the same version and release key (cycle.android.application).
 android {
     namespace = "com.tonypine.cycle.catalog"
 
     defaultConfig {
         applicationId = "com.tonypine.cycle.catalog"
-        versionCode = 1
-        versionName = "0.1.0"
     }
 }
 

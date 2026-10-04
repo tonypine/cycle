@@ -1,7 +1,8 @@
 name: Release
 
-# Every merge to main ships a signed APK on GitHub Releases once CI passes on that commit, then
-# posts an update to the Linear initiative. See docs/decisions/0002-release-distribution.md.
+# Every merge to main ships the signed Cycle and design-system catalog APKs on GitHub Releases once
+# CI passes on that commit, then posts an update to the Linear initiative. See
+# docs/decisions/0002-release-distribution.md.
 on:
   workflow_run:
     workflows: [CI]
@@ -47,6 +48,7 @@ jobs:
       tag: ${{ steps.version.outputs.tag }}
       release_url: ${{ steps.publish.outputs.release_url }}
       apk_url: ${{ steps.publish.outputs.apk_url }}
+      catalog_apk_url: ${{ steps.publish.outputs.catalog_apk_url }}
       changelog: ${{ steps.changelog.outputs.changelog }}
     steps:
       - name: Check the signing secrets
@@ -75,9 +77,9 @@ jobs:
         id: version
         run: |
           code="$(git rev-list --count HEAD)"
-          major_minor="$(sed -n 's/^val versionMajorMinor = "\([0-9]*\.[0-9]*\)"$/\1/p' app/build.gradle.kts)"
+          major_minor="$(sed -n 's/^cycle\.versionMajorMinor=\([0-9]*\.[0-9]*\)$/\1/p' gradle.properties)"
           if [ -z "$major_minor" ]; then
-            echo "::error::Could not read versionMajorMinor from app/build.gradle.kts"
+            echo "::error::Could not read cycle.versionMajorMinor from gradle.properties"
             exit 1
           fi
           name="$major_minor.$code"
@@ -124,44 +126,67 @@ jobs:
           fi
           echo "RELEASE_KEYSTORE_PATH=$keystore" >> "$GITHUB_ENV"
 
-      - name: Build the signed release APK
+      # The app and the design-system catalog share the version and the release key, so both update
+      # in place on the phone.
+      - name: Build the signed release APKs
         env:
           RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
           VERSION_CODE: ${{ steps.version.outputs.code }}
           VERSION_NAME: ${{ steps.version.outputs.name }}
-        run: ./gradlew :app:assembleRelease "-Pcycle.versionCode=$VERSION_CODE" "-Pcycle.versionName=$VERSION_NAME"
+        run: |
+          ./gradlew :app:assembleRelease :app-catalog:assembleRelease \
+            "-Pcycle.versionCode=$VERSION_CODE" "-Pcycle.versionName=$VERSION_NAME"
 
-      - name: Verify the APK signature and version
+      - name: Verify the APK signatures and versions
         id: apk
         env:
           VERSION_CODE: ${{ steps.version.outputs.code }}
           VERSION_NAME: ${{ steps.version.outputs.name }}
         run: |
-          # A signed build writes app-release.apk; app-release-unsigned.apk means signing was skipped.
-          apk=app/build/outputs/apk/release/app-release.apk
-          if [ ! -f "$apk" ]; then
-            echo "::error::$apk is missing; never publish an unsigned APK"
-            ls -l app/build/outputs/apk/release/ || true
+          build_tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+
+          # verify <module> <package> <asset>: checks the module's release APK and copies it to
+          # $RUNNER_TEMP/<asset>.
+          verify() {
+            local module="$1" package="$2" asset="$RUNNER_TEMP/$3"
+            # A signed build writes <module>-release.apk; <module>-release-unsigned.apk means signing
+            # was skipped.
+            local apk="$module/build/outputs/apk/release/$module-release.apk"
+            if [ ! -f "$apk" ]; then
+              echo "::error::$apk is missing; never publish an unsigned APK"
+              ls -l "$module/build/outputs/apk/release/" || true
+              exit 1
+            fi
+            "$build_tools/apksigner" verify --verbose "$apk"
+
+            local badging
+            badging="$("$build_tools/aapt2" dump badging "$apk" | head -n 1)"
+            echo "$badging"
+            case "$badging" in
+              "package: name='$package' versionCode='$VERSION_CODE' versionName='$VERSION_NAME' "*) ;;
+              *)
+                echo "::error::$apk is not package $package, versionCode $VERSION_CODE, versionName $VERSION_NAME"
+                exit 1
+                ;;
+            esac
+            cp "$apk" "$asset"
+          }
+          verify app com.tonypine.cycle "cycle-v$VERSION_NAME.apk"
+          verify app-catalog com.tonypine.cycle.catalog "cycle-catalog-v$VERSION_NAME.apk"
+
+          # Both must carry the one release certificate.
+          certificate() { "$build_tools/apksigner" verify --print-certs "$1" | grep 'certificate SHA-256 digest'; }
+          if [ "$(certificate "$RUNNER_TEMP/cycle-v$VERSION_NAME.apk")" != "$(certificate "$RUNNER_TEMP/cycle-catalog-v$VERSION_NAME.apk")" ]; then
+            echo "::error::The app and the catalog APKs are signed with different certificates"
             exit 1
           fi
-          build_tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
-          "$build_tools/apksigner" verify --verbose "$apk"
 
-          badging="$("$build_tools/aapt2" dump badging "$apk" | head -n 1)"
-          echo "$badging"
-          case "$badging" in
-            *"versionCode='$VERSION_CODE' versionName='$VERSION_NAME'"*) ;;
-            *)
-              echo "::error::The APK is not versionCode $VERSION_CODE, versionName $VERSION_NAME"
-              exit 1
-              ;;
-          esac
-
-          asset="$RUNNER_TEMP/cycle-v$VERSION_NAME.apk"
-          cp "$apk" "$asset"
-          echo "path=$asset" >> "$GITHUB_OUTPUT"
+          {
+            echo "app=$RUNNER_TEMP/cycle-v$VERSION_NAME.apk"
+            echo "catalog=$RUNNER_TEMP/cycle-catalog-v$VERSION_NAME.apk"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Build the changelog
         id: changelog
@@ -183,7 +208,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.version.outputs.tag }}
           SHA: ${{ github.event.workflow_run.head_sha }}
-          APK: ${{ steps.apk.outputs.path }}
+          APK: ${{ steps.apk.outputs.app }}
+          CATALOG_APK: ${{ steps.apk.outputs.catalog }}
           NOTES: ${{ steps.changelog.outputs.path }}
         run: |
           # Re-running the job for the same commit gives the same tag; keep the release it already made.
@@ -191,7 +217,7 @@ jobs:
             echo "::notice::Release $TAG already exists; leaving it as it is"
             created=false
           else
-            gh release create "$TAG" "$APK" \
+            gh release create "$TAG" "$APK" "$CATALOG_APK" \
               --repo "$GITHUB_REPOSITORY" \
               --target "$SHA" \
               --title "$TAG" \
@@ -200,12 +226,13 @@ jobs:
             created=true
           fi
           release_url="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json url --jq .url)"
-          apk_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/$TAG/$(basename "$APK")"
+          download_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/$TAG"
           echo "Published $release_url"
           {
             echo "created=$created"
             echo "release_url=$release_url"
-            echo "apk_url=$apk_url"
+            echo "apk_url=$download_url/$(basename "$APK")"
+            echo "catalog_apk_url=$download_url/$(basename "$CATALOG_APK")"
           } >> "$GITHUB_OUTPUT"
 
       - name: Remove the keystore
@@ -242,17 +269,28 @@ jobs:
             echo "::error::There is no GitHub Release for tag '$TAG'"
             exit 1
           fi
-          apk="$(jq --raw-output '[.assets[].name | select(endswith(".apk"))][0] // empty' "$release")"
-          if [ -z "$apk" ]; then
-            echo "::error::Release $TAG has no APK asset"
+          has_asset() { jq --exit-status --arg name "$1" 'any(.assets[]; .name == $name)' "$release" > /dev/null; }
+          download_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/$TAG"
+          apk="cycle-$TAG.apk"
+          if ! has_asset "$apk"; then
+            echo "::error::Release $TAG has no APK asset $apk"
             exit 1
+          fi
+          # Releases from before the catalog shipped have no catalog APK; their update links the app only.
+          catalog_apk="cycle-catalog-$TAG.apk"
+          catalog_apk_url=""
+          if has_asset "$catalog_apk"; then
+            catalog_apk_url="$download_url/$catalog_apk"
+          else
+            echo "::notice::Release $TAG has no catalog APK $catalog_apk; the update links the app only"
           fi
           notes="$RUNNER_TEMP/release-notes.md"
           jq --raw-output .body "$release" > "$notes"
           {
             echo "tag=$TAG"
             echo "release_url=$(jq --raw-output .url "$release")"
-            echo "apk_url=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/$TAG/$apk"
+            echo "apk_url=$download_url/$apk"
+            echo "catalog_apk_url=$catalog_apk_url"
             echo "notes=$notes"
           } >> "$GITHUB_OUTPUT"
 
@@ -263,7 +301,8 @@ jobs:
           TAG: ${{ steps.release.outputs.tag }}
           RELEASE_URL: ${{ steps.release.outputs.release_url }}
           APK_URL: ${{ steps.release.outputs.apk_url }}
+          CATALOG_APK_URL: ${{ steps.release.outputs.catalog_apk_url }}
           NOTES: ${{ steps.release.outputs.notes }}
         run: |
-          scripts/release/linear_update.sh body "$TAG" "$RELEASE_URL" "$APK_URL" "$NOTES"
-          scripts/release/linear_update.sh post "$TAG" "$RELEASE_URL" "$APK_URL" "$NOTES"
+          scripts/release/linear_update.sh body "$TAG" "$RELEASE_URL" "$APK_URL" "$CATALOG_APK_URL" "$NOTES"
+          scripts/release/linear_update.sh post "$TAG" "$RELEASE_URL" "$APK_URL" "$CATALOG_APK_URL" "$NOTES"

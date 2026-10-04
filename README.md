@@ -100,16 +100,25 @@ The sandbox config still has to provide:
 
 ## Releases
 
-Every merge to `main` ships a signed release APK on GitHub Releases, tagged `v<versionName>`
-(e.g. `v0.1.42`, where `42` is the commit count on `main`). The flow and its options are recorded
-in [`docs/decisions/0002-release-distribution.md`](docs/decisions/0002-release-distribution.md).
+Every merge to `main` ships a GitHub Release, tagged `v<versionName>` (e.g. `v0.1.42`, where `42`
+is the commit count on `main`), with two signed release APKs:
+
+- `cycle-v<versionName>.apk`: the Cycle app (`com.tonypine.cycle`).
+- `cycle-catalog-v<versionName>.apk`: the design-system catalog (`com.tonypine.cycle.catalog`), for
+  reviewing UI on a phone. It has the same version and release key as the app, so it updates in
+  place too. A catalog built locally with `installDebug` is debug-signed: uninstall it once before
+  installing the release catalog, because Android refuses an update signed with another key.
+
+The flow and its options are recorded in
+[`docs/decisions/0002-release-distribution.md`](docs/decisions/0002-release-distribution.md).
 
 [`.github/workflows/release.yml`](.github/workflows/release.yml) runs after `CI` passes on a push
-to `main`: it builds `:app:assembleRelease` with the version and signing secrets, checks the APK
-with `apksigner verify`, and creates the tag and the GitHub Release with the APK and the changelog.
+to `main`: it builds `:app:assembleRelease` and `:app-catalog:assembleRelease` with the version and
+signing secrets, checks each APK with `apksigner verify` and its package and version with
+`aapt2 dump badging`, and creates the tag and the GitHub Release with both APKs and the changelog.
 If a signing secret is missing, the job fails naming it and publishes nothing. A second job then
 posts an update to the Linear initiative "Menstrual Cycle App" with the version, the changelog and
-links to the APK and the release. If that call fails, the job fails with Linear's error and the
+links to both APKs and the release. If that call fails, the job fails with Linear's error and the
 release stays published.
 
 The release notes come from `scripts/release/changelog.sh`, which works the same locally:
@@ -126,7 +135,8 @@ update's Markdown and needs no key:
 scripts/release/changelog.sh > notes.md
 scripts/release/linear_update.sh body v0.1.42 \
   https://github.com/tonypine/cycle/releases/tag/v0.1.42 \
-  https://github.com/tonypine/cycle/releases/download/v0.1.42/cycle-v0.1.42.apk notes.md
+  https://github.com/tonypine/cycle/releases/download/v0.1.42/cycle-v0.1.42.apk \
+  https://github.com/tonypine/cycle/releases/download/v0.1.42/cycle-catalog-v0.1.42.apk notes.md
 scripts/release/linear_update_test.sh   # its test, against a stub curl: nothing reaches Linear
 ```
 
@@ -180,9 +190,11 @@ already has an update posts a second one.
 
 ### Building a release locally
 
-`./gradlew :app:assembleRelease` builds an unsigned APK with version `0.1.0`. To sign it, set
+`./gradlew :app:assembleRelease` builds an unsigned APK with version `0.1.0`, and
+`./gradlew :app-catalog:assembleRelease` the catalog's. Both apps share the release setup, from the
+`cycle.android.application` convention in `build-logic`. To sign them, set
 `RELEASE_KEYSTORE_PATH` (absolute path to the `.jks`), `RELEASE_KEYSTORE_PASSWORD`,
-`RELEASE_KEY_ALIAS` and `RELEASE_KEY_PASSWORD`; to version it, add
+`RELEASE_KEY_ALIAS` and `RELEASE_KEY_PASSWORD`; to version them, add
 `-Pcycle.versionCode=42 -Pcycle.versionName=0.1.42`.
 
 ## Privacy

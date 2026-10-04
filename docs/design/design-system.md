@@ -7,7 +7,8 @@ components built on them. It sits on Compose Foundation only; the build fails if
 `androidx.compose.material` or `material3` reaches a classpath (`checkNoMaterialDependencies`).
 
 The `app-catalog` app shows every token and component, one section per page. Run it while building
-UI, and use its screenshots in review.
+UI, and use its screenshots in review. Every GitHub Release also carries it as
+`cycle-catalog-v<versionName>.apk`, for reviewing the UI on a phone.
 
 ## Reading tokens
 
