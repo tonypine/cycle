@@ -77,8 +77,9 @@ that turns out wrong costs more trust than an honest range.
 
 ## Recommended approach for Cycle
 
-A starting point for the prediction ticket, not a decision. Record the final choice in
-`docs/decisions/`.
+A starting point for the prediction ticket, not a decision. The next-period rules Cycle follows are
+decided in [`0003-cycle-estimates.md`](../decisions/0003-cycle-estimates.md); the fertile window
+and ovulation are still open.
 
 ### Inputs
 

@@ -73,16 +73,22 @@ screenshots change with it. The map follows the `projects.*` dependencies in eac
 - `:core:designsystem`: also `:core:ui`, `:app-catalog` and `:app`. The catalog renders every
   component and `app` renders the theme.
 - `:core:ui`: also `:app`.
-- `:app-catalog`, `:app`: nothing depends on them.
+- `:core:model`: also `:core:domain` and `:core:data`.
+- `:core:domain`: also `:core:data`.
+- `:core:data`, `:app-catalog`, `:app`: nothing depends on them.
 
 `verifyRoborazziDebug` runs a module's unit tests and verifies its screenshots. `:core:ui` has no
-screenshot tests yet, so its check is `testDebugUnitTest`. Each takes seconds:
+screenshot tests yet, so its check is `testDebugUnitTest`. `:core:model`, `:core:domain` and
+`:core:data` have no screenshots either: their check is `testDebugUnitTest` (in the two pure Kotlin
+modules it runs `test`). Each takes seconds:
 
 ```sh
 ./gradlew ktlintCheck
 # a core:designsystem change, with the modules that depend on it:
 ./gradlew :core:designsystem:verifyRoborazziDebug :core:ui:testDebugUnitTest \
   :app-catalog:verifyRoborazziDebug :app:verifyRoborazziDebug
+# a core:model change, with the modules that depend on it:
+./gradlew :core:model:testDebugUnitTest :core:domain:testDebugUnitTest :core:data:testDebugUnitTest
 # in the touched module, only the changed test classes, screenshots still verified
 # (the dependent modules still run their full check):
 ./gradlew :core:designsystem:testDebugUnitTest --tests '*CycleTextFieldTest' -Proborazzi.test.verify=true

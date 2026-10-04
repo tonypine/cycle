@@ -24,5 +24,8 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include(":app")
 include(":app-catalog")
+include(":core:data")
 include(":core:designsystem")
+include(":core:domain")
+include(":core:model")
 include(":core:ui")
