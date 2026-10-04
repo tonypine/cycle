@@ -21,7 +21,7 @@ of preference:
 
 1. Clinical bodies and their guidance: WHO, FIGO, ACOG, NICE, the NHS, the CDC, STRAW+10.
 2. Peer-reviewed studies, favouring large prospective ones (Wilcox's hormone-measured cycles) and
-   large real-world app datasets (Natural Cycles, Flo, Clue, the Apple Women's Health Study).
+   large real-world app datasets (Natural Cycles, Flo, the Apple Women's Health Study).
 3. Product documentation and regulators' actions (Apple, Android, the FTC, Mozilla's reviews) for
    how apps behave and fail.
 

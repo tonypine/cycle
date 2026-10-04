@@ -97,7 +97,8 @@ A starting point for the prediction ticket, not a decision. Record the final cho
 - **Range** = last period start + her shortest to longest recent cycle.
 - **Expected length** = the median of her recent periods' lengths.
 - **Little data.** With no complete cycle, use the typical length she gives at setup (default 28
-  days, 5-day period) and a ±4-day range, FIGO's practical bound for a regular cycle
+  days, 5-day period) and a ±4-day range, about half of FIGO's 7–9-day regularity spread (the most
+  a regular cycle's shortest and longest lengths may differ)
   ([FIGO 2018](https://obgyn.onlinelibrary.wiley.com/doi/10.1002/ijgo.12666)). With one or two
   cycles, keep at least ±3 days. Say the estimate will improve as she logs.
 - **When it is late.** Never show a prediction in the past. Once the expected day passes without a

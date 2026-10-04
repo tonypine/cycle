@@ -101,7 +101,7 @@ Can move earlier if she wants them sooner; none depend on the steps above.
 | -- | -- | -- |
 | Usual cycle and period length, before any history | 28 and 5 days | Common convention; replaced by her data after the first complete cycle. |
 | Cycles used for predictions | The last 6 complete cycles, median | Matches the calendar rhythm rule and Apple's six-month window; a median resists one odd month. |
-| Prediction range with little data | ±4 days with no cycles, at least ±3 with one or two | FIGO's practical bound for a regular cycle. |
+| Prediction range with little data | ±4 days with no cycles, at least ±3 with one or two | About half of FIGO's 7–9-day regularity spread ([FIGO 2018](https://obgyn.onlinelibrary.wiley.com/doi/10.1002/ijgo.12666)). |
 | Cycles shown ahead on the calendar | 3 | Further out, the range grows too wide to help. |
 | Fertile window and ovulation | Depends on her answer to the first question below | Meaningless or unwanted for some goals. |
 | Health signal cards | On, dismissible, switchable off; to confirm with her | Useful and calm when worded as in [`health-signals.md`](health-signals.md). |
