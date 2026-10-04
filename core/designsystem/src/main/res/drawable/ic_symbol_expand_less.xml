@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Symbols Rounded "expand_less", weight 600, filled, grade 0, optical size 24. Apache 2.0, see res/raw/license_material_symbols.txt. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <group android:translateY="960">
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M480-511.48 333.04-364.52q-14.95 14.96-37.04 14.96t-37.04-14.96Q244-379.48 244-401.57q0-22.08 14.96-37.04l183.43-183.43q7.7-7.7 17.52-11.61 9.83-3.92 20.09-3.92t20.09 3.92q9.82 3.91 17.52 11.61l183.43 183.43Q716-423.65 716-401.57q0 22.09-14.96 37.05-14.95 14.96-37.04 14.96t-37.04-14.96L480-511.48Z" />
+    </group>
+</vector>

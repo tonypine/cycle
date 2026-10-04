@@ -1,5 +1,7 @@
 package com.tonypine.cycle.core.designsystem
 
+import androidx.compose.foundation.Indication
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.ui.test.junit4.createComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -35,9 +37,39 @@ class CycleThemeTest {
         var tokens: List<Any>? = null
         composeRule.setContent {
             CycleTheme {
-                tokens = listOf(CycleTheme.typography, CycleTheme.shapes, CycleTheme.spacing, CycleTheme.elevation)
+                tokens = listOf(
+                    CycleTheme.typography,
+                    CycleTheme.shapes,
+                    CycleTheme.spacing,
+                    CycleTheme.elevation,
+                    CycleTheme.motion,
+                    CycleTheme.stateAlpha
+                )
             }
         }
-        assertEquals(listOf(ZestTypography, ZestShapes, DefaultCycleSpacing, DefaultCycleElevation), tokens)
+        assertEquals(
+            listOf(
+                ZestTypography,
+                ZestShapes,
+                DefaultCycleSpacing,
+                DefaultCycleElevation,
+                ZestMotion,
+                DefaultCycleStateAlpha
+            ),
+            tokens
+        )
+    }
+
+    @Test
+    fun installsCycleIndicationInsteadOfRipple() {
+        var indication: Indication? = null
+        composeRule.setContent {
+            CycleTheme(darkTheme = true, reduceMotion = false) { indication = LocalIndication.current }
+        }
+        val cycle = indication as CycleIndication
+        assertEquals(DarkCycleColors.onSurface, cycle.color)
+        assertEquals(DarkCycleColors.accent, cycle.focusRingColor)
+        assertEquals(PRESSED_SCALE, cycle.pressedScale)
+        assertEquals(ZestMotion, cycle.motion)
     }
 }

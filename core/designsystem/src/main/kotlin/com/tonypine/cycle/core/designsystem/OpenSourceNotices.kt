@@ -10,5 +10,6 @@ class OpenSourceNotice(val name: String, val license: String, @param:RawRes val 
 
 val OpenSourceNotices: List<OpenSourceNotice> = listOf(
     OpenSourceNotice("Bricolage Grotesque", "SIL Open Font License 1.1", R.raw.license_bricolage_grotesque),
-    OpenSourceNotice("DM Sans", "SIL Open Font License 1.1", R.raw.license_dm_sans)
+    OpenSourceNotice("DM Sans", "SIL Open Font License 1.1", R.raw.license_dm_sans),
+    OpenSourceNotice("Material Symbols Rounded", "Apache License 2.0", R.raw.license_material_symbols)
 )

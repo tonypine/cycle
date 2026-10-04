@@ -336,6 +336,8 @@ Day cells: period: squircle (14dp); predicted: squircle (14dp); fertile: circle;
 
 Bouncy but quick. Underdamped springs (damping 0.6, stiffness 500) for shape and position, so selections overshoot and settle; colour changes stay critically damped. Logging a day gets a small celebratory morph. Spatial spring: `spring(dampingRatio = 0.6f, stiffness = 500f)`; effects spring: `spring(dampingRatio = 1.0f, stiffness = 1600f)`.
 
+Fast and slow speeds keep the damping and take Material 3 Expressive's stiffnesses: spatial 800 (fast) and 200 (slow), effects 3800 (fast) and 800 (slow). Pressed controls scale to 94%; focus shows a 3dp `accent` ring 2dp outside the control.
+
 ### Icons
 
 Material Symbols Rounded, weight 600, filled, grade 0, optical size 24, matching the heavy type.
