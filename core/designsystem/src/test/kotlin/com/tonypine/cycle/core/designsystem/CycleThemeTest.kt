@@ -29,4 +29,15 @@ class CycleThemeTest {
         }
         assertEquals(LightCycleColors, colors)
     }
+
+    @Test
+    fun providesEveryTokenSet() {
+        var tokens: List<Any>? = null
+        composeRule.setContent {
+            CycleTheme {
+                tokens = listOf(CycleTheme.typography, CycleTheme.shapes, CycleTheme.spacing, CycleTheme.elevation)
+            }
+        }
+        assertEquals(listOf(ZestTypography, ZestShapes, DefaultCycleSpacing, DefaultCycleElevation), tokens)
+    }
 }

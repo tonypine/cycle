@@ -8,7 +8,6 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.tonypine.cycle.core.designsystem.CycleTheme
 
 /** Placeholder start screen until the first feature lands. */
@@ -18,9 +17,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         text = stringResource(R.string.app_name),
         modifier = modifier
             .fillMaxSize()
-            .background(CycleTheme.colors.background)
+            .background(CycleTheme.colors.surface)
             .safeDrawingPadding()
-            .padding(24.dp),
-        style = CycleTheme.typography.title.copy(color = CycleTheme.colors.content)
+            .padding(CycleTheme.spacing.extraLarge),
+        style = CycleTheme.typography.headline.copy(color = CycleTheme.colors.onSurface)
     )
 }
