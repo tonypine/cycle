@@ -17,8 +17,8 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * The app shell with no data: Today's empty state and a placeholder tab, the navigation bar under
- * each, in light and dark. Records `src/test/screenshots/app_<tab>_<appearance>.png`.
+ * The app shell with no data: Today's and History's empty states and a placeholder tab, the navigation
+ * bar under each, in light and dark. Records `src/test/screenshots/app_<tab>_<appearance>.png`.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -48,5 +48,11 @@ class CycleAppScreenshotTest {
         composeRule.onNodeWithText("Calendar").performClick()
         composeRule.waitForIdle()
         composeRule.onRoot().captureRoboImage("src/test/screenshots/app_calendar_$appearance.png")
+
+        composeRule.onNodeWithText("History").performClick()
+        composeRule.waitUntil(5_000) {
+            composeRule.onAllNodes(hasText("No cycles yet")).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onRoot().captureRoboImage("src/test/screenshots/app_history_$appearance.png")
     }
 }

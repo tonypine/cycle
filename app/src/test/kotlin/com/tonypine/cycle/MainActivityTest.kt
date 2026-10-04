@@ -49,11 +49,14 @@ class MainActivityTest {
 
     @Test
     fun `each tab opens and back returns to Today`() {
-        listOf("Calendar", "History", "Settings").forEach { label ->
+        val placeholder = "This part of Cycle is on its way."
+        val screens = mapOf("Calendar" to placeholder, "History" to "No cycles yet", "Settings" to placeholder)
+        screens.forEach { (label, text) ->
             tab(label).performClick()
             tab(label).assertIsSelected()
             tab("Today").assertIsNotSelected()
-            composeRule.onNodeWithText("This part of Cycle is on its way.").assertIsDisplayed()
+            waitForText(text)
+            composeRule.onNodeWithText(text).assertIsDisplayed()
         }
 
         composeRule.runOnUiThread { composeRule.activity.onBackPressedDispatcher.onBackPressed() }
