@@ -4,12 +4,14 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -23,6 +25,8 @@ import com.tonypine.cycle.core.designsystem.CycleIcons
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.NavigationBar
 import com.tonypine.cycle.core.designsystem.NavigationDestination
+import com.tonypine.cycle.feature.onboarding.OnboardingRoute
+import com.tonypine.cycle.feature.onboarding.OnboardingViewModel
 import com.tonypine.cycle.feature.today.TodayRoute
 import com.tonypine.cycle.feature.today.TodayViewModel
 import java.time.LocalDate
@@ -36,8 +40,8 @@ enum class TopLevelDestination(val route: String, @param:StringRes val label: In
 }
 
 /**
- * The app: one screen per tab above the navigation bar. Each tab keeps its state when she leaves it,
- * and back from any tab returns to Today, then leaves the app.
+ * The app: the welcome and setup on the first launch, then one screen per tab above the navigation
+ * bar. Nothing shows until the settings are read, so the welcome never flashes on her way to Today.
  *
  * @param today her day, from the phone's clock in its current zone.
  */
@@ -48,6 +52,20 @@ fun CycleApp(
     today: () -> LocalDate = LocalDate::now,
     navController: NavHostController = rememberNavController()
 ) {
+    val onboarding = viewModel { OnboardingViewModel(data.settingsRepository, data.dayLogRepository, today) }
+    val showWelcome by onboarding.showWelcome.collectAsStateWithLifecycle()
+    Box(modifier.fillMaxSize().background(CycleTheme.colors.surface)) {
+        when (showWelcome) {
+            null -> Unit
+            true -> OnboardingRoute(onboarding)
+            false -> CycleTabs(data, today, navController)
+        }
+    }
+}
+
+/** Each tab keeps its state when she leaves it, and back from any tab returns to Today, then leaves the app. */
+@Composable
+private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: NavHostController) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val current = backStackEntry?.destination
     val selected = TopLevelDestination.entries
@@ -55,7 +73,7 @@ fun CycleApp(
         .coerceAtLeast(0)
     val motion = CycleTheme.motion
 
-    Column(modifier.fillMaxSize().background(CycleTheme.colors.surface)) {
+    Column(Modifier.fillMaxSize()) {
         NavHost(
             navController = navController,
             startDestination = TopLevelDestination.Today.route,
