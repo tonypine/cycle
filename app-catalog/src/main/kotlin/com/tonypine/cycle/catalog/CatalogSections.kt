@@ -28,7 +28,12 @@ val CatalogSections: List<CatalogSection> = listOf(
     CatalogSection("Indication", "The state layer, press scale and focus ring in every state.") {
         IndicationSection()
     },
-    CatalogSection("Icons", "Every Material Symbols Rounded icon the app ships.") { IconsSection() }
+    CatalogSection("Icons", "Every Material Symbols Rounded icon the app ships.") { IconsSection() },
+    CatalogSection("Buttons", "Filled, tonal, outlined and text buttons in every state.") { ButtonsSection() },
+    CatalogSection("Icon buttons", "Standard, filled, tonal and toggle icon buttons in every state.") {
+        IconButtonsSection()
+    },
+    CatalogSection("Chips", "Filter and assist chips in every state, and selection.") { ChipsSection() }
 )
 
 @Composable

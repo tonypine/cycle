@@ -64,7 +64,10 @@ class CatalogScreenshotTest(private val page: Page, private val variant: Variant
             "Spacing" to (860 to 1120),
             "Motion" to (1320 to 2300),
             "Indication" to (900 to 1400),
-            "Icons" to (1000 to 1900)
+            "Icons" to (1000 to 1900),
+            "Buttons" to (1400 to 2140),
+            "Icon buttons" to (1160 to 2240),
+            "Chips" to (1040 to 1900)
         )
 
         @JvmStatic
@@ -73,7 +76,7 @@ class CatalogScreenshotTest(private val page: Page, private val variant: Variant
             val pages = listOf(Page("list", 540, 840) { SectionList(onOpen = {}) }) +
                 CatalogSections.map { section ->
                     val (height, largeFontHeight) = heights.getValue(section.title)
-                    Page(section.title.lowercase(), height, largeFontHeight) {
+                    Page(section.title.lowercase().replace(' ', '_'), height, largeFontHeight) {
                         SectionPage(section, onBack = {})
                     }
                 }

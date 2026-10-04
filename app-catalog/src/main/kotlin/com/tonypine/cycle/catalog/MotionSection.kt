@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.tonypine.cycle.core.designsystem.CyclePolygons
 import com.tonypine.cycle.core.designsystem.CycleSpring
 import com.tonypine.cycle.core.designsystem.CycleTheme
+import com.tonypine.cycle.core.designsystem.FilledButton
 import com.tonypine.cycle.core.designsystem.LocalCycleMotion
 import com.tonypine.cycle.core.designsystem.animatedMorphShape
 import java.util.Locale
@@ -61,7 +62,7 @@ internal fun MotionSection() {
         CycleTheme.typography.bodySmall,
         color = CycleTheme.colors.onSurfaceVariant
     )
-    DemoButton(
+    FilledButton(
         if (forceReduceMotion) "Animate the demos" else "Reduce motion in the demos",
         onClick = { forceReduceMotion = !forceReduceMotion }
     )
@@ -110,7 +111,7 @@ private fun SpringDemo() {
                 .background(CycleTheme.colors.accent, CycleTheme.shapes.full)
         )
     }
-    DemoButton("Move with defaultSpatial", onClick = { atEnd = !atEnd })
+    FilledButton("Move with defaultSpatial", onClick = { atEnd = !atEnd })
 }
 
 @Composable
@@ -137,7 +138,7 @@ private fun MorphDemo() {
             )
         }
     }
-    DemoButton(if (logged) "Back to a circle" else "Morph to the sun", onClick = { logged = !logged })
+    FilledButton(if (logged) "Back to a circle" else "Morph to the sun", onClick = { logged = !logged })
 }
 
 private fun Float.format(): String = "%.1f".format(Locale.ROOT, this)
