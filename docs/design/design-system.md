@@ -16,7 +16,7 @@ accessors. Each one is a `CompositionLocal`, so previews and tests can provide o
 
 | Accessor | Type | Holds |
 | -- | -- | -- |
-| `CycleTheme.colors` | `CycleColors` | Every Zest colour role: `accent`, `surface`, `onSurface`, the error roles and the cycle roles (`period`, `predicted`, `predictedEdge`, `fertile`, `ovulation`, `today`, each with its `on*` role). Light or dark, from `darkTheme`. No dynamic colour. |
+| `CycleTheme.colors` | `CycleColors` | Every Zest colour role: `accent`, `surface`, `onSurface`, `scrim` behind dialogs, the error roles and the cycle roles (`period`, `predicted`, `predictedEdge`, `fertile`, `ovulation`, `today`, each with its `on*` role). Light or dark, from `darkTheme`. No dynamic colour. |
 | `CycleTheme.typography` | `CycleTypography` | `display`, `headline`, `title`, `titleSmall`, `body`, `bodySmall`, `label`, `labelSmall`, `dayNumber`, and emphasized variants (`headlineEmphasized`, `titleEmphasized`, `dayNumberEmphasized`) for key numbers. |
 | `CycleTheme.shapes` | `CycleShapes` | Corner scale: `extraSmall` 8dp, `small` 12dp, `medium` 16dp, `large` 24dp, `extraLarge` 32dp, `full` (pill). |
 | `CycleTheme.spacing` | `CycleSpacing` | 4dp grid: `extraSmall` 4, `small` 8, `medium` 12, `large` 16 (screen margin), `extraLarge` 24, `extraExtraLarge` 32, `huge` 48. |
@@ -379,6 +379,67 @@ so they snap under reduce motion.
 `imePadding()`, or `safeDrawingPadding()` which includes it. When the keyboard opens, the column
 shrinks above it, and Foundation scrolls the focused field, with its supporting text, back into view.
 `CycleTextFieldImeTest` checks this with Robolectric by dispatching keyboard insets.
+
+## Dialogs
+
+`Dialogs.kt`. A dialog interrupts to ask one question or collect one value. It opens in its own
+window from Compose UI's `Dialog`, edge to edge: the `scrim` dims the whole screen, system bars
+included, and the dialog sits on `surfaceContainer` with 32dp corners (`shapes.extraLarge`) and a
+level 3 shadow, inside the safe drawing area, so it never sits under a bar, a cut-out or the keyboard.
+
+| Component | Has | For |
+| -- | -- | -- |
+| `CycleAlertDialog` | Optional icon, title, a sentence or two, confirm and optional dismiss text buttons | A question with a clear answer: "Turn on reminders?" |
+| `CycleDestructiveDialog` | Error icon (by default), title, a sentence saying what is lost, a required dismiss button and an `error` confirm button | An action that loses data: "Delete this day?" |
+| `CycleDialog` | Optional icon, title and sentence, then a content slot, confirm and optional dismiss | Collecting a value, such as a note in a `CycleTextField`. `confirmEnabled` holds the confirm action off until it is valid. |
+
+```kotlin
+var confirmDelete by rememberSaveable { mutableStateOf(false) }
+CycleDestructiveDialog(
+    visible = confirmDelete,
+    onDismissRequest = { confirmDelete = false },
+    title = "Delete this day?",
+    text = "This removes the period and notes logged for 14 March. You can't undo it.",
+    confirmText = "Delete",
+    onConfirm = { onDelete(); confirmDelete = false },
+    dismissText = "Keep it"
+)
+```
+
+- **Showing and hiding.** Keep the dialog in composition and flip `visible`; set it to false in
+  `onDismissRequest` and in the actions. The scrim fades on the effects springs and the dialog fades
+  and scales from 90% on the spatial springs, faster on the way out. The window stays until the exit
+  ends. Under reduce motion both snap.
+- **Dismissal.** Back (and Escape) and a tap on the scrim call `onDismissRequest`. Turn either off
+  with `dismissOnBackPress = false` or `dismissOnScrimTap = false`, for a choice that must be made.
+  A tap on the dialog itself never dismisses it. The dismiss button calls `onDismiss`, which defaults
+  to `onDismissRequest`.
+- **Actions.** They sit in a row at the end, confirm last. When the row does not fit, such as at
+  200% font scale, they stack at the end with confirm on top. Alert and custom dialogs use text
+  buttons; the destructive one pairs a text button with an `error` pill (`onError` label).
+- **Destructive.** The danger never relies on colour alone: the error icon, a sentence that says what
+  will be lost and the red confirm button all carry it, and there is always a dismiss button.
+- **Focus.** When the dialog opens, focus moves into it, onto its first focusable element: the
+  dismiss button for a keyboard or D-pad user, or the first text field in a `CycleDialog`, which
+  opens the keyboard. When it closes, focus goes back to whatever had it, such as the button that
+  opened it. TalkBack announces the title as the window's title.
+- **Keyboard.** The dialog pads itself above the keyboard and its content scrolls, so the focused
+  field scrolls into view and the actions stay above the keyboard.
+- **TalkBack.** The title is a heading, and TalkBack reads the title, the text and the actions in
+  that order. The icon is decorative.
+- **Density and direction.** The dialog window uses the caller's `LocalDensity` and
+  `LocalLayoutDirection`, so it matches the screen that opened it.
+
+Text and icons on the dialog use pairs checked against `surfaceContainer`: `onSurface` (title),
+`onSurfaceVariant` (text), `accent` (icon and text buttons) and `error` (the destructive icon).
+
+Don't use a dialog for a message that needs no answer (that is a snackbar, still to come), for a
+choice that can be undone in place, or for a long form (use a screen).
+
+`DialogTest` covers dismissal, focus, the action layout and motion, `DialogImeTest` the keyboard,
+and `DialogScreenshotTest` captures each dialog over a sample screen with `captureScreenRoboImage`,
+then runs the accessibility checks on the dialog's window
+(`matrix.checkAccessibility(root = composeRule.onNode(isDialog()))`).
 
 ## Adding a token
 
