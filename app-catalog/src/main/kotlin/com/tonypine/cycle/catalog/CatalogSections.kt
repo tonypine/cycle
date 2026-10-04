@@ -45,6 +45,9 @@ val CatalogSections: List<CatalogSection> = listOf(
     CatalogSection("Text field", "The outlined text field: a form to type in, and every state.") {
         TextFieldSection()
     },
+    CatalogSection("Dialogs", "Alert, destructive and text field dialogs: open each one, and turn dismissal off.") {
+        DialogsSection()
+    },
     CatalogSection("Bottom sheet", "A modal sheet to open, drag, type in and dismiss.") {
         BottomSheetSection()
     },

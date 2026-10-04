@@ -143,6 +143,31 @@ fun TextButton(
     )
 }
 
+/**
+ * A destructive action, such as "Delete" in a [CycleDestructiveDialog]: an `error` pill with an
+ * `onError` label. Only the destructive dialog uses it, next to an error icon and a sentence that says
+ * what will be lost, so the danger never relies on colour alone. Otherwise the same as [FilledButton].
+ */
+@Composable
+internal fun ErrorButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+) {
+    val colors = CycleTheme.colors
+    ButtonBase(
+        text = text,
+        onClick = onClick,
+        modifier = modifier,
+        icon = null,
+        enabled = enabled,
+        interactionSource = interactionSource,
+        colors = if (enabled) ControlColors(colors.error, colors.onError) else disabledControlColors(container = true)
+    )
+}
+
 @Composable
 private fun ButtonBase(
     text: String,
