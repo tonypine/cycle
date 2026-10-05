@@ -1,8 +1,15 @@
 package com.tonypine.cycle.feature.history
 
+import com.tonypine.cycle.core.model.BodySymptom
+import com.tonypine.cycle.core.model.EnergyLevel
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.model.LengthSummary
+import com.tonypine.cycle.core.model.Mood
+import com.tonypine.cycle.core.model.PainKind
+import com.tonypine.cycle.core.model.PainLevel
 import com.tonypine.cycle.core.model.Period
+import com.tonypine.cycle.core.model.SexualActivity
+import com.tonypine.cycle.core.model.SleepQuality
 import java.time.LocalDate
 
 /**
@@ -43,7 +50,10 @@ internal object HistorySamples {
         cycles = listOf(current) + past
     )
 
-    /** August's cycle, with a day she logged no flow on. */
+    /**
+     * August's cycle, with a day she logged no flow on, and how she felt: cramps over the first
+     * three days, bloating on days 24 to 27, and two notes.
+     */
     val pastCycle = CycleDetailUiState.Detail(
         today = today,
         cycle = past.first(),
@@ -55,6 +65,23 @@ internal object HistorySamples {
             FlowLevel.MEDIUM,
             null,
             FlowLevel.LIGHT
+        ),
+        symptoms = listOf(
+            SymptomDays(Symptom.Pain(PainLevel.MILD, PainKind.CRAMPS), listOf(3)),
+            SymptomDays(Symptom.Pain(PainLevel.MODERATE, PainKind.CRAMPS), listOf(1, 2)),
+            SymptomDays(Symptom.Pain(PainLevel.MODERATE, PainKind.LOWER_BACK), listOf(1)),
+            SymptomDays(Symptom.Body(BodySymptom.BLOATING), listOf(24, 25, 26, 27)),
+            SymptomDays(Symptom.Body(BodySymptom.TENDER_BREASTS), listOf(26)),
+            SymptomDays(Symptom.Body(BodySymptom.TIRED), listOf(2)),
+            SymptomDays(Symptom.Feeling(Mood.SENSITIVE), listOf(26)),
+            SymptomDays(Symptom.Feeling(Mood.IRRITABLE), listOf(1)),
+            SymptomDays(Symptom.Energy(EnergyLevel.LOW), listOf(1)),
+            SymptomDays(Symptom.Sleep(SleepQuality.BADLY), listOf(2)),
+            SymptomDays(Symptom.Sex(SexualActivity.PROTECTED), listOf(14))
+        ),
+        notes = listOf(
+            CycleNote(1, "Sample note: a heat pad helped."),
+            CycleNote(3, "Sample note: a short walk after lunch.")
         )
     )
 

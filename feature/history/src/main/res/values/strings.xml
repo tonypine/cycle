@@ -45,7 +45,7 @@
     </plurals>
     <string name="history_open_cycle">see details</string>
 
-    <!-- One cycle's details. MOT-36 adds how she feels. -->
+    <!-- One cycle's details. -->
     <string name="cycle_title">Cycle</string>
     <string name="cycle_back">Back</string>
     <string name="cycle_period">Period</string>
@@ -56,6 +56,20 @@
     <string name="cycle_flow_medium">Medium</string>
     <string name="cycle_flow_heavy">Heavy</string>
     <string name="cycle_flow_not_logged">Not logged</string>
+    <!-- How she felt during the cycle, with the days of the cycle, day 1 first: "Days 1, 2, 24–27".
+         Each symptom's words come from core:ui, as Today's summary says them. -->
+    <string name="cycle_felt">How you felt</string>
+    <plurals name="cycle_days">
+        <item quantity="one">Day %1$s</item>
+        <item quantity="other">Days %1$s</item>
+    </plurals>
+    <string name="cycle_day_range">%1$d–%2$d</string>
+    <!-- What TalkBack reads for a range of days: "24 to 27". -->
+    <string name="cycle_day_range_spoken">%1$d to %2$d</string>
+    <!-- TalkBack reads a symptom and its days as one item: "Bloating, Days 24 to 27". -->
+    <string name="cycle_symptom_spoken">%1$s, %2$s</string>
+    <string name="cycle_notes">Notes</string>
+    <string name="cycle_note_day">Day %1$d</string>
     <string name="cycle_see_in_calendar">See it in the calendar</string>
     <string name="cycle_missing_title">This cycle has changed</string>
     <string name="cycle_missing_body">Its period was edited, so the cycle now starts on another day. Go back to see your cycles.</string>
