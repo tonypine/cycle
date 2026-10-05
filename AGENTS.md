@@ -70,15 +70,18 @@ touches, plus every module that depends on it: those render the changed code too
 screenshots change with it. The map follows the `projects.*` dependencies in each module's
 `build.gradle.kts`; update it when a module is added:
 
-- `:core:designsystem`: also `:core:ui`, `:feature:calendar`, `:feature:onboarding`, `:feature:today`,
-  `:app-catalog` and `:app`. The catalog renders every component and `app` renders the theme.
-- `:core:ui`: also `:feature:calendar`, `:feature:onboarding`, `:feature:today` and `:app`.
+- `:core:designsystem`: also `:core:ui`, `:feature:calendar`, `:feature:history`,
+  `:feature:onboarding`, `:feature:today`, `:app-catalog` and `:app`. The catalog renders every
+  component and `app` renders the theme.
+- `:core:ui`: also `:feature:calendar`, `:feature:history`, `:feature:onboarding`, `:feature:today`
+  and `:app`.
 - `:core:model`: also `:core:domain`, `:core:data`, `:core:ui`, `:feature:calendar`,
+  `:feature:history`, `:feature:onboarding`, `:feature:today` and `:app`.
+- `:core:domain`: also `:core:data`, `:feature:calendar`, `:feature:history`,
   `:feature:onboarding`, `:feature:today` and `:app`.
-- `:core:domain`: also `:core:data`, `:feature:calendar`, `:feature:onboarding`, `:feature:today` and
-  `:app`.
-- `:core:data`: also `:feature:calendar`, `:feature:onboarding`, `:feature:today` and `:app`.
-- `:feature:calendar`, `:feature:onboarding`, `:feature:today`: also `:app`.
+- `:core:data`: also `:feature:calendar`, `:feature:history`, `:feature:onboarding`,
+  `:feature:today` and `:app`.
+- `:feature:calendar`, `:feature:history`, `:feature:onboarding`, `:feature:today`: also `:app`.
 - `:app-catalog`, `:app`: nothing depends on them.
 
 `verifyRoborazziDebug` runs a module's unit tests and verifies its screenshots. `:core:model`,

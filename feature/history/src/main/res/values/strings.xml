@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Copy rules: docs/research/product-implications.md. Say "period", describe her cycles without
+         judging them: no "normal", "regular" or "abnormal". HistoryStringsTest guards against the
+         words the app never says. -->
+
+    <string name="history_title">History</string>
+
+    <!-- Before her first complete cycle. -->
+    <string name="history_empty_title">No cycles yet</string>
+    <string name="history_empty_body">Log a period on Today, and your cycles will show here.</string>
+    <string name="history_first_cycle_title">Your first cycle is still going</string>
+    <string name="history_first_cycle_body">When your next period starts, you will see how long this cycle lasted.</string>
+
+    <!-- Your typical cycle: the middle value of her recent lengths, then the shortest and longest. -->
+    <string name="history_typical_title">Your typical cycle</string>
+    <string name="history_typical_cycle">Cycle length</string>
+    <string name="history_typical_period">Period length</string>
+    <plurals name="history_typical_basis">
+        <item quantity="one">From your last cycle</item>
+        <item quantity="other">The middle length of your last %1$d cycles</item>
+    </plurals>
+    <plurals name="history_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="history_range">
+        <item quantity="one">Shortest to longest: %1$d to %2$d day</item>
+        <item quantity="other">Shortest to longest: %1$d to %2$d days</item>
+    </plurals>
+
+    <!-- The list of cycles, the current one first. -->
+    <string name="history_cycles">Cycles</string>
+    <string name="history_current_cycle">Current cycle</string>
+    <string name="history_since">Since %1$s</string>
+    <string name="history_dates">%1$s to %2$s</string>
+    <string name="history_day_so_far">Day %1$d so far</string>
+    <plurals name="history_period_length">
+        <item quantity="one">Period: %1$d day</item>
+        <item quantity="other">Period: %1$d days</item>
+    </plurals>
+    <plurals name="history_period_so_far">
+        <item quantity="one">Period: %1$d day so far</item>
+        <item quantity="other">Period: %1$d days so far</item>
+    </plurals>
+    <string name="history_open_cycle">see details</string>
+
+    <!-- One cycle's details. MOT-36 adds how she feels. -->
+    <string name="cycle_title">Cycle</string>
+    <string name="cycle_back">Back</string>
+    <string name="cycle_period">Period</string>
+    <string name="cycle_flow">Flow</string>
+    <string name="cycle_flow_none">No flow</string>
+    <string name="cycle_flow_spotting">Spotting</string>
+    <string name="cycle_flow_light">Light</string>
+    <string name="cycle_flow_medium">Medium</string>
+    <string name="cycle_flow_heavy">Heavy</string>
+    <string name="cycle_flow_not_logged">Not logged</string>
+    <string name="cycle_see_in_calendar">See it in the calendar</string>
+    <string name="cycle_missing_title">This cycle has changed</string>
+    <string name="cycle_missing_body">Its period was edited, so the cycle now starts on another day. Go back to see your cycles.</string>
+</resources>
