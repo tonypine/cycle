@@ -290,6 +290,58 @@ icon and switch draw at the disabled alphas, the state stays visible and taps ar
 Don't use a switch for choosing between options (use a `ButtonGroup`), for picking several items
 such as symptoms (use `FilterChip`s), or for an action that happens once (use a button).
 
+## Slider
+
+`Slider.kt`. A whole number picked along a track, such as her usual cycle length in days. Built on
+Compose Foundation's pointer input and semantics: there is no Foundation slider, and Material's is
+off limits.
+
+```kotlin
+var cycle by rememberSaveable { mutableIntStateOf(28) }
+SliderField(
+    label = "Cycle length",
+    value = cycle,
+    onValueChange = { cycle = it },
+    valueRange = 15..90,
+    valueText = "$cycle days",
+    decreaseDescription = "Cycle one day shorter",
+    increaseDescription = "Cycle one day longer",
+    supportingText = "Often between 21 and 35 days."
+)
+Slider(cycle, { cycle = it }, 15..90, contentDescription = "Cycle length", stateDescription = "$cycle days")
+```
+
+- `SliderField(label, value, onValueChange, valueRange, valueText, decreaseDescription, increaseDescription, modifier, supportingText = null, enabled = true)`
+  is the one to reach for: the `label` in `titleSmall` and the value as large text
+  (`valueText` in `headlineEmphasized`, "28 days"), `−` and `+` `TonalIconButton`s for one step at a
+  time, the slider under them for big moves, and an optional one-sentence `supportingText` in
+  `bodySmall` `onSurfaceVariant`, on `surfaceContainer` with 24dp corners (`shapes.large`). On a
+  wide range such as 15 to 90, one step is a millimetre of track, so the buttons are how she lands
+  on an exact value. `−` turns off at the start of the range and `+` at the end.
+- `Slider(value, onValueChange, valueRange, contentDescription, stateDescription, modifier, enabled = true, interactionSource)`
+  is the track alone, for a place that already shows the value. One step per whole number.
+
+**Looks.** A 16dp pill track: `accent` up to the value, `accentContainer` after it, with a 4dp
+`accent` dot at the far end. At the value, a 4 by 44dp `accent` handle with a 6dp gap on each side
+and 2dp corners on the track next to it. The slider is 48dp tall and fills the width it is given;
+it runs right to left in right-to-left layouts. Disabled, the active part and handle draw in
+`onSurface` at `stateAlpha.disabledContent` and the rest at `disabledContainer`.
+
+**Touch and motion.** Tapping the track moves to that value and the handle springs there on the fast
+spatial spring; dragging sideways follows the finger directly. A vertical swipe that starts on the
+track still scrolls the screen. The handle narrows to 2dp while held. Pressed and focused come from
+`cycleIndication` on the handle: the focus ring and press scale. Under reduce motion it all jumps.
+
+**Keys and TalkBack.** Arrow keys move one step (right is forward, or back in right-to-left), Home and
+End go to the ends. TalkBack reads the slider's `contentDescription` and `stateDescription` ("Cycle
+length, 28 days") and adjusts it one step at a time (`ProgressBarRangeInfo` with a step per whole
+number, and `setProgress`). In a `SliderField` the label and value read together as one item, a polite
+live region, so the new value is announced when `−` or `+` change it; the buttons read their
+descriptions, which name what they do ("Cycle one day shorter").
+
+Don't use a slider for a value she would type more easily, such as a year, or for a few named options
+(use a [`ButtonGroup`](#button-group)).
+
 ## Day cell
 
 `DayCell` draws one day of the calendar in Zest's shape for its cycle state, so no state relies on
@@ -642,6 +694,8 @@ target and the TalkBack order (and that a button group's labels stay on one line
 to prove they spring normally and snap under `CycleTheme(reduceMotion = true)`. `ContainerSemanticsTest`
 does the same for cards, the empty state (one heading group, scrolling at 200%) and the loading
 state (progress semantics), and `LoadingMotionTest` compares frames of the loading indicator.
+`SliderTest` drags, taps, scrolls past, presses keys on and sets through TalkBack the slider and the
+slider field, and checks that `−` and `+` stop at the ends.
 
 ## Text field
 

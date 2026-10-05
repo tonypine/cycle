@@ -3,6 +3,7 @@ package com.tonypine.cycle.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tonypine.cycle.core.data.settings.SettingsRepository
+import com.tonypine.cycle.core.domain.UsualLengths
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,14 +19,18 @@ class UsualLengthsViewModel(private val settings: SettingsRepository) : ViewMode
     val uiState: StateFlow<UsualLengthsUiState> = state.asStateFlow()
 
     init {
-        // Read once: the fields start from what is saved, then follow only what she types.
+        // Read once: the sliders start from what is saved, within the lengths they offer, then follow
+        // only what she sets.
         viewModelScope.launch {
             val saved = settings.settings.first()
-            state.value = UsualLengthsUiState.Editing(saved.usualCycleLength, saved.usualPeriodLength)
+            state.value = UsualLengthsUiState.Editing(
+                UsualLengths.cycle(saved.usualCycleLength),
+                UsualLengths.period(saved.usualPeriodLength)
+            )
         }
     }
 
-    /** Saves her lengths, already checked, then the screen closes. */
+    /** Saves her lengths, as the sliders give them, then the screen closes. */
     fun onSave(cycleLength: Int, periodLength: Int) {
         viewModelScope.launch {
             settings.saveSetup(cycleLength, periodLength)
@@ -38,7 +43,7 @@ sealed interface UsualLengthsUiState {
     /** Her settings have not been read yet. */
     data object Loading : UsualLengthsUiState
 
-    /** The lengths saved when she opened the screen, to start the fields from. */
+    /** The lengths saved when she opened the screen, to start the sliders from. */
     data class Editing(val cycleLength: Int, val periodLength: Int) : UsualLengthsUiState
 
     /** Her lengths are saved: the screen closes. */

@@ -1,22 +1,26 @@
 package com.tonypine.cycle.feature.onboarding
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.hasSetTextAction
-import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasStateDescription
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.performTextClearance
-import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.test.swipeRight
 import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -48,7 +52,10 @@ class OnboardingScreenTest {
         }
     }
 
-    private fun field(label: String) = composeRule.onNode(hasSetTextAction() and hasText(label, substring = true))
+    private fun slider(label: String) =
+        composeRule.onNode(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress) and hasContentDescription(label))
+
+    private fun button(description: String) = composeRule.onNodeWithContentDescription(description).performScrollTo()
 
     private fun tap(text: String) = composeRule.onNodeWithText(text).performScrollTo().performClick()
 
@@ -96,8 +103,10 @@ class OnboardingScreenTest {
 
         composeRule.onNodeWithText("How long do they usually last?").assertIsDisplayed()
         composeRule.onNodeWithText("Step 2 of 2").assertIsDisplayed()
-        field("Cycle length, in days").assert(hasText("28"))
-        field("Period length, in days").assert(hasText("5"))
+        slider("Cycle length").assert(hasStateDescription("28 days"))
+        slider("Period length").assert(hasStateDescription("5 days"))
+        composeRule.onNodeWithText("28 days").assertIsDisplayed()
+        composeRule.onNodeWithText("5 days").assertIsDisplayed()
         tap("Done")
 
         assertEquals(listOf(Triple(LocalDate.of(2027, 3, 2), 28, 5)), done)
@@ -132,15 +141,14 @@ class OnboardingScreenTest {
         tap("Get started")
         composeRule.onNodeWithContentDescription("2 March").performClick()
         tap("Next")
-        field("Cycle length, in days").performTextClearance()
-        field("Cycle length, in days").performTextInput("31")
+        repeat(3) { button("Cycle one day longer").performClick() }
 
         pressBack()
         composeRule.onNodeWithText("When did your last period start?").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("2 March").assertIsSelected()
 
         tap("Next")
-        field("Cycle length, in days").assert(hasText("31"))
+        slider("Cycle length").assert(hasStateDescription("31 days"))
 
         // The bar's back arrow, then the system back.
         composeRule.onNodeWithContentDescription("Back").performClick()
@@ -151,73 +159,53 @@ class OnboardingScreenTest {
     }
 
     @Test
-    fun `an impossible length shows how to fix it, and Done waits until it is fixed`() {
+    fun `minus and plus change a length a day at a time`() {
         show()
         tap("Get started")
         tap("I don't remember")
-        field("Cycle length, in days").performTextClearance()
-        field("Cycle length, in days").performTextInput("12")
-        // No error while she types.
-        composeRule.onNodeWithText("Enter a number of days from 15 to 90.").assertDoesNotExist()
-
+        repeat(4) { button("Period one day longer").performClick() }
+        button("Cycle one day shorter").performClick()
+        composeRule.onNodeWithText("27 days").assertExists()
+        composeRule.onNodeWithText("9 days").assertExists()
         tap("Done")
 
-        composeRule.onNodeWithText("Enter a number of days from 15 to 90.").assertIsDisplayed()
-        assertEquals(emptyList<Any>(), done)
-
-        // The error follows what she types from then on.
-        field("Cycle length, in days").performTextClearance()
-        field("Cycle length, in days").performTextInput("45")
-        composeRule.onNodeWithText("Enter a number of days from 15 to 90.").assertDoesNotExist()
-        tap("Done")
-
-        assertEquals(listOf(Triple(null, 45, 5)), done)
+        assertEquals(listOf(Triple(null, 27, 9)), done)
     }
 
     @Test
-    fun `an unusual length is accepted`() {
+    fun `dragging a slider to its end gives the longest length she can give`() {
         show()
         tap("Get started")
         tap("I don't remember")
-        field("Cycle length, in days").performTextClearance()
-        field("Cycle length, in days").performTextInput("19")
-        field("Period length, in days").performTextClearance()
-        field("Period length, in days").performTextInput("9")
+        slider("Cycle length").performScrollTo().performTouchInput { swipeRight(startX = centerX, endX = right + 100f) }
+        slider("Period length").performScrollTo().performTouchInput { swipeLeft(startX = centerX, endX = left - 100f) }
+
+        slider("Cycle length").assert(hasStateDescription("90 days"))
+        button("Cycle one day longer").assertIsNotEnabled()
+        slider("Period length").assert(hasStateDescription("1 day"))
+        button("Period one day shorter").assertIsNotEnabled()
         tap("Done")
 
-        assertEquals(listOf(Triple(null, 19, 9)), done)
+        assertEquals(listOf(Triple(null, 90, 1)), done)
     }
 
     @Test
-    fun `empty and too long fields each say what to enter`() {
+    fun `TalkBack reads each length and sets it a day at a time`() {
         show()
         tap("Get started")
         tap("I don't remember")
-        field("Cycle length, in days").performTextClearance()
-        field("Period length, in days").performTextClearance()
-        field("Period length, in days").performTextInput("15")
+        slider("Cycle length")
+            .assert(hasStateDescription("28 days"))
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.ProgressBarRangeInfo,
+                    ProgressBarRangeInfo(28f, 15f..90f, steps = 74)
+                )
+            )
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(19f) }
         tap("Done")
 
-        composeRule.onNodeWithText("Enter the number of days in your cycle, such as 28.").assertIsDisplayed()
-        composeRule.onNodeWithText("Enter a number of days from 1 to 14.").assertIsDisplayed()
-
-        field("Period length, in days").performTextClearance()
-        composeRule.onNodeWithText("Enter the number of days your period lasts, such as 5.").assertIsDisplayed()
-        assertEquals(emptyList<Any>(), done)
-    }
-
-    @Test
-    fun `the length fields take two digits and nothing else`() {
-        show()
-        tap("Get started")
-        tap("I don't remember")
-        field("Cycle length, in days").performTextClearance()
-        field("Cycle length, in days").performTextInput("3a")
-        field("Cycle length, in days").performTextInput("3")
-        field("Cycle length, in days").performTextInput("1")
-        field("Cycle length, in days").performTextInput("7")
-
-        field("Cycle length, in days").assert(hasText("31"))
+        assertEquals(listOf(Triple(null, 19, 5)), done)
     }
 
     private fun pressBack() {

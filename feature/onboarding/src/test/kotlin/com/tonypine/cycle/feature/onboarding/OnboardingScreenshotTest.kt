@@ -1,6 +1,5 @@
 package com.tonypine.cycle.feature.onboarding
 
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalDensity
@@ -18,8 +17,8 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * The welcome and both setup steps in light, dark and at 200% font scale, plus step 2 with its
- * errors. Each records `src/test/screenshots/onboarding_<screen>_<appearance>.png`. Synthetic dates.
+ * The welcome and both setup steps in light, dark and at 200% font scale, plus step 2 at the ends
+ * of its ranges. Each records `src/test/screenshots/onboarding_<screen>_<appearance>.png`. Synthetic dates.
  */
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -53,8 +52,8 @@ class OnboardingScreenshotTest(private val name: String, private val appearance:
             "welcome" to { WelcomeStep(onGetStarted = {}, onRestore = {}, onSkip = {}) },
             "last_period" to { lastPeriod(picked = null) },
             "last_period_picked" to { lastPeriod(picked = LocalDate.of(2027, 3, 2)) },
-            "usual_lengths" to { usualLengths(cycle = "28", period = "5", showErrors = false) },
-            "usual_lengths_errors" to { usualLengths(cycle = "12", period = "", showErrors = true) }
+            "usual_lengths" to { usualLengths(cycle = 28, period = 5) },
+            "usual_lengths_ends" to { usualLengths(cycle = 90, period = 1) }
         )
 
         @Composable
@@ -70,10 +69,11 @@ class OnboardingScreenshotTest(private val name: String, private val appearance:
         )
 
         @Composable
-        private fun usualLengths(cycle: String, period: String, showErrors: Boolean) = UsualLengthsStep(
-            cycleLength = TextFieldState(cycle),
-            periodLength = TextFieldState(period),
-            showErrors = showErrors,
+        private fun usualLengths(cycle: Int, period: Int) = UsualLengthsStep(
+            cycleLength = cycle,
+            onCycleLengthChange = {},
+            periodLength = period,
+            onPeriodLengthChange = {},
             onDone = {},
             onBack = {}
         )

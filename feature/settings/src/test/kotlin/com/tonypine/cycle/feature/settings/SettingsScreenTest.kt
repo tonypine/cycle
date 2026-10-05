@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
@@ -12,15 +13,20 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasStateDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.test.swipeRight
 import com.tonypine.cycle.core.data.export.ImportProblem
 import java.time.LocalDate
 import org.junit.Assert.assertEquals
@@ -261,27 +267,47 @@ class SettingsScreenTest {
     }
 
     @Test
-    fun `usual cycle and period starts from what is saved and saves only lengths that fit`() {
+    fun `usual cycle and period starts from what is saved, and minus and plus save a day either way`() {
         val saved = mutableListOf<Pair<Int, Int>>()
-        composeRule.setContent {
-            Themed {
-                UsualLengthsScreen(
-                    UsualLengthsUiState.Editing(29, 4),
-                    onSave = { cycle, period -> saved += cycle to period },
-                    onBack = { calls += "back" }
-                )
-            }
-        }
-        val cycle = composeRule.onNode(hasSetTextAction() and hasText("Cycle length, in days", substring = true))
-        cycle.assert(hasText("29"))
+        showUsualLengths(saved)
+        composeRule.onNodeWithText("Cycle length").assertExists()
+        composeRule.onNodeWithText("29 days").assertIsDisplayed()
+        composeRule.onNodeWithText("4 days").assertIsDisplayed()
+        lengthSlider("Cycle length").assert(hasStateDescription("29 days"))
+        // No number to type, and nothing to correct.
+        composeRule.onNode(hasSetTextAction()).assertDoesNotExist()
 
-        cycle.performTextReplacement("99")
+        composeRule.onNodeWithContentDescription("Cycle one day longer").performClick()
+        composeRule.onNodeWithContentDescription("Period one day shorter").performScrollTo().performClick()
         composeRule.onNodeWithText("Save").performScrollTo().performClick()
-        composeRule.onNodeWithText("Enter a number of days from 15 to 90.", substring = true).assertExists()
-        assertEquals(emptyList<Pair<Int, Int>>(), saved)
 
-        cycle.performTextReplacement("30")
-        composeRule.onNodeWithText("Save").performScrollTo().performClick()
-        assertEquals(listOf(30 to 4), saved)
+        assertEquals(listOf(30 to 3), saved)
     }
+
+    @Test
+    fun `dragging the usual lengths saves the ends of their ranges`() {
+        val saved = mutableListOf<Pair<Int, Int>>()
+        showUsualLengths(saved)
+        lengthSlider("Cycle length").performTouchInput { swipeLeft(startX = centerX, endX = left - 100f) }
+        lengthSlider("Period length").performScrollTo()
+            .performTouchInput { swipeRight(startX = centerX, endX = right + 100f) }
+        lengthSlider("Cycle length").assert(hasStateDescription("15 days"))
+        lengthSlider("Period length").assert(hasStateDescription("14 days"))
+        composeRule.onNodeWithText("Save").performScrollTo().performClick()
+
+        assertEquals(listOf(15 to 14), saved)
+    }
+
+    private fun showUsualLengths(saved: MutableList<Pair<Int, Int>>) = composeRule.setContent {
+        Themed {
+            UsualLengthsScreen(
+                UsualLengthsUiState.Editing(29, 4),
+                onSave = { cycle, period -> saved += cycle to period },
+                onBack = { calls += "back" }
+            )
+        }
+    }
+
+    private fun lengthSlider(label: String) =
+        composeRule.onNode(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress) and hasContentDescription(label))
 }

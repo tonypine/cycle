@@ -12,12 +12,11 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -31,8 +30,7 @@ import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.FilledButton
 import com.tonypine.cycle.core.designsystem.LoadingState
 import com.tonypine.cycle.core.designsystem.TopAppBar
-import com.tonypine.cycle.core.ui.UsualLengthFields
-import com.tonypine.cycle.core.ui.checkedLengths
+import com.tonypine.cycle.core.ui.UsualLengthSliders
 
 /** "Usual cycle and period", wired to its [viewModel]. [onBack] leaves it, and Save leaves once saved. */
 @Composable
@@ -46,9 +44,9 @@ fun UsualLengthsRoute(viewModel: UsualLengthsViewModel, onBack: () -> Unit, modi
 }
 
 /**
- * Her usual cycle and period lengths, as setup asked for them, starting from what is saved. Save
- * checks them as setup does: a value that does not fit says how to fix it, and nothing is saved.
- * What she types is kept through a configuration change. Scrolls when the text is large.
+ * Her usual cycle and period lengths, on the same sliders as setup, starting from what is saved.
+ * The sliders only offer lengths she can give, so Save saves what they show. What she sets is kept
+ * through a configuration change. Scrolls when the text is large or the phone is on its side.
  */
 @Composable
 fun UsualLengthsScreen(
@@ -65,9 +63,8 @@ fun UsualLengthsScreen(
         )
         when (state) {
             is UsualLengthsUiState.Editing -> {
-                val cycleLength = rememberTextFieldState(state.cycleLength.toString())
-                val periodLength = rememberTextFieldState(state.periodLength.toString())
-                var showErrors by rememberSaveable { mutableStateOf(false) }
+                var cycleLength by rememberSaveable { mutableIntStateOf(state.cycleLength) }
+                var periodLength by rememberSaveable { mutableIntStateOf(state.periodLength) }
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -84,13 +81,15 @@ fun UsualLengthsScreen(
                         modifier = Modifier.padding(horizontal = spacing.large),
                         style = CycleTheme.typography.body.copy(color = CycleTheme.colors.onSurfaceVariant)
                     )
-                    UsualLengthFields(cycleLength, periodLength, showErrors)
+                    UsualLengthSliders(
+                        cycleLength = cycleLength,
+                        onCycleLengthChange = { cycleLength = it },
+                        periodLength = periodLength,
+                        onPeriodLengthChange = { periodLength = it }
+                    )
                     FilledButton(
                         text = stringResource(R.string.usual_lengths_save),
-                        onClick = {
-                            val lengths = checkedLengths(cycleLength, periodLength)
-                            if (lengths != null) onSave(lengths.first, lengths.second) else showErrors = true
-                        },
+                        onClick = { onSave(cycleLength, periodLength) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = spacing.large)
