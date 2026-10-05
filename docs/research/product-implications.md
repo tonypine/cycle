@@ -77,7 +77,10 @@ health signals need several cycles, a doctor summary needs the signals' data.
 
 Can move earlier if she wants them sooner; none depend on the steps above.
 
-- App lock (PIN or biometric), hidden content in the recent-apps preview, delete everything.
+- App lock (PIN or biometric) and hidden content in the recent-apps preview: done, as "Lock Cycle"
+  with the phone's own lock ([`0005`](../decisions/0005-app-lock.md),
+  [MOT-47](https://linear.app/tonypine/issue/MOT-47)). Delete everything: done
+  ([MOT-40](https://linear.app/tonypine/issue/MOT-40)).
 - Import from a CSV export of another tracker, if she has history elsewhere.
 
 ### 6. Only if she asks
@@ -136,9 +139,10 @@ next planning ticket.
    [`tracking-data.md`](tracking-data.md) is a menu, not a requirement.
 5. **Does she want health signal cards**, and a doctor summary?
 6. **Which reminders, if any**, and how discreet should they be?
-7. **Does she want an app lock?** Backups already require end-to-end encryption, so a phone without
-   a screen lock gets none ([`0004`](../decisions/0004-backup-encryption.md)); if she would rather
-   have an unencrypted backup than none, that record changes.
+7. **Does she want an app lock?** Answered: yes, optional and off by default, with a 30-second grace
+   period ([`0005`](../decisions/0005-app-lock.md)). Backups already require end-to-end encryption,
+   so a phone without a screen lock gets none ([`0004`](../decisions/0004-backup-encryption.md)); if
+   she would rather have an unencrypted backup than none, that record changes.
 
 ## Effects on what already exists
 
