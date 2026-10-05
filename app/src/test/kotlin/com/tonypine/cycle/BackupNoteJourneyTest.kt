@@ -52,7 +52,7 @@ class BackupNoteJourneyTest {
         // Her log skips the first-run welcome.
         runBlocking { data.dayLogRepository.save(DayLog(LocalDate.of(2027, 9, 2), FlowLevel.MEDIUM)) }
         composeRule.setContent {
-            CycleTheme(reduceMotion = true) { CycleApp(data, today = { LocalDate.of(2027, 9, 10) }) }
+            CycleTheme(reduceMotion = true) { CycleApp(data, FakeDeviceLock(), today = { LocalDate.of(2027, 9, 10) }) }
         }
         waitFor(hasText("Settings") and isTab)
         tab("Settings").performClick()

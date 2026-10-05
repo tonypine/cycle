@@ -54,7 +54,7 @@ class CycleIconsTest(private val case: MatrixCase) {
             "arrow_back", "close", "add", "check", "error", "calendar_month", "today", "settings",
             "chevron_left", "chevron_right", "expand_less", "expand_more",
             "water_drop", "edit_note", "mood", "history", "healing", "bolt", "bedtime", "favorite", "edit",
-            "tune", "smartphone", "download", "upload", "delete", "info"
+            "tune", "smartphone", "download", "upload", "delete", "info", "lock"
         )
         assertEquals(required, symbols)
     }

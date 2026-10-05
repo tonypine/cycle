@@ -8,5 +8,13 @@
     <string name="tab_history">History</string>
     <string name="tab_settings">Settings</string>
 
+    <!-- Lock Cycle: the lock screen, and the phone's prompt. An access gate, not encryption: the copy
+         promises no more. -->
+    <string name="lock_title">Cycle is locked</string>
+    <string name="lock_body">Open it with your fingerprint, face or screen lock.</string>
+    <string name="lock_unlock">Unlock</string>
+    <string name="lock_prompt_title">Confirm it\'s you</string>
+    <string name="lock_prompt_subtitle">Use your fingerprint, face or screen lock.</string>
+
     <!-- A tab whose screen has not landed yet. -->
 </resources>

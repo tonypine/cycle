@@ -7,6 +7,7 @@ import com.tonypine.cycle.core.data.export.ImportProblem
 import com.tonypine.cycle.core.data.export.ImportRead
 import com.tonypine.cycle.core.data.export.YourDataRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
+import com.tonypine.cycle.core.ui.DeviceLock
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -23,16 +24,18 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * The Settings tab: her usual lengths, and "Your data": export to a file she picks, import from
- * one, and "Delete everything". The welcome's "Restore from a Cycle export" uses its import too.
+ * The Settings tab: her usual lengths, and "Your data": "Lock Cycle", export to a file she picks,
+ * import from one, and "Delete everything". The welcome's "Restore from a Cycle export" uses its import too.
  * Files are opened by the screen, from what Android's save screen or file picker returns, and only
  * read or written here.
  *
+ * @param deviceLock the phone's lock, which "Lock Cycle" asks for before it turns on or off.
  * @param clock her day, from the phone's clock in its current zone.
  */
 class SettingsViewModel(
     private val settings: SettingsRepository,
     private val yourData: YourDataRepository,
+    private val deviceLock: DeviceLock,
     private val clock: () -> LocalDate = LocalDate::now,
     private val io: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
@@ -41,13 +44,24 @@ class SettingsViewModel(
     // The file she picked, read and checked, until she answers "Import N days?".
     private var pending: ImportFile? = null
 
+    // The phone's prompt is showing for "Lock Cycle": another tap waits for it.
+    private var authenticating = false
+
     /** Null until her settings are read. */
     val uiState: StateFlow<SettingsUiState?> =
-        combine(settings.settings, settings.lastExported, visit) { settings, lastExported, visit ->
+        combine(
+            settings.settings,
+            settings.lastExported,
+            settings.appLock,
+            settings.appLockTurnedOff,
+            visit
+        ) { settings, lastExported, appLock, appLockTurnedOff, visit ->
             SettingsUiState(
                 usualCycleLength = settings.usualCycleLength,
                 usualPeriodLength = settings.usualPeriodLength,
                 lastExported = lastExported,
+                appLock = appLock,
+                appLockTurnedOff = appLockTurnedOff,
                 importedDays = visit.importedDays,
                 dialog = visit.dialog
             )
@@ -125,6 +139,33 @@ class SettingsViewModel(
         visit.update { it.copy(dialog = null) }
     }
 
+    /**
+     * "Lock Cycle": turning it on or off first asks for the phone's lock, so she can't lock herself
+     * out with a lock the phone doesn't have, and nobody else turns it off. Cancelled or failed, it
+     * stays as it was. A phone with no screen lock, fingerprint or face can't ask: turning it on says
+     * so instead, and turning it off just does, as the app would on its next start.
+     */
+    fun onAppLockChange(on: Boolean) {
+        if (authenticating) return
+        if (!deviceLock.canAuthenticate()) {
+            if (on) show(DataDialog.NoScreenLock) else viewModelScope.launch { settings.setAppLock(false) }
+            return
+        }
+        authenticating = true
+        viewModelScope.launch {
+            try {
+                if (deviceLock.authenticate()) settings.setAppLock(on)
+            } finally {
+                authenticating = false
+            }
+        }
+    }
+
+    /** She read the note that the lock turned itself off: it does not show again. */
+    fun onDismissLockNote() {
+        viewModelScope.launch { settings.dismissAppLockTurnedOff() }
+    }
+
     /** "Delete everything", once she confirmed: the app then opens on the welcome. */
     fun onDeleteEverything() {
         viewModelScope.launch { yourData.deleteEverything() }
@@ -145,6 +186,9 @@ class SettingsViewModel(
  * The Settings tab.
  *
  * @property lastExported the day of her last export, or null if she never exported.
+ * @property appLock whether "Lock Cycle" is on.
+ * @property appLockTurnedOff whether Cycle turned its lock off because the phone has no screen lock
+ *   any more, until she dismisses the note that says so.
  * @property importedDays how many days her last import added, while Settings stays open.
  * @property dialog the "Your data" dialog showing, if any.
  */
@@ -152,11 +196,13 @@ data class SettingsUiState(
     val usualCycleLength: Int,
     val usualPeriodLength: Int,
     val lastExported: LocalDate?,
+    val appLock: Boolean = false,
+    val appLockTurnedOff: Boolean = false,
     val importedDays: Int? = null,
     val dialog: DataDialog? = null
 )
 
-/** A dialog of "Your data", after she picked a file. */
+/** A dialog of "Your data", after she picked a file or tried to turn on "Lock Cycle". */
 sealed interface DataDialog {
     /**
      * "Import N days?", with [newDays] the days of the file not on the phone yet, or "Import your
@@ -172,4 +218,7 @@ sealed interface DataDialog {
 
     /** The file she picked on the save screen could not be written. */
     data object ExportFailed : DataDialog
+
+    /** "Lock Cycle" can't turn on: the phone has no screen lock, fingerprint or face to ask for. */
+    data object NoScreenLock : DataDialog
 }

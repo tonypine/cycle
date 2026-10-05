@@ -35,7 +35,7 @@ class CycleAppSetupTest {
         val data = (composeRule.activity.application as CycleApplication).data
         composeRule.setContent {
             CycleTheme(reduceMotion = true) {
-                CycleApp(data, today = { LocalDate.of(2027, 3, 20) })
+                CycleApp(data, FakeDeviceLock(), today = { LocalDate.of(2027, 3, 20) })
             }
         }
         waitForText("Get started")

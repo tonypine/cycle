@@ -98,7 +98,7 @@ class StatusBarScrimTest {
             CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale)) {
                 CycleTheme(darkTheme = darkTheme, reduceMotion = true) {
                     surface = CycleTheme.colors.surface
-                    CycleApp(data, today = { TODAY })
+                    CycleApp(data, FakeDeviceLock(), today = { TODAY })
                 }
             }
         }

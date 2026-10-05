@@ -132,4 +132,55 @@ class SettingsRepositoryTest {
             settings.settings.first()
         )
     }
+
+    @Test
+    fun `the app lock is off until she turns it on`() = runTest {
+        val settings = settingsRepository(folder.root, backgroundScope)
+        assertFalse(settings.appLock.first())
+
+        settings.setAppLock(true)
+        assertTrue(settings.appLock.first())
+
+        settings.setAppLock(false)
+        assertFalse(settings.appLock.first())
+        assertFalse(settings.appLockTurnedOff.first())
+    }
+
+    @Test
+    fun `a lock turned off for want of a screen lock leaves a note until she dismisses it`() = runTest {
+        val settings = settingsRepository(folder.root, backgroundScope)
+        // Nothing to turn off: no note.
+        settings.turnOffAppLockWithoutScreenLock()
+        assertFalse(settings.appLockTurnedOff.first())
+
+        settings.setAppLock(true)
+        settings.turnOffAppLockWithoutScreenLock()
+
+        assertFalse(settings.appLock.first())
+        assertTrue(settings.appLockTurnedOff.first())
+        settings.dismissAppLockTurnedOff()
+        assertFalse(settings.appLockTurnedOff.first())
+    }
+
+    @Test
+    fun `turning the lock back on drops the note`() = runTest {
+        val settings = settingsRepository(folder.root, backgroundScope)
+        settings.setAppLock(true)
+        settings.turnOffAppLockWithoutScreenLock()
+
+        settings.setAppLock(true)
+
+        assertTrue(settings.appLock.first())
+        assertFalse(settings.appLockTurnedOff.first())
+    }
+
+    @Test
+    fun `delete everything turns the lock off`() = runTest {
+        val settings = settingsRepository(folder.root, backgroundScope)
+        settings.setAppLock(true)
+
+        settings.clear()
+
+        assertFalse(settings.appLock.first())
+    }
 }

@@ -9,6 +9,8 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
@@ -48,6 +50,8 @@ class SettingsScreenTest {
                 versionName = "1.4.27",
                 onUsualLengths = { calls += "usual lengths" },
                 onWhatToLog = { calls += "what to log" },
+                onAppLockChange = { on -> calls += "lock $on" },
+                onDismissLockNote = { calls += "dismiss lock note" },
                 onExport = { calls += "export" },
                 onImport = { calls += "import" },
                 onConfirmImport = { calls += "confirm import" },
@@ -61,6 +65,7 @@ class SettingsScreenTest {
     }
 
     private val isButton = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button)
+    private val isSwitch = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch)
 
     private fun row(title: String) = composeRule.onNode(hasText(title) and isButton).performScrollTo()
 
@@ -89,6 +94,48 @@ class SettingsScreenTest {
         composeRule.onNodeWithText("No account, no cloud, no tracking", substring = true).assertExists()
         composeRule.onNodeWithText("Not a contraceptive, and not a diagnosis.").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("Version 1.4.27").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun `lock cycle is one switch under your data, and a tap asks to change it`() {
+        show()
+
+        val lock = composeRule.onNode(hasText("Lock Cycle") and isSwitch).performScrollTo()
+        lock.assert(hasText("Open Cycle with your fingerprint, face or screen lock.")).assertIsOff()
+        lock.performClick()
+        // The switch follows the setting, not the tap: it changes once the phone's prompt says so.
+        lock.assertIsOff()
+
+        state = state.copy(appLock = true)
+        lock.assertIsOn().performClick()
+
+        assertEquals(listOf("lock true", "lock false"), calls)
+    }
+
+    @Test
+    fun `a lock turned off for want of a screen lock says why until she dismisses it`() {
+        state = state.copy(appLockTurnedOff = true)
+        show()
+
+        composeRule.onNodeWithText("Lock Cycle is off").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Your phone has no screen lock now", substring = true).assertExists()
+        composeRule.onNodeWithText("Everything you logged is still here", substring = true).assertExists()
+        composeRule.onNode(hasText("OK") and isButton).performScrollTo().performClick()
+
+        assertEquals(listOf("dismiss lock note"), calls)
+        state = state.copy(appLockTurnedOff = false)
+        composeRule.onNodeWithText("Lock Cycle is off").assertDoesNotExist()
+    }
+
+    @Test
+    fun `with no screen lock on the phone, lock cycle says to set one first`() {
+        state = state.copy(dialog = DataDialog.NoScreenLock)
+        show()
+
+        composeRule.onNode(hasText("Set a screen lock first") and isHeading()).assertIsDisplayed()
+        composeRule.onNodeWithText("Add one in your phone's settings", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText("OK").performClick()
+        assertEquals(listOf("dismiss"), calls)
     }
 
     @Test

@@ -63,7 +63,7 @@ class FeelingsJourneyTest {
     fun `log how she feels, hide Sex and bring it back`() {
         val data = (composeRule.activity.application as CycleApplication).data
         composeRule.setContent {
-            CycleTheme(reduceMotion = true) { CycleApp(data, today = { LocalDate.of(2027, 3, 20) }) }
+            CycleTheme(reduceMotion = true) { CycleApp(data, FakeDeviceLock(), today = { LocalDate.of(2027, 3, 20) }) }
         }
         // Skips the first-run welcome to Today's empty state.
         waitFor(hasText("Skip for now"))

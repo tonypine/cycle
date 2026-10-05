@@ -59,9 +59,10 @@ reasons these apps go wrong.
   servers, at the cost of no backup at all on a phone without a screen lock. Export and import give
   her a second way to keep her history either way.
 - **An app lock** (PIN or biometric) and a quick "delete everything" are cheap and expected in this
-  category.
+  category. Cycle has both: "Lock Cycle" uses the phone's own fingerprint, face or screen lock
+  ([`0005`](../decisions/0005-app-lock.md)).
 - **Discretion is a feature.** Neutral notification text, no sensitive data in widgets or the recent
-  apps screenshot (`FLAG_SECURE` is an option for her to choose), a plain app name and icon if she
+  apps screenshot (hidden while "Lock Cycle" is on), a plain app name and icon if she
   wants one.
 - **Honesty is the other half of trust.** The tone in
   [`visual-directions.md`](../design/visual-directions.md)

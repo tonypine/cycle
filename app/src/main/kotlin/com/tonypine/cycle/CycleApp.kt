@@ -36,6 +36,7 @@ import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.NavigationBar
 import com.tonypine.cycle.core.designsystem.NavigationDestination
 import com.tonypine.cycle.core.designsystem.OpenSourceNotices
+import com.tonypine.cycle.core.ui.DeviceLock
 import com.tonypine.cycle.feature.calendar.CalendarRoute
 import com.tonypine.cycle.feature.calendar.CalendarViewModel
 import com.tonypine.cycle.feature.history.CycleDetailRoute
@@ -76,10 +77,16 @@ enum class TopLevelDestination(val route: String, @param:StringRes val label: In
  * scrolls under it, so a `surface` strip covers the status bar on every screen: nothing scrolls
  * under the clock and system icons. Sheets and dialogs open in their own windows, above it.
  *
+ * @param deviceLock the phone's lock, which Settings' "Lock Cycle" asks for.
  * @param today her day, from the phone's clock in its current zone.
  */
 @Composable
-fun CycleApp(data: CycleData, modifier: Modifier = Modifier, today: () -> LocalDate = LocalDate::now) {
+fun CycleApp(
+    data: CycleData,
+    deviceLock: DeviceLock,
+    modifier: Modifier = Modifier,
+    today: () -> LocalDate = LocalDate::now
+) {
     val onboarding = viewModel { OnboardingViewModel(data.settingsRepository, data.dayLogRepository, today) }
     val showWelcome by onboarding.showWelcome.collectAsStateWithLifecycle()
     Box(modifier.fillMaxSize().background(CycleTheme.colors.surface)) {
@@ -87,7 +94,8 @@ fun CycleApp(data: CycleData, modifier: Modifier = Modifier, today: () -> LocalD
             null -> Unit
 
             true -> {
-                val restore = viewModel { SettingsViewModel(data.settingsRepository, data.yourDataRepository, today) }
+                val restore =
+                    viewModel { SettingsViewModel(data.settingsRepository, data.yourDataRepository, deviceLock, today) }
                 OnboardingRoute(
                     onboarding,
                     onRestore = rememberRestoreFromExport(restore, onRestored = onboarding::onRestored)
@@ -95,7 +103,7 @@ fun CycleApp(data: CycleData, modifier: Modifier = Modifier, today: () -> LocalD
             }
 
             // A new controller each time, so she is on Today after the welcome.
-            false -> CycleTabs(data, today, rememberNavController())
+            false -> CycleTabs(data, deviceLock, today, rememberNavController())
         }
         Box(
             Modifier
@@ -113,7 +121,12 @@ fun CycleApp(data: CycleData, modifier: Modifier = Modifier, today: () -> LocalD
  * month it started. Settings opens its pages inside its tab.
  */
 @Composable
-private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: NavHostController) {
+private fun CycleTabs(
+    data: CycleData,
+    deviceLock: DeviceLock,
+    today: () -> LocalDate,
+    navController: NavHostController
+) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val current = backStackEntry?.destination
     val selected = TopLevelDestination.entries
@@ -176,7 +189,9 @@ private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: Na
             navigation(startDestination = SETTINGS_HOME_ROUTE, route = TopLevelDestination.Settings.route) {
                 composable(SETTINGS_HOME_ROUTE) {
                     SettingsRoute(
-                        viewModel { SettingsViewModel(data.settingsRepository, data.yourDataRepository, today) },
+                        viewModel {
+                            SettingsViewModel(data.settingsRepository, data.yourDataRepository, deviceLock, today)
+                        },
                         versionName = versionName,
                         onUsualLengths = { navController.navigate(USUAL_LENGTHS_ROUTE) },
                         onWhatToLog = { navController.navigate(WHAT_TO_LOG_ROUTE) },

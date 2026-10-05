@@ -55,7 +55,7 @@ class HistoryNavigationTest {
         }
         composeRule.setContent {
             CycleTheme(reduceMotion = true) {
-                CycleApp(data, today = { LocalDate.of(2027, 9, 10) })
+                CycleApp(data, FakeDeviceLock(), today = { LocalDate.of(2027, 9, 10) })
             }
         }
         // Her logs skip the first-run welcome; the tabs show once the settings are read.
