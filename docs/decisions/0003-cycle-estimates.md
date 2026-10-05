@@ -96,5 +96,7 @@ unless a migration changes them.
     even inside a period, so a cleared middle day shows as cleared while the period stays one.
 - Life stages (pregnancy, after birth, hormonal contraception) and cycles to exclude are not modelled
   yet. When they are, they are date ranges in their own table, and `CycleCalculator` leaves the
-  cycles inside them out of the last six.
+  cycles inside them out of the last six. Contraception is decided in
+  [`0006`](0006-contraception.md): one row per stretch on a method, which cycles leave the estimates,
+  and what each method shows instead.
 - Fertile window and ovulation estimates are not part of this record.
