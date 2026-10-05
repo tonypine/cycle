@@ -17,8 +17,8 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * The app shell with no data: Today's and History's empty states and a placeholder tab, the navigation
- * bar under each, in light and dark. Records `src/test/screenshots/app_<tab>_<appearance>.png`.
+ * The app shell with no data: Today's empty state, an empty calendar and History's empty state, the
+ * navigation bar under each, in light and dark. Records `src/test/screenshots/app_<tab>_<appearance>.png`.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)

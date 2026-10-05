@@ -108,4 +108,23 @@ class CycleRepositoryTest {
         assertEquals(day("2027-03-04"), edited.logs.last().date)
         assertEquals(listOf(Period(day("2027-03-02"), day("2027-03-04"))), edited.overview.periods)
     }
+
+    @Test
+    fun `the log comes with the overview and says what the day sheet offers`() = runTest {
+        val cycles = CycleRepository(dayLogs, settingsRepository(folder.root, backgroundScope))
+        val today = day("2027-03-20")
+        logPeriod(day("2027-02-02"))
+        logPeriod(day("2027-03-02"))
+
+        val log = cycles.observeLog(today).first()
+
+        assertEquals(DayLog(day("2027-03-03"), FlowLevel.MEDIUM), log.log(day("2027-03-03")))
+        assertEquals(DayLog(day("2027-03-12")), log.log(day("2027-03-12")))
+        // Her two 4-day periods make her usual length 4.
+        assertEquals(4, log.usualPeriodLength)
+        assertEquals(true, log.canFill(day("2027-03-12")))
+        assertEquals(false, log.canFill(day("2027-03-06")))
+        assertEquals(true, log.canClear(day("2027-03-03")))
+        assertEquals(false, log.canClear(day("2027-03-12")))
+    }
 }

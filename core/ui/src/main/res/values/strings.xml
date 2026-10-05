@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Copy rules: docs/research/product-implications.md. StringsTest guards against the words the
+         app never says. -->
+
+    <!-- The day log sheet, for any day up to today. MOT-36 adds how she feels. -->
+    <string name="day_log_flow">Flow</string>
+    <string name="day_log_flow_none">None</string>
+    <string name="day_log_flow_spotting">Spotting</string>
+    <string name="day_log_flow_light">Light</string>
+    <string name="day_log_flow_medium">Medium</string>
+    <string name="day_log_flow_heavy">Heavy</string>
+    <plurals name="day_log_fill">
+        <item quantity="one">Period started this day: fill in %1$d day</item>
+        <item quantity="other">Period started this day: fill in %1$d days</item>
+    </plurals>
+    <string name="day_log_clear">Clear this day</string>
+    <string name="day_log_dismiss">Nah</string>
+    <string name="day_log_save">Log it</string>
+
+    <!-- Clearing a day: says what goes, with a safe way out. -->
+    <string name="day_log_clear_title">Clear %1$s?</string>
+    <string name="day_log_clear_period_body">%1$s will no longer count as a period day, and what you logged for it goes. The other days of the period stay.</string>
+    <string name="day_log_clear_body">What you logged for %1$s goes.</string>
+    <string name="day_log_clear_confirm">Clear</string>
+    <string name="day_log_clear_keep">Keep it</string>
+</resources>

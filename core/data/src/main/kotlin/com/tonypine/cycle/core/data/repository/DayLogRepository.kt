@@ -3,6 +3,7 @@ package com.tonypine.cycle.core.data.repository
 import com.tonypine.cycle.core.data.database.DayLogDao
 import com.tonypine.cycle.core.data.database.toEntity
 import com.tonypine.cycle.core.data.database.toModel
+import com.tonypine.cycle.core.domain.DayLogEdits
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
 import java.time.LocalDate
@@ -34,6 +35,25 @@ class DayLogRepository(private val dao: DayLogDao) {
 
     /** Removes everything logged on [date]. */
     suspend fun clear(date: LocalDate) = dao.delete(date)
+
+    /**
+     * "Period started this day: fill in [length] days" on [start], by [DayLogEdits.fill]: nothing
+     * when a period is too near. One write, so no screen sees half the period.
+     */
+    suspend fun fillPeriod(start: LocalDate, length: Int, today: LocalDate) =
+        edit { logs -> DayLogEdits.fill(logs, start, length, today) }
+
+    /**
+     * "Clear this day" on [date], by [DayLogEdits.clear]: the day no longer counts as a period day
+     * and the rest of its period stays. One write, with any day next to it the edit moves.
+     */
+    suspend fun clearDay(date: LocalDate, today: LocalDate) = edit { logs -> DayLogEdits.clear(logs, date, today) }
+
+    private suspend fun edit(edit: (List<DayLog>) -> List<DayLog>) {
+        dao.edit { stored ->
+            edit(stored.map { it.toModel() }).map { log -> log.date to log.takeUnless { it.isEmpty }?.toEntity() }
+        }
+    }
 
     private suspend fun update(date: LocalDate, transform: (DayLog) -> DayLog) {
         dao.update(date) { stored ->

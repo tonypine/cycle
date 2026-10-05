@@ -8,25 +8,27 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.tonypine.cycle.core.data.CycleData
 import com.tonypine.cycle.core.designsystem.CycleIcons
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.NavigationBar
 import com.tonypine.cycle.core.designsystem.NavigationDestination
+import com.tonypine.cycle.feature.calendar.CalendarRoute
+import com.tonypine.cycle.feature.calendar.CalendarViewModel
 import com.tonypine.cycle.feature.history.CycleDetailRoute
 import com.tonypine.cycle.feature.history.CycleDetailViewModel
 import com.tonypine.cycle.feature.history.HistoryRoute
@@ -46,7 +48,9 @@ enum class TopLevelDestination(val route: String, @param:StringRes val label: In
 
 /**
  * The app: one screen per tab above the navigation bar. Each tab keeps its state when she leaves it,
- * and back from any tab returns to Today, then leaves the app.
+ * and back from any tab returns to Today, then leaves the app. Today's "missed a period?" card opens
+ * the calendar on the month the period was likely in, and a cycle's "See it in the calendar" on the
+ * month it started.
  *
  * @param today her day, from the phone's clock in its current zone.
  */
@@ -60,9 +64,12 @@ fun CycleApp(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val current = backStackEntry?.destination
     val selected = TopLevelDestination.entries
-        .indexOfFirst { destination -> current?.hierarchy?.any { it.isTab(destination) } == true }
+        .indexOfFirst { destination -> current?.hierarchy?.any { it.route == destination.route } == true }
         .coerceAtLeast(0)
     val motion = CycleTheme.motion
+    // The month Today's "Add a past period" or a cycle's "See it in the calendar" asks the calendar to
+    // open on, until it has.
+    var calendarMonth by rememberSaveable { mutableStateOf<YearMonth?>(null) }
 
     Column(modifier.fillMaxSize().background(CycleTheme.colors.surface)) {
         NavHost(
@@ -76,18 +83,20 @@ fun CycleApp(
                 TodayRoute(
                     viewModel {
                         TodayViewModel(data.cycleRepository, data.dayLogRepository, data.settingsRepository, today)
+                    },
+                    onAddPastPeriod = { month ->
+                        calendarMonth = month
+                        navController.navigateToTab(TopLevelDestination.Calendar)
                     }
                 )
             }
-            composable(
-                CALENDAR_ROUTE,
-                arguments = listOf(
-                    navArgument(MONTH_ARG) {
-                        type = NavType.StringType
-                        nullable = true
-                    }
+            composable(TopLevelDestination.Calendar.route) {
+                CalendarRoute(
+                    viewModel { CalendarViewModel(data.cycleRepository, data.dayLogRepository, today) },
+                    requestedMonth = calendarMonth,
+                    onMonthShown = { calendarMonth = null }
                 )
-            ) { PlaceholderScreen(TopLevelDestination.Calendar) }
+            }
             navigation(startDestination = HISTORY_LIST_ROUTE, route = TopLevelDestination.History.route) {
                 composable(HISTORY_LIST_ROUTE) {
                     HistoryRoute(
@@ -100,7 +109,10 @@ fun CycleApp(
                     CycleDetailRoute(
                         viewModel { CycleDetailViewModel(data.cycleRepository, start, today) },
                         onBack = { navController.popBackStack() },
-                        onSeeInCalendar = { month -> navController.navigateToCalendar(month) }
+                        onSeeInCalendar = { month ->
+                            calendarMonth = month
+                            navController.navigateToTab(TopLevelDestination.Calendar)
+                        }
                     )
                 }
             }
@@ -114,10 +126,6 @@ fun CycleApp(
     }
 }
 
-/** This is [destination]'s screen, or its graph: a route's arguments, after `?`, do not count. */
-private fun NavDestination.isTab(destination: TopLevelDestination): Boolean =
-    route?.substringBefore('?') == destination.route
-
 /** Opens [destination] with Today under it, so back returns to Today; each tab keeps its state. */
 private fun NavHostController.navigateToTab(destination: TopLevelDestination) {
     navigate(destination.route) {
@@ -126,20 +134,6 @@ private fun NavHostController.navigateToTab(destination: TopLevelDestination) {
         restoreState = true
     }
 }
-
-/**
- * Opens the Calendar tab on [month], with Today under it like any tab. History keeps its state, so
- * her History tab still shows the cycle she came from; the calendar opens fresh on that month.
- */
-private fun NavHostController.navigateToCalendar(month: YearMonth) {
-    navigate("${TopLevelDestination.Calendar.route}?$MONTH_ARG=$month") {
-        popUpTo(graph.findStartDestination().id) { saveState = true }
-    }
-}
-
-/** The month the Calendar tab opens on, as `2027-08`; none opens it on the current month. */
-internal const val MONTH_ARG = "month"
-private const val CALENDAR_ROUTE = "calendar?$MONTH_ARG={$MONTH_ARG}"
 
 private const val HISTORY_LIST_ROUTE = "history/cycles"
 private const val START_ARG = "start"

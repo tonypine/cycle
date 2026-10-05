@@ -8,19 +8,17 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,14 +35,14 @@ class HistoryNavigationTest {
     @get:Rule
     val composeRule = createAndroidComposeRule<ComponentActivity>()
 
-    private lateinit var navController: NavHostController
-
     private val isTab = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab)
 
     private fun tab(label: String): SemanticsNodeInteraction = composeRule.onNode(hasText(label) and isTab)
 
-    private fun waitForText(text: String) =
-        composeRule.waitUntil(WAIT_MILLIS) { composeRule.onAllNodes(hasText(text)).fetchSemanticsNodes().isNotEmpty() }
+    private fun waitFor(matcher: SemanticsMatcher) =
+        composeRule.waitUntil(WAIT_MILLIS) { composeRule.onAllNodes(matcher).fetchSemanticsNodes().isNotEmpty() }
+
+    private fun waitForText(text: String) = waitFor(hasText(text))
 
     private fun showApp(periods: List<Pair<String, Int>>) {
         val data = (composeRule.activity.application as CycleApplication).data
@@ -56,9 +54,8 @@ class HistoryNavigationTest {
             }
         }
         composeRule.setContent {
-            navController = rememberNavController()
             CycleTheme(reduceMotion = true) {
-                CycleApp(data, today = { LocalDate.of(2027, 9, 10) }, navController = navController)
+                CycleApp(data, today = { LocalDate.of(2027, 9, 10) })
             }
         }
         tab("History").performClick()
@@ -85,11 +82,11 @@ class HistoryNavigationTest {
         composeRule.onNodeWithText("Jul 9 to Aug 4", substring = true).performScrollTo().performClick()
         waitForText("July 9 to July 13")
         composeRule.onNodeWithText("See it in the calendar").performScrollTo().performClick()
-        composeRule.waitForIdle()
 
+        // The calendar opens on July, not on this month, September.
+        waitFor(hasText("July 2027") and isHeading())
         tab("Calendar").assertIsSelected()
         tab("History").assertIsNotSelected()
-        assertEquals("2027-07", navController.currentBackStackEntry?.arguments?.getString(MONTH_ARG))
 
         // Back from the calendar returns to Today, like from any tab.
         composeRule.runOnUiThread { composeRule.activity.onBackPressedDispatcher.onBackPressed() }

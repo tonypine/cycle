@@ -1,6 +1,5 @@
 package com.tonypine.cycle.feature.today
 
-import android.text.format.DateFormat
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
@@ -15,7 +14,6 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import com.tonypine.cycle.core.designsystem.ButtonGroup
 import com.tonypine.cycle.core.designsystem.CycleBottomSheet
 import com.tonypine.cycle.core.designsystem.CycleBottomSheetState
 import com.tonypine.cycle.core.designsystem.CycleDayState
@@ -24,10 +22,9 @@ import com.tonypine.cycle.core.designsystem.FilledButton
 import com.tonypine.cycle.core.designsystem.MonthCalendar
 import com.tonypine.cycle.core.designsystem.WeekRow
 import com.tonypine.cycle.core.model.EstimateBasis
-import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.ui.formatDate
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
 import java.util.Locale
 import kotlinx.coroutines.launch
@@ -116,27 +113,6 @@ internal fun LogPeriodSheet(
     }
 }
 
-/** The day log for today: flow for now; MOT-36 adds how she feels. Each choice saves at once. */
-@Composable
-internal fun DayLogSheet(sheet: CycleBottomSheetState, flow: FlowLevel?, onFlowChange: (FlowLevel?) -> Unit) {
-    val scope = rememberCoroutineScope()
-    CycleBottomSheet(sheet, title = stringResource(R.string.day_log_title)) {
-        val label = stringResource(R.string.day_log_flow)
-        CardTitle(label)
-        ButtonGroup(
-            label = label,
-            options = FlowLevel.entries.map { stringResource(it.label) },
-            selectedIndex = flow?.ordinal,
-            onSelectedChange = { index -> onFlowChange(index?.let { FlowLevel.entries[it] }) }
-        )
-        FilledButton(
-            text = stringResource(R.string.day_log_done),
-            onClick = { scope.launch { sheet.hide() } },
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
 /** "When was the last day?": the weeks of her period so far, with only its days to pick. */
 @Composable
 internal fun LastDaySheet(
@@ -201,15 +177,6 @@ private fun SheetText(text: String) {
     BasicText(text, style = CycleTheme.typography.body.copy(color = CycleTheme.colors.onSurfaceVariant))
 }
 
-private val FlowLevel.label: Int
-    get() = when (this) {
-        FlowLevel.NONE -> R.string.day_log_flow_none
-        FlowLevel.SPOTTING -> R.string.day_log_flow_spotting
-        FlowLevel.LIGHT -> R.string.day_log_flow_light
-        FlowLevel.MEDIUM -> R.string.day_log_flow_medium
-        FlowLevel.HEAVY -> R.string.day_log_flow_heavy
-    }
-
 /** The first day of each week [days] touches, in [locale]'s weeks, oldest first. */
 internal fun weeksOf(days: ClosedRange<LocalDate>, locale: Locale): List<LocalDate> {
     val firstDay = WeekFields.of(locale).dayOfWeek()
@@ -219,10 +186,3 @@ internal fun weeksOf(days: ClosedRange<LocalDate>, locale: Locale): List<LocalDa
         .distinct()
         .toList()
 }
-
-/** Skeletons for [DateFormat.getBestDateTimePattern]: the locale picks the order and punctuation. */
-internal const val DAY_AND_MONTH = "dMMMM"
-internal const val DAY_AND_DATE = "EEEEdMMMM"
-
-internal fun dateFormatter(locale: Locale, skeleton: String): DateTimeFormatter =
-    DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, skeleton), locale)

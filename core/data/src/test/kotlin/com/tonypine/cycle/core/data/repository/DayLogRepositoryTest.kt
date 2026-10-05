@@ -77,4 +77,35 @@ class DayLogRepositoryTest {
 
         assertEquals(emptyList<DayLog>(), repository.observeDayLogs().first())
     }
+
+    @Test
+    fun `fill logs a period's first and last day in one write`() = runTest {
+        repository.fillPeriod(day("2027-02-26"), length = 5, today = day("2027-03-20"))
+
+        assertEquals(
+            listOf(DayLog(day("2027-02-26"), periodStarted = true), DayLog(day("2027-03-02"), periodEnded = true)),
+            repository.observeDayLogs().first()
+        )
+    }
+
+    @Test
+    fun `fill near a period writes nothing`() = runTest {
+        repository.setFlow(day("2027-03-02"), FlowLevel.MEDIUM)
+
+        repository.fillPeriod(day("2027-03-03"), length = 5, today = day("2027-03-20"))
+
+        assertEquals(listOf(DayLog(day("2027-03-02"), FlowLevel.MEDIUM)), repository.observeDayLogs().first())
+    }
+
+    @Test
+    fun `clearing a period's first day moves the start to the next day in one write`() = runTest {
+        repository.fillPeriod(day("2027-03-02"), length = 5, today = day("2027-03-20"))
+
+        repository.clearDay(day("2027-03-02"), today = day("2027-03-20"))
+
+        assertEquals(
+            listOf(DayLog(day("2027-03-03"), periodStarted = true), DayLog(day("2027-03-06"), periodEnded = true)),
+            repository.observeDayLogs().first()
+        )
+    }
 }
