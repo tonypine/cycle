@@ -16,6 +16,7 @@ import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
@@ -31,7 +32,8 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * A text field low in a partially expanded [CycleBottomSheet] stays visible when the keyboard opens.
+ * A text field low in a partially expanded [CycleBottomSheet] stays visible when the keyboard opens,
+ * in a short window too, where the handle and title scroll away to make room.
  * Robolectric has no keyboard, so the test dispatches IME insets to the sheet's window itself.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -68,6 +70,33 @@ class BottomSheetImeTest {
         field.assertIsFocused()
     }
 
+    @Test
+    @Config(qualifiers = "w872dp-h392dp-land-mdpi")
+    fun inAShortWindowTheTitleScrollsAwaySoTheFieldFits() {
+        setSheet()
+        composeRule.runOnIdle { scope.launch { state.show() } }
+        composeRule.waitForIdle()
+        val field = composeRule.onNode(hasSetTextAction() and hasText("Notes"))
+
+        field.requestFocus()
+        composeRule.runOnIdle { sheetView.showKeyboard(LANDSCAPE_IME_HEIGHT) }
+        composeRule.waitForIdle()
+
+        val visibleBottom = LANDSCAPE_HEIGHT - LANDSCAPE_IME_HEIGHT
+        val notes = notesBounds()
+        assertTrue(
+            "Notes and its supporting text sit above the keyboard, at $notes",
+            notes.bottom.value <= visibleBottom
+        )
+        assertTrue("Notes stays on screen, at $notes", notes.top.value >= 0f)
+        val title = composeRule.onNode(hasText("Add a note") and isHeading()).fetchSemanticsNode()
+        assertTrue(
+            "The title scrolls away above Notes, at ${title.positionInRoot}",
+            title.positionInRoot.y + title.size.height <= 0f
+        )
+        field.assertIsFocused()
+    }
+
     private fun setSheet() {
         composeRule.setContent {
             CycleTheme(reduceMotion = true) {
@@ -95,5 +124,9 @@ class BottomSheetImeTest {
         const val NOTES_TAG = "notes"
         const val SCREEN_HEIGHT = 640f
         const val IME_HEIGHT = 300f
+
+        /** A phone on its side, and the keyboard it shows there. */
+        const val LANDSCAPE_HEIGHT = 392f
+        const val LANDSCAPE_IME_HEIGHT = 250f
     }
 }

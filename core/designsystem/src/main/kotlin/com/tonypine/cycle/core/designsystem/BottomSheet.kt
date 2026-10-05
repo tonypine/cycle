@@ -414,6 +414,7 @@ private fun SheetLayer(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun Sheet(
     state: CycleBottomSheetState,
@@ -463,28 +464,37 @@ private fun Sheet(
                 WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
             )
     ) {
-        DragHandle(state, handleFocus, Modifier.align(Alignment.CenterHorizontally))
-        BasicText(
-            title,
-            modifier = Modifier
-                .padding(horizontal = spacing.extraLarge)
-                .semantics { heading() },
-            style = CycleTheme.typography.title.copy(color = colors.onSurface)
-        )
-        Column(
-            modifier = Modifier
-                .weight(1f, fill = false)
-                .verticalScroll(rememberScrollState())
-                .padding(
+        // While the keyboard is up, the handle and title scroll with the content, so a short window
+        // (a phone in landscape) keeps its room for the field she types in.
+        val headerScrolls = WindowInsets.isImeVisible
+        if (!headerScrolls) SheetHeader(state, title, handleFocus)
+        Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
+            if (headerScrolls) SheetHeader(state, title, handleFocus)
+            Column(
+                modifier = Modifier.padding(
                     start = spacing.extraLarge,
                     end = spacing.extraLarge,
                     top = spacing.large,
                     bottom = spacing.extraLarge
                 ),
-            verticalArrangement = Arrangement.spacedBy(spacing.large),
-            content = content
-        )
+                verticalArrangement = Arrangement.spacedBy(spacing.large),
+                content = content
+            )
+        }
     }
+}
+
+/** The drag handle, then the sheet's [title], read as a heading. */
+@Composable
+private fun ColumnScope.SheetHeader(state: CycleBottomSheetState, title: String, handleFocus: FocusRequester) {
+    DragHandle(state, handleFocus, Modifier.align(Alignment.CenterHorizontally))
+    BasicText(
+        title,
+        modifier = Modifier
+            .padding(horizontal = CycleTheme.spacing.extraLarge)
+            .semantics { heading() },
+        style = CycleTheme.typography.title.copy(color = CycleTheme.colors.onSurface)
+    )
 }
 
 /**

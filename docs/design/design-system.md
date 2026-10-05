@@ -849,7 +849,9 @@ Collapse, and Dismiss, as custom actions. It shows the focus ring when focused f
 **Insets and the keyboard.** The sheet's window draws edge to edge. The sheet stops below the status
 bar, pads its content above the navigation bar, and sits above the keyboard (`imePadding()`). When
 the keyboard opens, a partially expanded sheet expands, and the focused field scrolls into view.
-`BottomSheetImeTest` checks this by dispatching keyboard insets to the sheet's window.
+While the keyboard is up, the handle and title scroll with the content, so a short window (a phone
+on its side) keeps its room for the field. `BottomSheetImeTest` checks this by dispatching keyboard
+insets to the sheet's window.
 
 **Focus and TalkBack.** Opening moves focus into the sheet: onto the handle for someone using a
 keyboard, and to the sheet itself for touch. The opener in the screen behind keeps its focus, so it is
