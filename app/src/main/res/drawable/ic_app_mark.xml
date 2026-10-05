@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The ring of the launcher icon (ic_launcher_foreground) without its safe-zone padding, sized like
+     a symbol, for the lock screen. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M20,2a18,18 0,1 0,0.01 0zM20,10a10,10 0,1 1,-0.01 0z" />
+</vector>

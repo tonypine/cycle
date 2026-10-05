@@ -96,7 +96,7 @@ class YourDataJourneyTest {
         }
         composeRule.setContent {
             CompositionLocalProvider(LocalActivityResultRegistryOwner provides owner) {
-                CycleTheme(reduceMotion = true) { CycleApp(data, today = { today }) }
+                CycleTheme(reduceMotion = true) { CycleApp(data, FakeDeviceLock(), today = { today }) }
             }
         }
         // Her logs skip the first-run welcome; the tabs show once the settings are read.

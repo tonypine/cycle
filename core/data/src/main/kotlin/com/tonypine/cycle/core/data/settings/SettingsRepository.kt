@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.map
 /**
  * Her settings, in DataStore: the usual lengths, whether setup is done, whether she is past the
  * welcome, the prompts she has dismissed, each under the first day of its cycle, the day log
- * categories she hid and the day she last exported her data. Until she sets them, the lengths are
+ * categories she hid, the day she last exported her data and whether the app lock is on. Until she sets them, the lengths are
  * [CycleRules.DEFAULT_CYCLE_LENGTH] and [CycleRules.DEFAULT_PERIOD_LENGTH], and every category shows.
  */
 class SettingsRepository(private val dataStore: DataStore<Preferences>) {
@@ -115,6 +115,38 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         dataStore.edit { it[LAST_EXPORTED] = date.toString() }
     }
 
+    /** "Lock Cycle": the app opens only after the phone's fingerprint, face or screen lock. Off by default. */
+    val appLock: Flow<Boolean> = dataStore.data.map { it[APP_LOCK] ?: false }.distinctUntilChanged()
+
+    suspend fun setAppLock(on: Boolean) {
+        dataStore.edit {
+            it[APP_LOCK] = on
+            it.remove(APP_LOCK_TURNED_OFF)
+        }
+    }
+
+    /**
+     * Whether Cycle turned its lock off itself, because the phone no longer has a screen lock or a
+     * fingerprint or face to ask for, and she has not seen the note that says so yet.
+     */
+    val appLockTurnedOff: Flow<Boolean> =
+        dataStore.data.map { it[APP_LOCK_TURNED_OFF] ?: false }.distinctUntilChanged()
+
+    /** Turns the lock off because the phone can't ask for it any more, and leaves her a note. */
+    suspend fun turnOffAppLockWithoutScreenLock() {
+        dataStore.edit {
+            if (it[APP_LOCK] == true) {
+                it[APP_LOCK] = false
+                it[APP_LOCK_TURNED_OFF] = true
+            }
+        }
+    }
+
+    /** She read the note that the lock was turned off. */
+    suspend fun dismissAppLockTurnedOff() {
+        dataStore.edit { it.remove(APP_LOCK_TURNED_OFF) }
+    }
+
     /** "Delete everything": every setting goes, so the app opens on the welcome with the defaults. */
     suspend fun clear() {
         dataStore.edit { it.clear() }
@@ -130,6 +162,9 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
 
         // The ISO date of her last export.
         val LAST_EXPORTED = stringPreferencesKey("last_exported")
+
+        val APP_LOCK = booleanPreferencesKey("app_lock")
+        val APP_LOCK_TURNED_OFF = booleanPreferencesKey("app_lock_turned_off")
 
         // ISO dates of the first day of each cycle whose prompt she dismissed.
         val DISMISSED_STILL_GOING = stringSetPreferencesKey("dismissed_still_going")

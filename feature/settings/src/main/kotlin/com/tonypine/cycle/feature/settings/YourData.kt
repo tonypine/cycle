@@ -54,8 +54,8 @@ internal fun rememberExportLauncher(viewModel: SettingsViewModel): () -> Unit {
 
 /**
  * The dialogs of "Your data" after she picked a file: "Import N days?" or "Import your usual
- * lengths?", nothing new to import, why a file can't be imported, and an export that could not be
- * saved. Each stays in composition, so it animates out with what it said.
+ * lengths?", nothing new to import, why a file can't be imported, an export that could not be
+ * saved, and why "Lock Cycle" can't turn on. Each stays in composition, so it animates out with what it said.
  */
 @Composable
 internal fun DataDialogs(dialog: DataDialog?, onConfirmImport: () -> Unit, onDismiss: () -> Unit) {
@@ -101,6 +101,15 @@ internal fun DataDialogs(dialog: DataDialog?, onConfirmImport: () -> Unit, onDis
         confirmText = stringResource(R.string.import_ok),
         onConfirm = onDismiss,
         icon = CycleIcons.Error
+    )
+    CycleAlertDialog(
+        visible = dialog == DataDialog.NoScreenLock,
+        onDismissRequest = onDismiss,
+        title = stringResource(R.string.no_screen_lock_title),
+        text = stringResource(R.string.no_screen_lock_text),
+        confirmText = stringResource(R.string.import_ok),
+        onConfirm = onDismiss,
+        icon = CycleIcons.Lock
     )
 }
 

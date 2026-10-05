@@ -11,6 +11,10 @@ robolectric = "4.17"
 robolectricAndroidAll = "16-robolectric-13921718-i7"
 composeBom = "2026.09.00"
 activityCompose = "1.13.0"
+# The phone's fingerprint, face or screen-lock prompt for the app lock. 1.1.0 is the latest stable.
+biometric = "1.1.0"
+# BiometricPrompt needs a FragmentActivity: the current one, not the 1.2.5 that biometric names.
+fragment = "1.9.1"
 coreKtx = "1.19.1"
 junit = "4.13.2"
 graphicsShapes = "1.1.0"
@@ -33,6 +37,8 @@ jvmToolchain = "21"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
+androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }

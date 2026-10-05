@@ -35,6 +35,8 @@ import com.tonypine.cycle.core.designsystem.CycleIcon
 import com.tonypine.cycle.core.designsystem.CycleIcons
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.LoadingState
+import com.tonypine.cycle.core.designsystem.SwitchRow
+import com.tonypine.cycle.core.designsystem.TextButton
 import com.tonypine.cycle.core.designsystem.TopAppBar
 import com.tonypine.cycle.core.ui.DAY_MONTH_AND_YEAR
 import com.tonypine.cycle.core.ui.formatDate
@@ -69,6 +71,8 @@ fun SettingsRoute(
         versionName = versionName,
         onUsualLengths = onUsualLengths,
         onWhatToLog = onWhatToLog,
+        onAppLockChange = viewModel::onAppLockChange,
+        onDismissLockNote = viewModel::onDismissLockNote,
         onExport = export,
         onImport = import,
         onConfirmImport = { viewModel.onConfirmImport() },
@@ -82,8 +86,10 @@ fun SettingsRoute(
 /**
  * Settings, in four sections:
  * - Your cycle: "Usual cycle and period" and "What to log", each opening its page.
- * - Your data: a card saying everything stays on this phone, then Export my data, with the day of
- *   the last export, Import from a file, and Delete everything, which asks first.
+ * - Your data: a card saying everything stays on this phone, then Lock Cycle, which asks for the
+ *   phone's lock before it turns on or off, with the note when Cycle turned it off itself, Export my
+ *   data, with the day of the last export, Import from a file, and Delete everything, which asks
+ *   first.
  * - About: the open-source notices, then that Cycle is not a contraceptive or a diagnosis, and the
  *   version.
  *
@@ -96,6 +102,8 @@ fun SettingsScreen(
     versionName: String?,
     onUsualLengths: () -> Unit,
     onWhatToLog: () -> Unit,
+    onAppLockChange: (Boolean) -> Unit,
+    onDismissLockNote: () -> Unit,
     onExport: () -> Unit,
     onImport: () -> Unit,
     onConfirmImport: () -> Unit,
@@ -146,6 +154,14 @@ fun SettingsScreen(
                     body = stringResource(R.string.settings_on_this_phone_body)
                 )
             }
+            SwitchRow(
+                title = stringResource(R.string.settings_lock_title),
+                checked = state.appLock,
+                onCheckedChange = onAppLockChange,
+                body = stringResource(R.string.settings_lock_body),
+                icon = CycleIcons.Lock
+            )
+            if (state.appLockTurnedOff) LockTurnedOffNote(onDismiss = onDismissLockNote)
             SettingsRow(
                 icon = CycleIcons.Download,
                 title = stringResource(R.string.settings_export_title),
@@ -224,6 +240,23 @@ private fun SectionTitle(text: String) {
     )
 }
 
+/** Cycle turned its lock off because the phone has no screen lock now, until she dismisses it. */
+@Composable
+private fun LockTurnedOffNote(onDismiss: () -> Unit) {
+    Card(Modifier.fillMaxWidth()) {
+        RowContent(
+            icon = CycleIcons.Info,
+            title = stringResource(R.string.settings_lock_off_title),
+            body = stringResource(R.string.settings_lock_off_body)
+        )
+        TextButton(
+            stringResource(R.string.settings_lock_off_ok),
+            onClick = onDismiss,
+            modifier = Modifier.align(Alignment.End)
+        )
+    }
+}
+
 /** A row that does something, as one button; [opensPage] adds the chevron of a row that opens a page. */
 @Composable
 private fun SettingsRow(
@@ -276,6 +309,8 @@ private fun SettingsPreview() {
             versionName = "1.0.0",
             onUsualLengths = {},
             onWhatToLog = {},
+            onAppLockChange = {},
+            onDismissLockNote = {},
             onExport = {},
             onImport = {},
             onConfirmImport = {},

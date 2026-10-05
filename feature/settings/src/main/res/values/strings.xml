@@ -12,6 +12,11 @@
     <string name="settings_your_data">Your data</string>
     <string name="settings_on_this_phone_title">Everything stays on this phone</string>
     <string name="settings_on_this_phone_body">No account, no cloud, no tracking. A copy leaves this phone only when you export one, to the place you pick, or in Android\'s backup, end-to-end encrypted with your screen lock.</string>
+    <string name="settings_lock_title">Lock Cycle</string>
+    <string name="settings_lock_body">Open Cycle with your fingerprint, face or screen lock.</string>
+    <string name="settings_lock_off_title">Lock Cycle is off</string>
+    <string name="settings_lock_off_body">Your phone has no screen lock now, so Cycle can\'t ask for one and turned its lock off. Everything you logged is still here.</string>
+    <string name="settings_lock_off_ok">OK</string>
     <string name="settings_export_title">Export my data</string>
     <string name="settings_export_body">Save a file with every day you logged</string>
     <string name="settings_last_exported">Last exported %1$s</string>
@@ -38,6 +43,10 @@
     <string name="delete_everything_text">Every day you logged and all your settings go from this phone, and Cycle starts over. This can\'t be undone. To keep a copy, export your data first.</string>
     <string name="delete_everything_confirm">Delete everything</string>
     <string name="delete_everything_keep">Keep it</string>
+
+    <!-- Lock Cycle, on a phone with no screen lock, fingerprint or face to ask for. -->
+    <string name="no_screen_lock_title">Set a screen lock first</string>
+    <string name="no_screen_lock_text">Lock Cycle uses your phone\'s fingerprint, face or screen lock, and this phone has none yet. Add one in your phone\'s settings, then turn this on.</string>
 
     <!-- Import, from Settings or the welcome's "Restore from a Cycle export". -->
     <plurals name="import_confirm_title">

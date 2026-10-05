@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.cycle.screenshot.tests)
 }
 
-// Settings: her usual lengths, "What to log", her data (export, import, delete everything) and
+// Settings: her usual lengths, "What to log", her data (Lock Cycle, export, import, delete everything) and
 // about. Files go only where she picks, through Android's save screen and file picker.
 android {
     namespace = "com.tonypine.cycle.feature.settings"

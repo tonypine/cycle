@@ -52,6 +52,7 @@ class SettingsViewModelTest {
     private val dayLogs = DayLogRepository(database)
     private val today = LocalDate.of(2027, 3, 20)
     private lateinit var settings: SettingsRepository
+    private val deviceLock = FakeDeviceLock()
 
     @Before
     fun setMain() = Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -66,7 +67,8 @@ class SettingsViewModelTest {
         settings = SettingsRepository(
             PreferenceDataStoreFactory.create(scope = backgroundScope) { File(folder.root, "test.preferences_pb") }
         )
-        val viewModel = SettingsViewModel(settings, YourDataRepository(database, settings), clock = { today })
+        val viewModel =
+            SettingsViewModel(settings, YourDataRepository(database, settings), deviceLock, clock = { today })
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
         return viewModel
     }
@@ -232,5 +234,103 @@ class SettingsViewModelTest {
                 it?.usualCycleLength == 28
             }
         )
+    }
+
+    @Test
+    fun `lock cycle is off, and turns on only once she unlocked the phone's prompt`() = runTest {
+        val viewModel = settingsViewModel()
+        assertFalse(viewModel.uiState.first { it != null }!!.appLock)
+
+        viewModel.onAppLockChange(true)
+
+        assertTrue(deviceLock.prompting)
+        assertFalse(settings.appLock.first())
+        deviceLock.answer(unlocked = true)
+        assertTrue(viewModel.uiState.first { it?.appLock == true }!!.appLock)
+        assertTrue(settings.appLock.first())
+    }
+
+    @Test
+    fun `a cancelled prompt leaves lock cycle as it was, on or off`() = runTest {
+        val viewModel = settingsViewModel()
+
+        viewModel.onAppLockChange(true)
+        deviceLock.answer(unlocked = false)
+        assertFalse(settings.appLock.first())
+
+        settings.setAppLock(true)
+        viewModel.onAppLockChange(false)
+        deviceLock.answer(unlocked = false)
+        assertTrue(settings.appLock.first())
+        assertTrue(viewModel.uiState.first { it != null }!!.appLock)
+        assertEquals(2, deviceLock.prompts)
+    }
+
+    @Test
+    fun `turning lock cycle off asks for the phone's lock too`() = runTest {
+        val viewModel = settingsViewModel()
+        settings.setAppLock(true)
+
+        viewModel.onAppLockChange(false)
+
+        assertTrue(settings.appLock.first())
+        deviceLock.answer(unlocked = true)
+        assertFalse(settings.appLock.first { !it })
+    }
+
+    @Test
+    fun `a second tap while the prompt shows asks nothing more`() = runTest {
+        val viewModel = settingsViewModel()
+
+        viewModel.onAppLockChange(true)
+        viewModel.onAppLockChange(true)
+        viewModel.onAppLockChange(false)
+
+        assertEquals(1, deviceLock.prompts)
+        deviceLock.answer(unlocked = true)
+        assertTrue(settings.appLock.first { it })
+        // Once it is answered, she can tap again.
+        viewModel.onAppLockChange(false)
+        assertEquals(2, deviceLock.prompts)
+    }
+
+    @Test
+    fun `with no screen lock on the phone, lock cycle can't turn on and says why`() = runTest {
+        val viewModel = settingsViewModel()
+        deviceLock.available = false
+
+        viewModel.onAppLockChange(true)
+
+        assertEquals(DataDialog.NoScreenLock, viewModel.awaitDialog())
+        assertEquals(0, deviceLock.prompts)
+        assertFalse(settings.appLock.first())
+        viewModel.onDismissDialog()
+        assertEquals(null, viewModel.uiState.first { it?.dialog == null }!!.dialog)
+    }
+
+    @Test
+    fun `with no screen lock on the phone, an on lock turns off without a prompt`() = runTest {
+        val viewModel = settingsViewModel()
+        settings.setAppLock(true)
+        deviceLock.available = false
+
+        viewModel.onAppLockChange(false)
+
+        assertFalse(settings.appLock.first { !it })
+        assertEquals(0, deviceLock.prompts)
+    }
+
+    @Test
+    fun `the note that the lock turned itself off shows until she dismisses it`() = runTest {
+        val viewModel = settingsViewModel()
+        settings.setAppLock(true)
+
+        settings.turnOffAppLockWithoutScreenLock()
+
+        val state = viewModel.uiState.first { it?.appLockTurnedOff == true }!!
+        assertFalse(state.appLock)
+        viewModel.onDismissLockNote()
+        assertFalse(viewModel.uiState.first { it?.appLockTurnedOff == false }!!.appLockTurnedOff)
+        assertFalse(settings.appLockTurnedOff.first())
     }
 }

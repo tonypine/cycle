@@ -94,6 +94,8 @@ private fun Settings(dialog: DataDialog? = null) = SettingsScreen(
     versionName = "1.4.27",
     onUsualLengths = {},
     onWhatToLog = {},
+    onAppLockChange = {},
+    onDismissLockNote = {},
     onExport = {},
     onImport = {},
     onConfirmImport = {},
