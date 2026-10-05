@@ -53,12 +53,14 @@ class MainActivityTest {
         tab("Calendar").performClick()
         tab("Calendar").assertIsSelected()
         waitForText("Predicted periods are estimates", substring = true)
-        listOf("History", "Settings").forEach { label ->
-            tab(label).performClick()
-            tab(label).assertIsSelected()
-            tab("Today").assertIsNotSelected()
-            composeRule.onNodeWithText("This part of Cycle is on its way.").assertIsDisplayed()
-        }
+        tab("History").performClick()
+        tab("History").assertIsSelected()
+        tab("Today").assertIsNotSelected()
+        composeRule.onNodeWithText("This part of Cycle is on its way.").assertIsDisplayed()
+        tab("Settings").performClick()
+        tab("Settings").assertIsSelected()
+        tab("Today").assertIsNotSelected()
+        composeRule.onNodeWithText("More settings are on their way.").assertIsDisplayed()
 
         composeRule.runOnUiThread { composeRule.activity.onBackPressedDispatcher.onBackPressed() }
 

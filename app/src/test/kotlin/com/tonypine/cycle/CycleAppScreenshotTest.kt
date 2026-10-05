@@ -46,7 +46,10 @@ class CycleAppScreenshotTest {
         composeRule.onRoot().captureRoboImage("src/test/screenshots/app_today_$appearance.png")
 
         composeRule.onNodeWithText("Calendar").performClick()
-        composeRule.waitForIdle()
+        // The log loads on Room's and DataStore's threads.
+        composeRule.waitUntil(5_000) {
+            composeRule.onAllNodes(hasText("March 2027")).fetchSemanticsNodes().isNotEmpty()
+        }
         composeRule.onRoot().captureRoboImage("src/test/screenshots/app_calendar_$appearance.png")
     }
 }
