@@ -10,11 +10,13 @@ import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
 import com.tonypine.cycle.core.designsystem.CycleDayState
+import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.EstimateBasis
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.model.Period
 import java.io.File
 import java.time.LocalDate
+import java.time.YearMonth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -204,9 +206,87 @@ class TodayViewModelTest {
         viewModel.onLogPeriod(day("2027-03-02"))
         viewModel.awaitState<TodayUiState.Tracking>()
 
-        viewModel.onFlowChange(FlowLevel.SPOTTING)
+        viewModel.onLogDay(today, FlowLevel.SPOTTING)
 
-        assertEquals(FlowLevel.SPOTTING, viewModel.awaitState<TodayUiState.Tracking> { it.todayFlow != null }.todayFlow)
+        val state = viewModel.awaitState<TodayUiState.Tracking> { it.todayLog.flow != null }
+        assertEquals(FlowLevel.SPOTTING, state.todayLog.flow)
+        assertTrue(state.todayLog.canClear)
+    }
+
+    @Test
+    fun `the day log never logs a day after today`() = today { viewModel, _ ->
+        viewModel.onLogPeriod(day("2027-03-02"))
+        viewModel.awaitState<TodayUiState.Tracking>()
+
+        viewModel.onLogDay(today.plusDays(1), FlowLevel.HEAVY)
+
+        assertEquals(emptyList<DayLog>(), dayLogs.observeDayLogs(today.plusDays(1), today.plusDays(1)).first())
+    }
+
+    @Test
+    fun `the day log never clears a day after today`() = today { viewModel, _ ->
+        viewModel.onLogPeriod(day("2027-03-02"))
+        // Logged before the phone's clock went back a day.
+        dayLogs.setFlow(today.plusDays(1), FlowLevel.LIGHT)
+        viewModel.awaitState<TodayUiState.Tracking>()
+
+        viewModel.onClearDay(today.plusDays(1))
+        // Written after the clear, in order, so once it shows, the clear has run.
+        viewModel.onLogDay(today, FlowLevel.SPOTTING)
+        viewModel.awaitState<TodayUiState.Tracking> { it.todayLog.flow != null }
+
+        assertEquals(
+            listOf(DayLog(today.plusDays(1), flow = FlowLevel.LIGHT)),
+            dayLogs.observeDayLogs(today.plusDays(1), today.plusDays(1)).first()
+        )
+    }
+
+    @Test
+    fun `clearing today takes the day off the period still going`() = today { viewModel, _ ->
+        viewModel.onLogPeriod(day("2027-03-18"))
+        viewModel.awaitState<TodayUiState.Tracking> { it.onPeriod }
+
+        viewModel.onClearDay(today)
+
+        val state = viewModel.awaitState<TodayUiState.Tracking> { !it.onPeriod }
+        assertEquals(Period(day("2027-03-18"), day("2027-03-19")), state.periods.last())
+        assertEquals(CycleDayState.Plain, state.dayState(today))
+    }
+
+    @Test
+    fun `missed a period is asked once, at 1_8 times her usual cycle`() = today { viewModel, settings ->
+        // Day 50 of a typical 28-day cycle: not yet.
+        logPeriod(day("2027-01-30"), day("2027-02-03"))
+        assertNull(viewModel.awaitState<TodayUiState.Tracking> { it.cycleDay == 50 }.missedPeriod)
+
+        clock = today.plusDays(1)
+        viewModel.refreshDay()
+        val asked = viewModel.awaitState<TodayUiState.Tracking> { it.cycleDay == 51 }
+        // Her period was due on 27 February: the calendar opens on February.
+        assertEquals(YearMonth.of(2027, 2), asked.missedPeriod?.likelyMonth)
+
+        viewModel.onNoMissedPeriod()
+        assertNull(viewModel.awaitState<TodayUiState.Tracking> { it.missedPeriod == null }.missedPeriod)
+        assertEquals(setOf(day("2027-01-30")), settings.settings.first().dismissedMissedPeriod)
+
+        clock = today.plusDays(2)
+        viewModel.refreshDay()
+        assertNull(viewModel.awaitState<TodayUiState.Tracking> { it.cycleDay == 52 }.missedPeriod)
+    }
+
+    @Test
+    fun `adding the missed period answers the question and recomputes the estimate`() = today { viewModel, _ ->
+        logPeriod(day("2027-01-29"), day("2027-02-02"))
+        viewModel.awaitState<TodayUiState.Tracking> { it.missedPeriod != null }
+
+        viewModel.onFillPeriod(day("2027-02-26"))
+
+        val state = viewModel.awaitState<TodayUiState.Tracking> { it.periods.size == 2 }
+        assertNull(state.missedPeriod)
+        assertEquals(23, state.cycleDay)
+        assertEquals(Period(day("2027-02-26"), day("2027-03-02")), state.periods.last())
+        // One cycle of 28 days, from 29 January to 25 February.
+        assertEquals(day("2027-03-26"), state.nextPeriod.expectedStart)
     }
 
     @Test

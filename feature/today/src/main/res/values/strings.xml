@@ -48,6 +48,13 @@
     <string name="today_last_day_body">Pick the last day of your period.</string>
     <string name="today_save">Save</string>
 
+    <!-- Missed a period? Asked once per cycle, at 1.8 times her usual cycle. Calm: a forgotten log
+         is the likeliest reason. -->
+    <string name="today_missed_title">Missed a period?</string>
+    <string name="today_missed_body">You are on day %1$d of this cycle, much longer than your usual one. If a period came and you did not log it, you can add it on the calendar.</string>
+    <string name="today_missed_add">Add a past period</string>
+    <string name="today_missed_no">No, I didn\'t miss one</string>
+
     <!-- The next period card. -->
     <string name="today_next_period">Next period</string>
     <string name="today_next_around">Around %1$s</string>
@@ -91,14 +98,4 @@
         <item quantity="other">Pick the first day of your last period. Cycle counts it as %1$d days long.</item>
     </plurals>
     <string name="log_period_confirm">Log it</string>
-
-    <!-- The day log sheet. MOT-36 adds how she feels. -->
-    <string name="day_log_title">Log today</string>
-    <string name="day_log_flow">Flow</string>
-    <string name="day_log_flow_none">None</string>
-    <string name="day_log_flow_spotting">Spotting</string>
-    <string name="day_log_flow_light">Light</string>
-    <string name="day_log_flow_medium">Medium</string>
-    <string name="day_log_flow_heavy">Heavy</string>
-    <string name="day_log_done">Done</string>
 </resources>

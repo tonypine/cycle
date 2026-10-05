@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Copy rules: docs/research/product-implications.md. Every estimate reads as an estimate.
+         StringsTest guards against the words the app never says. -->
+    <string name="calendar_title">Calendar</string>
+    <string name="calendar_go_to_today">Go to today</string>
+    <string name="calendar_hint">Predicted periods are estimates. Tap any day up to today to log or change it.</string>
+</resources>
