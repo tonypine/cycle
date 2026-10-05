@@ -99,7 +99,8 @@ class YourDataRepositoryTest {
     }
 
     private suspend fun CycleDatabase.everything(): Pair<List<DayLog>, List<DayFeelings>> =
-        dayLogDao().getAll().map { DayLog(it.date, it.flow, it.periodStarted, it.periodEnded) } to feelingsDao().getAll()
+        dayLogDao().getAll().map { DayLog(it.date, it.flow, it.periodStarted, it.periodEnded) } to
+            feelingsDao().getAll()
 
     private suspend fun YourDataRepository.exportBytes(): ByteArray =
         ByteArrayOutputStream().also { export(it) }.toByteArray()

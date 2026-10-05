@@ -4,19 +4,22 @@ plugins {
     alias(libs.plugins.cycle.screenshot.tests)
 }
 
-// Settings: for now the tab's placeholder with "What to log", where she shows or hides each day log
-// category. The rest of Settings lands with MOT-40.
+// Settings: her usual lengths, "What to log", her data (export, import, delete everything) and
+// about. Files go only where she picks, through Android's save screen and file picker.
 android {
     namespace = "com.tonypine.cycle.feature.settings"
 }
 
 dependencies {
     implementation(projects.core.designsystem)
+    implementation(projects.core.ui)
     implementation(projects.core.data)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    // The ViewModel tests run the real settings on a DataStore file.
+    // The ViewModel tests run the real repositories on an in-memory database and a DataStore file.
+    testImplementation(libs.androidx.room.runtime)
     testImplementation(libs.androidx.datastore.preferences)
     testImplementation(libs.kotlinx.coroutines.test)
 }

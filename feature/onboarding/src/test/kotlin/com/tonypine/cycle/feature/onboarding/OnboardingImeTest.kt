@@ -38,7 +38,10 @@ class OnboardingImeTest {
     fun `the focused length field stays above the keyboard`() {
         composeRule.activityRule.scenario.onActivity { it.window.setDecorFitsSystemWindows(false) }
         composeRule.setContent {
-            Themed { OnboardingScreen(today = LocalDate.of(2027, 3, 20), onSkip = {}, onDone = { _, _, _ -> }) }
+            Themed {
+                OnboardingScreen(today = LocalDate.of(2027, 3, 20), onRestore = {
+                }, onSkip = {}, onDone = { _, _, _ -> })
+            }
         }
         composeRule.onNodeWithText("Get started").performClick()
         composeRule.onNodeWithText("I don't remember").performScrollTo().performClick()

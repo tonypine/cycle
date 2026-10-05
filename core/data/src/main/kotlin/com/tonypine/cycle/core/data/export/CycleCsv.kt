@@ -105,7 +105,7 @@ internal object CycleCsv {
     private const val LINE_END = "\r\n"
     private const val SET_SEPARATOR = ";"
     private const val YES = "yes"
-    private const val BYTE_ORDER_MARK = '﻿'
+    private const val BYTE_ORDER_MARK = '\uFEFF'
 
     fun write(days: List<LoggedDay>, out: Appendable) {
         out.append(COLUMNS.joinToString(",")).append(LINE_END)
@@ -150,12 +150,11 @@ internal object CycleCsv {
         feelings.note
     )
 
-    private fun quote(value: String): String =
-        if (value.any { it == ',' || it == '"' || it == '\r' || it == '\n' }) {
-            "\"" + value.replace("\"", "\"\"") + "\""
-        } else {
-            value
-        }
+    private fun quote(value: String): String = if (value.any { it == ',' || it == '"' || it == '\r' || it == '\n' }) {
+        "\"" + value.replace("\"", "\"\"") + "\""
+    } else {
+        value
+    }
 
     private sealed interface Row {
         data class Day(val day: LoggedDay) : Row

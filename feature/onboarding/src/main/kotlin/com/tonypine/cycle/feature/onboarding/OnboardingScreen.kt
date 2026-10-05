@@ -18,12 +18,8 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.text.input.then
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,12 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import com.tonypine.cycle.core.designsystem.AppBarAction
 import com.tonypine.cycle.core.designsystem.CycleDayState
 import com.tonypine.cycle.core.designsystem.CycleIcons
-import com.tonypine.cycle.core.designsystem.CycleTextField
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.EmptyState
 import com.tonypine.cycle.core.designsystem.EmptyStateAction
@@ -50,30 +43,40 @@ import com.tonypine.cycle.core.designsystem.MonthCalendar
 import com.tonypine.cycle.core.designsystem.TextButton
 import com.tonypine.cycle.core.designsystem.TopAppBar
 import com.tonypine.cycle.core.domain.CycleRules
-import com.tonypine.cycle.core.domain.LengthCheck
-import com.tonypine.cycle.core.domain.UsualLengths
+import com.tonypine.cycle.core.ui.UsualLengthFields
+import com.tonypine.cycle.core.ui.checkedLengths
 import java.time.LocalDate
 import java.time.YearMonth
 
 /** The welcome and the two setup steps, in order. Back goes one step up. */
 enum class OnboardingStep { Welcome, LastPeriod, UsualLengths }
 
-/** The welcome and setup, wired to its [viewModel]. */
+/**
+ * The welcome and setup, wired to its [viewModel]. [onRestore] opens the file picker for "Restore
+ * from a Cycle export"; the app calls [OnboardingViewModel.onRestored] once the days are in.
+ */
 @Composable
-fun OnboardingRoute(viewModel: OnboardingViewModel, modifier: Modifier = Modifier) {
+fun OnboardingRoute(viewModel: OnboardingViewModel, onRestore: () -> Unit, modifier: Modifier = Modifier) {
     val today = remember(viewModel) { viewModel.today() }
-    OnboardingScreen(today = today, onSkip = viewModel::onSkip, onDone = viewModel::onDone, modifier = modifier)
+    OnboardingScreen(
+        today = today,
+        onRestore = onRestore,
+        onSkip = viewModel::onSkip,
+        onDone = viewModel::onDone,
+        modifier = modifier
+    )
 }
 
 /**
  * The welcome, then "When did your last period start?" and "How long do they usually last?". What
  * she picks and types is kept through back and forth between the steps and a configuration change,
  * and handed over only on Done: [onDone] gets the day she picked, or null for "I don't remember",
- * and her two lengths, already checked.
+ * and her two lengths, already checked. [onRestore] is the welcome's "Restore from a Cycle export".
  */
 @Composable
 fun OnboardingScreen(
     today: LocalDate,
+    onRestore: () -> Unit,
     onSkip: () -> Unit,
     onDone: (lastPeriodStart: LocalDate?, cycleLength: Int, periodLength: Int) -> Unit,
     modifier: Modifier = Modifier
@@ -98,6 +101,7 @@ fun OnboardingScreen(
         when (shown) {
             OnboardingStep.Welcome -> WelcomeStep(
                 onGetStarted = { step = OnboardingStep.LastPeriod },
+                onRestore = onRestore,
                 onSkip = onSkip
             )
 
@@ -120,13 +124,8 @@ fun OnboardingScreen(
                 periodLength = periodLength,
                 showErrors = showErrors,
                 onDone = {
-                    val cycle = UsualLengths.checkCycle(cycleLength.text.toString())
-                    val period = UsualLengths.checkPeriod(periodLength.text.toString())
-                    if (cycle is LengthCheck.Valid && period is LengthCheck.Valid) {
-                        onDone(start, cycle.days, period.days)
-                    } else {
-                        showErrors = true
-                    }
+                    val lengths = checkedLengths(cycleLength, periodLength)
+                    if (lengths != null) onDone(start, lengths.first, lengths.second) else showErrors = true
                 },
                 onBack = { step = OnboardingStep.LastPeriod }
             )
@@ -134,9 +133,14 @@ fun OnboardingScreen(
     }
 }
 
-/** "Hi! Let's get your cycle going", with Get started and Skip for now. */
+/** "Hi! Let's get your cycle going", with Get started, Restore from a Cycle export and Skip for now. */
 @Composable
-internal fun WelcomeStep(onGetStarted: () -> Unit, onSkip: () -> Unit, modifier: Modifier = Modifier) {
+internal fun WelcomeStep(
+    onGetStarted: () -> Unit,
+    onRestore: () -> Unit,
+    onSkip: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     EmptyState(
         title = stringResource(R.string.welcome_title),
         body = stringResource(R.string.welcome_body),
@@ -145,8 +149,10 @@ internal fun WelcomeStep(onGetStarted: () -> Unit, onSkip: () -> Unit, modifier:
             .windowInsetsPadding(WindowInsets.safeDrawing),
         illustration = { EmptyStateIcon(CycleIcons.WaterDrop) },
         action = EmptyStateAction(stringResource(R.string.welcome_get_started), onGetStarted),
-        // MOT-40 adds "Restore from a Cycle export" here, once restoring works.
-        secondaryAction = EmptyStateAction(stringResource(R.string.welcome_skip), onSkip)
+        secondaryActions = listOf(
+            EmptyStateAction(stringResource(R.string.welcome_restore), onRestore),
+            EmptyStateAction(stringResource(R.string.welcome_skip), onSkip)
+        )
     )
 }
 
@@ -217,35 +223,7 @@ internal fun UsualLengthsStep(
         onBack = onBack,
         modifier = modifier
     ) {
-        val margin = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = CycleTheme.spacing.large)
-        CycleTextField(
-            state = cycleLength,
-            label = stringResource(R.string.setup_cycle_length),
-            modifier = margin,
-            supportingText = stringResource(R.string.setup_cycle_length_supporting),
-            errorMessage = if (showErrors) {
-                lengthError(UsualLengths.checkCycle(cycleLength.text.toString()), R.string.setup_cycle_length_empty)
-            } else {
-                null
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-            inputTransformation = DaysInput
-        )
-        CycleTextField(
-            state = periodLength,
-            label = stringResource(R.string.setup_period_length),
-            modifier = margin,
-            supportingText = stringResource(R.string.setup_period_length_supporting),
-            errorMessage = if (showErrors) {
-                lengthError(UsualLengths.checkPeriod(periodLength.text.toString()), R.string.setup_period_length_empty)
-            } else {
-                null
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-            inputTransformation = DaysInput
-        )
+        UsualLengthFields(cycleLength, periodLength, showErrors)
         Actions {
             FilledButton(
                 text = stringResource(R.string.setup_done),
@@ -254,14 +232,6 @@ internal fun UsualLengthsStep(
             )
         }
     }
-}
-
-/** What to do about [check], or null when it is fine. [empty] asks for a number in this field's words. */
-@Composable
-private fun lengthError(check: LengthCheck, empty: Int): String? = when (check) {
-    is LengthCheck.Valid -> null
-    LengthCheck.Empty -> stringResource(empty)
-    is LengthCheck.OutOfRange -> stringResource(R.string.setup_length_out_of_range, check.range.first, check.range.last)
 }
 
 /**
@@ -320,10 +290,5 @@ private fun Actions(content: @Composable ColumnScope.() -> Unit) {
         content = content
     )
 }
-
-/** Digits only, up to two: every length she can give fits, and the keyboard has no other keys. */
-private val DaysInput = InputTransformation.maxLength(2).then(
-    InputTransformation { if (!asCharSequence().all(Char::isDigit)) revertAllChanges() }
-)
 
 private const val SETUP_STEPS = 2

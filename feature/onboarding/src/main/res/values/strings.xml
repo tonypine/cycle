@@ -7,6 +7,7 @@
     <string name="welcome_title">Hi! Let\'s get your cycle going</string>
     <string name="welcome_body">Log your period and Cycle estimates the next one. Everything stays on this phone: no account, no ads, no tracking.</string>
     <string name="welcome_get_started">Get started</string>
+    <string name="welcome_restore">Restore from a Cycle export</string>
     <string name="welcome_skip">Skip for now</string>
 
     <!-- Both setup steps. -->
@@ -19,15 +20,8 @@
     <string name="setup_next">Next</string>
     <string name="setup_dont_remember">I don\'t remember</string>
 
-    <!-- Step 2: her usual lengths. Each error says how to fix the value. -->
+    <!-- Step 2: her usual lengths, in core:ui's UsualLengthFields. -->
     <string name="setup_lengths_title">How long do they usually last?</string>
     <string name="setup_lengths_body">Cycle estimates from these until you have logged periods of your own.</string>
-    <string name="setup_cycle_length">Cycle length, in days</string>
-    <string name="setup_cycle_length_supporting">From the first day of one period to the first day of the next. Often between 21 and 35 days.</string>
-    <string name="setup_period_length">Period length, in days</string>
-    <string name="setup_period_length_supporting">The days you bleed. Often between 2 and 7 days.</string>
-    <string name="setup_cycle_length_empty">Enter the number of days in your cycle, such as 28.</string>
-    <string name="setup_period_length_empty">Enter the number of days your period lasts, such as 5.</string>
-    <string name="setup_length_out_of_range">Enter a number of days from %1$d to %2$d.</string>
     <string name="setup_done">Done</string>
 </resources>

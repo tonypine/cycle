@@ -129,6 +129,16 @@ class OnboardingViewModelTest {
     }
 
     @Test
+    fun `a restore leaves the welcome and keeps the typical lengths`() = onboarding { viewModel, settings ->
+        viewModel.awaitWelcome(shown = true)
+        dayLogs.setPeriodStarted(day("2027-03-02"), started = true)
+        viewModel.onRestored()
+
+        viewModel.awaitWelcome(shown = false)
+        assertEquals(CycleSettings(28, 5, setupDone = false), settings.settings.first())
+    }
+
+    @Test
     fun `after Done or Skip, the next launch opens on Today`() = onboarding { viewModel, _ ->
         viewModel.awaitWelcome(shown = true)
         viewModel.onSkip()
@@ -157,6 +167,22 @@ class OnboardingViewModelTest {
     }
 
     @Test
+    fun `an install from before the welcome shows the welcome again once everything is deleted`() = onboarding {
+            _,
+            settings
+        ->
+        dayLogs.setPeriodStarted(day("2027-03-02"), started = true)
+        val launch = nextLaunch()
+        launch.awaitWelcome(shown = false)
+
+        // What "Delete everything" does: the log, then the settings.
+        dayLogs.clear(day("2027-03-02"))
+        settings.clear()
+
+        launch.awaitWelcome(shown = true)
+    }
+
+    @Test
     fun `an install with setup from before the welcome opens on Today`() = onboarding { _, settings ->
         settings.saveSetup(cycleLength = 30, periodLength = 5)
 
@@ -169,8 +195,8 @@ class OnboardingViewModelTest {
         viewModel.onSkip()
         viewModel.awaitWelcome(shown = false)
 
-        // What "Delete everything" (MOT-40) leaves behind.
-        settings.setWelcomeDone(false)
+        // What "Delete everything" leaves behind.
+        settings.clear()
 
         viewModel.awaitWelcome(shown = true)
     }

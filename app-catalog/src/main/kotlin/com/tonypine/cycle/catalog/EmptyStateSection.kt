@@ -35,7 +35,7 @@ internal fun EmptyStateSection() {
         modifier = Modifier.frame(),
         illustration = { EmptyStateIcon(CycleIcons.WaterDrop) },
         action = EmptyStateAction("Get started", onClick = {}),
-        secondaryAction = EmptyStateAction("Skip for now", onClick = {})
+        secondaryActions = listOf(EmptyStateAction("Skip for now", onClick = {}))
     )
 
     SubsectionTitle("Without an action")

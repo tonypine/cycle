@@ -15,13 +15,13 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * What to log, with Sex hidden, and the Settings placeholder, in light, dark and at 200% font scale.
- * Each records `src/test/screenshots/<screen>_<appearance>.png`.
+ * What to log, with Sex hidden, in light, dark and at 200% font scale. Each records
+ * `src/test/screenshots/what_to_log_<appearance>.png`.
  */
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(qualifiers = "w360dp-h800dp-mdpi")
-class WhatToLogScreenshotTest(private val screen: String, private val appearance: Appearance) {
+class WhatToLogScreenshotTest(private val appearance: Appearance) {
     @get:Rule
     val composeRule = createComposeRule()
 
@@ -32,19 +32,15 @@ class WhatToLogScreenshotTest(private val screen: String, private val appearance
             val fontScale = if (appearance == Appearance.FontScale200) 2f else 1f
             CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale)) {
                 Themed(darkTheme = appearance == Appearance.Dark) {
-                    when (screen) {
-                        "what_to_log" -> WhatToLogScreen(
-                            WhatToLogUiState.Ready(setOf(LogCategory.SEX)),
-                            onShownChange = { _, _ -> },
-                            onBack = {}
-                        )
-
-                        else -> SettingsScreen(onWhatToLog = {})
-                    }
+                    WhatToLogScreen(
+                        WhatToLogUiState.Ready(setOf(LogCategory.SEX)),
+                        onShownChange = { _, _ -> },
+                        onBack = {}
+                    )
                 }
             }
         }
-        composeRule.onRoot().captureRoboImage("src/test/screenshots/${screen}_${appearance.fileName}.png")
+        composeRule.onRoot().captureRoboImage("src/test/screenshots/what_to_log_${appearance.fileName}.png")
     }
 
     enum class Appearance(val fileName: String) {
@@ -55,9 +51,7 @@ class WhatToLogScreenshotTest(private val screen: String, private val appearance
 
     companion object {
         @JvmStatic
-        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}_{1}")
-        fun cases(): List<Array<Any>> = listOf("what_to_log", "settings").flatMap { screen ->
-            Appearance.entries.map { arrayOf<Any>(screen, it) }
-        }
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun cases(): List<Array<Any>> = Appearance.entries.map { arrayOf<Any>(it) }
     }
 }

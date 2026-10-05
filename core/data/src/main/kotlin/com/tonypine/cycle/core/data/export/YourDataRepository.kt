@@ -62,6 +62,7 @@ class YourDataRepository(
         }
         return when (val read = CycleCsv.read(text)) {
             is CsvRead.Refused -> ImportRead.Refused(read.problem)
+
             is CsvRead.Days -> {
                 val onPhone = database.withTransaction { loggedDates() }
                 ImportRead.Ready(ImportFile(read.days), read.days.count { it.date !in onPhone })

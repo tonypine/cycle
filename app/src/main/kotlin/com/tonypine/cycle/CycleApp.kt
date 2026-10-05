@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -29,6 +31,7 @@ import com.tonypine.cycle.core.designsystem.CycleIcons
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.NavigationBar
 import com.tonypine.cycle.core.designsystem.NavigationDestination
+import com.tonypine.cycle.core.designsystem.OpenSourceNotices
 import com.tonypine.cycle.feature.calendar.CalendarRoute
 import com.tonypine.cycle.feature.calendar.CalendarViewModel
 import com.tonypine.cycle.feature.history.CycleDetailRoute
@@ -37,9 +40,15 @@ import com.tonypine.cycle.feature.history.HistoryRoute
 import com.tonypine.cycle.feature.history.HistoryViewModel
 import com.tonypine.cycle.feature.onboarding.OnboardingRoute
 import com.tonypine.cycle.feature.onboarding.OnboardingViewModel
-import com.tonypine.cycle.feature.settings.SettingsScreen
+import com.tonypine.cycle.feature.settings.OpenSourceNoticeScreen
+import com.tonypine.cycle.feature.settings.OpenSourceNoticesScreen
+import com.tonypine.cycle.feature.settings.SettingsRoute
+import com.tonypine.cycle.feature.settings.SettingsViewModel
+import com.tonypine.cycle.feature.settings.UsualLengthsRoute
+import com.tonypine.cycle.feature.settings.UsualLengthsViewModel
 import com.tonypine.cycle.feature.settings.WhatToLogRoute
 import com.tonypine.cycle.feature.settings.WhatToLogViewModel
+import com.tonypine.cycle.feature.settings.rememberRestoreFromExport
 import com.tonypine.cycle.feature.today.TodayRoute
 import com.tonypine.cycle.feature.today.TodayViewModel
 import java.time.LocalDate
@@ -54,25 +63,31 @@ enum class TopLevelDestination(val route: String, @param:StringRes val label: In
 }
 
 /**
- * The app: the welcome and setup on the first launch, then one screen per tab above the navigation
- * bar. Nothing shows until the settings are read, so the welcome never flashes on her way to Today.
+ * The app: the welcome and setup on the first launch, and again after "Delete everything", then one
+ * screen per tab above the navigation bar. Nothing shows until the settings are read, so the welcome
+ * never flashes on her way to Today. The welcome's "Restore from a Cycle export" imports a file with
+ * Settings' import, then opens Today.
  *
  * @param today her day, from the phone's clock in its current zone.
  */
 @Composable
-fun CycleApp(
-    data: CycleData,
-    modifier: Modifier = Modifier,
-    today: () -> LocalDate = LocalDate::now,
-    navController: NavHostController = rememberNavController()
-) {
+fun CycleApp(data: CycleData, modifier: Modifier = Modifier, today: () -> LocalDate = LocalDate::now) {
     val onboarding = viewModel { OnboardingViewModel(data.settingsRepository, data.dayLogRepository, today) }
     val showWelcome by onboarding.showWelcome.collectAsStateWithLifecycle()
     Box(modifier.fillMaxSize().background(CycleTheme.colors.surface)) {
         when (showWelcome) {
             null -> Unit
-            true -> OnboardingRoute(onboarding)
-            false -> CycleTabs(data, today, navController)
+
+            true -> {
+                val restore = viewModel { SettingsViewModel(data.settingsRepository, data.yourDataRepository, today) }
+                OnboardingRoute(
+                    onboarding,
+                    onRestore = rememberRestoreFromExport(restore, onRestored = onboarding::onRestored)
+                )
+            }
+
+            // A new controller each time, so she is on Today after the welcome.
+            false -> CycleTabs(data, today, rememberNavController())
         }
     }
 }
@@ -81,7 +96,7 @@ fun CycleApp(
  * One screen per tab above the navigation bar. Each tab keeps its state when she leaves it, and back
  * from any tab returns to Today, then leaves the app. Today's "missed a period?" card opens the
  * calendar on the month the period was likely in, and a cycle's "See it in the calendar" on the
- * month it started. Settings opens What to log inside its tab.
+ * month it started. Settings opens its pages inside its tab.
  */
 @Composable
 private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: NavHostController) {
@@ -94,6 +109,10 @@ private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: Na
     // The month Today's "Add a past period" or a cycle's "See it in the calendar" asks the calendar to
     // open on, until it has.
     var calendarMonth by rememberSaveable { mutableStateOf<YearMonth?>(null) }
+    val context = LocalContext.current
+    val versionName = remember(context) {
+        context.packageManager.getPackageInfo(context.packageName, 0).versionName
+    }
 
     Column(Modifier.fillMaxSize()) {
         NavHost(
@@ -142,13 +161,36 @@ private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: Na
             }
             navigation(startDestination = SETTINGS_HOME_ROUTE, route = TopLevelDestination.Settings.route) {
                 composable(SETTINGS_HOME_ROUTE) {
-                    SettingsScreen(onWhatToLog = { navController.navigate(WHAT_TO_LOG_ROUTE) })
+                    SettingsRoute(
+                        viewModel { SettingsViewModel(data.settingsRepository, data.yourDataRepository, today) },
+                        versionName = versionName,
+                        onUsualLengths = { navController.navigate(USUAL_LENGTHS_ROUTE) },
+                        onWhatToLog = { navController.navigate(WHAT_TO_LOG_ROUTE) },
+                        onNotices = { navController.navigate(NOTICES_ROUTE) }
+                    )
+                }
+                composable(USUAL_LENGTHS_ROUTE) {
+                    UsualLengthsRoute(
+                        viewModel { UsualLengthsViewModel(data.settingsRepository) },
+                        onBack = { navController.popBackStack() }
+                    )
                 }
                 composable(WHAT_TO_LOG_ROUTE) {
                     WhatToLogRoute(
                         viewModel { WhatToLogViewModel(data.settingsRepository) },
                         onBack = { navController.popBackStack() }
                     )
+                }
+                composable(NOTICES_ROUTE) {
+                    OpenSourceNoticesScreen(
+                        onOpen = { index -> navController.navigate("$NOTICE_PREFIX$index") },
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+                composable(NOTICE_ROUTE) { entry ->
+                    val index = entry.arguments?.getString(INDEX_ARG)?.toIntOrNull()
+                    val notice = index?.let(OpenSourceNotices::getOrNull) ?: OpenSourceNotices.first()
+                    OpenSourceNoticeScreen(notice, onBack = { navController.popBackStack() })
                 }
             }
         }
@@ -162,7 +204,14 @@ private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: Na
 
 // The screens inside the Settings tab.
 private const val SETTINGS_HOME_ROUTE = "settings/home"
+private const val USUAL_LENGTHS_ROUTE = "settings/usual_lengths"
 private const val WHAT_TO_LOG_ROUTE = "settings/what_to_log"
+private const val NOTICES_ROUTE = "settings/notices"
+private const val INDEX_ARG = "index"
+
+/** One open-source notice, by its place in `OpenSourceNotices`. */
+private const val NOTICE_PREFIX = "settings/notice/"
+private const val NOTICE_ROUTE = "$NOTICE_PREFIX{$INDEX_ARG}"
 
 /** Opens [destination] with Today under it, so back returns to Today; each tab keeps its state. */
 private fun NavHostController.navigateToTab(destination: TopLevelDestination) {

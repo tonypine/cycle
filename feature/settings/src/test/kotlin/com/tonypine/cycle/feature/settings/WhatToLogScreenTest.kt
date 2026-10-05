@@ -13,7 +13,6 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.tonypine.cycle.core.model.LogCategory
@@ -25,7 +24,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-/** What TalkBack reads on What to log and the Settings placeholder, and what each switch does. */
+/** What TalkBack reads on What to log, and what each switch does. */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(qualifiers = "w360dp-h800dp-mdpi")
@@ -83,16 +82,5 @@ class WhatToLogScreenTest {
         composeRule.onNode(hasText("Notes") and isSwitch).performScrollTo().performClick()
 
         assertEquals(listOf("SEX true", "NOTES false"), calls)
-    }
-
-    @Test
-    fun `the Settings placeholder opens What to log from one button`() {
-        composeRule.setContent { Themed { SettingsScreen(onWhatToLog = { calls += "what to log" }) } }
-
-        composeRule.onNode(hasText("Settings") and isHeading()).assertExists()
-        composeRule.onNodeWithText("What to log", substring = true)
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
-            .performClick()
-        assertEquals(listOf("what to log"), calls)
     }
 }

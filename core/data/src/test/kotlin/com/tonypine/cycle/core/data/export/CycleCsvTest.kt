@@ -19,11 +19,14 @@ import org.junit.Test
 class CycleCsvTest {
     private val header = "date,flow,period_started,period_ended,pain,pain_where,body,mood,energy,sleep,sex,note"
 
-    private fun write(vararg days: LoggedDay): String = StringBuilder().also { CycleCsv.write(days.toList(), it) }.toString()
+    private fun write(vararg days: LoggedDay): String = StringBuilder().also {
+        CycleCsv.write(days.toList(), it)
+    }.toString()
 
     private fun read(vararg lines: String): CsvRead = CycleCsv.read(lines.joinToString("\r\n", postfix = "\r\n"))
 
-    private fun refused(problem: ImportProblem, vararg lines: String) = assertEquals(CsvRead.Refused(problem), read(*lines))
+    private fun refused(problem: ImportProblem, vararg lines: String) =
+        assertEquals(CsvRead.Refused(problem), read(*lines))
 
     @Test
     fun `one row per day, one column per category, empty for what she did not log`() {
@@ -46,7 +49,8 @@ class CycleCsvTest {
 
         assertEquals(
             "$header\r\n" +
-                "2027-03-02,medium,yes,,moderate,cramps;lower_back,bloating,sensitive;low,low,badly,protected,Synthetic note\r\n" +
+                "2027-03-02,medium,yes,,moderate,cramps;lower_back,bloating,sensitive;low,low,badly,protected," +
+                "Synthetic note\r\n" +
                 "2027-03-06,,,yes,,,,,,,,\r\n",
             csv
         )
@@ -68,7 +72,7 @@ class CycleCsvTest {
 
     @Test
     fun `reads LF line ends, a byte order mark, spaces around codes and no final line break`() {
-        val text = "﻿$header\n2027-03-02, light ,yes,,,,,calm ; happy,,,,\n\n2027-03-01,spotting,,,,,,,,,,"
+        val text = "\uFEFF$header\n2027-03-02, light ,yes,,,,,calm ; happy,,,,\n\n2027-03-01,spotting,,,,,,,,,,"
 
         assertEquals(
             CsvRead.Days(
@@ -109,13 +113,12 @@ class CycleCsvTest {
         refused(ImportProblem.BadDate(line = 2, value = "02/03/2027"), header, "02/03/2027,light,,,,,,,,,,")
 
     @Test
-    fun `a second row for the same day is refused`() =
-        refused(
-            ImportProblem.RepeatedDate(line = 3, date = day("2027-03-02")),
-            header,
-            "2027-03-02,light,,,,,,,,,,",
-            "2027-03-02,heavy,,,,,,,,,,"
-        )
+    fun `a second row for the same day is refused`() = refused(
+        ImportProblem.RepeatedDate(line = 3, date = day("2027-03-02")),
+        header,
+        "2027-03-02,light,,,,,,,,,,",
+        "2027-03-02,heavy,,,,,,,,,,"
+    )
 
     @Test
     fun `a value Cycle does not write is refused with its column`() {

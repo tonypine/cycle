@@ -437,7 +437,7 @@ button, so TalkBack could not reach the inner control. Use a `Card` with the con
 ## Empty state
 
 `EmptyState.kt`. What a screen or list shows when it has nothing yet: an illustration, a title, one
-sentence of body and up to two actions, centred one above the other.
+sentence of body, a main action and any secondary ones, centred one above the other.
 
 ```kotlin
 EmptyState(
@@ -455,7 +455,7 @@ EmptyState(
 | `body` | One sentence in `body` `onSurfaceVariant`: what will appear here, or how to start. |
 | `illustration` | Any composable above the title. `EmptyStateIcon(icon)` draws the icon at 48dp in `onAccentContainer` in a 96dp `accentContainer` circle. It is decoration and is not read. |
 | `action` | `EmptyStateAction(label, onClick, icon = null)`, shown as a `FilledButton`. Leave it out when there is nothing to do yet. |
-| `secondaryAction` | An `EmptyStateAction` shown as a `TextButton` under `action`, for the way out ("Skip for now"). |
+| `secondaryActions` | `EmptyStateAction`s shown as `TextButton`s under `action`, in order, such as "Restore from a Cycle export" and the way out ("Skip for now"). |
 
 Given a bounded height (a screen, or a box with a size) it fills it, centres its content and scrolls
 when the content is taller, as at 200% font scale, so it never clips. In a column that already
