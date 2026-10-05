@@ -17,15 +17,16 @@ internal class Converters {
     fun textToDate(text: String?): LocalDate? = text?.let(LocalDate::parse)
 
     @TypeConverter
-    fun flowToText(flow: FlowLevel?): String? = flow?.let { FLOW_TEXT.getValue(it) }
+    fun flowToText(flow: FlowLevel?): String? = flow?.let(FLOW::encode)
 
     @TypeConverter
     fun textToFlow(text: String?): FlowLevel? = text?.let { value ->
-        FLOW_TEXT.entries.first { it.value == value }.key
+        checkNotNull(FLOW.decode(value)) { "Unknown flow \"$value\"" }
     }
 
-    private companion object {
-        val FLOW_TEXT = mapOf(
+    companion object {
+        /** The text each flow is stored and exported as. Never change a code that has shipped. */
+        val FLOW = FeelingCodes.Codes(
             FlowLevel.NONE to "none",
             FlowLevel.SPOTTING to "spotting",
             FlowLevel.LIGHT to "light",

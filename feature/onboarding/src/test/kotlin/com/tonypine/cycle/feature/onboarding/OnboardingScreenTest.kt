@@ -35,11 +35,13 @@ class OnboardingScreenTest {
     private val today = LocalDate.of(2027, 3, 20)
     private val done = mutableListOf<Triple<LocalDate?, Int, Int>>()
     private var skipped = 0
+    private var restores = 0
 
     private fun show() = composeRule.setContent {
         Themed {
             OnboardingScreen(
                 today = today,
+                onRestore = { restores++ },
                 onSkip = { skipped++ },
                 onDone = { start, cycle, period -> done += Triple(start, cycle, period) }
             )
@@ -51,14 +53,16 @@ class OnboardingScreenTest {
     private fun tap(text: String) = composeRule.onNodeWithText(text).performScrollTo().performClick()
 
     @Test
-    fun `the welcome offers Get started and Skip for now`() {
+    fun `the welcome offers Get started, Restore from a Cycle export and Skip for now`() {
         show()
         composeRule.onNodeWithText("Hi! Let's get your cycle going", substring = true).assertIsDisplayed()
         composeRule.onNodeWithText("no account, no ads, no tracking", substring = true).assertIsDisplayed()
         composeRule.onNodeWithText("Get started").assertIsDisplayed()
 
+        tap("Restore from a Cycle export")
         tap("Skip for now")
 
+        assertEquals(1, restores)
         assertEquals(1, skipped)
         assertEquals(emptyList<Any>(), done)
     }

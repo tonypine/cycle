@@ -3,14 +3,83 @@
     <!-- Copy rules: docs/research/product-implications.md. SettingsStringsTest guards against the
          words the app never says. -->
 
-    <!-- The Settings tab, until MOT-40 builds the rest of it. -->
+    <!-- The Settings tab: her cycle, what to log, her data, and about. -->
     <string name="settings_title">Settings</string>
+    <string name="settings_back">Back</string>
+    <string name="settings_your_cycle">Your cycle</string>
+    <string name="settings_usual_lengths_body">%1$d-day cycle, %2$d-day period</string>
     <string name="settings_what_to_log_body">Choose what the day log asks about</string>
-    <string name="settings_more_soon">More settings are on their way.</string>
+    <string name="settings_your_data">Your data</string>
+    <string name="settings_on_this_phone_title">Everything stays on this phone</string>
+    <string name="settings_on_this_phone_body">No account, no cloud, no tracking. A copy leaves this phone only when you export one, to the place you pick, or in Android\'s backup, end-to-end encrypted with your screen lock.</string>
+    <string name="settings_export_title">Export my data</string>
+    <string name="settings_export_body">Save a file with every day you logged</string>
+    <string name="settings_last_exported">Last exported %1$s</string>
+    <string name="settings_import_title">Import from a file</string>
+    <string name="settings_import_body">Add the days from a Cycle export</string>
+    <plurals name="settings_imported">
+        <item quantity="one">Added %1$d day</item>
+        <item quantity="other">Added %1$d days</item>
+    </plurals>
+    <string name="settings_delete_title">Delete everything</string>
+    <string name="settings_delete_body">Every day you logged and every setting</string>
+    <string name="settings_about">About</string>
+    <string name="settings_notices_body">The fonts and icons Cycle uses</string>
+    <string name="settings_disclaimer">Not a contraceptive, and not a diagnosis.</string>
+    <string name="settings_version">Version %1$s</string>
+
+    <!-- Usual cycle and period: setup's second step, to change later. -->
+    <string name="usual_lengths_title">Usual cycle and period</string>
+    <string name="usual_lengths_intro">Cycle estimates from these until you have logged periods of your own.</string>
+    <string name="usual_lengths_save">Save</string>
+
+    <!-- Delete everything. -->
+    <string name="delete_everything_title">Delete everything?</string>
+    <string name="delete_everything_text">Every day you logged and all your settings go from this phone, and Cycle starts over. This can\'t be undone. To keep a copy, export your data first.</string>
+    <string name="delete_everything_confirm">Delete everything</string>
+    <string name="delete_everything_keep">Keep it</string>
+
+    <!-- Import, from Settings or the welcome's "Restore from a Cycle export". -->
+    <plurals name="import_confirm_title">
+        <item quantity="one">Import %1$d day?</item>
+        <item quantity="other">Import %1$d days?</item>
+    </plurals>
+    <string name="import_confirm_text">Days already logged on this phone stay as they are.</string>
+    <string name="import_lengths_title">Import your usual lengths?</string>
+    <string name="import_lengths_text">This file has no new days, only your usual cycle and period lengths. Cycle uses them for its estimates.</string>
+    <string name="import_confirm">Import</string>
+    <string name="import_cancel">Cancel</string>
+    <string name="import_nothing_title">Nothing new to import</string>
+    <string name="import_nothing_text">Every day in this file is already on this phone.</string>
+    <string name="import_ok">OK</string>
+    <string name="import_refused_title">This file can\'t be imported</string>
+
+    <!-- Why a file can't be imported: one sentence each, saying what is wrong. -->
+    <string name="import_problem_unreadable">Cycle couldn\'t open this file. Try picking it again.</string>
+    <string name="import_problem_not_text">This file isn\'t a Cycle export: it isn\'t text.</string>
+    <string name="import_problem_too_large">This file is too large to be a Cycle export.</string>
+    <string name="import_problem_empty">This file is empty.</string>
+    <string name="import_problem_not_an_export">This file isn\'t a Cycle export: its first line doesn\'t name the columns Cycle writes.</string>
+    <string name="import_problem_unclosed_quote">Line %1$d opens a quote that never closes.</string>
+    <plurals name="import_problem_value_count">
+        <item quantity="one">Line %2$d has %1$d value instead of %3$d.</item>
+        <item quantity="other">Line %2$d has %1$d values instead of %3$d.</item>
+    </plurals>
+    <string name="import_problem_bad_date">Line %1$d has “%2$s” as its date. Dates look like 2027-03-02.</string>
+    <string name="import_problem_repeated_date">Line %1$d is a second line for %2$s.</string>
+    <string name="import_problem_unknown_value">Line %1$d has “%2$s” in the %3$s column, which isn\'t something Cycle logs there.</string>
+    <string name="import_problem_pain_where">Line %1$d says where it hurt but not how much.</string>
+    <string name="import_problem_note_too_long">Line %1$d has a note longer than %2$d characters.</string>
+    <string name="import_problem_bad_length">Line %1$d has “%2$s” as %3$s. Cycle takes a number of days from %4$d to %5$d.</string>
+    <string name="import_problem_repeated_setting">Line %1$d is a second line for %2$s.</string>
+    <string name="import_problem_one_usual_length">This file gives only one of usual_cycle_length and usual_period_length. A Cycle export has both or neither.</string>
+
+    <!-- Export. -->
+    <string name="export_failed_title">Couldn\'t save your data</string>
+    <string name="export_failed_text">Cycle couldn\'t write to that file. Try again, or pick another place to save it.</string>
 
     <!-- What to log: a switch per day log category. Turning one off hides it, never deletes. -->
     <string name="what_to_log_title">What to log</string>
-    <string name="what_to_log_back">Back</string>
     <string name="what_to_log_intro">Turn off what you don\'t track. It disappears from the day log and from Today, and anything you already logged stays.</string>
     <string name="what_to_log_flow">Flow and spotting</string>
     <string name="what_to_log_flow_body">Always on: estimates need it</string>
@@ -28,4 +97,7 @@
     <string name="what_to_log_sex_body">Protected or unprotected. Never shown in a notification.</string>
     <string name="what_to_log_notes">Notes</string>
     <string name="what_to_log_notes_body">Anything else, kept only on this phone</string>
+
+    <!-- Open-source notices: the bundled fonts and icons, and their licences. -->
+    <string name="notices_title">Open-source notices</string>
 </resources>

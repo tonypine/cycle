@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.tonypine.cycle.core.domain.CycleRules
 import com.tonypine.cycle.core.model.CyclePrompt
@@ -17,9 +18,9 @@ import kotlinx.coroutines.flow.map
 
 /**
  * Her settings, in DataStore: the usual lengths, whether setup is done, whether she is past the
- * welcome, the prompts she has dismissed, each under the first day of its cycle, and the day log
- * categories she hid. Until she sets them, the lengths are [CycleRules.DEFAULT_CYCLE_LENGTH] and
- * [CycleRules.DEFAULT_PERIOD_LENGTH], and every category shows.
+ * welcome, the prompts she has dismissed, each under the first day of its cycle, the day log
+ * categories she hid and the day she last exported her data. Until she sets them, the lengths are
+ * [CycleRules.DEFAULT_CYCLE_LENGTH] and [CycleRules.DEFAULT_PERIOD_LENGTH], and every category shows.
  */
 class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     val settings: Flow<CycleSettings> = dataStore.data.map { preferences ->
@@ -52,6 +53,22 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
             it[USUAL_CYCLE_LENGTH] = cycleLength
             it[USUAL_PERIOD_LENGTH] = periodLength
             it[SETUP_DONE] = true
+        }
+    }
+
+    /**
+     * Setup's lengths from a Cycle export, saved as [saveSetup] does, unless she has already done
+     * setup on this phone: then her lengths stay.
+     */
+    suspend fun restoreSetup(cycleLength: Int, periodLength: Int) {
+        require(cycleLength > 0) { "A cycle lasts at least a day, got $cycleLength" }
+        require(periodLength > 0) { "A period lasts at least a day, got $periodLength" }
+        dataStore.edit {
+            if (it[SETUP_DONE] != true) {
+                it[USUAL_CYCLE_LENGTH] = cycleLength
+                it[USUAL_PERIOD_LENGTH] = periodLength
+                it[SETUP_DONE] = true
+            }
         }
     }
 
@@ -90,6 +107,19 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         }
     }
 
+    /** The day she last exported her data, or null if she never has. */
+    val lastExported: Flow<LocalDate?> =
+        dataStore.data.map { preferences -> preferences[LAST_EXPORTED]?.let(LocalDate::parse) }.distinctUntilChanged()
+
+    suspend fun setLastExported(date: LocalDate) {
+        dataStore.edit { it[LAST_EXPORTED] = date.toString() }
+    }
+
+    /** "Delete everything": every setting goes, so the app opens on the welcome with the defaults. */
+    suspend fun clear() {
+        dataStore.edit { it.clear() }
+    }
+
     private fun Set<String>?.toDates(): Set<LocalDate> = orEmpty().mapTo(mutableSetOf(), LocalDate::parse)
 
     private companion object {
@@ -97,6 +127,9 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         val USUAL_PERIOD_LENGTH = intPreferencesKey("usual_period_length")
         val SETUP_DONE = booleanPreferencesKey("setup_done")
         val WELCOME_DONE = booleanPreferencesKey("welcome_done")
+
+        // The ISO date of her last export.
+        val LAST_EXPORTED = stringPreferencesKey("last_exported")
 
         // ISO dates of the first day of each cycle whose prompt she dismissed.
         val DISMISSED_STILL_GOING = stringSetPreferencesKey("dismissed_still_going")

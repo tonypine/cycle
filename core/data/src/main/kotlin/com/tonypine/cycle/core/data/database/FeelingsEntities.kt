@@ -151,7 +151,10 @@ internal object FeelingCodes {
 
         fun decode(code: String): T? = byCode[code]
 
-        fun encodeSet(values: Set<T>): String = byValue.filterKeys { it in values }.values.joinToString(SEPARATOR)
+        fun encodeSet(values: Set<T>): String = encodeAll(values).joinToString(SEPARATOR)
+
+        /** The codes of [values], in the order the codes are listed. */
+        fun encodeAll(values: Set<T>): List<String> = byValue.filterKeys { it in values }.values.toList()
 
         fun decodeSet(text: String): Set<T> =
             text.split(SEPARATOR).mapNotNullTo(mutableSetOf()) { byCode[it] }.let { decoded ->

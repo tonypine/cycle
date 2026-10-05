@@ -43,7 +43,7 @@ class EmptyStateScreenshotTest(private val case: MatrixCase) {
             modifier = Modifier.size(width = 288.dp, height = 400.dp),
             illustration = { EmptyStateIcon(CycleIcons.WaterDrop) },
             action = EmptyStateAction("Get started", onClick = {}),
-            secondaryAction = EmptyStateAction("Skip for now", onClick = {})
+            secondaryActions = listOf(EmptyStateAction("Skip for now", onClick = {}))
         )
     }
 

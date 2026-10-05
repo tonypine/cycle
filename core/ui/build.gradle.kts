@@ -5,7 +5,7 @@ plugins {
 }
 
 // Shared app-level UI built on core:designsystem: what more than one feature shows, such as the day
-// log sheet that Today and the calendar both open.
+// log sheet that Today and the calendar both open, and the usual-length fields of setup and Settings.
 android {
     namespace = "com.tonypine.cycle.core.ui"
 }
@@ -13,4 +13,5 @@ android {
 dependencies {
     api(projects.core.designsystem)
     api(projects.core.model)
+    implementation(projects.core.domain)
 }

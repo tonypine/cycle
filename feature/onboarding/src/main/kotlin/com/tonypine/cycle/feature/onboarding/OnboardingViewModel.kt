@@ -26,10 +26,22 @@ class OnboardingViewModel(
     /**
      * True while the app should show the welcome, false once she is past it, and null until the
      * settings are read. An install that already has her logs or setup, from before the welcome
-     * existed, opens on Today.
+     * existed, opens on Today, and is marked past the welcome: "Delete everything", which clears
+     * that mark, then brings the welcome back.
      */
     val showWelcome: StateFlow<Boolean?> = settings.welcomeDone
-        .map { done -> !done && !alreadyInUse() }
+        .map { done ->
+            when {
+                done -> false
+
+                alreadyInUse() -> {
+                    settings.setWelcomeDone(true)
+                    false
+                }
+
+                else -> true
+            }
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), null)
 
     /** Her day, for setup's calendar. */
@@ -37,6 +49,9 @@ class OnboardingViewModel(
 
     /** "Skip for now": Today, on the typical lengths. */
     fun onSkip() = finish { }
+
+    /** She restored her days from a Cycle export: Today, on what she restored. */
+    fun onRestored() = finish { }
 
     /**
      * Setup's Done: her usual lengths, and the period she picked, if any, as a period of

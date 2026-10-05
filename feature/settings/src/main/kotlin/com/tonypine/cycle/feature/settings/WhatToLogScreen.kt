@@ -50,7 +50,7 @@ fun WhatToLogScreen(
     Column(modifier.fillMaxSize()) {
         TopAppBar(
             title = stringResource(R.string.what_to_log_title),
-            navigation = AppBarAction(CycleIcons.Back, stringResource(R.string.what_to_log_back), onBack)
+            navigation = AppBarAction(CycleIcons.Back, stringResource(R.string.settings_back), onBack)
         )
         when (state) {
             WhatToLogUiState.Loading -> LoadingState(Modifier.fillMaxSize())

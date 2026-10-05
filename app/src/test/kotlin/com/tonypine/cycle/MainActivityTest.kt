@@ -86,7 +86,7 @@ class MainActivityTest {
         tab("Calendar").performClick()
         tab("Calendar").assertIsSelected()
         waitForText("Predicted periods are estimates", substring = true)
-        val screens = mapOf("History" to "No cycles yet", "Settings" to "More settings are on their way.")
+        val screens = mapOf("History" to "No cycles yet", "Settings" to "Export my data")
         screens.forEach { (label, text) ->
             tab(label).performClick()
             tab(label).assertIsSelected()

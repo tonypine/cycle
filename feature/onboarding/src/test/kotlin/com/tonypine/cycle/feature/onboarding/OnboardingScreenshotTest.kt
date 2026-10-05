@@ -50,7 +50,7 @@ class OnboardingScreenshotTest(private val name: String, private val appearance:
         private val Today = LocalDate.of(2027, 3, 20)
 
         private val Screens: Map<String, @Composable () -> Unit> = mapOf(
-            "welcome" to { WelcomeStep(onGetStarted = {}, onSkip = {}) },
+            "welcome" to { WelcomeStep(onGetStarted = {}, onRestore = {}, onSkip = {}) },
             "last_period" to { lastPeriod(picked = null) },
             "last_period_picked" to { lastPeriod(picked = LocalDate.of(2027, 3, 2)) },
             "usual_lengths" to { usualLengths(cycle = "28", period = "5", showErrors = false) },

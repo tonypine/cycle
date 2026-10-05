@@ -11,6 +11,7 @@ import java.util.Locale
 /** Skeletons for [DateFormat.getBestDateTimePattern]: the locale picks the order and punctuation. */
 const val DAY_AND_MONTH = "dMMMM"
 const val DAY_AND_DATE = "EEEEdMMMM"
+const val DAY_MONTH_AND_YEAR = "dMMMMy"
 
 fun dateFormatter(locale: Locale, skeleton: String): DateTimeFormatter =
     DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, skeleton), locale)
