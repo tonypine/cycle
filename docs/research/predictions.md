@@ -90,7 +90,10 @@ and ovulation are still open.
 - **Recent cycles** are the last six complete cycles that are not excluded. Exclude cycles that span
   a pregnancy, the months after birth until three regular cycles return, or a stretch on hormonal
   contraception ([WHO FP Handbook](https://fphandbook.org/sites/default/files/Chapter_18_Eng.pdf)), and
-  ask about a cycle about twice her usual length before counting it: it may be a missed log.
+  ask about a cycle about twice her usual length before counting it: it may be a missed log. After
+  a hormonal method, natural cycles count from the first period after stopping (after the
+  injection, from the first one after the next injection would have been due); cycles with a copper
+  IUD count as usual ([`contraception.md`](contraception.md)).
 
 ### Next period
 
@@ -148,5 +151,9 @@ Her last six cycles were 26, 27, 28, 28, 29 and 31 days, and her last period sta
   the next period comes with its range.
 - **Never compute fertility on hormonal contraception, in pregnancy, or after birth until cycles
   return.** Hide those estimates in those modes rather than show meaningless ones.
+- **Never predict a period that is not one.** On a combined pill, patch or ring the bleed follows the
+  pack and is predicted as a bleed in the break; on the implant, the injection, the
+  progestogen-only pill and, by default, the hormonal IUD, bleeding follows no cycle and gets no
+  next date ([`contraception.md`](contraception.md)).
 - **Never send prediction data off the device** to improve the algorithm. Everything above runs
   locally on a few numbers ([`0001-stack.md`](../decisions/0001-stack.md)).

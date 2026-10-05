@@ -18,11 +18,10 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -43,8 +42,7 @@ import com.tonypine.cycle.core.designsystem.MonthCalendar
 import com.tonypine.cycle.core.designsystem.TextButton
 import com.tonypine.cycle.core.designsystem.TopAppBar
 import com.tonypine.cycle.core.domain.CycleRules
-import com.tonypine.cycle.core.ui.UsualLengthFields
-import com.tonypine.cycle.core.ui.checkedLengths
+import com.tonypine.cycle.core.ui.UsualLengthSliders
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -69,9 +67,10 @@ fun OnboardingRoute(viewModel: OnboardingViewModel, onRestore: () -> Unit, modif
 
 /**
  * The welcome, then "When did your last period start?" and "How long do they usually last?". What
- * she picks and types is kept through back and forth between the steps and a configuration change,
+ * she picks and sets is kept through back and forth between the steps and a configuration change,
  * and handed over only on Done: [onDone] gets the day she picked, or null for "I don't remember",
- * and her two lengths, already checked. [onRestore] is the welcome's "Restore from a Cycle export".
+ * and her two lengths, which the sliders keep within the lengths she can give. [onRestore] is the
+ * welcome's "Restore from a Cycle export".
  */
 @Composable
 fun OnboardingScreen(
@@ -84,9 +83,8 @@ fun OnboardingScreen(
     var step by rememberSaveable { mutableStateOf(OnboardingStep.Welcome) }
     var month by rememberSaveable { mutableStateOf(YearMonth.from(today)) }
     var start by rememberSaveable { mutableStateOf<LocalDate?>(null) }
-    val cycleLength = rememberTextFieldState(CycleRules.DEFAULT_CYCLE_LENGTH.toString())
-    val periodLength = rememberTextFieldState(CycleRules.DEFAULT_PERIOD_LENGTH.toString())
-    var showErrors by rememberSaveable { mutableStateOf(false) }
+    var cycleLength by rememberSaveable { mutableIntStateOf(CycleRules.DEFAULT_CYCLE_LENGTH) }
+    var periodLength by rememberSaveable { mutableIntStateOf(CycleRules.DEFAULT_PERIOD_LENGTH) }
 
     BackHandler(enabled = step != OnboardingStep.Welcome) {
         step = OnboardingStep.entries[step.ordinal - 1]
@@ -121,12 +119,10 @@ fun OnboardingScreen(
 
             OnboardingStep.UsualLengths -> UsualLengthsStep(
                 cycleLength = cycleLength,
+                onCycleLengthChange = { cycleLength = it },
                 periodLength = periodLength,
-                showErrors = showErrors,
-                onDone = {
-                    val lengths = checkedLengths(cycleLength, periodLength)
-                    if (lengths != null) onDone(start, lengths.first, lengths.second) else showErrors = true
-                },
+                onPeriodLengthChange = { periodLength = it },
+                onDone = { onDone(start, cycleLength, periodLength) },
                 onBack = { step = OnboardingStep.LastPeriod }
             )
         }
@@ -203,15 +199,13 @@ internal fun LastPeriodStep(
     }
 }
 
-/**
- * Step 2: her usual cycle and period lengths, as numbers. The errors show once she taps Done with a
- * value that does not fit, and follow what she types from then on.
- */
+/** Step 2: her usual cycle and period lengths, on a slider each, starting at 28 and 5 days. */
 @Composable
 internal fun UsualLengthsStep(
-    cycleLength: TextFieldState,
-    periodLength: TextFieldState,
-    showErrors: Boolean,
+    cycleLength: Int,
+    onCycleLengthChange: (Int) -> Unit,
+    periodLength: Int,
+    onPeriodLengthChange: (Int) -> Unit,
     onDone: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
@@ -223,7 +217,7 @@ internal fun UsualLengthsStep(
         onBack = onBack,
         modifier = modifier
     ) {
-        UsualLengthFields(cycleLength, periodLength, showErrors)
+        UsualLengthSliders(cycleLength, onCycleLengthChange, periodLength, onPeriodLengthChange)
         Actions {
             FilledButton(
                 text = stringResource(R.string.setup_done),
@@ -236,8 +230,8 @@ internal fun UsualLengthsStep(
 
 /**
  * A setup step: a bar with Back and "Step n of 2", the question as a heading, one line under it,
- * then [content]. Edge to edge, it scrolls, and pads itself above the system bars and the keyboard,
- * so a focused field and its error stay in view.
+ * then [content]. Edge to edge, it scrolls, as at 200% font scale or on a phone on its side, and pads
+ * itself above the system bars.
  */
 @Composable
 private fun SetupStep(

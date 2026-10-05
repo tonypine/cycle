@@ -22,6 +22,9 @@ enum class CycleIcons(@param:DrawableRes val drawable: Int, val symbol: String) 
     Back(R.drawable.ic_symbol_arrow_back, "arrow_back"),
     Close(R.drawable.ic_symbol_close, "close"),
     Add(R.drawable.ic_symbol_add, "add"),
+
+    /** One less, as in a slider's − button. */
+    Remove(R.drawable.ic_symbol_remove, "remove"),
     Check(R.drawable.ic_symbol_check, "check"),
 
     /** Always next to an error sentence, never on its own. */

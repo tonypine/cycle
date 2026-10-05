@@ -51,7 +51,7 @@ class CycleIconsTest(private val case: MatrixCase) {
     fun theListedSymbolsAreAllThere() {
         val symbols = CycleIcons.entries.map { it.symbol }.toSet()
         val required = setOf(
-            "arrow_back", "close", "add", "check", "error", "calendar_month", "today", "settings",
+            "arrow_back", "close", "add", "remove", "check", "error", "calendar_month", "today", "settings",
             "chevron_left", "chevron_right", "expand_less", "expand_more",
             "water_drop", "edit_note", "mood", "history", "healing", "bolt", "bedtime", "favorite", "edit",
             "tune", "smartphone", "download", "upload", "delete", "info", "lock"

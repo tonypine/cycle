@@ -20,7 +20,7 @@
     <string name="setup_next">Next</string>
     <string name="setup_dont_remember">I don\'t remember</string>
 
-    <!-- Step 2: her usual lengths, in core:ui's UsualLengthFields. -->
+    <!-- Step 2: her usual lengths, in core:ui's UsualLengthSliders. -->
     <string name="setup_lengths_title">How long do they usually last?</string>
     <string name="setup_lengths_body">Cycle estimates from these until you have logged periods of your own.</string>
     <string name="setup_done">Done</string>

@@ -50,4 +50,18 @@ class UsualLengthsViewModelTest {
         assertEquals(UsualLengthsUiState.Saved, viewModel.uiState.first { it == UsualLengthsUiState.Saved })
         assertEquals(CycleSettings(30, 4, setupDone = true), settings.settings.first())
     }
+
+    @Test
+    fun `a saved length the sliders do not offer starts at the nearest end`() = runTest {
+        val settings = SettingsRepository(
+            PreferenceDataStoreFactory.create(scope = backgroundScope) { File(folder.root, "test.preferences_pb") }
+        )
+        settings.saveSetup(cycleLength = 120, periodLength = 20)
+        val viewModel = UsualLengthsViewModel(settings)
+
+        assertEquals(
+            UsualLengthsUiState.Editing(90, 14),
+            viewModel.uiState.first { it is UsualLengthsUiState.Editing }
+        )
+    }
 }
