@@ -9,5 +9,4 @@
     <string name="tab_settings">Settings</string>
 
     <!-- A tab whose screen has not landed yet. -->
-    <string name="placeholder_body">This part of Cycle is on its way.</string>
 </resources>

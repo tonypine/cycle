@@ -1,10 +1,21 @@
 package com.tonypine.cycle.feature.today
 
+import com.tonypine.cycle.core.model.BodySymptom
 import com.tonypine.cycle.core.model.CyclePrompt
+import com.tonypine.cycle.core.model.DayFeelings
+import com.tonypine.cycle.core.model.EnergyLevel
 import com.tonypine.cycle.core.model.EstimateBasis
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.Mood
+import com.tonypine.cycle.core.model.Pain
+import com.tonypine.cycle.core.model.PainKind
+import com.tonypine.cycle.core.model.PainLevel
 import com.tonypine.cycle.core.model.Period
+import com.tonypine.cycle.core.model.SleepQuality
+import com.tonypine.cycle.core.ui.CalendarDays
+import com.tonypine.cycle.core.ui.DayLogEntry
 import java.time.LocalDate
+import java.time.YearMonth
 
 /**
  * One synthetic Today per state, for previews and screenshots. Made-up dates in 2027, never anyone's
@@ -103,6 +114,41 @@ internal object TodaySamples {
         )
     )
 
+    /** Day 51 of a cycle that usually lasts 28 days: did she miss logging a period in February? */
+    val missedPeriod = tracking(
+        cycleDay = 51,
+        phase = TodayPhase.Late(daysLate = 22),
+        periods = listOf(period("2027-01-01", "2027-01-05"), period("2027-01-29", "2027-02-02")),
+        next = next(
+            "2027-03-20",
+            "2027-03-20",
+            "2027-03-20",
+            lastStart = "2027-01-29",
+            basis = EstimateBasis.Logged(1),
+            daysLate = 22
+        ),
+        missedPeriod = MissedPeriod(
+            CyclePrompt.MissedPeriod(LocalDate.parse("2027-01-29"), cycleDay = 51),
+            likelyMonth = YearMonth.of(2027, 2)
+        )
+    )
+
+    /** Day 19, after logging how she feels: the walkthrough's day, with a synthetic note. */
+    val loggedToday = midCycle.copy(
+        todayLog = midCycle.todayLog.copy(
+            canClear = true,
+            feelings = DayFeelings(
+                date = today,
+                pain = Pain(PainLevel.MODERATE, setOf(PainKind.CRAMPS)),
+                body = setOf(BodySymptom.BLOATING),
+                moods = setOf(Mood.IRRITABLE),
+                energy = EnergyLevel.LOW,
+                sleep = SleepQuality.BADLY,
+                note = "A synthetic note."
+            )
+        )
+    )
+
     /** Every state, by name, in the order the screenshots list them. */
     val all: Map<String, TodayUiState> = linkedMapOf(
         "empty" to empty,
@@ -112,7 +158,9 @@ internal object TodaySamples {
         "on_period" to onPeriod,
         "period_ended" to periodEnded,
         "late" to late,
-        "still_going" to stillGoing
+        "still_going" to stillGoing,
+        "missed_period" to missedPeriod,
+        "logged_today" to loggedToday
     )
 
     private fun tracking(
@@ -121,21 +169,33 @@ internal object TodaySamples {
         periods: List<Period>,
         next: NextPeriod,
         todayFlow: FlowLevel? = null,
-        stillGoing: StillGoing? = null
-    ) = TodayUiState.Tracking(
-        today = today,
-        cycleDay = cycleDay,
-        phase = phase,
-        todayFlow = todayFlow,
-        periods = periods,
-        // The next three, a usual cycle apart, five days each.
-        predicted = (0L until 3L).map { ahead ->
-            val start = next.expectedStart.plusDays(ahead * next.cycleLength)
-            start..start.plusDays(4)
-        },
-        nextPeriod = next,
-        stillGoing = stillGoing
-    )
+        stillGoing: StillGoing? = null,
+        missedPeriod: MissedPeriod? = null
+    ): TodayUiState.Tracking {
+        val days = CalendarDays(
+            periods = periods,
+            // The next three, a usual cycle apart, five days each.
+            predicted = (0L until 3L).map { ahead ->
+                val start = next.expectedStart.plusDays(ahead * next.cycleLength)
+                start..start.plusDays(4)
+            }
+        )
+        return TodayUiState.Tracking(
+            today = today,
+            cycleDay = cycleDay,
+            phase = phase,
+            days = days,
+            todayLog = DayLogEntry(
+                date = today,
+                flow = todayFlow,
+                canClear = days.isPeriodDay(today) || todayFlow != null,
+                isPeriodDay = days.isPeriodDay(today)
+            ),
+            nextPeriod = next,
+            stillGoing = stillGoing,
+            missedPeriod = missedPeriod
+        )
+    }
 
     private fun period(start: String, end: String, open: Boolean = false) =
         Period(LocalDate.parse(start), LocalDate.parse(end), isOpen = open)

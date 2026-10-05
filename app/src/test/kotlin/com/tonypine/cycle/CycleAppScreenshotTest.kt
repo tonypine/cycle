@@ -17,8 +17,9 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * The app shell with no data: Today's empty state and a placeholder tab, the navigation bar under
- * each, in light and dark. Records `src/test/screenshots/app_<tab>_<appearance>.png`.
+ * The app with no data: the welcome, then, after Skip, Today's empty state, an empty calendar and
+ * History's empty state, the navigation bar under each, in light and dark. Records
+ * `src/test/screenshots/app_<screen>_<appearance>.png`.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -41,12 +42,27 @@ class CycleAppScreenshotTest {
             }
         }
         composeRule.waitUntil(5_000) {
+            composeRule.onAllNodes(hasText("Skip for now")).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onRoot().captureRoboImage("src/test/screenshots/app_welcome_$appearance.png")
+
+        composeRule.onNodeWithText("Skip for now").performClick()
+        composeRule.waitUntil(5_000) {
             composeRule.onAllNodes(hasText("No periods logged yet")).fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.onRoot().captureRoboImage("src/test/screenshots/app_today_$appearance.png")
 
         composeRule.onNodeWithText("Calendar").performClick()
-        composeRule.waitForIdle()
+        // The log loads on Room's and DataStore's threads.
+        composeRule.waitUntil(5_000) {
+            composeRule.onAllNodes(hasText("March 2027")).fetchSemanticsNodes().isNotEmpty()
+        }
         composeRule.onRoot().captureRoboImage("src/test/screenshots/app_calendar_$appearance.png")
+
+        composeRule.onNodeWithText("History").performClick()
+        composeRule.waitUntil(5_000) {
+            composeRule.onAllNodes(hasText("No cycles yet")).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onRoot().captureRoboImage("src/test/screenshots/app_history_$appearance.png")
     }
 }

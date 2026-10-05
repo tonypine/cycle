@@ -23,7 +23,7 @@ class CycleData(context: Context) {
         )
     }
 
-    val dayLogRepository: DayLogRepository by lazy { DayLogRepository(database.dayLogDao()) }
+    val dayLogRepository: DayLogRepository by lazy { DayLogRepository(database) }
 
     val cycleRepository: CycleRepository by lazy { CycleRepository(dayLogRepository, settingsRepository) }
 

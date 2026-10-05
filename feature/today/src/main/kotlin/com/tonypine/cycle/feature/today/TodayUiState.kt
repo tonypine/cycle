@@ -1,14 +1,15 @@
 package com.tonypine.cycle.feature.today
 
+import com.tonypine.cycle.core.data.repository.LogOverview
 import com.tonypine.cycle.core.designsystem.CycleDayState
-import com.tonypine.cycle.core.model.CycleOverview
 import com.tonypine.cycle.core.model.CyclePrompt
 import com.tonypine.cycle.core.model.CycleSettings
-import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.EstimateBasis
-import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.model.Period
+import com.tonypine.cycle.core.ui.CalendarDays
+import com.tonypine.cycle.core.ui.DayLogEntry
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 
 /** What Today shows. Built from her overview by [TodayUiState.from]; the screen draws it as is. */
@@ -25,28 +26,28 @@ sealed interface TodayUiState {
      * @property cycleDay her cycle day today: "Day 19".
      * @property phase where she is in her cycle, which picks the context line, the cards and the
      *   main button.
-     * @property todayFlow the flow she logged today, for the day log sheet.
-     * @property periods her logged periods, for the day cells.
-     * @property predicted the estimated periods, first to last day each, for the day cells.
+     * @property days her logged and estimated periods, for the day cells.
+     * @property todayLog what the day log sheet shows for today.
      * @property nextPeriod the next period card.
      * @property stillGoing the "still going?" question, while it is asked.
+     * @property missedPeriod the "missed a period?" question, while it is asked.
      */
     data class Tracking(
         val today: LocalDate,
         val cycleDay: Int,
         val phase: TodayPhase,
-        val todayFlow: FlowLevel?,
-        val periods: List<Period>,
-        val predicted: List<ClosedRange<LocalDate>>,
+        val days: CalendarDays,
+        val todayLog: DayLogEntry,
         val nextPeriod: NextPeriod,
-        val stillGoing: StillGoing?
+        val stillGoing: StillGoing? = null,
+        val missedPeriod: MissedPeriod? = null
     ) : TodayUiState {
+        /** Her logged periods. */
+        val periods: List<Period>
+            get() = days.periods
+
         /** The day cell state of [date]: a logged period wins over a predicted one. */
-        fun dayState(date: LocalDate): CycleDayState = when {
-            periods.any { date in it.start..it.end } -> CycleDayState.Period
-            predicted.any { date in it } -> CycleDayState.PredictedPeriod
-            else -> CycleDayState.Plain
-        }
+        fun dayState(date: LocalDate): CycleDayState = days.stateOf(date)
 
         /** She is on her period today, including the day it ended. */
         val onPeriod: Boolean
@@ -56,9 +57,11 @@ sealed interface TodayUiState {
     }
 
     companion object {
-        /** Today's state from her [overview], her [settings] and what she logged [today][todayLog]. */
-        fun from(overview: CycleOverview, settings: CycleSettings, todayLog: DayLog): TodayUiState {
+        /** Today's state from her [log] on that day and her [settings]. */
+        fun from(log: LogOverview, settings: CycleSettings): TodayUiState {
+            val overview = log.overview
             val today = overview.today
+            val todayLog = log.log(today)
             val last = overview.periods.lastOrNull()
             val estimate = overview.estimate
             val cycleDay = overview.cycleDay
@@ -78,28 +81,44 @@ sealed interface TodayUiState {
                 overview.prompts.filterIsInstance<CyclePrompt.StillGoing>().firstOrNull()
                     ?.let { StillGoing(it, period.start..today) }
             }
+            // Late moves the expected start to today; the period was due that many days before.
+            val due = next.expectedStart.minusDays(estimate.daysLate.toLong())
+            val missedPeriod = overview.prompts.filterIsInstance<CyclePrompt.MissedPeriod>().firstOrNull()
+                ?.let { MissedPeriod(it, likelyMonth = YearMonth.from(due)) }
+            val days = CalendarDays.from(overview, log.logs)
             return Tracking(
                 today = today,
                 cycleDay = cycleDay,
                 phase = phase,
-                todayFlow = todayLog.flow,
-                periods = overview.periods,
-                predicted = estimate.periods.map { it.expectedStart..it.expectedEnd },
+                days = days,
+                todayLog = log.entry(today, days),
                 nextPeriod = NextPeriod(
                     expectedStart = next.expectedStart,
                     earliestStart = next.earliestStart,
                     latestStart = next.latestStart,
                     lastStart = last.start,
-                    // Late moves the expected start to today; her cycle length is the day it was due.
-                    cycleLength = daysBetween(last.start, next.expectedStart) - estimate.daysLate,
+                    // Her cycle length is the day it was due.
+                    cycleLength = daysBetween(last.start, due),
                     daysLate = estimate.daysLate,
                     basis = estimate.cycleBasis
                 ),
-                stillGoing = stillGoing
+                stillGoing = stillGoing,
+                missedPeriod = missedPeriod
             )
         }
     }
 }
+
+/** What the day log sheet offers on [date], given the [days] as they draw. */
+internal fun LogOverview.entry(date: LocalDate, days: CalendarDays): DayLogEntry = DayLogEntry(
+    date = date,
+    flow = log(date).flow,
+    fillDays = usualPeriodLength.takeIf { canFill(date) },
+    canClear = canClear(date),
+    isPeriodDay = days.isPeriodDay(date),
+    feelings = feelings(date),
+    hiddenCategories = hiddenCategories
+)
 
 /** Where she is in her cycle today. */
 sealed interface TodayPhase {
@@ -141,5 +160,11 @@ data class NextPeriod(
 
 /** "Still going?": her open period has lasted longer than usual. [days] are its days so far. */
 data class StillGoing(val prompt: CyclePrompt.StillGoing, val days: ClosedRange<LocalDate>)
+
+/**
+ * "Missed a period?": her cycle has run far longer than usual. "Add a past period" opens the
+ * calendar on [likelyMonth], the month her next period was due in.
+ */
+data class MissedPeriod(val prompt: CyclePrompt.MissedPeriod, val likelyMonth: YearMonth)
 
 internal fun daysBetween(from: LocalDate, to: LocalDate): Int = ChronoUnit.DAYS.between(from, to).toInt()

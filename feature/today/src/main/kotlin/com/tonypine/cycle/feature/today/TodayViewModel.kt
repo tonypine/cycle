@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
+import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.FlowLevel
 import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,9 +35,7 @@ class TodayViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<TodayUiState> = day
         .flatMapLatest { day ->
-            combine(cycles.observeDay(day), settings.settings) { dayOverview, settings ->
-                TodayUiState.from(dayOverview.overview, settings, dayOverview.log)
-            }
+            combine(cycles.observeLog(day), settings.settings) { log, settings -> TodayUiState.from(log, settings) }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), TodayUiState.Loading)
 
@@ -60,16 +59,30 @@ class TodayViewModel(
      * when that is over before today, its last day is marked ended; otherwise it is still going.
      */
     fun onLogPeriod(start: LocalDate) = write {
-        val today = day.value
-        if (start > today) return@write
-        val end = start.plusDays(settings.settings.first().usualPeriodLength - 1L)
-        // The end first: alone it is ignored, so Today never shows the period open in between.
-        if (end < today) dayLogs.setPeriodEnded(end, ended = true)
-        dayLogs.setPeriodStarted(start, started = true)
+        dayLogs.logPeriod(start, settings.settings.first().usualPeriodLength, day.value)
     }
 
-    /** The flow she picked in the day log sheet for today, or null to clear it. */
-    fun onFlowChange(flow: FlowLevel?) = write { dayLogs.setFlow(day.value, flow) }
+    /** "Log it" in the day log sheet: the flow she picked for [date] (null for none) and how she felt. */
+    fun onLogDay(date: LocalDate, flow: FlowLevel?, feelings: DayFeelings) = write {
+        if (date <= day.value) dayLogs.logDay(date, flow, feelings)
+    }
+
+    /** "Period started this day: fill in N days" on [start], N being her usual period length. */
+    fun onFillPeriod(start: LocalDate) = write {
+        val today = day.value
+        if (start > today) return@write
+        dayLogs.fillPeriod(start, cycles.observeLog(today).first().usualPeriodLength, today)
+    }
+
+    /** "Clear this day" on [date]: what she logged in the categories she hid stays. */
+    fun onClearDay(date: LocalDate) = write {
+        if (date <= day.value) dayLogs.clearDay(date, day.value, settings.settings.first().hiddenCategories)
+    }
+
+    /** "No, I didn't miss one": not asked again in this cycle. */
+    fun onNoMissedPeriod() = write {
+        (uiState.value as? TodayUiState.Tracking)?.missedPeriod?.let { settings.dismiss(it.prompt) }
+    }
 
     /** "Still going": not asked again for this period. */
     fun onStillGoing() = write { stillGoing()?.let { settings.dismiss(it.prompt) } }

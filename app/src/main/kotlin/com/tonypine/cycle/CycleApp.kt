@@ -4,12 +4,21 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -17,15 +26,28 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.tonypine.cycle.core.data.CycleData
 import com.tonypine.cycle.core.designsystem.CycleIcons
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.NavigationBar
 import com.tonypine.cycle.core.designsystem.NavigationDestination
+import com.tonypine.cycle.feature.calendar.CalendarRoute
+import com.tonypine.cycle.feature.calendar.CalendarViewModel
+import com.tonypine.cycle.feature.history.CycleDetailRoute
+import com.tonypine.cycle.feature.history.CycleDetailViewModel
+import com.tonypine.cycle.feature.history.HistoryRoute
+import com.tonypine.cycle.feature.history.HistoryViewModel
+import com.tonypine.cycle.feature.onboarding.OnboardingRoute
+import com.tonypine.cycle.feature.onboarding.OnboardingViewModel
+import com.tonypine.cycle.feature.settings.SettingsScreen
+import com.tonypine.cycle.feature.settings.WhatToLogRoute
+import com.tonypine.cycle.feature.settings.WhatToLogViewModel
 import com.tonypine.cycle.feature.today.TodayRoute
 import com.tonypine.cycle.feature.today.TodayViewModel
 import java.time.LocalDate
+import java.time.YearMonth
 
 /** The four tabs, in the navigation bar's order. The app starts on [Today]. */
 enum class TopLevelDestination(val route: String, @param:StringRes val label: Int, val icon: CycleIcons) {
@@ -36,8 +58,12 @@ enum class TopLevelDestination(val route: String, @param:StringRes val label: In
 }
 
 /**
- * The app: one screen per tab above the navigation bar. Each tab keeps its state when she leaves it,
- * and back from any tab returns to Today, then leaves the app.
+ * The app: the welcome and setup on the first launch, then one screen per tab above the navigation
+ * bar. Nothing shows until the settings are read, so the welcome never flashes on her way to Today.
+ *
+ * The app draws edge to edge. Every screen pads its content below the status bar, but a screen
+ * scrolls under it, so a `surface` strip covers the status bar on every screen: nothing scrolls
+ * under the clock and system icons. Sheets and dialogs open in their own windows, above it.
  *
  * @param today her day, from the phone's clock in its current zone.
  */
@@ -48,14 +74,42 @@ fun CycleApp(
     today: () -> LocalDate = LocalDate::now,
     navController: NavHostController = rememberNavController()
 ) {
+    val onboarding = viewModel { OnboardingViewModel(data.settingsRepository, data.dayLogRepository, today) }
+    val showWelcome by onboarding.showWelcome.collectAsStateWithLifecycle()
+    Box(modifier.fillMaxSize().background(CycleTheme.colors.surface)) {
+        when (showWelcome) {
+            null -> Unit
+            true -> OnboardingRoute(onboarding)
+            false -> CycleTabs(data, today, navController)
+        }
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .windowInsetsTopHeight(WindowInsets.safeDrawing)
+                .background(CycleTheme.colors.surface)
+        )
+    }
+}
+
+/**
+ * One screen per tab above the navigation bar. Each tab keeps its state when she leaves it, and back
+ * from any tab returns to Today, then leaves the app. Today's "missed a period?" card opens the
+ * calendar on the month the period was likely in, and a cycle's "See it in the calendar" on the
+ * month it started. Settings opens What to log inside its tab.
+ */
+@Composable
+private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: NavHostController) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val current = backStackEntry?.destination
     val selected = TopLevelDestination.entries
         .indexOfFirst { destination -> current?.hierarchy?.any { it.route == destination.route } == true }
         .coerceAtLeast(0)
     val motion = CycleTheme.motion
+    // The month Today's "Add a past period" or a cycle's "See it in the calendar" asks the calendar to
+    // open on, until it has.
+    var calendarMonth by rememberSaveable { mutableStateOf<YearMonth?>(null) }
 
-    Column(modifier.fillMaxSize().background(CycleTheme.colors.surface)) {
+    Column(Modifier.fillMaxSize()) {
         NavHost(
             navController = navController,
             startDestination = TopLevelDestination.Today.route,
@@ -67,12 +121,50 @@ fun CycleApp(
                 TodayRoute(
                     viewModel {
                         TodayViewModel(data.cycleRepository, data.dayLogRepository, data.settingsRepository, today)
+                    },
+                    onAddPastPeriod = { month ->
+                        calendarMonth = month
+                        navController.navigateToTab(TopLevelDestination.Calendar)
                     }
                 )
             }
-            composable(TopLevelDestination.Calendar.route) { PlaceholderScreen(TopLevelDestination.Calendar) }
-            composable(TopLevelDestination.History.route) { PlaceholderScreen(TopLevelDestination.History) }
-            composable(TopLevelDestination.Settings.route) { PlaceholderScreen(TopLevelDestination.Settings) }
+            composable(TopLevelDestination.Calendar.route) {
+                CalendarRoute(
+                    viewModel { CalendarViewModel(data.cycleRepository, data.dayLogRepository, today) },
+                    requestedMonth = calendarMonth,
+                    onMonthShown = { calendarMonth = null }
+                )
+            }
+            navigation(startDestination = HISTORY_LIST_ROUTE, route = TopLevelDestination.History.route) {
+                composable(HISTORY_LIST_ROUTE) {
+                    HistoryRoute(
+                        viewModel { HistoryViewModel(data.cycleRepository, today) },
+                        onCycleClick = { start -> navController.navigate("$HISTORY_CYCLE_PREFIX$start") }
+                    )
+                }
+                composable(HISTORY_CYCLE_ROUTE) { entry ->
+                    val start = LocalDate.parse(entry.arguments?.getString(START_ARG))
+                    CycleDetailRoute(
+                        viewModel { CycleDetailViewModel(data.cycleRepository, start, today) },
+                        onBack = { navController.popBackStack() },
+                        onSeeInCalendar = { month ->
+                            calendarMonth = month
+                            navController.navigateToTab(TopLevelDestination.Calendar)
+                        }
+                    )
+                }
+            }
+            navigation(startDestination = SETTINGS_HOME_ROUTE, route = TopLevelDestination.Settings.route) {
+                composable(SETTINGS_HOME_ROUTE) {
+                    SettingsScreen(onWhatToLog = { navController.navigate(WHAT_TO_LOG_ROUTE) })
+                }
+                composable(WHAT_TO_LOG_ROUTE) {
+                    WhatToLogRoute(
+                        viewModel { WhatToLogViewModel(data.settingsRepository) },
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+            }
         }
         NavigationBar(
             destinations = TopLevelDestination.entries.map { NavigationDestination(stringResource(it.label), it.icon) },
@@ -82,6 +174,10 @@ fun CycleApp(
     }
 }
 
+// The screens inside the Settings tab.
+private const val SETTINGS_HOME_ROUTE = "settings/home"
+private const val WHAT_TO_LOG_ROUTE = "settings/what_to_log"
+
 /** Opens [destination] with Today under it, so back returns to Today; each tab keeps its state. */
 private fun NavHostController.navigateToTab(destination: TopLevelDestination) {
     navigate(destination.route) {
@@ -90,3 +186,10 @@ private fun NavHostController.navigateToTab(destination: TopLevelDestination) {
         restoreState = true
     }
 }
+
+private const val HISTORY_LIST_ROUTE = "history/cycles"
+private const val START_ARG = "start"
+
+/** A cycle's details, by the day it started, as `2027-08-05`. */
+private const val HISTORY_CYCLE_PREFIX = "history/cycle/"
+private const val HISTORY_CYCLE_ROUTE = "$HISTORY_CYCLE_PREFIX{$START_ARG}"

@@ -142,9 +142,9 @@ next planning ticket.
 
 ## Effects on what already exists
 
-- The `CycleLegend` labels ovulation and the fertile window without saying they are estimates. When
-  fertility estimates ship, the legend and the day cell's TalkBack descriptions should say
-  "estimated" ([MOT-29](https://linear.app/tonypine/issue/MOT-29)).
+- The `CycleLegend` labels ("Estimated fertile window", "Estimated ovulation") and the day cell's
+  TalkBack descriptions ("18 March, estimated ovulation") say ovulation and the fertile window are
+  estimates ([MOT-29](https://linear.app/tonypine/issue/MOT-29)).
 - The `Predicted period` day state (dashed edge on a pale fill) already reads as uncertain; the range
   of a predicted period could use the same treatment, with the most likely start emphasised.
 - Backups to Google Drive carry the database and settings only when end-to-end encrypted with the

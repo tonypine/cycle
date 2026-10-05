@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Copy rules: docs/research/product-implications.md. SettingsStringsTest guards against the
+         words the app never says. -->
+
+    <!-- The Settings tab, until MOT-40 builds the rest of it. -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_what_to_log_body">Choose what the day log asks about</string>
+    <string name="settings_more_soon">More settings are on their way.</string>
+
+    <!-- What to log: a switch per day log category. Turning one off hides it, never deletes. -->
+    <string name="what_to_log_title">What to log</string>
+    <string name="what_to_log_back">Back</string>
+    <string name="what_to_log_intro">Turn off what you don\'t track. It disappears from the day log and from Today, and anything you already logged stays.</string>
+    <string name="what_to_log_flow">Flow and spotting</string>
+    <string name="what_to_log_flow_body">Always on: estimates need it</string>
+    <string name="what_to_log_pain">Pain</string>
+    <string name="what_to_log_pain_body">How much it hurts, and where</string>
+    <string name="what_to_log_body">Body</string>
+    <string name="what_to_log_body_body">Bloating, cravings, hot flushes and more</string>
+    <string name="what_to_log_mood">Mood</string>
+    <string name="what_to_log_mood_body">Calm, anxious, irritable and more</string>
+    <string name="what_to_log_energy">Energy</string>
+    <string name="what_to_log_energy_body">Low, normal or high</string>
+    <string name="what_to_log_sleep">Sleep</string>
+    <string name="what_to_log_sleep_body">Slept well or badly</string>
+    <string name="what_to_log_sex">Sex</string>
+    <string name="what_to_log_sex_body">Protected or unprotected. Never shown in a notification.</string>
+    <string name="what_to_log_notes">Notes</string>
+    <string name="what_to_log_notes_body">Anything else, kept only on this phone</string>
+</resources>

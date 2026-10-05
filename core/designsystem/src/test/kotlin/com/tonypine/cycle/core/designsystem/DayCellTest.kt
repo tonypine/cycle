@@ -62,8 +62,8 @@ class DayCellTest {
             CycleDayState.Plain to "20 March",
             CycleDayState.Period to "20 March, period",
             CycleDayState.PredictedPeriod to "20 March, predicted period",
-            CycleDayState.Fertile to "20 March, fertile window",
-            CycleDayState.Ovulation to "20 March, ovulation"
+            CycleDayState.Fertile to "20 March, estimated fertile window",
+            CycleDayState.Ovulation to "20 March, estimated ovulation"
         )
         composeRule.setContent {
             CycleTheme(darkTheme = false) {

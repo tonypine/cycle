@@ -340,8 +340,9 @@ starts as a period day shows the squircle straight away.
 The cell is at least 48dp square and grows with large text, so the shape always holds the number (58dp
 at 200%). Its geometry scales with the cell's smaller side. It is a `Role.Button` whose content
 description is the date in the locale's day-and-month form, then "today" and the state: "20 March,
-today, period", "14 March, predicted period". The visible number is hidden from TalkBack, so it is
-not read twice. The words live in `core:designsystem`'s `strings.xml`.
+today, period", "14 March, predicted period", "17 March, estimated ovulation". Ovulation and the
+fertile window are estimates from period dates, so they always say "estimated". The visible number is
+hidden from TalkBack, so it is not read twice. The words live in `core:designsystem`'s `strings.xml`.
 
 Do not use it for a date picker that has no cycle meaning, and do not tint a cell with other colours:
 a new cycle state needs a new `CycleDayState` with its own shape.
@@ -400,7 +401,8 @@ today"). Each weekday initial reads as the day's full name ("Monday").
 
 `CycleLegend(entries = CycleLegendEntry.entries)` is the calendar's key: one swatch per entry
 (`Period`, `PredictedPeriod`, `Fertile`, `Ovulation`, `Today`), each drawn by the same code as the
-cells at 32dp, with its label in `bodySmall` `onSurfaceVariant`. Show only the entries the calendar
+cells at 32dp, with its label in `bodySmall` `onSurfaceVariant`: "Period", "Predicted period",
+"Estimated fertile window", "Estimated ovulation", "Today". Show only the entries the calendar
 above it can draw: `CycleLegendEntry.WithoutFertility` (period, predicted period, today) while
 fertility estimates are off, as in the MVP. The default is all five. It is a `FlowRow`, so the entries
 wrap when the text is large, and it exposes `CollectionInfo` with one `CollectionItemInfo` per entry,
@@ -435,7 +437,7 @@ button, so TalkBack could not reach the inner control. Use a `Card` with the con
 ## Empty state
 
 `EmptyState.kt`. What a screen or list shows when it has nothing yet: an illustration, a title, one
-sentence of body and an optional action, centred one above the other.
+sentence of body and up to two actions, centred one above the other.
 
 ```kotlin
 EmptyState(
@@ -453,11 +455,12 @@ EmptyState(
 | `body` | One sentence in `body` `onSurfaceVariant`: what will appear here, or how to start. |
 | `illustration` | Any composable above the title. `EmptyStateIcon(icon)` draws the icon at 48dp in `onAccentContainer` in a 96dp `accentContainer` circle. It is decoration and is not read. |
 | `action` | `EmptyStateAction(label, onClick, icon = null)`, shown as a `FilledButton`. Leave it out when there is nothing to do yet. |
+| `secondaryAction` | An `EmptyStateAction` shown as a `TextButton` under `action`, for the way out ("Skip for now"). |
 
 Given a bounded height (a screen, or a box with a size) it fills it, centres its content and scrolls
 when the content is taller, as at 200% font scale, so it never clips. In a column that already
 scrolls, it takes its content's height and leaves scrolling to the column. TalkBack reads the
-illustration, title and body as one item marked as a heading, then the action as a button.
+illustration, title and body as one item marked as a heading, then the actions as buttons.
 
 Don't use it for an error (say what went wrong and how to fix it, next to where it happened), or
 while content is loading (use `LoadingState`).

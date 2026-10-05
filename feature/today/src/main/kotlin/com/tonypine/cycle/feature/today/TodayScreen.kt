@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
@@ -42,14 +41,25 @@ import com.tonypine.cycle.core.designsystem.TextButton
 import com.tonypine.cycle.core.designsystem.TonalButton
 import com.tonypine.cycle.core.designsystem.WeekRow
 import com.tonypine.cycle.core.designsystem.rememberCycleBottomSheetState
+import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.EstimateBasis
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.ui.DAY_AND_DATE
+import com.tonypine.cycle.core.ui.DayLogEntry
+import com.tonypine.cycle.core.ui.DayLogSheet
+import com.tonypine.cycle.core.ui.daySummary
+import com.tonypine.cycle.core.ui.formatDate
+import com.tonypine.cycle.core.ui.summaryLine
 import java.time.LocalDate
+import java.time.YearMonth
 import kotlinx.coroutines.launch
 
-/** Today, wired to its [viewModel]. The day is read again whenever the screen resumes. */
+/**
+ * Today, wired to its [viewModel]. The day is read again whenever the screen resumes.
+ * [onAddPastPeriod] opens the calendar on a month, from the "missed a period?" card.
+ */
 @Composable
-fun TodayRoute(viewModel: TodayViewModel, modifier: Modifier = Modifier) {
+fun TodayRoute(viewModel: TodayViewModel, modifier: Modifier = Modifier, onAddPastPeriod: (YearMonth) -> Unit = {}) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LifecycleResumeEffect(viewModel) {
         viewModel.refreshDay()
@@ -64,9 +74,13 @@ fun TodayRoute(viewModel: TodayViewModel, modifier: Modifier = Modifier) {
                 onPeriodEnded = viewModel::onPeriodEnded,
                 onUndoPeriodEnded = viewModel::onUndoPeriodEnded,
                 onLogPeriod = viewModel::onLogPeriod,
-                onFlowChange = viewModel::onFlowChange,
+                onLogDay = viewModel::onLogDay,
+                onFillPeriod = viewModel::onFillPeriod,
+                onClearDay = viewModel::onClearDay,
                 onStillGoing = viewModel::onStillGoing,
-                onEndedOn = viewModel::onEndedOn
+                onEndedOn = viewModel::onEndedOn,
+                onAddPastPeriod = onAddPastPeriod,
+                onNoMissedPeriod = viewModel::onNoMissedPeriod
             )
         },
         modifier = modifier
@@ -80,14 +94,18 @@ class TodayActions(
     val onPeriodEnded: () -> Unit = {},
     val onUndoPeriodEnded: () -> Unit = {},
     val onLogPeriod: (start: LocalDate) -> Unit = {},
-    val onFlowChange: (FlowLevel?) -> Unit = {},
+    val onLogDay: (date: LocalDate, flow: FlowLevel?, feelings: DayFeelings) -> Unit = { _, _, _ -> },
+    val onFillPeriod: (start: LocalDate) -> Unit = {},
+    val onClearDay: (date: LocalDate) -> Unit = {},
     val onStillGoing: () -> Unit = {},
-    val onEndedOn: (lastDay: LocalDate) -> Unit = {}
+    val onEndedOn: (lastDay: LocalDate) -> Unit = {},
+    val onAddPastPeriod: (month: YearMonth) -> Unit = {},
+    val onNoMissedPeriod: () -> Unit = {}
 )
 
 /**
- * Today: the day and date, her cycle day, a line of context, this week, the one-tap period buttons
- * and the next period estimate. Scrolls when the text is large, so nothing clips at 200%.
+ * Today: the day and date, her cycle day, a line of context, this week, the one-tap period buttons,
+ * what she logged today and the next period estimate. Scrolls when the text is large, so nothing clips at 200%.
  */
 @Composable
 fun TodayScreen(state: TodayUiState, actions: TodayActions, modifier: Modifier = Modifier) {
@@ -147,11 +165,14 @@ private fun TrackingToday(state: TodayUiState.Tracking, actions: TodayActions, m
         )
         StatusCard(state, actions, onEndedEarlier = { scope.launch { lastDaySheet.show() } }, modifier = margin)
         Actions(state, actions, onLog = { scope.launch { dayLogSheet.show() } }, modifier = margin)
+        if (state.todayLog.isLogged) {
+            LoggedTodayCard(state.todayLog, onEdit = { scope.launch { dayLogSheet.show() } }, modifier = margin)
+        }
         NextPeriodCard(state.nextPeriod, onExplain = { scope.launch { estimateSheet.show() } }, modifier = margin)
     }
 
     EstimateSheet(estimateSheet, state.nextPeriod)
-    DayLogSheet(dayLogSheet, state.todayFlow, actions.onFlowChange)
+    DayLogSheet(dayLogSheet, state.todayLog, actions.onLogDay, actions.onFillPeriod, actions.onClearDay)
     state.stillGoing?.let { LastDaySheet(lastDaySheet, state.today, it, actions.onEndedOn) }
 }
 
@@ -189,7 +210,10 @@ private fun contextLine(phase: TodayPhase): String = when (phase) {
     is TodayPhase.PeriodEndedToday -> pluralStringResource(R.plurals.today_context_ended, phase.length, phase.length)
 }
 
-/** The card under the week: Undo after a one-tap log, the calm late card, or "Still going?". */
+/**
+ * The card under the week: "Missed a period?", "Still going?", Undo after a one-tap log, or the calm
+ * late card.
+ */
 @Composable
 private fun StatusCard(
     state: TodayUiState.Tracking,
@@ -198,7 +222,21 @@ private fun StatusCard(
     modifier: Modifier
 ) {
     val stillGoing = state.stillGoing
+    val missedPeriod = state.missedPeriod
     when {
+        missedPeriod != null -> Card(modifier.fillMaxWidth()) {
+            CardTitle(stringResource(R.string.today_missed_title))
+            CardBody(stringResource(R.string.today_missed_body, missedPeriod.prompt.cycleDay))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small)) {
+                TonalButton(
+                    text = stringResource(R.string.today_missed_add),
+                    onClick = { actions.onAddPastPeriod(missedPeriod.likelyMonth) },
+                    icon = CycleIcons.Calendar
+                )
+                TextButton(stringResource(R.string.today_missed_no), onClick = actions.onNoMissedPeriod)
+            }
+        }
+
         stillGoing != null -> Card(modifier.fillMaxWidth()) {
             CardTitle(stringResource(R.string.today_still_going_title))
             val days = stillGoing.prompt.periodDay
@@ -270,6 +308,29 @@ private fun Actions(state: TodayUiState.Tracking, actions: TodayActions, onLog: 
 }
 
 /**
+ * "Logged today: Cramps, moderate · Bloating · Low energy", once she has logged something she shows,
+ * with Edit to open the day log again. TalkBack reads the title and the summary as one item. The note
+ * stays out of the line; a day with only a note says so.
+ */
+@Composable
+private fun LoggedTodayCard(log: DayLogEntry, onEdit: () -> Unit, modifier: Modifier) {
+    val items = daySummary(log.flow, log.shownFeelings)
+    Card(modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.semantics(mergeDescendants = true) {},
+            verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.extraSmall)
+        ) {
+            CardTitle(stringResource(R.string.today_logged_title))
+            CardBody(
+                if (items.isEmpty()) stringResource(R.string.today_logged_note_only) else summaryLine(items),
+                style = CycleTheme.typography.body
+            )
+        }
+        TextButton(stringResource(R.string.today_logged_edit), onClick = onEdit, icon = CycleIcons.Edit)
+    }
+}
+
+/**
  * "Around 23 October, between 19 and 27 October, estimated from ...". TalkBack reads the estimate as
  * one item, "estimated" included, then the button that explains it.
  */
@@ -325,14 +386,6 @@ internal fun CardTitle(text: String, modifier: Modifier = Modifier) {
 @Composable
 internal fun CardBody(text: String, modifier: Modifier = Modifier, style: TextStyle = CycleTheme.typography.bodySmall) {
     BasicText(text = text, modifier = modifier, style = style.copy(color = CycleTheme.colors.onSurfaceVariant))
-}
-
-/** [date] in the phone's locale, by default as day and month: "23 October". */
-@Composable
-internal fun formatDate(date: LocalDate, skeleton: String = DAY_AND_MONTH): String {
-    val locale = LocalConfiguration.current.locales[0]
-    val formatter = remember(locale, skeleton) { dateFormatter(locale, skeleton) }
-    return formatter.format(date)
 }
 
 @Preview

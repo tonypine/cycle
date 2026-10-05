@@ -51,6 +51,13 @@ object CycleCalculator {
     }
 
     /**
+     * Her usual period length, as the estimates use it: the median of her periods that are over, or
+     * her setup length, or the typical 5 days before setup. "Fill in N days" logs this many.
+     */
+    fun usualPeriodLength(typical: TypicalLengths, settings: CycleSettings): Int =
+        UsualLengths.of(typical, settings).period
+
+    /**
      * Her periods, oldest first. A period is a run of period days (light or heavier flow, or a
      * period marker) with gaps of at most [MAX_GAP_DAYS]; spotting alone never starts one. "Ended"
      * marks a period's last day. "Ended" alone, with no flow and no "started", never starts a

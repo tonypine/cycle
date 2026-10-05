@@ -22,7 +22,7 @@ unless a migration changes them.
 | Stored values | Dates and flow are written as fixed text by explicit converters, not enum names or ordinals, so renaming a Kotlin constant cannot change what is on her phone. |
 | Feelings, later | The "how she feels" categories (MOT-30 J10) arrive as their own tables keyed by the same `date`, so each is a migration that adds a table. |
 | Schema changes | Every version is exported to `core/data/schemas/` and committed. A change raises the version, adds a migration to `CycleMigrations.ALL` and goes through `CycleDatabaseMigrationTest`, which migrates every earlier version to the current one, validates the result and reads her log back. The test also pins the hash of each released schema, so a shipped version cannot be edited in place. There is no destructive fallback: a missing migration fails rather than erasing her history. |
-| Settings | DataStore: usual cycle length (default 28), usual period length (default 5), whether setup is done, and the prompts she dismissed, each set keyed by the first day of its cycle. |
+| Settings | DataStore: usual cycle length (default 28), usual period length (default 5), whether setup is done, whether she is past the first-run welcome (set by setup's Done and by Skip, so skipping keeps the typical lengths), and the prompts she dismissed, each set keyed by the first day of its cycle. Setup accepts a usual cycle of 15 to 90 days and a usual period of 1 to 14 (`CycleRules`): unusual lengths are hers to give, impossible ones are refused with the range to use. |
 | A period | A run of period days, allowing a gap of one day; spotting alone never starts one. A period day is a day with light or heavier flow, or with either marker. A gap day may be unlogged, `none` or spotting. |
 | Started and ended | "Ended" marks a period's last day: the next period day starts a new period. "Ended" alone, with no light or heavier flow and no "started", never starts a period: it closes the period before it if that one has not ended yet, which then runs up to that day however many days lie between, the way "started" and "ended" fill the days between them. When the period before it has already ended, or there is none, the day is ignored. "Started" without "ended" keeps the period open: it takes in every later day, and the last period runs up to today. A new "started" after more than a day's gap starts a new period, and the open one before it ends on its last logged day. |
 | A cycle | From one period's first day to the day before the next. The last cycle is open until the next period is logged. |
@@ -74,6 +74,26 @@ unless a migration changes them.
   `SettingsRepository`; none of them computes a cycle itself. A screen that also shows what she
   logged on the day, such as Today's Undo, reads `CycleRepository.observeDay(today)`: the overview
   and the day's log from one read, so they never disagree for a moment after a write.
+- Screens that show and edit any day, the calendar and the day log sheet, read
+  `CycleRepository.observeLog(today)`: the overview with every logged day. Edits that touch more than
+  one day go through `DayLogEdits` in `core:domain` and are written in one transaction
+  (`DayLogRepository.fillPeriod`, `clearDay`), so no screen sees half an edit:
+  - "Period started this day: fill in N days" (N her usual period length, as the estimates use it)
+    is offered on a day up to today with no period within a day's gap of the days it would fill. It
+    marks the day started and the Nth day ended, as Today's "Log a period" does; a fill that reaches
+    today is still going. A stray "ended" on a day before the Nth, left by earlier clears, is removed
+    so it cannot close the period early.
+  - "Clear this day" removes what she logged and takes the day off its period while the rest stays:
+    on the first day, "started" moves to the next day that still draws as a period day; on the last,
+    the nearest such day before is marked ended, which also closes a period still going today. Days
+    she cleared before are skipped, so a marker never puts them back on the period. A day in the
+    middle is logged as no flow, a gap day: splitting the period instead would invent a cycle of a
+    few days and skew every estimate. When that gap day would still cut the period short (a second
+    cleared day next to it in a period logged as flow alone, or the day held its "started"), the
+    period's first day is marked started and, unless it is still going, its last day ended, so it
+    keeps the same days.
+  - The calendar draws a day logged with no period flow and no marker (none or spotting) as plain,
+    even inside a period, so a cleared middle day shows as cleared while the period stays one.
 - Life stages (pregnancy, after birth, hormonal contraception) and cycles to exclude are not modelled
   yet. When they are, they are date ranges in their own table, and `CycleCalculator` leaves the
   cycles inside them out of the last six.
