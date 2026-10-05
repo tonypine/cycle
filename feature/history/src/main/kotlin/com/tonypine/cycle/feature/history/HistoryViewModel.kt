@@ -35,8 +35,10 @@ class HistoryViewModel(private val cycles: CycleRepository, private val today: (
 }
 
 /**
- * The state of the cycle that starts on [start]. It follows her log like [HistoryViewModel]: when an
- * edit moves the cycle's first day, the state becomes [CycleDetailUiState.Missing].
+ * The state of the cycle that starts on [start]. It follows her log and her settings like
+ * [HistoryViewModel]: when an edit moves the cycle's first day, the state becomes
+ * [CycleDetailUiState.Missing], and a category she hides or shows again in "What to log" leaves or
+ * comes back at once.
  */
 class CycleDetailViewModel(
     private val cycles: CycleRepository,
@@ -48,7 +50,7 @@ class CycleDetailViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<CycleDetailUiState> = day
         .flatMapLatest { day -> cycles.observeLog(day) }
-        .map { CycleDetailUiState.from(it.overview, it.logs, start) }
+        .map { CycleDetailUiState.from(it.overview, it.logs, start, it.feelings, it.hiddenCategories) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), CycleDetailUiState.Loading)
 
     /** Reads the day again, such as when she comes back to the app after midnight. */

@@ -1,8 +1,17 @@
 package com.tonypine.cycle.feature.history
 
+import com.tonypine.cycle.core.model.BodySymptom
 import com.tonypine.cycle.core.model.CycleSettings
+import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
+import com.tonypine.cycle.core.model.EnergyLevel
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.Mood
+import com.tonypine.cycle.core.model.Pain
+import com.tonypine.cycle.core.model.PainKind
+import com.tonypine.cycle.core.model.PainLevel
+import com.tonypine.cycle.core.model.SexualActivity
+import com.tonypine.cycle.core.model.SleepQuality
 import java.time.LocalDate
 
 // Synthetic logs only: made-up dates in 2027, never anyone's real cycle.
@@ -36,5 +45,36 @@ val syntheticHistory: List<DayLog> =
             DayLog(day("2027-09-04"), FlowLevel.MEDIUM),
             DayLog(day("2027-09-05"), FlowLevel.LIGHT)
         )
+
+/** How she felt in August's cycle, behind [HistorySamples.pastCycle]: it starts on August 5, day 1. */
+val syntheticFeelings: List<DayFeelings> = listOf(
+    DayFeelings(
+        day("2027-08-05"),
+        pain = Pain(PainLevel.MODERATE, setOf(PainKind.CRAMPS, PainKind.LOWER_BACK)),
+        moods = setOf(Mood.IRRITABLE),
+        energy = EnergyLevel.LOW,
+        note = "Sample note: a heat pad helped."
+    ),
+    DayFeelings(
+        day("2027-08-06"),
+        pain = Pain(PainLevel.MODERATE, setOf(PainKind.CRAMPS)),
+        body = setOf(BodySymptom.TIRED),
+        sleep = SleepQuality.BADLY
+    ),
+    DayFeelings(
+        day("2027-08-07"),
+        pain = Pain(PainLevel.MILD, setOf(PainKind.CRAMPS)),
+        note = "Sample note: a short walk after lunch."
+    ),
+    DayFeelings(day("2027-08-18"), sex = SexualActivity.PROTECTED),
+    DayFeelings(day("2027-08-28"), body = setOf(BodySymptom.BLOATING)),
+    DayFeelings(day("2027-08-29"), body = setOf(BodySymptom.BLOATING)),
+    DayFeelings(
+        day("2027-08-30"),
+        body = setOf(BodySymptom.BLOATING, BodySymptom.TENDER_BREASTS),
+        moods = setOf(Mood.SENSITIVE)
+    ),
+    DayFeelings(day("2027-08-31"), body = setOf(BodySymptom.BLOATING))
+)
 
 val notSetUp = CycleSettings(usualCycleLength = 28, usualPeriodLength = 5, setupDone = false)
