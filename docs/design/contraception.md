@@ -110,6 +110,11 @@ Hormonal IUD, Copper IUD, Injection.
 Body: "Roughly is fine." A `MonthCalendar` with days up to today; days before the method's start are
 not tappable when stopping.
 
+When she adds a method while on none, every day up to today is tappable. A day inside an earlier
+method's dates asks to move that method's end, as in E7 ("Move the end of your implant?"); a day on
+or before an earlier method's start is refused, as after E8 ("That would cover all of your time on
+the implant. Delete the implant's dates first, or pick a later day."). Journey D shows both.
+
 ### Breaks (combined pill, patch, ring)
 
 Title: "Do you take a break between packs?" (patch: "Do you have a patch-free week?", ring: "Do you
@@ -198,6 +203,24 @@ Today is Saturday 20 March 2027. Her implant was fitted on 9 November 2026.
 | A5 | Since when | Setup, step 3 of 3 | "When was your implant fitted?" "Roughly is fine." Calendar, 9 November 2026 chosen. **Done** · **I don't remember** (no start date: every day logged before counts as on the implant). On a combined method, Done becomes Next and the breaks page follows, still step 3 of 3. |
 | A6 | Today on the implant | Today | "SATURDAY 20 MARCH", display "Implant", "Bleeding on the implant can come at any time, so Cycle doesn't estimate it." The week, no bleeding. **Bleeding started** · Log how you feel. Card "Last 90 days": "You logged bleeding or spotting on 5 days, in 1 episode. The longest lasted 5 days." (the period from setup, now bleeding). What changes on the implant? |
 
+**With no start date** (I don't remember in A5), every place that prints the start says it is not
+known:
+
+- Settings' row: Contraception · "Implant, start not known".
+- Contraception's Now card: "Implant", "Start not known", the calm line.
+- "Your methods" and History's card: "Start not known" while she is on it; "Until 3 Nov 2027" once
+  it has stopped, in place of "9 Nov 2026 to 3 Nov 2027".
+- The edit page: Fitted · "Not known", which she can tap to set a date. Deleting asks "Cycle forgets
+  you use the implant." (after it stopped: "Cycle forgets you used the implant until 3 November
+  2027.")
+- Today's bleeding card is always "Last 90 days", never "Since …"; the first-months line and the
+  copper IUD's heavier-periods card never show; no cycle is marked as cut short.
+- On a combined method with a break every month, there is no first break to estimate. The period
+  from setup (A2) falls inside the stretch and counts as her last bleed, so Today shows the next
+  bleed from it as in B. With no bleed logged, Today shows "Pill" and "Cycle will estimate your next
+  bleed once you log one.", with no Next bleed card, and the calendar expects nothing, until she
+  logs one.
+
 ### B. Starting the combined pill from Settings
 
 Today is Monday 10 May 2027. She started the pill on 3 May.
@@ -246,13 +269,36 @@ Today is Monday 15 November 2027. The implant came out on 3 November.
 | D1 | Settings | Settings | Contraception · "Implant, since 9 Nov 2026" |
 | D2 | Contraception | Settings › Your cycle › Contraception | "Now": "Implant", "Since 9 November 2026", the calm line. **Mark as stopped** · Change method. "Your methods": Implant · Since 9 Nov 2026 › |
 | D3 | Stopped on | Settings › Contraception › Mark as stopped | "When was your implant taken out?" "Roughly is fine." Calendar, 3 November chosen. **Save** |
-| D4 | Contraception: none now | Settings › Your cycle › Contraception | "Now": "None", "Cycle estimates your periods from your own cycle." Add your method. "Your methods": Implant · 9 Nov 2026 to 3 Nov 2027 › |
+| D4 | Contraception: none now | Settings › Your cycle › Contraception | "Now": "None", "Cycle estimates your periods from your own cycle." Add your method (a start inside the implant's dates: below). "Your methods": Implant · 9 Nov 2026 to 3 Nov 2027 › |
 | D5 | Today: fresh estimates | Today | "MONDAY 15 NOVEMBER", display "12 days", "since your implant came out". **My period started** · Log how you feel. "Next period": "Around 2 December", "Between 25 November and 9 December", "Estimated from your usual 29-day cycle. Cycles can take a few months to settle after the implant, so the range is wider." How is this estimated? |
 | D6 | History | History | The implant's card now reads "9 Nov 2026 to 3 Nov 2027", "Not part of your typical cycle.", "In its last 90 days you logged bleeding or spotting on 10 days, in 3 episodes. The longest lasted 5 days." |
 
 Once she logs her first period after it, Today is "Day 1" again, with the ±7-day range until she has
 logged three cycles. "Missed a period?" is not asked before that first period. Other methods:
 "since you stopped the pill", "since your IUD came out".
+
+**Adding a method after it** (from D4's Add your method, the same steps as F1 to F3). On 15
+November she adds the pill from 20 October, inside the implant's dates: the dialog asks "Move the
+end of your implant?" "Your implant would end on 19 October instead of 3 November, so the two don't
+overlap. Cycle works out its estimates again." Cancel · **Move it**. Cancel goes back to the
+calendar. A day on or before 9 November 2026 would cover all of the implant and is refused: "That
+would cover all of your time on the implant. Delete the implant's dates first, or pick a later
+day." A day after 3 November needs no dialog.
+
+**After the pill.** A bleed in the 7 days after a combined method stops is the withdrawal bleed,
+part of the time on it, not a period. Her last pill was on 3 November 2027 and she logs a bleed on 6
+November:
+
+- From 4 to 10 November, Today shows "N days", "since you stopped the pill", with **Bleed started**
+  ("Bleeding started" after a break every few packs or none). From 11 November it is **My period
+  started**.
+- On 8 November, during the bleed: "5 days", "since you stopped the pill", **Bleed ended**. The
+  calendar and TalkBack call its days "bleed", to its last day, even past 10 November.
+- The bleed does not end the days-since display and does not count as her first period. "Next
+  period" still counts from the stop date: "Around 2 December", "Between 25 November and 9
+  December", "Estimated from your usual 29-day cycle. Cycles can take a few months to settle after
+  the pill, so the range is wider." "Missed a period?" still waits for her first period.
+- A bleed that starts on 11 November or later is her first period: "Day 1", as above.
 
 **After the injection.** Her last injection was on 3 August 2027; she marks it as stopped on 20
 August with that date ("When was your last injection?", "Cycle counts 13 weeks from it."). The
@@ -300,7 +346,7 @@ Today is Tuesday 22 June 2027. Her last period started on 14 June; the IUD was f
 
 | Step | Screen | Where | Copy |
 | -- | -- | -- | -- |
-| F1 | Contraception | Settings › Your cycle › Contraception | "None". **Add your method** |
+| F1 | Contraception | Settings › Your cycle › Contraception | "None". **Add your method**. With an earlier method under "Your methods", a start inside its dates offers to move its end, and one on or before its start is refused ([Since when](#since-when), journey D). |
 | F2 | Choose copper IUD | Settings › Contraception › Add | The list, Copper IUD chosen. **Next** |
 | F3 | Since when | Settings › Contraception › Add | "When was your IUD fitted?" 15 June chosen, during her period. **Save** |
 | F4 | Contraception: copper IUD | Settings › Your cycle › Contraception | "Copper IUD", "Since 15 June 2027", "Your cycle stays your own, so Cycle keeps estimating your periods. They can be heavier or longer at first." |

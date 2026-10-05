@@ -65,7 +65,8 @@ second mode to switch to. Worth revisiting if she has a hormonal IUD and asks.
 - Every place that says "period" takes the word of the method on that day: Today's buttons ("Bleed
   started", "Bleeding started"), its cards and sheets, the day log's fill offer and clear dialog, the
   calendar legend and hint, History's labels, and TalkBack's day descriptions ("14 October,
-  bleeding"). A day before she started a method keeps "period".
+  bleeding"). A day before she started a method keeps "period". A bleed that starts in the 7 days
+  after a combined method stops keeps the method's word to its last day ([Stopping](#stopping)).
 - No cycle language where there is no cycle: no cycle-day counter ("Day 19"), phases, "late",
   "Missed a period?" or "Still going?" on a no-estimate method. Counting the days of the bleeding
   itself ("Day 2 of bleeding") is fine, and "Still going?" becomes "Still bleeding?".
@@ -98,9 +99,29 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
   it always falls before the current stretch ends. A new start on or before the current stretch's
   start is refused: "That's before you started the pill on 3 May. Pick a later day, or change the
   pill's dates first."
+- **Adding a method while she is on none.** The new stretch starts on the day she picks, today or
+  earlier, with no stop date. A start inside an earlier stretch would overlap it, so a dialog offers
+  to move that stretch's end to the day before, as in Edits below. Implant 9 November 2026 to 3
+  November 2027; on 15 November she adds the pill from 20 October: "Move the end of your implant?"
+  "Your implant would end on 19 October instead of 3 November, so the two don't overlap. Cycle works
+  out its estimates again." Cancel · **Move it**. Cancel goes back to the calendar. A start on or
+  before an earlier stretch's start would cover all of it and is refused with the dates to use:
+  "That would cover all of your time on the implant. Delete the implant's dates first, or pick a
+  later day."
 - **Unknown start.** In every date comparison, here, in edits and in import, a null start counts as
   earlier than any date and a null stop as later than any. So a new start always ends a stretch
-  with an unknown start the day before, and is never refused because of it.
+  with an unknown start the day before (or offers to, when she is on none), and is never refused
+  because of it.
+- **Unknown start, in what she reads.** Where the copy prints the start date, a stretch with no
+  start says so instead: Settings' row "Implant, start not known"; the Now card "Start not known"
+  under the method's name (in place of "Since 9 November 2026"); "Your methods" and History's card
+  "Start not known" while she is on it and "Until 3 Nov 2027" once it has stopped (in place of "9
+  Nov 2026 to 3 Nov 2027"); the edit page "Fitted · Not known", which she can tap to set a date; the
+  delete dialog "Cycle forgets you used the implant until 3 November 2027." (while on it, "Cycle
+  forgets you use the implant."). Everything counted from the start date leaves it out: Today's
+  bleeding card is always titled "Last 90 days", the first-months line and the copper IUD's
+  heavier-periods card never show, no cycle is marked as cut short, and a combined method's first
+  bleed is not estimated (below).
 - **Edits.** Changing a stretch's start or stop recomputes everything, like editing a day. When the
   change would overlap a neighbour, a dialog offers to move the neighbour's edge ("Move the end of
   your pill?"); a change that would swallow a neighbour entirely is refused with the dates to use.
@@ -129,8 +150,9 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
   it never counts toward her typical period length.
 - **Combined methods, the bleed after stopping.** Bleeding that starts within 7 days after she stops
   a combined pill, patch or ring is still a withdrawal bleed and belongs to the stretch
-  ([`contraception.md`](../research/contraception.md#combined-pill)). The first period after it
-  starts her first natural cycle.
+  ([`contraception.md`](../research/contraception.md#combined-pill)): it is never a period and
+  never her first period after stopping ([Stopping](#stopping)). The first period after it starts
+  her first natural cycle.
 - **Copper IUD.** Cycles count. Her expected period length uses periods that started on or after the
   date fitted, once one has ended; before that, her usual length.
 - **Unknown start** (skipped in setup): the stretch covers every day logged before its stop, so none
@@ -142,15 +164,20 @@ Every pack, patch cycle or ring cycle is 28 days, with the break or dummy pills 
 comes in the break, so:
 
 - **Which bleeds count.** A bleed counts only if it starts at least 21 days after the start date
-  (for the first one) or at least 21 days after the first day of the last bleed that counted. Each
-  break that passes with no bleed logged (below) moves that day 28 days later. Any other bleed is
-  bleeding between breaks: it shows and counts in her logs, but does not move the estimate and does
-  not restart the 21 days. Started 3 May, bleed logged 8 May: the bleed is still expected 24 to 30
-  May, not 3 to 7 June.
+  (for the first one; with no start date, the first bleed she logs on the method counts) or at
+  least 21 days after the first day of the last bleed that counted. Each break that passes with no
+  bleed logged (below) moves that day 28 days later. Any other bleed is bleeding between breaks: it
+  shows and counts in her logs, but does not move the estimate and does not restart the 21 days.
+  Started 3 May, bleed logged 8 May: the bleed is still expected 24 to 30 May, not 3 to 7 June.
 - **Before a bleed has counted:** the bleed is expected in the first break, from the start date + 21
   days to the start date + 27 (days 22 to 28 of the first pack, which covers 21/7, 24/4 and 26/2
   packs). Today shows it as a range only: "24 to 30 May", "In your first pill break. Estimated from
   the day you started the pill."
+- **With no start date** ("I don't remember" in setup), there is no first break to place, so there
+  is no estimate until a bleed counts. Usually that is the period she gave in setup, which falls
+  inside the stretch; with none logged, Today shows "Pill" and "Cycle will estimate your next bleed
+  once you log one." with no Next bleed card, the calendar expects nothing, and no break can pass
+  "with no bleed logged". The first bleed she logs counts, and the estimate runs from it as below.
 - **After that:** around the first day of the last bleed that counted + 28 days, between 2 days
   before and 2 days after.
 - **Three ahead** on the calendar, each 28 days after the one before, as in `0003`.
@@ -184,11 +211,23 @@ in plain counts, never with the clinical labels:
 
 ### Stopping
 
-The stretch ends on the stop date and the next day is "none". Everything below starts the day after
-the stop date, never while it is still ahead (the injection's weeks, above):
+The stretch ends on the stop date and the next day is "none", except for a combined method's
+withdrawal bleed (below). Everything below starts the day after the stop date, never while it is
+still ahead (the injection's weeks, above):
 
 - **Today** shows the days since the stop date ("12 days", "since your implant came out") instead of
   a cycle day, until her first period after stopping, and "My period started" as its button.
+- **The 7 days after a combined method.** A bleed that starts in the 7 days after the stop date is
+  the withdrawal bleed and belongs to the stretch (above). In those days Today's button is the
+  method's "Bleed started" ("Bleeding started" after a break every few packs or none), and "My
+  period started" from the 8th day. That bleed's days are "bleed" (or "bleeding") on Today, the
+  calendar, TalkBack and the day log, to its last day, even past the 7th; while it lasts, the button
+  is "Bleed ended" ("Bleeding stopped"). It does not end the days-since display, is not her first
+  period after stopping, and does not anchor the estimate: the next period is still expected at the
+  stop date + her usual cycle, ±7 days, and "Missed a period?" still waits for her first period.
+  Last pill 3 November, bleed logged on 6 November: on 8 November Today reads "5 days", "since you
+  stopped the pill", **Bleed ended**, next period around 2 December. A bleed that starts on 11
+  November or later is her first period: "Day 1".
 - **The next period** is expected at the stop date + her usual cycle (the median of her natural
   cycles, or her setup length, or 28), between 7 days before and 7 days after. Once she logs a
   period, cycles count from it as in `0003`, but the range stays at least ±7 days until she has
