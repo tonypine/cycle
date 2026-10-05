@@ -34,7 +34,8 @@ she asks for, each one optional and hideable.
 | Basal body temperature | °C or °F, two decimals; time taken; a "disturbed" flag (fever, alcohol, short sleep, different time) | Same time every morning before getting up ([WHO FP Handbook](https://fphandbook.org/sites/default/files/Chapter_18_Eng.pdf)). Disturbed readings are kept but left out of ovulation detection. Health Connect: `BasalBodyTemperatureRecord`. |
 | Ovulation test | Negative, high, positive, inconclusive | Health Connect's `OvulationTestRecord` results. |
 | Pregnancy test | Negative, positive | Only if she wants it; a positive one can offer the pregnancy mode. |
-| Medication, contraception | Free text or a short list she builds; contraception as a setting with start and end dates | Hormonal methods switch fertility estimates off ([`cycle-physiology.md`](cycle-physiology.md)). |
+| Medication | Free text or a short list she builds | |
+| Contraception | A setting, not a daily log: the method (combined pill, patch, ring, progestogen-only pill by kind, implant, hormonal IUD, copper IUD, injection), the date she started and stopped it, and for combined methods optionally the regimen and the current pack's start date | Changes the words for what she logs, which estimates appear, and which health signals apply; hormonal methods switch fertility estimates off ([`contraception.md`](contraception.md)). |
 | Notes | Free text per day | Everything else. |
 
 ## For the premenstrual diary
@@ -59,7 +60,9 @@ These follow [`0001-stack.md`](../decisions/0001-stack.md) (Room, `java.time`, o
 - **One row per day per category**, each optional, so adding a category is a migration that adds a
   table or a column, not a rewrite.
 - **Life stages and settings are date ranges** (on the pill from, to; pregnant from, to), so past
-  cycles keep their meaning when a setting changes.
+  cycles keep their meaning when a setting changes. Bleeding is stored the same way on every method:
+  a bleeding day on the implant and a period day are the same row, and the method in force on that
+  date decides how it is labelled and counted ([`contraception.md`](contraception.md)).
 - **Line up with Health Connect.** Using the same categories and values as Health Connect's cycle
   tracking records ([Android](https://developer.android.com/health-and-fitness/guides/health-connect/plan/data-types))
   keeps a later import or export a mapping, not a redesign. Health Connect itself stays out until
