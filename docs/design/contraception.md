@@ -32,7 +32,8 @@ Refined against MOT-49. "Hormonal method" means everything except the copper IUD
 2. **Add or change it later.** When I start the pill, get an implant fitted or switch, I set it in
    Settings › Your cycle › Contraception, with the date it started (required there). On a combined
    pill, patch or ring, I also say whether I take a break every month, every few packs, or never.
-   Switching ends the old method the day before the new one starts.
+   Switching ends the old method the day before the new one starts, also when I skipped "since when"
+   for it.
 3. **Know what Cycle does on my method.** On a hormonal method Cycle says in one calm line what it
    stops estimating and why, on Today and in Settings ([the calm line](#the-calm-line-per-method)).
    Never "safe days", never a condition name, never advice on the method.
@@ -211,7 +212,9 @@ Today is Monday 10 May 2027. She started the pill on 3 May.
 | B6 | Today: the next bleed | Today | "MONDAY 10 MAY", display "Pill", "Your first bleed is expected in about 14 days". **Bleed started** · Log how you feel. Card "Next bleed": "24 to 30 May", "In your first pill break. Estimated from the day you started the pill." "Bleeding between breaks is common in the first three months, and usually settles." How is this estimated? |
 | B7 | Calendar | Calendar | Expected bleed on 24 to 30 May, dashed like a predicted period. Legend: Bleed, Expected bleed, Today. "Expected bleeds are estimates. Tap any day up to today to log or change it." |
 
-Later on the pill, once she has logged a bleed: "Your next bleed is expected in about 6 days"; card
+A bleed logged before 24 May is bleeding between breaks: it shows on the calendar, and the card
+still says "24 to 30 May". Later on the pill, once a bleed has counted (21 days or more after the
+start, or after the last bleed that counted): "Your next bleed is expected in about 6 days"; card
 "Around 21 June", "Between 19 and 23 June", "In your pill break. Estimated from your last bleed on
 the pill." If a break passes with no bleed logged, the status card says "No bleed logged this
 break" and "Some breaks pass without one. The next is expected in your next break."
@@ -249,9 +252,26 @@ Today is Monday 15 November 2027. The implant came out on 3 November.
 
 Once she logs her first period after it, Today is "Day 1" again, with the ±7-day range until she has
 logged three cycles. "Missed a period?" is not asked before that first period. Other methods:
-"since you stopped the pill", "since your IUD came out". After the injection, Today shows no next
-period: "Periods can take several months to come back after the injection. Cycle will estimate again
-once you log one."
+"since you stopped the pill", "since your IUD came out".
+
+**After the injection.** Her last injection was on 3 August 2027; she marks it as stopped on 20
+August with that date ("When was your last injection?", "Cycle counts 13 weeks from it."). The
+stretch now ends on 2 November, and until then she is still on the injection:
+
+- Contraception's "Now" card stays "Injection", "Since 9 November 2026", the calm line, then
+  "Cycle counts it until 2 November 2027, 13 weeks after your last injection." **Change method**
+  stays; "Mark as stopped" is gone until the stop date has passed. Its edit page reads First
+  injection · 9 November 2026; Counted until · 2 November 2027 (any day up to 13 weeks from today,
+  for an 8-week injection); Delete these dates.
+- Today, the calendar and History are unchanged: "Injection", the calm line, the Last 90 days card,
+  "bleeding".
+- Changing method in those weeks ends the injection the day before: an implant fitted on 31 August
+  makes it "Injection · 9 Nov 2026 to 30 Aug 2027".
+
+From 3 November, Contraception shows "None" and the injection under "Your methods" as "9 Nov 2026
+to 2 Nov 2027". Today shows "12 days", "since you stopped the injection" (on 14 November), and no
+next period: "Periods can take several months to come back after the injection. Cycle will estimate
+again once you log one."
 
 ### E. Switching from the pill to a hormonal IUD, then correcting the start date
 

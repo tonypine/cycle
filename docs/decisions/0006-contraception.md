@@ -86,12 +86,20 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
 | `id` | integer, primary key | |
 | `method` | text | `combined_pill`, `patch`, `ring`, `progestogen_pill`, `implant`, `hormonal_iud`, `copper_iud`, `injection`, written by an explicit converter as in `0003`. |
 | `started` | ISO date, nullable | First day on the method. Null only when she skipped "since when" in setup: the stretch then covers every day before `stopped`. |
-| `stopped` | ISO date, nullable | Last day on the method, included. Null while she is still on it. |
+| `stopped` | ISO date, nullable | Last day on the method, included. Null while she is still on it. Only the injection's can be after today (below). |
 | `breaks` | text, nullable | Combined pill, patch and ring only: `monthly`, `every_few_packs` or `none`. |
 
-- **No overlaps, one open stretch.** Starting or changing a method ends the open stretch the day
-  before the new one starts. A new start on or before the open stretch's start is refused: "That's
-  before you started the pill on 3 May. Pick a later day, or change the pill's dates first."
+- **The current stretch.** At most one stretch covers today: the one with no stop date, or with a
+  stop date today or later. That stretch is her method "Now" in Settings, on Today and everywhere
+  else, until its stop date has passed.
+- **No overlaps.** Starting or changing a method ends the current stretch the day before the new one
+  starts, moving its stop date earlier if it has one. A new start can only be today or earlier, so
+  it always falls before the current stretch ends. A new start on or before the current stretch's
+  start is refused: "That's before you started the pill on 3 May. Pick a later day, or change the
+  pill's dates first."
+- **Unknown start.** In every date comparison, here, in edits and in import, a null start counts as
+  earlier than any date and a null stop as later than any. So a new start always ends a stretch
+  with an unknown start the day before, and is never refused because of it.
 - **Edits.** Changing a stretch's start or stop recomputes everything, like editing a day. When the
   change would overlap a neighbour, a dialog offers to move the neighbour's edge ("Move the end of
   your pill?"); a change that would swallow a neighbour entirely is refused with the dates to use.
@@ -100,8 +108,13 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
   count as her own cycle again.
 - **None** is no row: Cycle is on "none" on any day outside every stretch.
 - **Injection.** Stopping asks for the date of her last injection; the stretch ends 13 weeks after
-  it, the DMPA interval ([`contraception.md`](../research/contraception.md#injection)). She can edit
-  the end, for an 8-week injection.
+  it, the DMPA interval ([`contraception.md`](../research/contraception.md#injection)), so its stop
+  date is usually still ahead. Until then she is still on the injection: Today, the calendar, History
+  and Settings show it as her current method, with its words and its calm line, and Settings adds
+  when Cycle counts it until. Starting or changing a method in those weeks moves the stop date to
+  the day before the new start: last injection 3 August, stop date 2 November, implant fitted 31
+  August, so the injection now ends on 30 August. She can edit the end, to any day up to 13 weeks
+  after today, for an 8-week injection.
 
 ### Leaving her estimates
 
@@ -127,13 +140,18 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
 Every pack, patch cycle or ring cycle is 28 days, with the break or dummy pills at its end. The bleed
 comes in the break, so:
 
-- **Before she has logged a bleed on the method:** the bleed is expected in the first break, from the
-  start date + 21 days to the start date + 27 (days 22 to 28 of the first pack, which covers 21/7,
-  24/4 and 26/2 packs). Today shows it as a range only: "24 to 30 May", "In your first pill break.
-  Estimated from the day you started the pill."
-- **After that:** around the first day of her last bleed on the method + 28 days, between 2 days
-  before and 2 days after. A bleed that starts less than 21 days after the last one started is
-  bleeding between breaks: it shows and counts in her logs, but does not move the estimate.
+- **Which bleeds count.** A bleed counts only if it starts at least 21 days after the start date
+  (for the first one) or at least 21 days after the first day of the last bleed that counted. Each
+  break that passes with no bleed logged (below) moves that day 28 days later. Any other bleed is
+  bleeding between breaks: it shows and counts in her logs, but does not move the estimate and does
+  not restart the 21 days. Started 3 May, bleed logged 8 May: the bleed is still expected 24 to 30
+  May, not 3 to 7 June.
+- **Before a bleed has counted:** the bleed is expected in the first break, from the start date + 21
+  days to the start date + 27 (days 22 to 28 of the first pack, which covers 21/7, 24/4 and 26/2
+  packs). Today shows it as a range only: "24 to 30 May", "In your first pill break. Estimated from
+  the day you started the pill."
+- **After that:** around the first day of the last bleed that counted + 28 days, between 2 days
+  before and 2 days after.
 - **Three ahead** on the calendar, each 28 days after the one before, as in `0003`.
 - **No bleed in a break:** once the range has passed with nothing logged, Today says "No bleed
   logged this break. Some breaks pass without one." and the next one is expected 28 days after the
@@ -165,10 +183,11 @@ in plain counts, never with the clinical labels:
 
 ### Stopping
 
-The stretch ends on the stop date and the next day is "none". Then:
+The stretch ends on the stop date and the next day is "none". Everything below starts the day after
+the stop date, never while it is still ahead (the injection's weeks, above):
 
-- **Today** shows the days since she stopped ("12 days", "since your implant came out") instead of a
-  cycle day, until her first period after stopping, and "My period started" as its button.
+- **Today** shows the days since the stop date ("12 days", "since your implant came out") instead of
+  a cycle day, until her first period after stopping, and "My period started" as its button.
 - **The next period** is expected at the stop date + her usual cycle (the median of her natural
   cycles, or her setup length, or 28), between 7 days before and 7 days after. Once she logs a
   period, cycles count from it as in `0003`, but the range stays at least ±7 days until she has
@@ -197,7 +216,7 @@ The method is health data and stays on the phone with the rest:
   [`0004`](0004-backup-encryption.md)). The export gains a third section after the settings, with
   the columns `method,started,stopped,breaks`, and import adds the stretches that do not overlap
   ones already on the phone, refusing the file with a line number otherwise, like its other
-  problems.
+  problems. A null start overlaps every stretch that starts on or before its stop, as above.
 - Never in a notification, a widget or any text outside the app. "Delete everything" deletes it.
 
 ### Thresholds
@@ -225,7 +244,7 @@ the copper IUD note.
   follow the pack anyway, so the estimate anchors on them after the first break.
 - **Counting the next bleed from any bleed she logs.** Breakthrough bleeding is common in the first
   months; letting it move the estimate would put the next bleed in the middle of a pack. Only a
-  bleed at least 21 days after the last one counts.
+  bleed at least 21 days after the start date, or after the last bleed that counted, counts.
 - **Planned breaks for extended and flexible regimens** ("Next planned break: 3 to 6 June"). Needs
   her break dates for every pack; left out until she asks.
 - **A next-bleed estimate on the hormonal IUD once her bleeding looks regular.** See above: no rule
