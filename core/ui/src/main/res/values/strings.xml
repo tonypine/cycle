@@ -97,12 +97,17 @@
     <string name="day_log_clear_confirm">Clear</string>
     <string name="day_log_clear_keep">Keep it</string>
 
-    <!-- Her usual lengths, at setup and in Settings. Each error says how to fix the value. -->
-    <string name="usual_cycle_length">Cycle length, in days</string>
+    <!-- Her usual lengths, at setup and in Settings: a slider each, with − and + a day at a time. -->
+    <string name="usual_cycle_length">Cycle length</string>
     <string name="usual_cycle_length_supporting">From the first day of one period to the first day of the next. Often between 21 and 35 days.</string>
-    <string name="usual_period_length">Period length, in days</string>
+    <string name="usual_cycle_length_shorter">Cycle one day shorter</string>
+    <string name="usual_cycle_length_longer">Cycle one day longer</string>
+    <string name="usual_period_length">Period length</string>
     <string name="usual_period_length_supporting">The days you bleed. Often between 2 and 7 days.</string>
-    <string name="usual_cycle_length_empty">Enter the number of days in your cycle, such as 28.</string>
-    <string name="usual_period_length_empty">Enter the number of days your period lasts, such as 5.</string>
-    <string name="usual_length_out_of_range">Enter a number of days from %1$d to %2$d.</string>
+    <string name="usual_period_length_shorter">Period one day shorter</string>
+    <string name="usual_period_length_longer">Period one day longer</string>
+    <plurals name="usual_length_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
 </resources>
