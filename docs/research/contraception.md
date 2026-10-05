@@ -85,7 +85,7 @@ So Cycle needs the date she started a method, not just its name.
 | -- | -- | -- | -- | -- | -- |
 | Combined pill with a break or dummy pills | Stopped | Withdrawal bleed in the break | Follows the pack | Hidden | Fast; first bleed after stopping is still a withdrawal bleed |
 | Combined pill, extended or continuous | Stopped | Bleed in each break, if any; unscheduled bleeding | Only at a planned break; none if continuous | Hidden | Fast |
-| Patch or ring | Stopped | Withdrawal bleed in week 4 | Follows the patch or ring weeks | Hidden | 1 to 3 months |
+| Patch or ring | Stopped | Withdrawal bleed in week 4 | Follows the patch or ring weeks | Hidden | Fast (the NHS says 1 to 3 months) |
 | Progestogen-only pill, traditional (levonorgestrel, norethisterone) | Not reliably stopped | Bleeding | None | Hidden | Fast |
 | Progestogen-only pill, desogestrel or drospirenone | Stopped | Bleeding | None | Hidden | Fast |
 | Implant | Stopped, nearly always | Bleeding | None | Hidden | Fast |
@@ -172,9 +172,13 @@ patch is like the pill's; the ring may bring less unscheduled bleeding
 
 **Predictions.** As for the combined pill: the bleed follows the patch-free or ring-free week.
 
-**Stopping.** Fertility usually returns after one to three months
+**Stopping.** As after the pill, fertility returns with no significant delay after any combined
+hormonal method
+([FSRH CHC 2019, 15.3.1](https://www.cosrh.org/Common/Uploaded%20files/documents/fsrh-guideline-combined-hormonal-contraception-october-2023.pdf)).
+The NHS puts the upper end in plain words: fertility usually returns within one to three months
 ([NHS patch](https://www.nhs.uk/contraception/methods-of-contraception/contraceptive-patch/what-is-it/),
 [NHS ring](https://www.nhs.uk/contraception/methods-of-contraception/vaginal-ring/what-is-it/)).
+The bleed after the last patch or ring is still a withdrawal bleed, as after the last active pill.
 
 **For Cycle.** The same as the combined pill, with "patch-free week" or "ring-free week" in place
 of "pill break".
