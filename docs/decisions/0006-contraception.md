@@ -1,7 +1,8 @@
 # 0006: Contraception: what Cycle records, says and estimates on each method
 
-**Status:** accepted, 2026-10-05. Designed only: the build tickets (MOT-51 to MOT-55) were canceled,
-so a later build follows this record and [`contraception.md`](../design/contraception.md).
+**Status:** proposed, 2026-10-05; accepted once MOT-50's screens and this record are approved.
+Designed only: the build tickets (MOT-51 to MOT-55) were canceled, so a later build follows this
+record and [`contraception.md`](../design/contraception.md).
 
 ## Context
 

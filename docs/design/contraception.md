@@ -193,7 +193,7 @@ Today is Saturday 20 March 2027. Her implant was fitted on 9 November 2026.
 | -- | -- | -- | -- |
 | A1 | Welcome | Setup | Unchanged: "Hi! Let's get your cycle going", "Log your period and Cycle estimates the next one. Everything stays on this phone: no account, no ads, no tracking." Get started · Restore from a Cycle export · Skip for now |
 | A2 | Last period | Setup, step 1 of 3 | "Step 1 of 3" (was "of 2"). "When did your last period start?" "Roughly is fine." Calendar, 2 March chosen. Next · I don't remember |
-| A3 | Usual lengths | Setup, step 2 of 3 | "How long do they usually last?" "Cycle estimates from these until you have logged periods of your own." Cycle length 28, period length 5, with their hints. The button now reads **Next**, not Done. |
+| A3 | Usual lengths | Setup, step 2 of 3 | "How long do they usually last?" "Cycle estimates from these until you have logged periods of your own." Two slider fields: "Cycle length" "28 days" and "Period length" "5 days", each with − and + a day at a time and its hint ("From the first day of one period to the first day of the next. Often between 21 and 35 days." · "The days you bleed. Often between 2 and 7 days."). The button now reads **Next**, not Done. |
 | A4 | Contraception | Setup, step 3 of 3 (new) | "Are you using contraception?" "Some methods change bleeding, so Cycle changes what it estimates. You can change this later in Settings." The method list, Implant chosen. **Next** (off until she chooses) · **Skip**. Choosing None makes the button **Done**. |
 | A5 | Since when | Setup, step 3 of 3 | "When was your implant fitted?" "Roughly is fine." Calendar, 9 November 2026 chosen. **Done** · **I don't remember** (no start date: every day logged before counts as on the implant). On a combined method, Done becomes Next and the breaks page follows, still step 3 of 3. |
 | A6 | Today on the implant | Today | "SATURDAY 20 MARCH", display "Implant", "Bleeding on the implant can come at any time, so Cycle doesn't estimate it." The week, no bleeding. **Bleeding started** · Log how you feel. Card "Last 90 days": "You logged bleeding or spotting on 5 days, in 1 episode. The longest lasted 5 days." (the period from setup, now bleeding). What changes on the implant? |
@@ -321,7 +321,7 @@ which the build adds first with their catalog entries, previews and tests
 | `TopAppBar`, `NavigationBar` | Every screen | Exists |
 | `EmptyState` | A1 | Exists |
 | `MonthCalendar`, `WeekRow`, `CycleLegend`, `DayCell` | A2, A5, B4, B7, C4, D3, E3, E6, F3, F6; the week on Today | Exist; gain `BleedingWords` |
-| `UsualLengthFields` (`core:ui`) | A3 | Exists |
+| `UsualLengthSliders` (`core:ui`, two `SliderField`s) | A3 | Exists |
 | `Card`, `ClickableCard` | Today's cards, History, Contraception's Now card | Exist |
 | `FilledButton`, `TonalButton`, `TextButton` | Throughout | Exist |
 | `CycleBottomSheet` | C3 and the estimate sheet, E6 | Exists |
