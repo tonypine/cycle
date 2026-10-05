@@ -14,7 +14,7 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * The empty state with an icon and an action, in a fixed box, in light, dark, 200% font scale and
+ * The empty state with an icon and an action, and with a second, text action under it, in a fixed box, in light, dark, 200% font scale and
  * right-to-left. At 200% the content is taller than the box: it scrolls, so the screenshot shows its
  * top and the rest stays reachable (`ContainerSemanticsTest` scrolls to the action).
  */
@@ -32,6 +32,18 @@ class EmptyStateScreenshotTest(private val case: MatrixCase) {
             modifier = Modifier.size(width = 288.dp, height = 400.dp),
             illustration = { EmptyStateIcon(CycleIcons.Calendar) },
             action = EmptyStateAction("Log a period", onClick = {}, icon = CycleIcons.Add)
+        )
+    }
+
+    @Test
+    fun emptyStateWithTwoActions() = matrix.capture("empty_state_two_actions", case) {
+        EmptyState(
+            title = "Hi! Let's get your cycle going",
+            body = "Log your period and Cycle estimates the next one.",
+            modifier = Modifier.size(width = 288.dp, height = 400.dp),
+            illustration = { EmptyStateIcon(CycleIcons.WaterDrop) },
+            action = EmptyStateAction("Get started", onClick = {}),
+            secondaryAction = EmptyStateAction("Skip for now", onClick = {})
         )
     }
 

@@ -16,6 +16,23 @@ object CycleRules {
     const val DEFAULT_PERIOD_LENGTH = 5
 
     /**
+     * The usual cycle lengths she can give at setup. Anything in between is accepted, unusual or not
+     * (`cycle-physiology.md`, "Bound inputs ... without rejecting her data"): a 19-day or a 50-day
+     * cycle happens. 15 days is already shorter than the shortest common follicular phase (10 days,
+     * period included) and luteal phase (7 days) together (Bull 2019), so anything shorter is not a
+     * cycle; at 90 days without a period it is time to see a doctor (ACOG, `health-signals.md`), and
+     * there is no rhythm left to estimate from.
+     */
+    val USUAL_CYCLE_LENGTHS = 15..90
+
+    /**
+     * The usual period lengths she can give at setup. More than 8 days is "prolonged" (FIGO 2018,
+     * `cycle-physiology.md`) but still accepted; a period of more than two weeks is not a usual one.
+     * The longest stays shorter than the shortest cycle, so the two always fit together.
+     */
+    val USUAL_PERIOD_LENGTHS = 1..14
+
+    /**
      * Days without a period log that a period may contain and still be one period
      * (`predictions.md`, "Inputs": "allowing a gap of a day without a log inside it").
      */

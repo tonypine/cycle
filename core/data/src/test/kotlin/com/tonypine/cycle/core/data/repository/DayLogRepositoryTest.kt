@@ -51,6 +51,37 @@ class DayLogRepositoryTest {
     }
 
     @Test
+    fun `a period logged in the past starts on its day and ends after its length`() = runTest {
+        repository.logPeriod(day("2027-03-02"), length = 5, today = day("2027-03-20"))
+
+        assertEquals(
+            listOf(DayLog(day("2027-03-02"), periodStarted = true), DayLog(day("2027-03-06"), periodEnded = true)),
+            repository.observeDayLogs().first()
+        )
+    }
+
+    @Test
+    fun `a period that would end after today is still going`() = runTest {
+        repository.logPeriod(day("2027-03-18"), length = 5, today = day("2027-03-20"))
+
+        assertEquals(listOf(DayLog(day("2027-03-18"), periodStarted = true)), repository.observeDayLogs().first())
+    }
+
+    @Test
+    fun `a period ending today is still going, to be ended by hand`() = runTest {
+        repository.logPeriod(day("2027-03-16"), length = 5, today = day("2027-03-20"))
+
+        assertEquals(listOf(DayLog(day("2027-03-16"), periodStarted = true)), repository.observeDayLogs().first())
+    }
+
+    @Test
+    fun `a period starting after today is not logged`() = runTest {
+        repository.logPeriod(day("2027-03-21"), length = 5, today = day("2027-03-20"))
+
+        assertEquals(emptyList<DayLog>(), repository.observeDayLogs().first())
+    }
+
+    @Test
     fun `undoing the only thing logged on a day removes the day`() = runTest {
         repository.setPeriodStarted(day("2027-03-02"), started = true)
         repository.setPeriodStarted(day("2027-03-02"), started = false)

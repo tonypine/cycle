@@ -9,7 +9,9 @@ import com.tonypine.cycle.core.model.LogCategory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -45,6 +47,31 @@ class SettingsRepositoryTest {
     }
 
     @Test
+    fun `setup saves both lengths and marks setup done`() = runTest {
+        val settings = settingsRepository(folder.root, backgroundScope)
+
+        settings.saveSetup(cycleLength = 33, periodLength = 6)
+
+        assertEquals(
+            CycleSettings(usualCycleLength = 33, usualPeriodLength = 6, setupDone = true),
+            settings.settings.first()
+        )
+        // Setup alone does not pass the welcome: the app does that once everything is saved.
+        assertFalse(settings.welcomeDone.first())
+    }
+
+    @Test
+    fun `the welcome is done once set, apart from setup`() = runTest {
+        val settings = settingsRepository(folder.root, backgroundScope)
+        assertFalse(settings.welcomeDone.first())
+
+        settings.setWelcomeDone(true)
+
+        assertTrue(settings.welcomeDone.first())
+        assertFalse(settings.settings.first().setupDone)
+    }
+
+    @Test
     fun `remembers each dismissed prompt under its own cycle`() = runTest {
         val settings = settingsRepository(folder.root, backgroundScope)
 
@@ -66,6 +93,9 @@ class SettingsRepositoryTest {
         }
         assertThrows(IllegalArgumentException::class.java) {
             kotlinx.coroutines.runBlocking { settings.setUsualPeriodLength(-1) }
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            kotlinx.coroutines.runBlocking { settings.saveSetup(cycleLength = 28, periodLength = 0) }
         }
     }
 

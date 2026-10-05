@@ -59,12 +59,7 @@ class TodayViewModel(
      * when that is over before today, its last day is marked ended; otherwise it is still going.
      */
     fun onLogPeriod(start: LocalDate) = write {
-        val today = day.value
-        if (start > today) return@write
-        val end = start.plusDays(settings.settings.first().usualPeriodLength - 1L)
-        // The end first: alone it is ignored, so Today never shows the period open in between.
-        if (end < today) dayLogs.setPeriodEnded(end, ended = true)
-        dayLogs.setPeriodStarted(start, started = true)
+        dayLogs.logPeriod(start, settings.settings.first().usualPeriodLength, day.value)
     }
 
     /** "Log it" in the day log sheet: the flow she picked for [date] (null for none) and how she felt. */

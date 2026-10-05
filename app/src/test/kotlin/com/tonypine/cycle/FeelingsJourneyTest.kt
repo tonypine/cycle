@@ -65,6 +65,9 @@ class FeelingsJourneyTest {
         composeRule.setContent {
             CycleTheme(reduceMotion = true) { CycleApp(data, today = { LocalDate.of(2027, 3, 20) }) }
         }
+        // Skips the first-run welcome to Today's empty state.
+        waitFor(hasText("Skip for now"))
+        composeRule.onNodeWithText("Skip for now").performClick()
         waitFor(hasText("Log a period"))
         composeRule.onNodeWithText("Log a period").performClick()
         composeRule.waitForIdle()

@@ -12,13 +12,14 @@ import com.tonypine.cycle.core.model.CycleSettings
 import com.tonypine.cycle.core.model.LogCategory
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 /**
- * Her settings, in DataStore: the usual lengths, whether setup is done, the prompts she has
- * dismissed, each under the first day of its cycle, and the day log categories she hid. Until she
- * sets them, the lengths are [CycleRules.DEFAULT_CYCLE_LENGTH] and [CycleRules.DEFAULT_PERIOD_LENGTH],
- * and every category shows.
+ * Her settings, in DataStore: the usual lengths, whether setup is done, whether she is past the
+ * welcome, the prompts she has dismissed, each under the first day of its cycle, and the day log
+ * categories she hid. Until she sets them, the lengths are [CycleRules.DEFAULT_CYCLE_LENGTH] and
+ * [CycleRules.DEFAULT_PERIOD_LENGTH], and every category shows.
  */
 class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     val settings: Flow<CycleSettings> = dataStore.data.map { preferences ->
@@ -31,6 +32,27 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
             hiddenCategories = preferences[HIDDEN_CATEGORIES].orEmpty()
                 .mapNotNullTo(mutableSetOf()) { code -> CATEGORY_CODES.entries.firstOrNull { it.value == code }?.key }
         )
+    }
+
+    /**
+     * She finished or skipped the first-run welcome, so the app opens on Today. Kept apart from
+     * [CycleSettings.setupDone]: skipping the welcome leaves the estimates on the typical lengths.
+     */
+    val welcomeDone: Flow<Boolean> = dataStore.data.map { it[WELCOME_DONE] ?: false }.distinctUntilChanged()
+
+    suspend fun setWelcomeDone(done: Boolean) {
+        dataStore.edit { it[WELCOME_DONE] = done }
+    }
+
+    /** Setup's lengths, and setup marked done, in one write: estimates never mix the two. */
+    suspend fun saveSetup(cycleLength: Int, periodLength: Int) {
+        require(cycleLength > 0) { "A cycle lasts at least a day, got $cycleLength" }
+        require(periodLength > 0) { "A period lasts at least a day, got $periodLength" }
+        dataStore.edit {
+            it[USUAL_CYCLE_LENGTH] = cycleLength
+            it[USUAL_PERIOD_LENGTH] = periodLength
+            it[SETUP_DONE] = true
+        }
     }
 
     suspend fun setUsualCycleLength(days: Int) {
@@ -74,6 +96,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         val USUAL_CYCLE_LENGTH = intPreferencesKey("usual_cycle_length")
         val USUAL_PERIOD_LENGTH = intPreferencesKey("usual_period_length")
         val SETUP_DONE = booleanPreferencesKey("setup_done")
+        val WELCOME_DONE = booleanPreferencesKey("welcome_done")
 
         // ISO dates of the first day of each cycle whose prompt she dismissed.
         val DISMISSED_STILL_GOING = stringSetPreferencesKey("dismissed_still_going")
