@@ -17,7 +17,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * The app with no data: the welcome, then, after Skip, Today's empty state and a placeholder tab,
+ * The app with no data: the welcome, then, after Skip, Today's empty state and an empty calendar,
  * the navigation bar under each, in light and dark. Records
  * `src/test/screenshots/app_<screen>_<appearance>.png`.
  */

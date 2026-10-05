@@ -53,6 +53,6 @@ class TodayScreenshotTest(private val name: String, private val appearance: Appe
         @ParameterizedRobolectricTestRunner.Parameters(name = "{0}_{1}")
         fun cases(): List<Array<Any>> = TodaySamples.all.keys.flatMap { name ->
             listOf(Appearance.Light, Appearance.Dark).map { arrayOf<Any>(name, it) }
-        } + listOf("mid_cycle", "still_going").map { arrayOf<Any>(it, Appearance.FontScale200) }
+        } + listOf("mid_cycle", "still_going", "missed_period").map { arrayOf<Any>(it, Appearance.FontScale200) }
     }
 }
