@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
+import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.FlowLevel
 import java.time.LocalDate
 import java.time.YearMonth
@@ -70,9 +71,9 @@ class CalendarViewModel(
         if (date <= day.value) selected.value = date
     }
 
-    /** "Log it": the flow she picked for [date], or null for none. */
-    fun onLogDay(date: LocalDate, flow: FlowLevel?) = write {
-        if (date <= day.value) dayLogs.setFlow(date, flow)
+    /** "Log it": the flow she picked for [date] (null for none) and how she felt. */
+    fun onLogDay(date: LocalDate, flow: FlowLevel?, feelings: DayFeelings) = write {
+        if (date <= day.value) dayLogs.logDay(date, flow, feelings)
     }
 
     /** "Period started this day: fill in N days" on [start], N being her usual period length. */
@@ -82,9 +83,11 @@ class CalendarViewModel(
         dayLogs.fillPeriod(start, cycles.observeLog(today).first().usualPeriodLength, today)
     }
 
-    /** "Clear this day" on [date]. */
+    /** "Clear this day" on [date]: what she logged in the categories she hid stays. */
     fun onClearDay(date: LocalDate) = write {
-        if (date <= day.value) dayLogs.clearDay(date, day.value)
+        val today = day.value
+        if (date > today) return@write
+        dayLogs.clearDay(date, today, cycles.observeLog(today).first().hiddenCategories)
     }
 
     private fun write(block: suspend () -> Unit) {

@@ -5,15 +5,20 @@ import com.tonypine.cycle.core.data.day
 import com.tonypine.cycle.core.data.inMemoryDatabase
 import com.tonypine.cycle.core.data.settingsRepository
 import com.tonypine.cycle.core.model.CyclePrompt
+import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.EstimateBasis
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.LogCategory
 import com.tonypine.cycle.core.model.Period
+import com.tonypine.cycle.core.model.SexualActivity
 import java.time.LocalDate
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -25,7 +30,7 @@ class CycleRepositoryTest {
     val folder = TemporaryFolder()
 
     private val database = inMemoryDatabase()
-    private val dayLogs = DayLogRepository(database.dayLogDao())
+    private val dayLogs = DayLogRepository(database)
 
     @After
     fun closeDatabase() = database.close()
@@ -126,5 +131,27 @@ class CycleRepositoryTest {
         assertEquals(false, log.canFill(day("2027-03-06")))
         assertEquals(true, log.canClear(day("2027-03-03")))
         assertEquals(false, log.canClear(day("2027-03-12")))
+    }
+
+    @Test
+    fun `the log carries how she felt and what she hid, and a day she can see something on can be cleared`() = runTest {
+        val settings = settingsRepository(folder.root, backgroundScope)
+        val cycles = CycleRepository(dayLogs, settings)
+        val sex = DayFeelings(day("2027-03-05"), sex = SexualActivity.PROTECTED)
+        dayLogs.logDay(day("2027-03-05"), null, sex)
+        val today = day("2027-03-10")
+
+        val shown = cycles.observeLog(today).first()
+        assertEquals(sex, shown.feelings(day("2027-03-05")))
+        assertEquals(DayFeelings(day("2027-03-06")), shown.feelings(day("2027-03-06")))
+        assertTrue(shown.canClear(day("2027-03-05")))
+
+        settings.setCategoryShown(LogCategory.SEX, shown = false)
+
+        val hidden = cycles.observeLog(today).first()
+        assertEquals(setOf(LogCategory.SEX), hidden.hiddenCategories)
+        // Hidden, not deleted: the log still has it, and the sheet saves it back as it was.
+        assertEquals(sex, hidden.feelings(day("2027-03-05")))
+        assertFalse(hidden.canClear(day("2027-03-05")))
     }
 }

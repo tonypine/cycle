@@ -44,7 +44,9 @@ sealed interface CalendarUiState {
                         flow = log.log(date).flow,
                         fillDays = log.usualPeriodLength.takeIf { log.canFill(date) },
                         canClear = log.canClear(date),
-                        isPeriodDay = days.isPeriodDay(date)
+                        isPeriodDay = days.isPeriodDay(date),
+                        feelings = log.feelings(date),
+                        hiddenCategories = log.hiddenCategories
                     )
                 }
             )

@@ -53,7 +53,7 @@ class CalendarScreenTest {
             // As the ViewModel does: the day is selected and its sheet has what to show.
             state = CalendarSamples.selected
         },
-        onLogDay = { date, flow -> calls += "log $date $flow" },
+        onLogDay = { date, flow, _ -> calls += "log $date $flow" },
         onFillPeriod = { calls += "fill $it" },
         onClearDay = { calls += "clear $it" }
     )

@@ -86,7 +86,7 @@ class CalendarJourneyTest {
 
         composeRule.onNodeWithContentDescription("February 4, period").performClick()
         waitFor(hasText("Clear this day"))
-        composeRule.onNodeWithText("Clear this day").performClick()
+        composeRule.onNodeWithText("Clear this day").performScrollTo().performClick()
         waitFor(hasText("Clear February 4?"))
         composeRule.onNodeWithText("Clear").performClick()
 

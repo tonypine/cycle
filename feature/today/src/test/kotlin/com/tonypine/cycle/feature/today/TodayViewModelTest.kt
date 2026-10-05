@@ -10,10 +10,16 @@ import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
 import com.tonypine.cycle.core.designsystem.CycleDayState
+import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
+import com.tonypine.cycle.core.model.EnergyLevel
 import com.tonypine.cycle.core.model.EstimateBasis
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.LogCategory
+import com.tonypine.cycle.core.model.Mood
 import com.tonypine.cycle.core.model.Period
+import com.tonypine.cycle.core.model.SexualActivity
+import com.tonypine.cycle.core.model.SleepQuality
 import java.io.File
 import java.time.LocalDate
 import java.time.YearMonth
@@ -53,7 +59,7 @@ class TodayViewModelTest {
         .inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext<Context>(), CycleDatabase::class.java)
         .allowMainThreadQueries()
         .build()
-    private val dayLogs = DayLogRepository(database.dayLogDao())
+    private val dayLogs = DayLogRepository(database)
 
     @Before
     fun setMain() = Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -206,7 +212,7 @@ class TodayViewModelTest {
         viewModel.onLogPeriod(day("2027-03-02"))
         viewModel.awaitState<TodayUiState.Tracking>()
 
-        viewModel.onLogDay(today, FlowLevel.SPOTTING)
+        viewModel.onLogDay(today, FlowLevel.SPOTTING, DayFeelings(today))
 
         val state = viewModel.awaitState<TodayUiState.Tracking> { it.todayLog.flow != null }
         assertEquals(FlowLevel.SPOTTING, state.todayLog.flow)
@@ -214,11 +220,41 @@ class TodayViewModelTest {
     }
 
     @Test
+    fun `the day log saves how she felt, and hiding a category keeps it for when it shows again`() =
+        today { viewModel, settings ->
+            viewModel.onLogPeriod(day("2027-03-02"))
+            viewModel.awaitState<TodayUiState.Tracking>()
+            val feelings = DayFeelings(
+                today,
+                moods = setOf(Mood.IRRITABLE),
+                sleep = SleepQuality.BADLY,
+                sex = SexualActivity.PROTECTED
+            )
+
+            viewModel.onLogDay(today, null, feelings)
+            val logged = viewModel.awaitState<TodayUiState.Tracking> { it.todayLog.isLogged }
+            assertEquals(feelings, logged.todayLog.shownFeelings)
+
+            settings.setCategoryShown(LogCategory.SEX, shown = false)
+            val hidden = viewModel.awaitState<TodayUiState.Tracking> { it.todayLog.hiddenCategories.isNotEmpty() }
+            assertEquals(feelings.copy(sex = null), hidden.todayLog.shownFeelings)
+            // The sheet starts from everything, so saving it again keeps the hidden category.
+            assertEquals(feelings, hidden.todayLog.feelings)
+            viewModel.onLogDay(today, null, hidden.todayLog.feelings.copy(energy = EnergyLevel.HIGH))
+
+            settings.setCategoryShown(LogCategory.SEX, shown = true)
+            val shown = viewModel.awaitState<TodayUiState.Tracking> {
+                it.todayLog.hiddenCategories.isEmpty() && it.todayLog.feelings.energy != null
+            }
+            assertEquals(feelings.copy(energy = EnergyLevel.HIGH), shown.todayLog.shownFeelings)
+        }
+
+    @Test
     fun `the day log never logs a day after today`() = today { viewModel, _ ->
         viewModel.onLogPeriod(day("2027-03-02"))
         viewModel.awaitState<TodayUiState.Tracking>()
 
-        viewModel.onLogDay(today.plusDays(1), FlowLevel.HEAVY)
+        viewModel.onLogDay(today.plusDays(1), FlowLevel.HEAVY, DayFeelings(today.plusDays(1)))
 
         assertEquals(emptyList<DayLog>(), dayLogs.observeDayLogs(today.plusDays(1), today.plusDays(1)).first())
     }
@@ -232,7 +268,7 @@ class TodayViewModelTest {
 
         viewModel.onClearDay(today.plusDays(1))
         // Written after the clear, in order, so once it shows, the clear has run.
-        viewModel.onLogDay(today, FlowLevel.SPOTTING)
+        viewModel.onLogDay(today, FlowLevel.SPOTTING, DayFeelings(today))
         viewModel.awaitState<TodayUiState.Tracking> { it.todayLog.flow != null }
 
         assertEquals(

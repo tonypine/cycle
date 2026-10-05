@@ -32,6 +32,7 @@ import com.tonypine.cycle.core.designsystem.LoadingState
 import com.tonypine.cycle.core.designsystem.MonthCalendar
 import com.tonypine.cycle.core.designsystem.TopAppBar
 import com.tonypine.cycle.core.designsystem.rememberCycleBottomSheetState
+import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.ui.DayLogSheet
 import java.time.LocalDate
@@ -84,7 +85,7 @@ class CalendarActions(
     val onNextMonth: () -> Unit = {},
     val onGoToToday: () -> Unit = {},
     val onDayClick: (date: LocalDate) -> Unit = {},
-    val onLogDay: (date: LocalDate, flow: FlowLevel?) -> Unit = { _, _ -> },
+    val onLogDay: (date: LocalDate, flow: FlowLevel?, feelings: DayFeelings) -> Unit = { _, _, _ -> },
     val onFillPeriod: (start: LocalDate) -> Unit = {},
     val onClearDay: (date: LocalDate) -> Unit = {}
 )

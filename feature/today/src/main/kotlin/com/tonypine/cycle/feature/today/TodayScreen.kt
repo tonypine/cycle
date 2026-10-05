@@ -41,11 +41,15 @@ import com.tonypine.cycle.core.designsystem.TextButton
 import com.tonypine.cycle.core.designsystem.TonalButton
 import com.tonypine.cycle.core.designsystem.WeekRow
 import com.tonypine.cycle.core.designsystem.rememberCycleBottomSheetState
+import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.EstimateBasis
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.ui.DAY_AND_DATE
+import com.tonypine.cycle.core.ui.DayLogEntry
 import com.tonypine.cycle.core.ui.DayLogSheet
+import com.tonypine.cycle.core.ui.daySummary
 import com.tonypine.cycle.core.ui.formatDate
+import com.tonypine.cycle.core.ui.summaryLine
 import java.time.LocalDate
 import java.time.YearMonth
 import kotlinx.coroutines.launch
@@ -90,7 +94,7 @@ class TodayActions(
     val onPeriodEnded: () -> Unit = {},
     val onUndoPeriodEnded: () -> Unit = {},
     val onLogPeriod: (start: LocalDate) -> Unit = {},
-    val onLogDay: (date: LocalDate, flow: FlowLevel?) -> Unit = { _, _ -> },
+    val onLogDay: (date: LocalDate, flow: FlowLevel?, feelings: DayFeelings) -> Unit = { _, _, _ -> },
     val onFillPeriod: (start: LocalDate) -> Unit = {},
     val onClearDay: (date: LocalDate) -> Unit = {},
     val onStillGoing: () -> Unit = {},
@@ -100,8 +104,8 @@ class TodayActions(
 )
 
 /**
- * Today: the day and date, her cycle day, a line of context, this week, the one-tap period buttons
- * and the next period estimate. Scrolls when the text is large, so nothing clips at 200%.
+ * Today: the day and date, her cycle day, a line of context, this week, the one-tap period buttons,
+ * what she logged today and the next period estimate. Scrolls when the text is large, so nothing clips at 200%.
  */
 @Composable
 fun TodayScreen(state: TodayUiState, actions: TodayActions, modifier: Modifier = Modifier) {
@@ -161,6 +165,9 @@ private fun TrackingToday(state: TodayUiState.Tracking, actions: TodayActions, m
         )
         StatusCard(state, actions, onEndedEarlier = { scope.launch { lastDaySheet.show() } }, modifier = margin)
         Actions(state, actions, onLog = { scope.launch { dayLogSheet.show() } }, modifier = margin)
+        if (state.todayLog.isLogged) {
+            LoggedTodayCard(state.todayLog, onEdit = { scope.launch { dayLogSheet.show() } }, modifier = margin)
+        }
         NextPeriodCard(state.nextPeriod, onExplain = { scope.launch { estimateSheet.show() } }, modifier = margin)
     }
 
@@ -297,6 +304,29 @@ private fun Actions(state: TodayUiState.Tracking, actions: TodayActions, onLog: 
             modifier = Modifier.fillMaxWidth(),
             icon = CycleIcons.EditNote
         )
+    }
+}
+
+/**
+ * "Logged today: Cramps, moderate · Bloating · Low energy", once she has logged something she shows,
+ * with Edit to open the day log again. TalkBack reads the title and the summary as one item. The note
+ * stays out of the line; a day with only a note says so.
+ */
+@Composable
+private fun LoggedTodayCard(log: DayLogEntry, onEdit: () -> Unit, modifier: Modifier) {
+    val items = daySummary(log.flow, log.shownFeelings)
+    Card(modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.semantics(mergeDescendants = true) {},
+            verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.extraSmall)
+        ) {
+            CardTitle(stringResource(R.string.today_logged_title))
+            CardBody(
+                if (items.isEmpty()) stringResource(R.string.today_logged_note_only) else summaryLine(items),
+                style = CycleTheme.typography.body
+            )
+        }
+        TextButton(stringResource(R.string.today_logged_edit), onClick = onEdit, icon = CycleIcons.Edit)
     }
 }
 

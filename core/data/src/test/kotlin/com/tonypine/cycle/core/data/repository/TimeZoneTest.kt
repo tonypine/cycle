@@ -26,7 +26,7 @@ class TimeZoneTest {
     val folder = TemporaryFolder()
 
     private val database = inMemoryDatabase()
-    private val dayLogs = DayLogRepository(database.dayLogDao())
+    private val dayLogs = DayLogRepository(database)
     private val originalZone = TimeZone.getDefault()
 
     @After

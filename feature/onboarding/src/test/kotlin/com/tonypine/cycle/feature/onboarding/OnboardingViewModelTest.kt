@@ -49,7 +49,7 @@ class OnboardingViewModelTest {
         .inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext<Context>(), CycleDatabase::class.java)
         .allowMainThreadQueries()
         .build()
-    private val dayLogs = DayLogRepository(database.dayLogDao())
+    private val dayLogs = DayLogRepository(database)
 
     @Before
     fun setMain() = Dispatchers.setMain(UnconfinedTestDispatcher())

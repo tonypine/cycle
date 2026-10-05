@@ -1,9 +1,17 @@
 package com.tonypine.cycle.feature.today
 
+import com.tonypine.cycle.core.model.BodySymptom
 import com.tonypine.cycle.core.model.CyclePrompt
+import com.tonypine.cycle.core.model.DayFeelings
+import com.tonypine.cycle.core.model.EnergyLevel
 import com.tonypine.cycle.core.model.EstimateBasis
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.Mood
+import com.tonypine.cycle.core.model.Pain
+import com.tonypine.cycle.core.model.PainKind
+import com.tonypine.cycle.core.model.PainLevel
 import com.tonypine.cycle.core.model.Period
+import com.tonypine.cycle.core.model.SleepQuality
 import com.tonypine.cycle.core.ui.CalendarDays
 import com.tonypine.cycle.core.ui.DayLogEntry
 import java.time.LocalDate
@@ -125,6 +133,22 @@ internal object TodaySamples {
         )
     )
 
+    /** Day 19, after logging how she feels: the walkthrough's day, with a synthetic note. */
+    val loggedToday = midCycle.copy(
+        todayLog = midCycle.todayLog.copy(
+            canClear = true,
+            feelings = DayFeelings(
+                date = today,
+                pain = Pain(PainLevel.MODERATE, setOf(PainKind.CRAMPS)),
+                body = setOf(BodySymptom.BLOATING),
+                moods = setOf(Mood.IRRITABLE),
+                energy = EnergyLevel.LOW,
+                sleep = SleepQuality.BADLY,
+                note = "A synthetic note."
+            )
+        )
+    )
+
     /** Every state, by name, in the order the screenshots list them. */
     val all: Map<String, TodayUiState> = linkedMapOf(
         "empty" to empty,
@@ -135,7 +159,8 @@ internal object TodaySamples {
         "period_ended" to periodEnded,
         "late" to late,
         "still_going" to stillGoing,
-        "missed_period" to missedPeriod
+        "missed_period" to missedPeriod,
+        "logged_today" to loggedToday
     )
 
     private fun tracking(

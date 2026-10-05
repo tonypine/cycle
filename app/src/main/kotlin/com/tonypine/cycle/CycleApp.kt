@@ -37,6 +37,9 @@ import com.tonypine.cycle.feature.history.HistoryRoute
 import com.tonypine.cycle.feature.history.HistoryViewModel
 import com.tonypine.cycle.feature.onboarding.OnboardingRoute
 import com.tonypine.cycle.feature.onboarding.OnboardingViewModel
+import com.tonypine.cycle.feature.settings.SettingsScreen
+import com.tonypine.cycle.feature.settings.WhatToLogRoute
+import com.tonypine.cycle.feature.settings.WhatToLogViewModel
 import com.tonypine.cycle.feature.today.TodayRoute
 import com.tonypine.cycle.feature.today.TodayViewModel
 import java.time.LocalDate
@@ -78,7 +81,7 @@ fun CycleApp(
  * One screen per tab above the navigation bar. Each tab keeps its state when she leaves it, and back
  * from any tab returns to Today, then leaves the app. Today's "missed a period?" card opens the
  * calendar on the month the period was likely in, and a cycle's "See it in the calendar" on the
- * month it started.
+ * month it started. Settings opens What to log inside its tab.
  */
 @Composable
 private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: NavHostController) {
@@ -137,7 +140,17 @@ private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: Na
                     )
                 }
             }
-            composable(TopLevelDestination.Settings.route) { PlaceholderScreen(TopLevelDestination.Settings) }
+            navigation(startDestination = SETTINGS_HOME_ROUTE, route = TopLevelDestination.Settings.route) {
+                composable(SETTINGS_HOME_ROUTE) {
+                    SettingsScreen(onWhatToLog = { navController.navigate(WHAT_TO_LOG_ROUTE) })
+                }
+                composable(WHAT_TO_LOG_ROUTE) {
+                    WhatToLogRoute(
+                        viewModel { WhatToLogViewModel(data.settingsRepository) },
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+            }
         }
         NavigationBar(
             destinations = TopLevelDestination.entries.map { NavigationDestination(stringResource(it.label), it.icon) },
@@ -146,6 +159,10 @@ private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: Na
         )
     }
 }
+
+// The screens inside the Settings tab.
+private const val SETTINGS_HOME_ROUTE = "settings/home"
+private const val WHAT_TO_LOG_ROUTE = "settings/what_to_log"
 
 /** Opens [destination] with Today under it, so back returns to Today; each tab keeps its state. */
 private fun NavHostController.navigateToTab(destination: TopLevelDestination) {
