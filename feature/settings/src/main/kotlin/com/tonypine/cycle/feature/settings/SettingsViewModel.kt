@@ -75,8 +75,9 @@ class SettingsViewModel(
     }
 
     /**
-     * Reads and checks the file [open] opens, the one she picked, then asks "Import N days?", says
-     * there is nothing new, or says why it can't be imported. Nothing is written yet.
+     * Reads and checks the file [open] opens, the one she picked, then asks "Import N days?", or
+     * "Import your usual lengths?" for a file that brings only those, says there is nothing new, or
+     * says why it can't be imported. Nothing is written yet.
      */
     fun onImport(open: () -> InputStream?) {
         viewModelScope.launch {
@@ -91,7 +92,8 @@ class SettingsViewModel(
             when {
                 read is ImportRead.Refused -> show(DataDialog.ImportRefused(read.problem))
 
-                read is ImportRead.Ready && read.newDays == 0 -> show(DataDialog.NothingToImport)
+                read is ImportRead.Ready && read.newDays == 0 && !read.restoresLengths ->
+                    show(DataDialog.NothingToImport)
 
                 read is ImportRead.Ready -> {
                     pending = read.file
@@ -101,14 +103,18 @@ class SettingsViewModel(
         }
     }
 
-    /** "Import": adds the new days of the file she picked, then calls [onImported]. */
+    /**
+     * "Import": adds the new days of the file she picked, and its usual lengths if she has not done
+     * setup, then calls [onImported].
+     */
     fun onConfirmImport(onImported: () -> Unit = {}) {
         val file = pending ?: return
         pending = null
         visit.update { it.copy(dialog = null) }
         viewModelScope.launch {
             val added = yourData.import(file)
-            visit.update { it.copy(importedDays = added) }
+            // A file that brought only her usual lengths shows in "Usual cycle and period".
+            if (added > 0) visit.update { it.copy(importedDays = added) }
             onImported()
         }
     }
@@ -152,7 +158,10 @@ data class SettingsUiState(
 
 /** A dialog of "Your data", after she picked a file. */
 sealed interface DataDialog {
-    /** "Import N days?", with [newDays] the days of the file not on the phone yet. */
+    /**
+     * "Import N days?", with [newDays] the days of the file not on the phone yet, or "Import your
+     * usual lengths?" when it brings none but its usual lengths.
+     */
     data class ConfirmImport(val newDays: Int) : DataDialog
 
     /** Every day in the file is on the phone already. */

@@ -45,6 +45,8 @@
         <item quantity="other">Import %1$d days?</item>
     </plurals>
     <string name="import_confirm_text">Days already logged on this phone stay as they are.</string>
+    <string name="import_lengths_title">Import your usual lengths?</string>
+    <string name="import_lengths_text">This file has no new days, only your usual cycle and period lengths. Cycle uses them for its estimates.</string>
     <string name="import_confirm">Import</string>
     <string name="import_cancel">Cancel</string>
     <string name="import_nothing_title">Nothing new to import</string>

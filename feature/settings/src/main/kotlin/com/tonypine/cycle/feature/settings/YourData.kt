@@ -53,9 +53,9 @@ internal fun rememberExportLauncher(viewModel: SettingsViewModel): () -> Unit {
 }
 
 /**
- * The dialogs of "Your data" after she picked a file: "Import N days?", nothing new to import, why
- * a file can't be imported, and an export that could not be saved. Each stays in composition, so it
- * animates out with what it said.
+ * The dialogs of "Your data" after she picked a file: "Import N days?" or "Import your usual
+ * lengths?", nothing new to import, why a file can't be imported, and an export that could not be
+ * saved. Each stays in composition, so it animates out with what it said.
  */
 @Composable
 internal fun DataDialogs(dialog: DataDialog?, onConfirmImport: () -> Unit, onDismiss: () -> Unit) {
@@ -63,8 +63,14 @@ internal fun DataDialogs(dialog: DataDialog?, onConfirmImport: () -> Unit, onDis
     CycleAlertDialog(
         visible = dialog is DataDialog.ConfirmImport,
         onDismissRequest = onDismiss,
-        title = confirm?.let { pluralStringResource(R.plurals.import_confirm_title, it.newDays, it.newDays) }.orEmpty(),
-        text = stringResource(R.string.import_confirm_text),
+        title = when {
+            confirm == null -> ""
+            confirm.newDays == 0 -> stringResource(R.string.import_lengths_title)
+            else -> pluralStringResource(R.plurals.import_confirm_title, confirm.newDays, confirm.newDays)
+        },
+        text = stringResource(
+            if (confirm?.newDays == 0) R.string.import_lengths_text else R.string.import_confirm_text
+        ),
         confirmText = stringResource(R.string.import_confirm),
         onConfirm = onConfirmImport,
         dismissText = stringResource(R.string.import_cancel)

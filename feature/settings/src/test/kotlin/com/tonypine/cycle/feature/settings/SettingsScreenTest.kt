@@ -127,6 +127,18 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun `a picked file with only the usual lengths asks to import them`() {
+        state = state.copy(dialog = DataDialog.ConfirmImport(newDays = 0))
+        show()
+
+        composeRule.onNode(hasText("Import your usual lengths?") and isHeading()).assertIsDisplayed()
+        composeRule.onNodeWithText("only your usual cycle and period lengths", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText("Import").performClick()
+
+        assertEquals(listOf("confirm import"), calls)
+    }
+
+    @Test
     fun `a malformed file is refused with a sentence that says what is wrong`() {
         val sentences = mapOf(
             ImportProblem.Unreadable to "Cycle couldn't open this file. Try picking it again.",

@@ -177,6 +177,27 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun `a file with only the usual lengths asks to import them and restores them`() = runTest {
+        val viewModel = settingsViewModel()
+        settings.saveSetup(cycleLength = 31, periodLength = 6)
+        settings.setWelcomeDone(true)
+        val export = ByteArrayOutputStream().also { YourDataRepository(database, settings).export(it) }.toByteArray()
+        viewModel.onDeleteEverything()
+        settings.welcomeDone.first { !it }
+
+        viewModel.onImport { ByteArrayInputStream(export) }
+        assertEquals(DataDialog.ConfirmImport(newDays = 0), viewModel.awaitDialog())
+
+        var restored = false
+        viewModel.onConfirmImport(onImported = { restored = true })
+
+        val state = viewModel.uiState.first { it?.usualCycleLength == 31 }
+        assertEquals(SettingsUiState(31, 6, lastExported = null), state)
+        assertTrue(settings.settings.first().setupDone)
+        assertTrue(restored)
+    }
+
+    @Test
     fun `a malformed or unreadable file is refused with its problem`() = runTest {
         val viewModel = settingsViewModel()
 

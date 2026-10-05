@@ -19,8 +19,8 @@ import kotlinx.coroutines.flow.map
 /**
  * Her settings, in DataStore: the usual lengths, whether setup is done, whether she is past the
  * welcome, the prompts she has dismissed, each under the first day of its cycle, the day log
- * categories she hid and the day she last exported her data. Until she sets them, the lengths are [CycleRules.DEFAULT_CYCLE_LENGTH] and
- * [CycleRules.DEFAULT_PERIOD_LENGTH], and every category shows.
+ * categories she hid and the day she last exported her data. Until she sets them, the lengths are
+ * [CycleRules.DEFAULT_CYCLE_LENGTH] and [CycleRules.DEFAULT_PERIOD_LENGTH], and every category shows.
  */
 class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     val settings: Flow<CycleSettings> = dataStore.data.map { preferences ->

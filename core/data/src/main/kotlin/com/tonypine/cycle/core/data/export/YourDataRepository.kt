@@ -24,8 +24,12 @@ class ImportFile internal constructor(internal val days: List<LoggedDay>, intern
 
 /** What reading a file for import gives. */
 sealed interface ImportRead {
-    /** The file can be imported: [newDays] of its days are not on the phone yet. */
-    data class Ready(val file: ImportFile, val newDays: Int) : ImportRead
+    /**
+     * The file can be imported: [newDays] of its days are not on the phone yet, and
+     * [restoresLengths] says whether its usual lengths would be restored, on a phone where she has
+     * not done setup.
+     */
+    data class Ready(val file: ImportFile, val newDays: Int, val restoresLengths: Boolean) : ImportRead
 
     /** The file cannot be imported, because of [problem]. */
     data class Refused(val problem: ImportProblem) : ImportRead
@@ -72,7 +76,11 @@ class YourDataRepository(
 
             is CsvRead.Days -> {
                 val onPhone = database.withTransaction { loggedDates() }
-                ImportRead.Ready(ImportFile(read.days, read.usualLengths), read.days.count { it.date !in onPhone })
+                ImportRead.Ready(
+                    ImportFile(read.days, read.usualLengths),
+                    newDays = read.days.count { it.date !in onPhone },
+                    restoresLengths = read.usualLengths != null && !settings.settings.first().setupDone
+                )
             }
         }
     }

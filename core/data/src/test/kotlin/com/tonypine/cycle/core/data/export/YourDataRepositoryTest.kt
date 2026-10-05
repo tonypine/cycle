@@ -139,6 +139,27 @@ class YourDataRepositoryTest {
     }
 
     @Test
+    fun `a file with only the usual lengths restores them after delete everything`() = runTest {
+        val phone = phone()
+        phone.settings.saveSetup(cycleLength = 30, periodLength = 4)
+        val exported = phone.repository.exportBytes()
+
+        val onSetUpPhone = phone.repository.read(ByteArrayInputStream(exported)) as ImportRead.Ready
+        assertEquals(0 to false, onSetUpPhone.newDays to onSetUpPhone.restoresLengths)
+
+        phone.repository.deleteEverything()
+        val read = phone.repository.read(ByteArrayInputStream(exported)) as ImportRead.Ready
+        assertEquals(0 to true, read.newDays to read.restoresLengths)
+        assertEquals(0, phone.repository.import(read.file))
+
+        val settings = phone.settings.settings.first()
+        assertEquals(
+            Triple(30, 4, true),
+            Triple(settings.usualCycleLength, settings.usualPeriodLength, settings.setupDone)
+        )
+    }
+
+    @Test
     fun `usual lengths she gave on the phone win over the file's`() = runTest {
         val phone = phone()
         phone.settings.saveSetup(cycleLength = 30, periodLength = 4)
@@ -186,6 +207,7 @@ class YourDataRepositoryTest {
         val read = phone.repository.read(ByteArrayInputStream(exported)) as ImportRead.Ready
 
         assertEquals(0, read.newDays)
+        assertFalse(read.restoresLengths)
         assertEquals(0, phone.repository.import(read.file))
     }
 
