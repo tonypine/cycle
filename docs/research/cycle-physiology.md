@@ -82,11 +82,16 @@ every pregnancy.
   ([NHS](https://www.nhs.uk/conditions/periods/)); early cycles are often irregular
   ([ACOG CO 651](https://www.acog.org/clinical/clinical-guidance/committee-opinion/articles/2015/12/menstruation-in-girls-and-adolescents-using-the-menstrual-cycle-as-a-vital-sign)).
   Not our user, but it explains why "normal" ranges differ by age.
-- **Hormonal contraception.** On the combined pill, patch or ring there is no ovulation, and the
-  bleed in the hormone-free week is a withdrawal bleed, not a period
-  ([Devon Sexual Health, NHS](https://www.devonsexualhealth.nhs.uk/combined-pill-taking-a-different-approach-to-make-this-method-work-best-for-you/)). Hormonal IUDs, implants and
-  injections often make bleeding light, irregular or absent. Fertile window and ovulation estimates
-  mean nothing on these methods.
+- **Contraception.** On the combined pill, patch or ring there is no ovulation, and the bleed in the
+  break is a withdrawal bleed, not a period
+  ([FSRH CHC 2019](https://www.cosrh.org/Common/Uploaded%20files/documents/fsrh-guideline-combined-hormonal-contraception-october-2023.pdf)).
+  The implant, the injection and the desogestrel pill stop ovulation too, and bring bleeding that
+  does not follow a cycle: anything from none to frequent or prolonged. Most users of a hormonal
+  IUD, and many on a traditional progestogen-only pill, still ovulate, but their bleeding changes
+  too. The copper IUD leaves the cycle alone and makes periods heavier and longer, especially at
+  first. Fertile window and ovulation estimates mean nothing on hormonal methods. Each method, what
+  she logs on it, and how fast cycles come back after stopping (weeks for most, months for the
+  injection) are in [`contraception.md`](contraception.md).
 - **Pregnancy, after birth and breastfeeding.** Periods stop in pregnancy. After birth, cycles
   return at different times, often later when breastfeeding, and the first ones are irregular.
   Calendar-based methods should wait until three regular cycles have returned
@@ -119,6 +124,7 @@ every pregnancy.
   are estimates and should look and read like estimates (see [`predictions.md`](predictions.md)).
   The legend already shows predicted periods with a dashed edge; estimated ovulation deserves the
   same honesty.
-- **Life stages are modes.** Pregnancy, after birth, breastfeeding, hormonal contraception and
-  perimenopause each change what the app can predict. The app needs a way to say "pause or change
-  predictions" without her deleting data.
+- **Life stages are modes.** Pregnancy, after birth, breastfeeding, contraception and perimenopause
+  each change what the app can predict. The app needs a way to say "pause or change predictions"
+  without her deleting data. For contraception, what changes depends on the method
+  ([`contraception.md`](contraception.md)).
