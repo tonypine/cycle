@@ -58,6 +58,8 @@ class HistoryNavigationTest {
                 CycleApp(data, today = { LocalDate.of(2027, 9, 10) })
             }
         }
+        // Her logs skip the first-run welcome; the tabs show once the settings are read.
+        waitFor(hasText("History") and isTab)
         tab("History").performClick()
     }
 

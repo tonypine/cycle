@@ -117,6 +117,27 @@ class ContainerSemanticsTest {
     }
 
     @Test
+    fun theEmptyStateReadsItsSecondActionAfterTheFirst() {
+        val clicks = mutableListOf<String>()
+        show {
+            EmptyState(
+                title = "Hi there",
+                body = "Log your period.",
+                modifier = Modifier.size(320.dp, 480.dp),
+                action = EmptyStateAction("Get started", onClick = { clicks += "start" }),
+                secondaryAction = EmptyStateAction("Skip for now", onClick = { clicks += "skip" })
+            )
+        }
+        val stops = composeRule.onAllNodes(isHeading().or(hasClickAction())).fetchSemanticsNodes().map { node ->
+            node.config[SemanticsProperties.Text].first().text
+        }
+        assertEquals(listOf("Hi there", "Get started", "Skip for now"), stops)
+        composeRule.onNodeWithText("Skip for now").assert(hasRole(Role.Button)).performClick()
+        composeRule.onNodeWithText("Get started").performClick()
+        assertEquals(listOf("skip", "start"), clicks)
+    }
+
+    @Test
     fun theEmptyStateScrollsRatherThanClipsAt200Percent() {
         show(Appearance.FontScale200) {
             EmptyState(

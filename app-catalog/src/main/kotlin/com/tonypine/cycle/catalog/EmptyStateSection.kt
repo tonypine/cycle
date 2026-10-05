@@ -28,6 +28,16 @@ internal fun EmptyStateSection() {
         action = EmptyStateAction(if (logged) "Undo" else "Log a period", onClick = { logged = !logged })
     )
 
+    SubsectionTitle("With a second action")
+    EmptyState(
+        title = "Hi! Let's get your cycle going",
+        body = "Log your period and Cycle estimates the next one.",
+        modifier = Modifier.frame(),
+        illustration = { EmptyStateIcon(CycleIcons.WaterDrop) },
+        action = EmptyStateAction("Get started", onClick = {}),
+        secondaryAction = EmptyStateAction("Skip for now", onClick = {})
+    )
+
     SubsectionTitle("Without an action")
     EmptyState(
         title = "No notes",
@@ -37,7 +47,7 @@ internal fun EmptyStateSection() {
     )
     CatalogText(
         "Centred in the space it is given, and scrolls when the text is large. TalkBack reads the illustration, " +
-            "title and body as one heading, then the action.",
+            "title and body as one heading, then the actions.",
         CycleTheme.typography.bodySmall,
         color = CycleTheme.colors.onSurfaceVariant
     )

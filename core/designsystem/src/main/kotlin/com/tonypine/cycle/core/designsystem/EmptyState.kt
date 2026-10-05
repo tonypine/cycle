@@ -22,21 +22,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-/** The button under an [EmptyState]: its [label], an optional leading [icon], and what it does. */
+/** A button under an [EmptyState]: its [label], an optional leading [icon], and what it does. */
 @Immutable
 class EmptyStateAction(val label: String, val onClick: () -> Unit, val icon: CycleIcons? = null)
 
 /**
  * What a screen or a list shows when it has nothing yet, such as before the first period is logged:
  * an [illustration] (an [EmptyStateIcon] or a drawing), a [title] in `title`, one [body] sentence
- * in `onSurfaceVariant` and an optional [action] as a [FilledButton], centred one above the other.
+ * in `onSurfaceVariant`, an optional [action] as a [FilledButton] and an optional [secondaryAction]
+ * as a [TextButton] under it, such as "Skip for now", centred one above the other.
  *
  * Given a bounded height (a screen, or a box with a size), it fills it, centres its content, and
  * scrolls when the content is taller, as at 200% font scale; it never clips. In a column that
  * scrolls already, it takes its content's height and leaves scrolling to the column.
  *
- * TalkBack reads the illustration, title and body as one item marked as a heading, then the action
- * as a button.
+ * TalkBack reads the illustration, title and body as one item marked as a heading, then the actions
+ * as buttons.
  */
 @Composable
 fun EmptyState(
@@ -44,7 +45,8 @@ fun EmptyState(
     body: String,
     modifier: Modifier = Modifier,
     illustration: (@Composable () -> Unit)? = null,
-    action: EmptyStateAction? = null
+    action: EmptyStateAction? = null,
+    secondaryAction: EmptyStateAction? = null
 ) {
     BoxWithConstraints(modifier, contentAlignment = Alignment.Center) {
         val scroll = if (constraints.hasBoundedHeight) {
@@ -80,7 +82,17 @@ fun EmptyState(
                     style = typography.body.copy(color = colors.onSurfaceVariant, textAlign = TextAlign.Center)
                 )
             }
-            if (action != null) FilledButton(action.label, action.onClick, icon = action.icon)
+            if (action != null || secondaryAction != null) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (action != null) FilledButton(action.label, action.onClick, icon = action.icon)
+                    if (secondaryAction != null) {
+                        TextButton(secondaryAction.label, secondaryAction.onClick, icon = secondaryAction.icon)
+                    }
+                }
+            }
         }
     }
 }
@@ -120,6 +132,18 @@ private fun EmptyStateSample() {
     )
 }
 
+@Composable
+private fun EmptyStateTwoActionsSample() {
+    EmptyState(
+        title = "Hi! Let's get your cycle going",
+        body = "Log your period and Cycle estimates the next one.",
+        modifier = Modifier.size(width = 328.dp, height = 480.dp),
+        illustration = { EmptyStateIcon(CycleIcons.WaterDrop) },
+        action = EmptyStateAction("Get started", onClick = {}),
+        secondaryAction = EmptyStateAction("Skip for now", onClick = {})
+    )
+}
+
 @Preview(name = "Empty state · light", widthDp = 360)
 @Composable
 private fun EmptyStateLightPreview() = PreviewSurface(darkTheme = false) { EmptyStateSample() }
@@ -131,3 +155,11 @@ private fun EmptyStateDarkPreview() = PreviewSurface(darkTheme = true) { EmptySt
 @Preview(name = "Empty state · 200% font", widthDp = 360, fontScale = 2f)
 @Composable
 private fun EmptyStateLargeFontPreview() = PreviewSurface(darkTheme = false) { EmptyStateSample() }
+
+@Preview(name = "Empty state · two actions · light", widthDp = 360)
+@Composable
+private fun EmptyStateTwoActionsLightPreview() = PreviewSurface(darkTheme = false) { EmptyStateTwoActionsSample() }
+
+@Preview(name = "Empty state · two actions · dark", widthDp = 360)
+@Composable
+private fun EmptyStateTwoActionsDarkPreview() = PreviewSurface(darkTheme = true) { EmptyStateTwoActionsSample() }
