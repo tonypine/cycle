@@ -6,7 +6,11 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -68,6 +72,10 @@ enum class TopLevelDestination(val route: String, @param:StringRes val label: In
  * never flashes on her way to Today. The welcome's "Restore from a Cycle export" imports a file with
  * Settings' import, then opens Today.
  *
+ * The app draws edge to edge. Every screen pads its content below the status bar, but a screen
+ * scrolls under it, so a `surface` strip covers the status bar on every screen: nothing scrolls
+ * under the clock and system icons. Sheets and dialogs open in their own windows, above it.
+ *
  * @param today her day, from the phone's clock in its current zone.
  */
 @Composable
@@ -89,6 +97,12 @@ fun CycleApp(data: CycleData, modifier: Modifier = Modifier, today: () -> LocalD
             // A new controller each time, so she is on Today after the welcome.
             false -> CycleTabs(data, today, rememberNavController())
         }
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .windowInsetsTopHeight(WindowInsets.safeDrawing)
+                .background(CycleTheme.colors.surface)
+        )
     }
 }
 

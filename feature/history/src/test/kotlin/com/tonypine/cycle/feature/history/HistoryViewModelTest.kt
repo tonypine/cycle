@@ -9,7 +9,9 @@ import com.tonypine.cycle.core.data.database.CycleDatabase
 import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
+import com.tonypine.cycle.core.model.BodySymptom
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.LogCategory
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,6 +48,7 @@ class HistoryViewModelTest {
         .allowMainThreadQueries()
         .build()
     private val dayLogs = DayLogRepository(database)
+    private lateinit var settings: SettingsRepository
 
     @Before
     fun setMain() = Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -81,7 +84,7 @@ class HistoryViewModelTest {
 
     @Test
     fun `the detail follows an edit to its period, and goes missing when its start moves`() = history { cycles ->
-        syntheticHistory.forEach { dayLogs.save(it) }
+        logSyntheticHistory()
         val viewModel = CycleDetailViewModel(cycles, day("2027-08-05")) { clock }.also { follow(it.uiState) }
         assertEquals(HistorySamples.pastCycle, viewModel.uiState.first { it is CycleDetailUiState.Detail })
 
@@ -98,6 +101,31 @@ class HistoryViewModelTest {
     }
 
     @Test
+    fun `the detail shows how she felt, and follows what she hides and shows again`() = history { cycles ->
+        logSyntheticHistory()
+        val viewModel = CycleDetailViewModel(cycles, day("2027-08-05")) { clock }.also { follow(it.uiState) }
+        assertEquals(HistorySamples.pastCycle, viewModel.uiState.first { it is CycleDetailUiState.Detail })
+        val bloating = Symptom.Body(BodySymptom.BLOATING)
+
+        // In "What to log", she turns Body off: bloating goes, nothing is deleted.
+        settings.setCategoryShown(LogCategory.BODY, shown = false)
+        val hidden = viewModel.uiState.first {
+            it is CycleDetailUiState.Detail && it.symptoms.none { item -> item.symptom == bloating }
+        } as CycleDetailUiState.Detail
+        assertEquals(8, hidden.symptoms.size)
+
+        // She turns it back on: it comes back as it was.
+        settings.setCategoryShown(LogCategory.BODY, shown = true)
+        assertEquals(
+            HistorySamples.pastCycle,
+            viewModel.uiState.first {
+                it is CycleDetailUiState.Detail &&
+                    it.symptoms.any { item -> item.symptom == bloating }
+            }
+        )
+    }
+
+    @Test
     fun `a new day moves the current cycle on`() = history { cycles ->
         syntheticHistory.forEach { dayLogs.save(it) }
         val viewModel = HistoryViewModel(cycles) { clock }.also { follow(it.uiState) }
@@ -110,12 +138,18 @@ class HistoryViewModelTest {
         assertEquals(10, (state as HistoryUiState.Cycles).cycles.first().length)
     }
 
-    /** Runs [test] with a [CycleRepository] on the test database. */
+    /** Runs [test] with a [CycleRepository] on the test database and [settings]. */
     private fun history(test: suspend TestScope.(CycleRepository) -> Unit) = runTest {
-        val settings = SettingsRepository(
+        settings = SettingsRepository(
             PreferenceDataStoreFactory.create(scope = backgroundScope) { File(folder.root, "test.preferences_pb") }
         )
         test(CycleRepository(dayLogs, settings))
+    }
+
+    /** Logs [syntheticHistory] and how she felt, [syntheticFeelings], as the day log sheet does. */
+    private suspend fun logSyntheticHistory() {
+        syntheticHistory.forEach { dayLogs.save(it) }
+        syntheticFeelings.forEach { dayLogs.logDay(it.date, dayLogs.get(it.date).flow, it) }
     }
 
     /** Collects [state] as the screen would, so it keeps following the log. */

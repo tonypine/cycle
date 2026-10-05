@@ -20,6 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +39,10 @@ import com.tonypine.cycle.core.designsystem.LoadingState
 import com.tonypine.cycle.core.designsystem.TonalButton
 import com.tonypine.cycle.core.designsystem.TopAppBar
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.Pain
+import com.tonypine.cycle.core.ui.label
+import com.tonypine.cycle.core.ui.painSummary
+import com.tonypine.cycle.core.ui.summaryLabel
 import java.time.YearMonth
 
 /** A cycle's details, wired to its [viewModel]. The day is read again whenever the screen resumes. */
@@ -56,8 +62,9 @@ fun CycleDetailRoute(
 }
 
 /**
- * One cycle: its length and dates, its period's dates and the flow of each period day, and a button
- * that opens the calendar on the month it started in. Scrolls when the text is large.
+ * One cycle: its length and dates, its period's dates and the flow of each period day, how she felt
+ * and her notes, and a button that opens the calendar on the month it started in. Scrolls when the
+ * text is large.
  */
 @Composable
 fun CycleDetailScreen(
@@ -101,6 +108,8 @@ private fun Detail(state: CycleDetailUiState.Detail, onSeeInCalendar: (YearMonth
     ) {
         Summary(state, Modifier.fillMaxWidth())
         PeriodCard(state, Modifier.fillMaxWidth())
+        if (state.symptoms.isNotEmpty()) SymptomsCard(state.symptoms, Modifier.fillMaxWidth())
+        if (state.notes.isNotEmpty()) NotesCard(state.notes, Modifier.fillMaxWidth())
         TonalButton(
             text = stringResource(R.string.cycle_see_in_calendar),
             onClick = { onSeeInCalendar(state.cycle.month) },
@@ -192,6 +201,79 @@ private fun FlowDayCell(day: FlowDay, isToday: Boolean) {
             style = CycleTheme.typography.labelSmall.copy(color = CycleTheme.colors.onSurfaceVariant)
         )
     }
+}
+
+/**
+ * "How you felt": each thing she logged and the days of the cycle it fell on, "Bloating, days
+ * 24–27". TalkBack reads each one with its days as one item, a range as "24 to 27".
+ */
+@Composable
+private fun SymptomsCard(symptoms: List<SymptomDays>, modifier: Modifier) {
+    val colors = CycleTheme.colors
+    val typography = CycleTheme.typography
+    Card(modifier) {
+        SectionTitle(stringResource(R.string.cycle_felt))
+        symptoms.forEach { item ->
+            val label = item.symptom.label()
+            val spoken = stringResource(R.string.cycle_symptom_spoken, label, cycleDays(item.days, spoken = true))
+            Column(Modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = spoken }) {
+                BasicText(text = label, style = typography.body.copy(color = colors.onSurface))
+                BasicText(
+                    text = cycleDays(item.days, spoken = false),
+                    style = typography.bodySmall.copy(color = colors.onSurfaceVariant)
+                )
+            }
+        }
+    }
+}
+
+/** Her notes, each under the day of the cycle she wrote it on, read by TalkBack as one item. */
+@Composable
+private fun NotesCard(notes: List<CycleNote>, modifier: Modifier) {
+    val colors = CycleTheme.colors
+    val typography = CycleTheme.typography
+    Card(modifier) {
+        SectionTitle(stringResource(R.string.cycle_notes))
+        notes.forEach { note ->
+            Column(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}) {
+                BasicText(
+                    text = stringResource(R.string.cycle_note_day, note.day),
+                    style = typography.label.copy(color = colors.onSurfaceVariant)
+                )
+                BasicText(text = note.text, style = typography.body.copy(color = colors.onSurface))
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectionTitle(text: String) {
+    BasicText(
+        text = text,
+        modifier = Modifier.semantics { heading() },
+        style = CycleTheme.typography.titleSmall.copy(color = CycleTheme.colors.onSurface)
+    )
+}
+
+/** "Days 1, 2, 24–27", or with [spoken] "Days 1, 2, 24 to 27" for TalkBack. */
+@Composable
+private fun cycleDays(days: List<Int>, spoken: Boolean): String {
+    val range = if (spoken) R.string.cycle_day_range_spoken else R.string.cycle_day_range
+    val list = dayRuns(days).map { run ->
+        if (run.first == run.last) run.first.toString() else stringResource(range, run.first, run.last)
+    }.joinToString(", ")
+    return pluralStringResource(R.plurals.cycle_days, days.size, list)
+}
+
+/** The symptom in a few words, as Today's summary says it: "Cramps, moderate", "Low energy". */
+@Composable
+private fun Symptom.label(): String = when (this) {
+    is Symptom.Pain -> painSummary(Pain(level, setOfNotNull(place)))
+    is Symptom.Body -> stringResource(symptom.label)
+    is Symptom.Feeling -> stringResource(mood.label)
+    is Symptom.Energy -> stringResource(level.summaryLabel)
+    is Symptom.Sleep -> stringResource(quality.label)
+    is Symptom.Sex -> stringResource(activity.summaryLabel)
 }
 
 private val FlowLevel?.label: Int

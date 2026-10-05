@@ -124,6 +124,34 @@ class HistoryScreenTest {
     }
 
     @Test
+    fun `how she felt and her notes read as one item each, under their headings`() {
+        showDetail(HistorySamples.pastCycle)
+
+        composeRule.onNodeWithText("How you felt").performScrollTo().assert(isHeading())
+        // TalkBack reads each symptom with its days, a range as "24 to 27".
+        listOf(
+            "Cramps, mild, Day 3",
+            "Cramps, moderate, Days 1, 2",
+            "Lower back, moderate, Day 1",
+            "Bloating, Days 24 to 27",
+            "Low energy, Day 1",
+            "Protected sex, Day 14"
+        ).forEach { composeRule.onNodeWithContentDescription(it).performScrollTo().assertIsDisplayed() }
+        composeRule.onNodeWithText("Notes").performScrollTo().assert(isHeading())
+        composeRule.onNode(hasText("Day 1") and hasText("Sample note: a heat pad helped.")).performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNode(hasText("Day 3") and hasText("Sample note: a short walk after lunch.")).assertExists()
+    }
+
+    @Test
+    fun `a cycle with nothing logged about how she felt shows neither card`() {
+        showDetail(HistorySamples.currentCycle)
+
+        composeRule.onAllNodesWithText("How you felt").assertCountEquals(0)
+        composeRule.onAllNodesWithText("Notes").assertCountEquals(0)
+    }
+
+    @Test
     fun `see it in the calendar opens the month the cycle started in, and back goes back`() {
         showDetail(HistorySamples.pastCycle)
         composeRule.onNodeWithText("See it in the calendar").performScrollTo().assert(isButton).performClick()

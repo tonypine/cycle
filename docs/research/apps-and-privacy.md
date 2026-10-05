@@ -43,19 +43,21 @@ reasons these apps go wrong.
   cannot be subpoenaed from a company.
 - **Backups leave the phone too.** Android's backup to Google Drive is end-to-end encrypted with the
   device's PIN, pattern or password on Android 9 and later, but only when a screen lock is set. An
-  app can require that encryption with `requireFlags="clientSideEncryption"` in its backup rules, and
-  each app gets 25 MB ([Android](https://developer.android.com/identity/data/autobackup)). Cycle
-  currently sets `allowBackup="true"` with no rules, so its database is backed up whether or not the
-  backup is end-to-end encrypted.
+  app can require that encryption in its backup rules (`requireFlags="clientSideEncryption"` up to
+  Android 11, `disableIfNoEncryptionCapabilities="true"` from Android 12), and each app gets 25 MB
+  ([Android](https://developer.android.com/identity/data/autobackup)). Cycle requires it: its data
+  is backed up only end-to-end encrypted, and not at all on a phone without a screen lock
+  ([`0004`](../decisions/0004-backup-encryption.md)).
 
 ## Implications for Cycle
 
 - **Already decided, and right:** data stays on the device, no backend, no analytics, no crash
   reporting, no third-party SDK that sends data ([`0001-stack.md`](../decisions/0001-stack.md),
   `AGENTS.md`). This alone puts Cycle in the same group as drip and Euki.
-- **Backup needs its own decision.** Requiring client-side encryption keeps unencrypted copies off
-  Google's servers, at the cost of no backup at all on a phone without a screen lock. Export and
-  import give her a second way to keep her history either way.
+- **Backups are end-to-end encrypted or not made**
+  ([`0004`](../decisions/0004-backup-encryption.md)). That keeps readable copies off Google's
+  servers, at the cost of no backup at all on a phone without a screen lock. Export and import give
+  her a second way to keep her history either way.
 - **An app lock** (PIN or biometric) and a quick "delete everything" are cheap and expected in this
   category.
 - **Discretion is a feature.** Neutral notification text, no sensitive data in widgets or the recent

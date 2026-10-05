@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Android 12 and later. Her log and settings go to Google's backup only when it is end-to-end
+    encrypted with the phone's screen lock; without a lock the app is not backed up at all
+    (docs/decisions/0004-backup-encryption.md). A per-file requireFlags is ignored in this format,
+    so the requirement sits on the whole cloud-backup section.
+-->
+<data-extraction-rules>
+    <cloud-backup disableIfNoEncryptionCapabilities="true">
+        <include domain="database" path="." />
+        <include domain="file" path="datastore/" />
+    </cloud-backup>
+    <!-- Phone to phone, by cable or local network: the data never reaches a server. -->
+    <device-transfer>
+        <include domain="database" path="." />
+        <include domain="file" path="datastore/" />
+    </device-transfer>
+</data-extraction-rules>

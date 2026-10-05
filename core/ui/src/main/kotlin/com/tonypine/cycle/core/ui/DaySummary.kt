@@ -9,6 +9,7 @@ import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.EnergyLevel
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.model.Mood
+import com.tonypine.cycle.core.model.Pain
 import com.tonypine.cycle.core.model.PainKind
 import com.tonypine.cycle.core.model.PainLevel
 import com.tonypine.cycle.core.model.SexualActivity
@@ -20,28 +21,27 @@ import com.tonypine.cycle.core.model.SleepQuality
  * [feelings] without the categories she hid ([DayFeelings.without]).
  */
 @Composable
-fun daySummary(flow: FlowLevel?, feelings: DayFeelings): List<String> {
+fun daySummary(flow: FlowLevel?, feelings: DayFeelings): List<String> = buildList {
+    flow?.let { add(stringResource(it.summaryLabel)) }
+    feelings.pain?.let { add(painSummary(it)) }
+    BodySymptom.entries.filter { it in feelings.body }.forEach { add(stringResource(it.label)) }
+    Mood.entries.filter { it in feelings.moods }.forEach { add(stringResource(it.label)) }
+    feelings.energy?.let { add(stringResource(it.summaryLabel)) }
+    feelings.sleep?.let { add(stringResource(it.label)) }
+    feelings.sex?.let { add(stringResource(it.summaryLabel)) }
+}
+
+/** [pain] in a few words: "Cramps, lower back, moderate", or "Mild pain" when she said nowhere. */
+@Composable
+fun painSummary(pain: Pain): String {
+    val kinds = PainKind.entries.filter { it in pain.kinds }
+    if (kinds.isEmpty() || pain.level == PainLevel.NONE) return stringResource(pain.level.summaryAlone)
+    // "Cramps, lower back": the places after the first read on in lower case.
     val locale = LocalConfiguration.current.locales[0]
-    return buildList {
-        flow?.let { add(stringResource(it.summaryLabel)) }
-        feelings.pain?.let { pain ->
-            val kinds = PainKind.entries.filter { it in pain.kinds }
-            if (kinds.isEmpty() || pain.level == PainLevel.NONE) {
-                add(stringResource(pain.level.summaryAlone))
-            } else {
-                // "Cramps, lower back": the places after the first read on in lower case.
-                val where = kinds.mapIndexed { index, kind ->
-                    stringResource(kind.label).let { if (index == 0) it else it.lowercase(locale) }
-                }.joinToString(", ")
-                add(stringResource(R.string.summary_pain_where, where, stringResource(pain.level.summaryAfterWhere)))
-            }
-        }
-        BodySymptom.entries.filter { it in feelings.body }.forEach { add(stringResource(it.label)) }
-        Mood.entries.filter { it in feelings.moods }.forEach { add(stringResource(it.label)) }
-        feelings.energy?.let { add(stringResource(it.summaryLabel)) }
-        feelings.sleep?.let { add(stringResource(it.label)) }
-        feelings.sex?.let { add(stringResource(it.summaryLabel)) }
-    }
+    val where = kinds.mapIndexed { index, kind ->
+        stringResource(kind.label).let { if (index == 0) it else it.lowercase(locale) }
+    }.joinToString(", ")
+    return stringResource(R.string.summary_pain_where, where, stringResource(pain.level.summaryAfterWhere))
 }
 
 /** [items] joined into one line: "Bloating · Irritable". */
@@ -135,15 +135,17 @@ private val PainLevel.summaryAfterWhere: Int
         PainLevel.SEVERE -> R.string.summary_pain_severe
     }
 
-private val EnergyLevel.summaryLabel: Int
-    get() = when (this) {
+/** The energy in a summary: "Low energy". */
+val EnergyLevel.summaryLabel: Int
+    @StringRes get() = when (this) {
         EnergyLevel.LOW -> R.string.summary_energy_low
         EnergyLevel.NORMAL -> R.string.summary_energy_normal
         EnergyLevel.HIGH -> R.string.summary_energy_high
     }
 
-private val SexualActivity.summaryLabel: Int
-    get() = when (this) {
+/** Sex in a summary: "Protected sex". In the app only, never in a notification or widget. */
+val SexualActivity.summaryLabel: Int
+    @StringRes get() = when (this) {
         SexualActivity.PROTECTED -> R.string.summary_sex_protected
         SexualActivity.UNPROTECTED -> R.string.summary_sex_unprotected
     }

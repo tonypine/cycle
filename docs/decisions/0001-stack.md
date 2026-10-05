@@ -20,7 +20,7 @@ first and moves to Google Play later, so anything Play makes permanent has to be
 | Architecture | ViewModels expose `StateFlow`; repositories sit between them and storage. No DI framework until manual wiring hurts. |
 | Minimum SDK | 29 (Android 10). `targetSdk` and `compileSdk` track the latest stable API, as Play requires. |
 | Storage | Room (SQLite) for cycle data, DataStore for settings. `java.time` for dates. |
-| Backup | Android's built-in backup includes the database. No custom sync, no backend. |
+| Backup | Android's built-in backup includes the database and settings, only when it is end-to-end encrypted ([`0004`](0004-backup-encryption.md)). No custom sync, no backend. |
 | Health Connect | Not now. Revisit with its own record if she asks for it. |
 | Build | Gradle with the Kotlin DSL, a version catalog in `gradle/libs.versions.toml`, and the Gradle wrapper. A JDK toolchain pins the Java version. |
 | Lint and format | ktlint for formatting, Android Lint for the rest. Both fail the build on errors. |
@@ -35,4 +35,5 @@ first and moves to Google Play later, so anything Play makes permanent has to be
 - Agents can run every check locally and in CI without an emulator or a device, and can show what the UI looks like through screenshot tests.
 - Nothing leaves the device apart from Android's own backup. Adding sync, analytics, crash
   reporting or any third-party SDK that sends data needs a new record.
-- Losing the release keystore means she has to reinstall the app (her data comes back from backup).
+- Losing the release keystore means she has to reinstall the app (her data comes back from an
+  encrypted backup, which needs a screen lock on her phone).
