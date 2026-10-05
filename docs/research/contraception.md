@@ -368,7 +368,9 @@ suggestion about protection.
 [WHO FP Handbook](https://fphandbook.org/questions-and-answers-about-intrauterine-device)).
 
 **For Cycle.** Estimate as without a method; call them periods; base the expected period length on
-periods since insertion; keep these cycles in her history and predictions.
+periods since insertion; keep these cycles in her history and predictions; flag long periods at more
+than 8 days, from three months after insertion
+([Worth mentioning to a doctor, on a method](#worth-mentioning-to-a-doctor-on-a-method)).
 
 ## Injection
 
@@ -439,13 +441,20 @@ that is their job, so Cycle does not prompt pregnancy tests (see the copy rules 
 On a hormonal method, the natural-cycle signals about cycle length, regularity and a long time
 without a period do not apply: those patterns are what the method does. These apply instead.
 
+With a copper IUD the natural-cycle signals in [`health-signals.md`](health-signals.md) apply from
+the day it goes in, except the long-period one: it uses the WHO's 8 days instead of 7, and waits
+until three months after insertion, because longer periods are expected in the first months
+([WHO FP Handbook, copper IUD](https://fphandbook.org/managing-any-problems)). So a 7- or 8-day
+period on a copper IUD raises no card, and neither does a longer one in the first three months. The
+signs of heavy bleeding (soaking through in an hour or two, large clots) apply at any time.
+
 | Pattern | Applies to | Example wording (synthetic numbers) | Source |
 | -- | -- | -- | -- |
 | Bleeding after sex, pain during sex, pelvic pain | Every method | "You logged bleeding after sex on 14 May. That is worth mentioning to a doctor or nurse, each time it happens." | [FSRH bleeding 2015, 5.5.2](https://www.cosrh.org/Common/Uploaded%20files/documents/ceuguidanceproblematicbleedinghormonalcontraception.pdf), [`health-signals.md`](health-signals.md) |
 | Bleeding outside the break that continues after the first three months | Combined pill, patch, ring | "You have logged bleeding outside your pill breaks in each of the last three packs. Bleeding like this after the first few months on the pill is worth mentioning to a doctor or nurse." | [FSRH CHC 2019, Box 4](https://www.cosrh.org/Common/Uploaded%20files/documents/fsrh-guideline-combined-hormonal-contraception-october-2023.pdf), [FSRH bleeding 2015](https://www.cosrh.org/Common/Uploaded%20files/documents/ceuguidanceproblematicbleedinghormonalcontraception.pdf) |
 | Bleeding that keeps going after three months (a guide; six for the hormonal IUD) | Progestogen-only pill, implant, injection, hormonal IUD | "In the last 90 days you logged bleeding or spotting on 41 days, once for 16 days in a row. Bleeding like this after the first months on the implant is worth mentioning to a doctor or nurse." | [FSRH bleeding 2015, 5.5.2](https://www.cosrh.org/Common/Uploaded%20files/documents/ceuguidanceproblematicbleedinghormonalcontraception.pdf), [NHS](https://www.nhs.uk/contraception/methods-of-contraception/ius-hormonal-coil/side-effects-and-risks/) |
 | A change after a settled pattern: bleeding again after months of little or none, or new irregular bleeding | Every hormonal method, after at least three months | "You logged no bleeding from January to April, and bleeding on 9 days since 2 May. A change like this after a settled stretch is worth mentioning to a doctor or nurse." | [WHO FP Handbook, implants](https://fphandbook.org/managing-any-problems-0), [injectables](https://fphandbook.org/managing-any-problems-2), [hormonal IUD](https://fphandbook.org/managing-any-problems-3), [FSRH injectable 2014, 12.1](https://www.cosrh.org/Common/Uploaded%20files/documents/progestogen-only-injectable-december-2014-amended-11july2023.pdf) |
-| Heavy bleeding: about twice her usual, longer than 8 days after the first months, or the signs in `health-signals.md` at any time | Every method, the copper IUD most of all | "Your last three periods lasted 9, 10 and 9 days, six months after the copper IUD went in. Periods longer than 8 days are worth mentioning to a doctor or nurse." | [WHO FP Handbook, copper IUD](https://fphandbook.org/managing-any-problems), [NHS](https://www.nhs.uk/contraception/methods-of-contraception/iud-coil/side-effects/), [`health-signals.md`](health-signals.md) |
+| Heavy bleeding: about twice her usual or longer than 8 days, from three months after the start date (six for the hormonal IUD); the signs in `health-signals.md` at any time | Every method, the copper IUD most of all | "Your last three periods lasted 9, 10 and 9 days, six months after the copper IUD went in. Periods longer than 8 days are worth mentioning to a doctor or nurse." | [WHO FP Handbook, copper IUD](https://fphandbook.org/managing-any-problems), [NHS](https://www.nhs.uk/contraception/methods-of-contraception/iud-coil/side-effects/), [`health-signals.md`](health-signals.md) |
 | No period three months after stopping | Pill, patch, ring, progestogen-only pill, implant, IUDs | "You stopped the pill on 3 March and have not logged a period since. After three months, that is worth mentioning to a doctor or nurse." | [`health-signals.md`](health-signals.md) (90 days; the NHS says three missed periods), [FSRH CHC 2019, 6.2.6](https://www.cosrh.org/Common/Uploaded%20files/documents/fsrh-guideline-combined-hormonal-contraception-october-2023.pdf) |
 | No period a year after the last injection | Injection | "Your last injection was on 10 January last year and you have not logged a period since. A gap this long is worth mentioning to a doctor or nurse." | [FSRH injectable 2014, 11.1](https://www.cosrh.org/Common/Uploaded%20files/documents/progestogen-only-injectable-december-2014-amended-11july2023.pdf), [NHS](https://www.nhs.uk/contraception/methods-of-contraception/contraceptive-injection/what-is-it/) |
 | Bleeding that bothers her | Every method | Not a signal card. Where the app explains what a method does to bleeding, the NHS's own words fit: if the bleeding becomes a problem for her, a GP or sexual health clinic can help. | [NHS, implant](https://www.nhs.uk/contraception/methods-of-contraception/contraceptive-implant/side-effects-and-risks/) |
@@ -479,7 +488,7 @@ pharmacist or clinic, not for Cycle.
   | Combined, continuous | Nothing | Next bleed, fertile window, ovulation, phases | What she logged |
   | Progestogen-only pill | Nothing | Next bleed, cycle day, fertile window, ovulation, phases | A 90-day summary |
   | Implant | Nothing | Next bleed, cycle day, fertile window, ovulation, phases | A 90-day summary |
-  | Hormonal IUD | Nothing by default; maybe the next bleed once her own bleeds are regular (design question) | Fertile window, ovulation, phases | A 90-day summary |
+  | Hormonal IUD | Nothing by default; maybe the next bleed once her own bleeds are regular (a design question for MOT-50) | Next bleed (by default), cycle day, fertile window, ovulation, phases | A 90-day summary |
   | Copper IUD | As without a method | As without a method | Periods, as without a method |
   | Injection | Nothing (a next-injection reminder only if she asks) | Next bleed, cycle day, fertile window, ovulation, phases | A 90-day summary |
 
@@ -500,7 +509,8 @@ pharmacist or clinic, not for Cycle.
 - **The first months on a method are noisy.** Signals about bleeding on a method wait for three
   months after the start date (six for the hormonal IUD), except bleeding after sex and the signs of
   heavy bleeding in [`health-signals.md`](health-signals.md) (soaking through in an hour or two,
-  large clots), which do not wait.
+  large clots), which do not wait. On a copper IUD only the long-period signal waits, and it uses 8
+  days instead of 7; the other natural-cycle signals apply from the start.
 - **Health signals change with the method**, as listed above. The thresholds and the method they
   apply to belong in one place in code with their sources, like the others.
 - **Synthetic data only.** Every example here uses made-up dates and numbers, like the rest of the

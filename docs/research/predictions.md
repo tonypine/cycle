@@ -152,8 +152,8 @@ Her last six cycles were 26, 27, 28, 28, 29 and 31 days, and her last period sta
 - **Never compute fertility on hormonal contraception, in pregnancy, or after birth until cycles
   return.** Hide those estimates in those modes rather than show meaningless ones.
 - **Never predict a period that is not one.** On a combined pill, patch or ring the bleed follows the
-  pack and is predicted as a bleed in the break; on the implant, the injection and the
-  progestogen-only pill, bleeding follows no cycle and gets no next date
-  ([`contraception.md`](contraception.md)).
+  pack and is predicted as a bleed in the break; on the implant, the injection, the
+  progestogen-only pill and, by default, the hormonal IUD, bleeding follows no cycle and gets no
+  next date ([`contraception.md`](contraception.md)).
 - **Never send prediction data off the device** to improve the algorithm. Everything above runs
   locally on a few numbers ([`0001-stack.md`](../decisions/0001-stack.md)).
