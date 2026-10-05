@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import com.tonypine.cycle.core.designsystem.EmptyState
 import com.tonypine.cycle.core.designsystem.EmptyStateIcon
 
-/** A tab whose screen has not landed yet: History (MOT-39), Settings (MOT-40). */
+/** A tab whose screen has not landed yet: History (MOT-39). */
 @Composable
 fun PlaceholderScreen(destination: TopLevelDestination, modifier: Modifier = Modifier) {
     EmptyState(
