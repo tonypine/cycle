@@ -453,7 +453,7 @@ EmptyState(
 | -- | -- |
 | `title` | `title` style in `onSurface`. Marked as a heading. |
 | `body` | One sentence in `body` `onSurfaceVariant`: what will appear here, or how to start. |
-| `illustration` | Any composable above the title. `EmptyStateIcon(icon)` draws the icon at 48dp in `onAccentContainer` in a 96dp `accentContainer` circle. It is decoration and is not read. |
+| `illustration` | Any composable above the title. `EmptyStateIcon(icon)` draws the icon at 48dp in `onAccentContainer` in a 96dp `accentContainer` circle; `EmptyStateIcon(painter)` does the same for a single-colour drawing outside `CycleIcons`, such as the app's mark on the lock screen. It is decoration and is not read. |
 | `action` | `EmptyStateAction(label, onClick, icon = null)`, shown as a `FilledButton`. Leave it out when there is nothing to do yet. |
 | `secondaryActions` | `EmptyStateAction`s shown as `TextButton`s under `action`, in order, such as "Restore from a Cycle export" and the way out ("Skip for now"). |
 

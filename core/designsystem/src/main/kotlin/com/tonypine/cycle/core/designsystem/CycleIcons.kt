@@ -75,7 +75,10 @@ enum class CycleIcons(@param:DrawableRes val drawable: Int, val symbol: String) 
 
     /** Deleting data. Pair it with a destructive dialog. */
     Delete(R.drawable.ic_symbol_delete, "delete"),
-    Info(R.drawable.ic_symbol_info, "info")
+    Info(R.drawable.ic_symbol_info, "info"),
+
+    /** The app lock. */
+    Lock(R.drawable.ic_symbol_lock, "lock")
 }
 
 /**

@@ -1,5 +1,6 @@
 package com.tonypine.cycle.core.designsystem
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -103,17 +107,26 @@ fun EmptyState(
  */
 @Composable
 fun EmptyStateIcon(icon: CycleIcons, modifier: Modifier = Modifier) {
+    EmptyStateIcon(painterResource(icon.drawable), modifier)
+}
+
+/**
+ * [EmptyStateIcon] for a single-colour drawing that is not one of [CycleIcons], such as the app's
+ * own mark on the lock screen: [painter] at 48dp, tinted `onAccentContainer`, in the same circle.
+ */
+@Composable
+fun EmptyStateIcon(painter: Painter, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .size(EmptyStateIconContainerSize)
             .background(CycleTheme.colors.accentContainer, CycleTheme.shapes.full),
         contentAlignment = Alignment.Center
     ) {
-        CycleIcon(
-            icon,
+        Image(
+            painter = painter,
             contentDescription = null,
-            tint = CycleTheme.colors.onAccentContainer,
-            size = EmptyStateIconSize
+            modifier = Modifier.size(EmptyStateIconSize),
+            colorFilter = ColorFilter.tint(CycleTheme.colors.onAccentContainer)
         )
     }
 }
