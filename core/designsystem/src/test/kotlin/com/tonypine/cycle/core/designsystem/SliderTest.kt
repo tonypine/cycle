@@ -1,5 +1,7 @@
 package com.tonypine.cycle.core.designsystem
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -8,8 +10,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
@@ -41,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import com.tonypine.cycle.core.designsystem.testing.Appearance
 import com.tonypine.cycle.core.designsystem.testing.Themed
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -161,6 +168,42 @@ class SliderTest {
         assertEquals(15, value)
         slider.performTouchInput { click(centerRight) }
         assertEquals(90, value)
+    }
+
+    @Test
+    fun aDragCutOffMidwayNoLongerHoldsTheHandle() {
+        var enabled by mutableStateOf(true)
+        var pressed = false
+        composeRule.setContent {
+            Themed(Appearance.Light) {
+                val interactionSource = remember { MutableInteractionSource() }
+                pressed = interactionSource.collectIsPressedAsState().value
+                Slider(
+                    value = value,
+                    onValueChange = { value = it },
+                    valueRange = 15..90,
+                    contentDescription = "Cycle length",
+                    stateDescription = "$value days",
+                    modifier = Modifier.width(320.dp).testTag("slider"),
+                    enabled = enabled,
+                    interactionSource = interactionSource
+                )
+            }
+        }
+        slider.performTouchInput {
+            down(center)
+            moveBy(Offset(100f, 0f))
+        }
+        composeRule.waitForIdle()
+        assertTrue(pressed)
+
+        // Turning it off and on mid-drag restarts its touch handling, which cuts the drag off.
+        enabled = false
+        composeRule.waitForIdle()
+        enabled = true
+        composeRule.waitForIdle()
+        assertFalse(pressed)
+        slider.performTouchInput { up() }
     }
 
     @OptIn(ExperimentalTestApi::class)

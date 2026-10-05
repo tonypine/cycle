@@ -64,6 +64,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.roundToInt
 
 /**
@@ -164,29 +165,36 @@ fun Slider(
                     val down = awaitFirstDown()
                     val press = PressInteraction.Press(down.position)
                     interactionSource.tryEmit(press)
-                    val drag = awaitHorizontalTouchSlopOrCancellation(down.id) { change, _ -> change.consume() }
-                    if (drag != null) {
-                        dragging = true
-                        change(valueAt(drag.position.x))
-                        val ended = horizontalDrag(drag.id) {
-                            change(valueAt(it.position.x))
-                            it.consume()
-                        }
-                        dragging = false
-                        interactionSource.tryEmit(
-                            if (ended) PressInteraction.Release(press) else PressInteraction.Cancel(press)
-                        )
-                    } else {
-                        // No drag: a tap moves to where she tapped, unless something else, such as a
-                        // scroll, took the gesture.
-                        val up = currentEvent.changes.firstOrNull { it.id == down.id }
-                        if (up != null && up.changedToUp() && !up.isConsumed) {
-                            up.consume()
-                            change(valueAt(down.position.x))
-                            interactionSource.tryEmit(PressInteraction.Release(press))
+                    try {
+                        val drag = awaitHorizontalTouchSlopOrCancellation(down.id) { change, _ -> change.consume() }
+                        if (drag != null) {
+                            dragging = true
+                            change(valueAt(drag.position.x))
+                            val ended = horizontalDrag(drag.id) {
+                                change(valueAt(it.position.x))
+                                it.consume()
+                            }
+                            dragging = false
+                            interactionSource.tryEmit(
+                                if (ended) PressInteraction.Release(press) else PressInteraction.Cancel(press)
+                            )
                         } else {
-                            interactionSource.tryEmit(PressInteraction.Cancel(press))
+                            // No drag: a tap moves to where she tapped, unless something else, such as a
+                            // scroll, took the gesture.
+                            val up = currentEvent.changes.firstOrNull { it.id == down.id }
+                            if (up != null && up.changedToUp() && !up.isConsumed) {
+                                up.consume()
+                                change(valueAt(down.position.x))
+                                interactionSource.tryEmit(PressInteraction.Release(press))
+                            } else {
+                                interactionSource.tryEmit(PressInteraction.Cancel(press))
+                            }
                         }
+                    } catch (e: CancellationException) {
+                        // The gesture was cut off, such as when the slider is disabled mid-drag.
+                        dragging = false
+                        interactionSource.tryEmit(PressInteraction.Cancel(press))
+                        throw e
                     }
                 }
             }
