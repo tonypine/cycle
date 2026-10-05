@@ -33,9 +33,10 @@ import org.robolectric.shadows.ShadowDialog
 
 /**
  * The day log sheet with the keyboard up on "Your note": the whole field, with its supporting text,
- * sits above the keyboard, and so does "Log it" when there is room, or it is a scroll away. Robolectric
- * has no keyboard, so the test applies IME insets to the sheet's window, a frame at a time as the
- * keyboard slides in. Synthetic days and notes.
+ * sits above the keyboard, and so does "Log it" when there is room, or it is a scroll away. In
+ * landscape the keyboard leaves about 120dp below the status bar, and the sheet's title scrolls away
+ * to make room. Robolectric has no keyboard, so the test applies IME insets to the sheet's window, a
+ * frame at a time as the keyboard slides in. Synthetic days and notes.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -59,19 +60,30 @@ class DayLogSheetImeTest {
     }
 
     @Test
-    @Config(qualifiers = "w800dp-h360dp-mdpi")
+    @Config(qualifiers = LANDSCAPE)
     fun `in landscape the note field shows and Log it is a scroll away`() {
-        typeANote(keyboard = 180.dp)
+        typeANote(keyboard = LANDSCAPE_KEYBOARD)
 
-        assertLogItIsAScrollAway(keyboard = 180.dp)
+        assertLogItIsAScrollAway(keyboard = LANDSCAPE_KEYBOARD)
+    }
+
+    @Test
+    @Config(qualifiers = LANDSCAPE)
+    fun `in landscape at 200 percent font scale the note field shows and the rest is a scroll away`() {
+        typeANote(keyboard = LANDSCAPE_KEYBOARD, fontScale = 2f, supportingTextFits = false)
+
+        val supportingText = composeRule.onNodeWithText("Only on this phone.").performScrollTo().bounds()
+        assertAboveTheKeyboard("The note's supporting text", supportingText, LANDSCAPE_KEYBOARD)
+        assertLogItIsAScrollAway(keyboard = LANDSCAPE_KEYBOARD)
     }
 
     /**
      * Picks Pain: Moderate and taps "Your note" where it peeks in at the bottom of the sheet. The
      * field still has focus from before she closed the keyboard, so tapping it does not scroll it
-     * into view. Then the keyboard slides in.
+     * into view. Then the keyboard slides in. Its supporting text shows below it unless
+     * [supportingTextFits] is false: at 200% in landscape the field alone fills the space left.
      */
-    private fun typeANote(keyboard: Dp, fontScale: Float = 1f) {
+    private fun typeANote(keyboard: Dp, fontScale: Float = 1f, supportingTextFits: Boolean = true) {
         composeRule.setContent {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale)) {
@@ -92,9 +104,13 @@ class DayLogSheetImeTest {
         showKeyboard(keyboard)
 
         note().assertIsFocused()
-        val supportingText = composeRule.onNodeWithText("Only on this phone.").bounds()
-        val field = note().bounds().copy(bottom = supportingText.bottom)
-        assertAboveTheKeyboard("The note field and its supporting text", field, keyboard)
+        if (supportingTextFits) {
+            val supportingText = composeRule.onNodeWithText("Only on this phone.").bounds()
+            val field = note().bounds().copy(bottom = supportingText.bottom)
+            assertAboveTheKeyboard("The note field and its supporting text", field, keyboard)
+        } else {
+            assertAboveTheKeyboard("The note field", note().bounds(), keyboard)
+        }
     }
 
     private fun assertLogItIsAScrollAway(keyboard: Dp) {
@@ -134,13 +150,17 @@ class DayLogSheetImeTest {
 
     private fun Dp.toPx() = value * composeRule.density.density
 
-    /** Slides the keyboard in over the sheet's window, [height] tall, the way the system animates it. */
+    /**
+     * Slides the keyboard in over the sheet's window, [height] tall, the way the system animates it,
+     * below a status bar as tall as a phone's.
+     */
     private fun showKeyboard(height: Dp) {
         val window = checkNotNull(ShadowDialog.getLatestDialog().window)
         for (step in 1..KEYBOARD_FRAMES) {
             composeRule.runOnIdle {
                 val px = (height.toPx() * step / KEYBOARD_FRAMES).toInt()
                 val insets = WindowInsets.Builder()
+                    .setInsets(WindowInsets.Type.statusBars(), Insets.of(0, STATUS_BAR.toPx().toInt(), 0, 0))
                     .setInsets(WindowInsets.Type.ime(), Insets.of(0, 0, 0, px))
                     .setVisible(WindowInsets.Type.ime(), true)
                     .build()
@@ -153,6 +173,12 @@ class DayLogSheetImeTest {
 
     private companion object {
         const val KEYBOARD_FRAMES = 8
+
+        /** A phone on its side, 392dp tall, with the keyboard it shows there. */
+        const val LANDSCAPE = "w872dp-h392dp-land-mdpi"
+        val LANDSCAPE_KEYBOARD = 250.dp
+
+        val STATUS_BAR = 24.dp
 
         /** How much of the note field shows at the bottom of the sheet when she taps it. */
         val PEEK = 40.dp

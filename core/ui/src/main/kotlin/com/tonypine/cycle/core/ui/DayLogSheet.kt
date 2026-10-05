@@ -27,10 +27,12 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import com.tonypine.cycle.core.designsystem.AssistChip
 import com.tonypine.cycle.core.designsystem.ButtonGroup
 import com.tonypine.cycle.core.designsystem.CycleBottomSheet
@@ -100,7 +102,8 @@ data class DayLogEntry(
  * sheet.
  *
  * While she types a note, the field with its supporting text stays above the keyboard, and so do
- * Nah / Log it when there is room; otherwise they are a scroll away.
+ * Nah / Log it when there is room; otherwise they are a scroll away. In a window shorter than
+ * [SHORT_WINDOW] the note starts at one line instead of two.
  *
  * TalkBack announces the sheet by its title and reads each section title as a heading. A choice of
  * one reads as a radio button with its group ("Medium, Flow, radio button, selected"), a choice of
@@ -192,6 +195,7 @@ fun DayLogSheet(
         val noteSource = remember { MutableInteractionSource() }
         val endOfSheet = remember { BringIntoViewRequester() }
         val noteField = remember { BringIntoViewRequester() }
+        val shortWindow = LocalWindowInfo.current.containerDpSize.height < SHORT_WINDOW
         KeepAboveKeyboard(noteSource, endOfSheet, noteField)
         Column(
             modifier = Modifier.bringIntoViewRequester(endOfSheet),
@@ -206,7 +210,12 @@ fun DayLogSheet(
                         placeholder = stringResource(R.string.day_log_note_placeholder),
                         supportingText = stringResource(R.string.day_log_note_supporting),
                         maxLength = DayFeelings.NOTE_MAX_LENGTH,
-                        lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2, maxHeightInLines = 6),
+                        // In a short window (a phone on its side) the note starts at one line, so
+                        // it fits above the keyboard at large font sizes too.
+                        lineLimits = TextFieldLineLimits.MultiLine(
+                            minHeightInLines = if (shortWindow) 1 else 2,
+                            maxHeightInLines = 6
+                        ),
                         interactionSource = noteSource
                     )
                 }
@@ -331,6 +340,9 @@ private fun <T> Chips(
         }
     }
 }
+
+/** Below this height (a phone on its side), the window is short: the note starts at one line. */
+private val SHORT_WINDOW = 480.dp
 
 private val FlowLevel.label: Int
     get() = when (this) {
