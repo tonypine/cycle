@@ -19,6 +19,7 @@ dependencies {
     implementation(projects.core.ui)
     implementation(projects.core.data)
     implementation(projects.feature.calendar)
+    implementation(projects.feature.history)
     implementation(projects.feature.onboarding)
     implementation(projects.feature.settings)
     implementation(projects.feature.today)

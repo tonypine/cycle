@@ -86,14 +86,14 @@ class MainActivityTest {
         tab("Calendar").performClick()
         tab("Calendar").assertIsSelected()
         waitForText("Predicted periods are estimates", substring = true)
-        tab("History").performClick()
-        tab("History").assertIsSelected()
-        tab("Today").assertIsNotSelected()
-        composeRule.onNodeWithText("This part of Cycle is on its way.").assertIsDisplayed()
-        tab("Settings").performClick()
-        tab("Settings").assertIsSelected()
-        tab("Today").assertIsNotSelected()
-        composeRule.onNodeWithText("More settings are on their way.").assertIsDisplayed()
+        val screens = mapOf("History" to "No cycles yet", "Settings" to "More settings are on their way.")
+        screens.forEach { (label, text) ->
+            tab(label).performClick()
+            tab(label).assertIsSelected()
+            tab("Today").assertIsNotSelected()
+            waitForText(text)
+            composeRule.onNodeWithText(text).assertIsDisplayed()
+        }
 
         composeRule.runOnUiThread { composeRule.activity.onBackPressedDispatcher.onBackPressed() }
 

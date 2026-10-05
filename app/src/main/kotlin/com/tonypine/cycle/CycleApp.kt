@@ -31,6 +31,10 @@ import com.tonypine.cycle.core.designsystem.NavigationBar
 import com.tonypine.cycle.core.designsystem.NavigationDestination
 import com.tonypine.cycle.feature.calendar.CalendarRoute
 import com.tonypine.cycle.feature.calendar.CalendarViewModel
+import com.tonypine.cycle.feature.history.CycleDetailRoute
+import com.tonypine.cycle.feature.history.CycleDetailViewModel
+import com.tonypine.cycle.feature.history.HistoryRoute
+import com.tonypine.cycle.feature.history.HistoryViewModel
 import com.tonypine.cycle.feature.onboarding.OnboardingRoute
 import com.tonypine.cycle.feature.onboarding.OnboardingViewModel
 import com.tonypine.cycle.feature.settings.SettingsScreen
@@ -76,7 +80,8 @@ fun CycleApp(
 /**
  * One screen per tab above the navigation bar. Each tab keeps its state when she leaves it, and back
  * from any tab returns to Today, then leaves the app. Today's "missed a period?" card opens the
- * calendar on the month the period was likely in. Settings opens What to log inside its tab.
+ * calendar on the month the period was likely in, and a cycle's "See it in the calendar" on the
+ * month it started. Settings opens What to log inside its tab.
  */
 @Composable
 private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: NavHostController) {
@@ -86,7 +91,8 @@ private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: Na
         .indexOfFirst { destination -> current?.hierarchy?.any { it.route == destination.route } == true }
         .coerceAtLeast(0)
     val motion = CycleTheme.motion
-    // The month Today's "Add a past period" asks the calendar to open on, until it has.
+    // The month Today's "Add a past period" or a cycle's "See it in the calendar" asks the calendar to
+    // open on, until it has.
     var calendarMonth by rememberSaveable { mutableStateOf<YearMonth?>(null) }
 
     Column(Modifier.fillMaxSize()) {
@@ -115,7 +121,25 @@ private fun CycleTabs(data: CycleData, today: () -> LocalDate, navController: Na
                     onMonthShown = { calendarMonth = null }
                 )
             }
-            composable(TopLevelDestination.History.route) { PlaceholderScreen(TopLevelDestination.History) }
+            navigation(startDestination = HISTORY_LIST_ROUTE, route = TopLevelDestination.History.route) {
+                composable(HISTORY_LIST_ROUTE) {
+                    HistoryRoute(
+                        viewModel { HistoryViewModel(data.cycleRepository, today) },
+                        onCycleClick = { start -> navController.navigate("$HISTORY_CYCLE_PREFIX$start") }
+                    )
+                }
+                composable(HISTORY_CYCLE_ROUTE) { entry ->
+                    val start = LocalDate.parse(entry.arguments?.getString(START_ARG))
+                    CycleDetailRoute(
+                        viewModel { CycleDetailViewModel(data.cycleRepository, start, today) },
+                        onBack = { navController.popBackStack() },
+                        onSeeInCalendar = { month ->
+                            calendarMonth = month
+                            navController.navigateToTab(TopLevelDestination.Calendar)
+                        }
+                    )
+                }
+            }
             navigation(startDestination = SETTINGS_HOME_ROUTE, route = TopLevelDestination.Settings.route) {
                 composable(SETTINGS_HOME_ROUTE) {
                     SettingsScreen(onWhatToLog = { navController.navigate(WHAT_TO_LOG_ROUTE) })
@@ -148,3 +172,10 @@ private fun NavHostController.navigateToTab(destination: TopLevelDestination) {
         restoreState = true
     }
 }
+
+private const val HISTORY_LIST_ROUTE = "history/cycles"
+private const val START_ARG = "start"
+
+/** A cycle's details, by the day it started, as `2027-08-05`. */
+private const val HISTORY_CYCLE_PREFIX = "history/cycle/"
+private const val HISTORY_CYCLE_ROUTE = "$HISTORY_CYCLE_PREFIX{$START_ARG}"
