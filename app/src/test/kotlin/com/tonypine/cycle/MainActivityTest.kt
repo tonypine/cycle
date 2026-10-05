@@ -35,8 +35,9 @@ class MainActivityTest {
 
     private fun tab(label: String): SemanticsNodeInteraction = composeRule.onNode(hasText(label) and isTab)
 
-    private fun waitForText(text: String) =
-        composeRule.waitUntil(WAIT_MILLIS) { composeRule.onAllNodes(hasText(text)).fetchSemanticsNodes().isNotEmpty() }
+    private fun waitForText(text: String, substring: Boolean = false) = composeRule.waitUntil(WAIT_MILLIS) {
+        composeRule.onAllNodes(hasText(text, substring = substring)).fetchSemanticsNodes().isNotEmpty()
+    }
 
     @Test
     fun `the app starts on Today with four tabs`() {
@@ -49,7 +50,10 @@ class MainActivityTest {
 
     @Test
     fun `each tab opens and back returns to Today`() {
-        listOf("Calendar", "History", "Settings").forEach { label ->
+        tab("Calendar").performClick()
+        tab("Calendar").assertIsSelected()
+        waitForText("Predicted periods are estimates", substring = true)
+        listOf("History", "Settings").forEach { label ->
             tab(label).performClick()
             tab(label).assertIsSelected()
             tab("Today").assertIsNotSelected()

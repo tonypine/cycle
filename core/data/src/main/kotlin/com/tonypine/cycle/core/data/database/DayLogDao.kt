@@ -26,6 +26,23 @@ abstract class DayLogDao {
     @Query("DELETE FROM day_log WHERE date = :date")
     abstract suspend fun delete(date: LocalDate)
 
+    @Query("SELECT * FROM day_log ORDER BY date")
+    abstract suspend fun getAll(): List<DayLogEntity>
+
+    /**
+     * Reads every logged day and writes what [edit] returns of them, in one transaction, so no reader
+     * sees part of an edit that spans several days. Each pair replaces its date; a null deletes it.
+     */
+    @Transaction
+    open suspend fun edit(edit: (List<DayLogEntity>) -> List<Pair<LocalDate, DayLogEntity?>>) {
+        edit(getAll()).forEach { (date, day) ->
+            when (day) {
+                null -> delete(date)
+                else -> upsert(day)
+            }
+        }
+    }
+
     /**
      * Replaces the day at [date] with [transform] of what is stored (null when nothing is), in one
      * transaction. A null result deletes the row.

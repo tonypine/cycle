@@ -18,6 +18,7 @@ dependencies {
     implementation(projects.core.designsystem)
     implementation(projects.core.ui)
     implementation(projects.core.data)
+    implementation(projects.feature.calendar)
     implementation(projects.feature.today)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
