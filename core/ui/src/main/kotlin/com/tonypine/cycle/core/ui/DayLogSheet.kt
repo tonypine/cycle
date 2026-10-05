@@ -1,25 +1,38 @@
 package com.tonypine.cycle.core.ui
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import com.tonypine.cycle.core.designsystem.AssistChip
 import com.tonypine.cycle.core.designsystem.ButtonGroup
 import com.tonypine.cycle.core.designsystem.CycleBottomSheet
@@ -43,6 +56,7 @@ import com.tonypine.cycle.core.model.PainLevel
 import com.tonypine.cycle.core.model.SexualActivity
 import com.tonypine.cycle.core.model.SleepQuality
 import java.time.LocalDate
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
@@ -86,6 +100,10 @@ data class DayLogEntry(
  * The fill chip logs the period with [onFill] at once and closes the sheet. "Clear this day" asks
  * first, in a [CycleDestructiveDialog] that says what goes, then calls [onClear] and closes the
  * sheet.
+ *
+ * While she types a note, the field with its supporting text stays above the keyboard, and so do
+ * Nah / Log it when there is room; otherwise they are a scroll away. In a window shorter than
+ * [SHORT_WINDOW] the note starts at one line instead of two.
  *
  * TalkBack announces the sheet by its title and reads each section title as a heading. A choice of
  * one reads as a radio button with its group ("Medium, Flow, radio button, selected"), a choice of
@@ -172,39 +190,57 @@ fun DayLogSheet(
                 }
             }
         }
-        if (shown(LogCategory.NOTES)) {
-            Section(stringResource(R.string.day_log_notes)) {
-                CycleTextField(
-                    state = note,
-                    label = stringResource(R.string.day_log_note_label),
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = stringResource(R.string.day_log_note_placeholder),
-                    supportingText = stringResource(R.string.day_log_note_supporting),
-                    maxLength = DayFeelings.NOTE_MAX_LENGTH,
-                    lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2, maxHeightInLines = 6)
+        // The end of the sheet: the note, Clear and Nah / Log it, in one column so it can be brought
+        // into view above the keyboard together.
+        val noteSource = remember { MutableInteractionSource() }
+        val endOfSheet = remember { BringIntoViewRequester() }
+        val noteField = remember { BringIntoViewRequester() }
+        val shortWindow = LocalWindowInfo.current.containerDpSize.height < SHORT_WINDOW
+        KeepAboveKeyboard(noteSource, endOfSheet, noteField)
+        Column(
+            modifier = Modifier.bringIntoViewRequester(endOfSheet),
+            verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.large)
+        ) {
+            if (shown(LogCategory.NOTES)) {
+                Section(stringResource(R.string.day_log_notes)) {
+                    CycleTextField(
+                        state = note,
+                        label = stringResource(R.string.day_log_note_label),
+                        modifier = Modifier.fillMaxWidth().bringIntoViewRequester(noteField),
+                        placeholder = stringResource(R.string.day_log_note_placeholder),
+                        supportingText = stringResource(R.string.day_log_note_supporting),
+                        maxLength = DayFeelings.NOTE_MAX_LENGTH,
+                        // In a short window (a phone on its side) the note starts at one line, so
+                        // it fits above the keyboard at large font sizes too.
+                        lineLimits = TextFieldLineLimits.MultiLine(
+                            minHeightInLines = if (shortWindow) 1 else 2,
+                            maxHeightInLines = 6
+                        ),
+                        interactionSource = noteSource
+                    )
+                }
+            }
+            if (entry.canClear) {
+                TextButton(
+                    text = stringResource(R.string.day_log_clear),
+                    onClick = { confirmClear = true },
+                    icon = CycleIcons.Delete
                 )
             }
-        }
-        if (entry.canClear) {
-            TextButton(
-                text = stringResource(R.string.day_log_clear),
-                onClick = { confirmClear = true },
-                icon = CycleIcons.Delete
-            )
-        }
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small, Alignment.End),
-            verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small)
-        ) {
-            TextButton(stringResource(R.string.day_log_dismiss), onClick = { scope.launch { sheet.hide() } })
-            FilledButton(
-                text = stringResource(R.string.day_log_save),
-                onClick = {
-                    onLog(date, flow, feelings.copy(note = note.text.toString()))
-                    scope.launch { sheet.hide() }
-                }
-            )
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small, Alignment.End),
+                verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small)
+            ) {
+                TextButton(stringResource(R.string.day_log_dismiss), onClick = { scope.launch { sheet.hide() } })
+                FilledButton(
+                    text = stringResource(R.string.day_log_save),
+                    onClick = {
+                        onLog(date, flow, feelings.copy(note = note.text.toString()))
+                        scope.launch { sheet.hide() }
+                    }
+                )
+            }
         }
     }
     val day = formatDate(date)
@@ -224,6 +260,33 @@ fun DayLogSheet(
         },
         dismissText = stringResource(R.string.day_log_clear_keep)
     )
+}
+
+/**
+ * Keeps the note and Log it above the keyboard while the field in [noteSource] has focus. Each time
+ * the keyboard opens or changes height, brings [endOfSheet] into view, Log it included when there is
+ * room, then [noteField], so the whole field and its supporting text show even when the end of the
+ * sheet is taller than the space left. Foundation does this only for a field that was fully in view
+ * before the keyboard opened.
+ */
+@Composable
+private fun KeepAboveKeyboard(
+    noteSource: MutableInteractionSource,
+    endOfSheet: BringIntoViewRequester,
+    noteField: BringIntoViewRequester
+) {
+    val focused by noteSource.collectIsFocusedAsState()
+    val ime = WindowInsets.ime
+    val density = LocalDensity.current
+    LaunchedEffect(focused, ime, density) {
+        if (!focused) return@LaunchedEffect
+        snapshotFlow { ime.getBottom(density) }.collectLatest {
+            // Wait a frame, so the sheet has laid out above the keyboard's new height first.
+            withFrameNanos {}
+            endOfSheet.bringIntoView()
+            noteField.bringIntoView()
+        }
+    }
 }
 
 /** A titled part of the sheet: the title, read as a heading, then [content], given the title. */
@@ -277,6 +340,9 @@ private fun <T> Chips(
         }
     }
 }
+
+/** Below this height (a phone on its side), the window is short: the note starts at one line. */
+private val SHORT_WINDOW = 480.dp
 
 private val FlowLevel.label: Int
     get() = when (this) {
