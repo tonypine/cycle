@@ -11,7 +11,7 @@
     <string name="settings_what_to_log_body">Choose what the day log asks about</string>
     <string name="settings_your_data">Your data</string>
     <string name="settings_on_this_phone_title">Everything stays on this phone</string>
-    <string name="settings_on_this_phone_body">No account, no cloud, no tracking. Your data leaves this phone only when you export it, to the place you pick.</string>
+    <string name="settings_on_this_phone_body">No account, no cloud, no tracking. A copy leaves this phone only when you export one, to the place you pick, or in Android\'s backup, end-to-end encrypted with your screen lock.</string>
     <string name="settings_export_title">Export my data</string>
     <string name="settings_export_body">Save a file with every day you logged</string>
     <string name="settings_last_exported">Last exported %1$s</string>
