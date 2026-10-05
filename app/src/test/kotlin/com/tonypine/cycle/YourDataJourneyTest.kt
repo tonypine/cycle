@@ -11,16 +11,16 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyAncestor
-import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.performTextReplacement
 import androidx.core.app.ActivityOptionsCompat
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.model.DayLog
@@ -154,9 +154,9 @@ class YourDataJourneyTest {
         // 5. Usual cycle and period: 30 days.
         tab("Settings").performClick()
         row("Usual cycle and period").performClick()
-        val cycle = composeRule.onNode(hasSetTextAction() and hasText("Cycle length, in days", substring = true))
-        waitFor(hasSetTextAction() and hasText("28"))
-        cycle.performTextReplacement("30")
+        waitForText("28 days")
+        repeat(2) { composeRule.onNodeWithContentDescription("Cycle one day longer").performClick() }
+        composeRule.onNodeWithText("30 days").assertIsDisplayed()
         composeRule.onNodeWithText("Save").performScrollTo().performClick()
         waitForText("30-day cycle, 5-day period")
 

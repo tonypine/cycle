@@ -6,49 +6,34 @@ import org.junit.Test
 
 class UsualLengthsTest {
     @Test
-    fun `the defaults are valid`() {
-        assertEquals(LengthCheck.Valid(28), UsualLengths.checkCycle("28"))
-        assertEquals(LengthCheck.Valid(5), UsualLengths.checkPeriod("5"))
+    fun `the defaults are lengths she can give`() {
+        assertEquals(28, UsualLengths.cycle(CycleRules.DEFAULT_CYCLE_LENGTH))
+        assertEquals(5, UsualLengths.period(CycleRules.DEFAULT_PERIOD_LENGTH))
     }
 
     @Test
-    fun `unusual lengths are accepted`() {
-        assertEquals(LengthCheck.Valid(19), UsualLengths.checkCycle("19"))
-        assertEquals(LengthCheck.Valid(50), UsualLengths.checkCycle("50"))
-        assertEquals(LengthCheck.Valid(10), UsualLengths.checkPeriod("10"))
+    fun `unusual lengths stay as they are`() {
+        assertEquals(19, UsualLengths.cycle(19))
+        assertEquals(50, UsualLengths.cycle(50))
+        assertEquals(10, UsualLengths.period(10))
     }
 
     @Test
-    fun `the bounds themselves are accepted`() {
-        assertEquals(LengthCheck.Valid(15), UsualLengths.checkCycle("15"))
-        assertEquals(LengthCheck.Valid(90), UsualLengths.checkCycle("90"))
-        assertEquals(LengthCheck.Valid(1), UsualLengths.checkPeriod("1"))
-        assertEquals(LengthCheck.Valid(14), UsualLengths.checkPeriod("14"))
+    fun `the ends of each range are lengths she can give`() {
+        assertEquals(15, UsualLengths.cycle(15))
+        assertEquals(90, UsualLengths.cycle(90))
+        assertEquals(1, UsualLengths.period(1))
+        assertEquals(14, UsualLengths.period(14))
     }
 
     @Test
-    fun `impossible lengths are refused with the range to use`() {
-        val cycles = LengthCheck.OutOfRange(15..90)
-        assertEquals(cycles, UsualLengths.checkCycle("14"))
-        assertEquals(cycles, UsualLengths.checkCycle("91"))
-        assertEquals(cycles, UsualLengths.checkCycle("0"))
-
-        val periods = LengthCheck.OutOfRange(1..14)
-        assertEquals(periods, UsualLengths.checkPeriod("0"))
-        assertEquals(periods, UsualLengths.checkPeriod("15"))
-    }
-
-    @Test
-    fun `text that is not a whole number is out of range`() {
-        assertEquals(LengthCheck.OutOfRange(15..90), UsualLengths.checkCycle("2.5"))
-        assertEquals(LengthCheck.OutOfRange(1..14), UsualLengths.checkPeriod("-3"))
-        assertEquals(LengthCheck.OutOfRange(15..90), UsualLengths.checkCycle("99999999999"))
-    }
-
-    @Test
-    fun `an empty or blank field is empty`() {
-        assertEquals(LengthCheck.Empty, UsualLengths.checkCycle(""))
-        assertEquals(LengthCheck.Empty, UsualLengths.checkPeriod("  "))
+    fun `a length outside the range becomes the nearest end`() {
+        assertEquals(15, UsualLengths.cycle(14))
+        assertEquals(15, UsualLengths.cycle(0))
+        assertEquals(90, UsualLengths.cycle(91))
+        assertEquals(1, UsualLengths.period(0))
+        assertEquals(1, UsualLengths.period(-3))
+        assertEquals(14, UsualLengths.period(15))
     }
 
     @Test
