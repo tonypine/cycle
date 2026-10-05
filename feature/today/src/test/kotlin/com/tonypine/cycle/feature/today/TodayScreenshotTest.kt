@@ -16,7 +16,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * Every Today state in light and dark, and two at 200% font scale. Each records
+ * Every Today state in light and dark, and four at 200% font scale. Each records
  * `src/test/screenshots/today_<state>_<appearance>.png`. The data is synthetic ([TodaySamples]).
  */
 @RunWith(ParameterizedRobolectricTestRunner::class)
@@ -53,6 +53,9 @@ class TodayScreenshotTest(private val name: String, private val appearance: Appe
         @ParameterizedRobolectricTestRunner.Parameters(name = "{0}_{1}")
         fun cases(): List<Array<Any>> = TodaySamples.all.keys.flatMap { name ->
             listOf(Appearance.Light, Appearance.Dark).map { arrayOf<Any>(name, it) }
-        } + listOf("mid_cycle", "still_going", "missed_period").map { arrayOf<Any>(it, Appearance.FontScale200) }
+        } +
+            listOf("mid_cycle", "still_going", "missed_period", "logged_today").map {
+                arrayOf<Any>(it, Appearance.FontScale200)
+            }
     }
 }

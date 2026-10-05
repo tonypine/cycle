@@ -5,6 +5,7 @@ import com.tonypine.cycle.core.data.day
 import com.tonypine.cycle.core.data.settingsRepository
 import com.tonypine.cycle.core.model.CyclePrompt
 import com.tonypine.cycle.core.model.CycleSettings
+import com.tonypine.cycle.core.model.LogCategory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -66,5 +67,19 @@ class SettingsRepositoryTest {
         assertThrows(IllegalArgumentException::class.java) {
             kotlinx.coroutines.runBlocking { settings.setUsualPeriodLength(-1) }
         }
+    }
+
+    @Test
+    fun `every category shows until she hides one, and showing it again undoes that`() = runTest {
+        val settings = settingsRepository(folder.root, backgroundScope)
+        assertEquals(emptySet<LogCategory>(), settings.settings.first().hiddenCategories)
+
+        settings.setCategoryShown(LogCategory.SEX, shown = false)
+        settings.setCategoryShown(LogCategory.NOTES, shown = false)
+        assertEquals(setOf(LogCategory.SEX, LogCategory.NOTES), settings.settings.first().hiddenCategories)
+
+        settings.setCategoryShown(LogCategory.SEX, shown = true)
+        settings.setCategoryShown(LogCategory.MOOD, shown = true)
+        assertEquals(setOf(LogCategory.NOTES), settings.settings.first().hiddenCategories)
     }
 }

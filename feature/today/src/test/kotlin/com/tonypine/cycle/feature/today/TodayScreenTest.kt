@@ -30,7 +30,9 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import com.github.takahirom.roborazzi.captureScreenRoboImage
+import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.LogCategory
 import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -59,7 +61,7 @@ class TodayScreenTest {
         onPeriodEnded = { calls += "ended" },
         onUndoPeriodEnded = { calls += "undo ended" },
         onLogPeriod = { calls += "log $it" },
-        onLogDay = { date, flow -> calls += "log day $date $flow" },
+        onLogDay = { date, flow, _ -> calls += "log day $date $flow" },
         onFillPeriod = { calls += "fill $it" },
         onClearDay = { calls += "clear $it" },
         onStillGoing = { calls += "still going" },
@@ -132,9 +134,37 @@ class TodayScreenTest {
         composeRule.waitForIdle()
         captureScreenRoboImage("src/test/screenshots/today_sheet_day_log.png")
         composeRule.onNodeWithText("Light").performClick()
-        composeRule.onNodeWithText("Log it").performClick()
+        composeRule.onNodeWithText("Log it").performScrollTo().performClick()
 
         assertEquals(listOf("ended", "log day 2027-03-20 ${FlowLevel.LIGHT}"), calls)
+    }
+
+    @Test
+    fun `logged today sums up the day, read as one item, and Edit opens the day log`() {
+        show(TodaySamples.loggedToday)
+
+        composeRule.onNode(
+            hasText("Logged today") and hasText("Cramps, moderate · Bloating · Irritable · Low energy · Slept badly")
+        ).assertIsDisplayed()
+        composeRule.onNodeWithText("Edit").performScrollTo().performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNode(hasText("Saturday, March 20") and isHeading()).assertIsDisplayed()
+        composeRule.onNodeWithText("Cramps").assert(SemanticsMatcher.expectValue(SemanticsProperties.Selected, true))
+        composeRule.onNodeWithText("A synthetic note.").assertExists()
+    }
+
+    @Test
+    fun `logged today leaves out what she hid, and says when there is only a note`() {
+        val log = TodaySamples.loggedToday.todayLog
+        show(TodaySamples.loggedToday.copy(todayLog = log.copy(hiddenCategories = setOf(LogCategory.SLEEP))))
+        composeRule.onNodeWithText("Cramps, moderate · Bloating · Irritable · Low energy").assertIsDisplayed()
+
+        show(TodaySamples.loggedToday.copy(todayLog = log.copy(feelings = DayFeelings(log.date, note = "Synthetic"))))
+        composeRule.onNodeWithText("A note").assertIsDisplayed()
+
+        show(TodaySamples.loggedToday.copy(todayLog = log.copy(hiddenCategories = LogCategory.entries.toSet())))
+        composeRule.onAllNodesWithText("Logged today").assertCountEquals(0)
     }
 
     @Test
@@ -287,6 +317,7 @@ class TodayScreenTest {
             if (state.stillGoing != null) addAll(listOf("Still going", "It ended earlier"))
             if (state.missedPeriod != null) addAll(listOf("Add a past period", "No, I didn't miss one"))
             add(if (state.onPeriod) "Log flow and how you feel" else "Log how you feel")
+            if (state.todayLog.isLogged) add("Edit")
             add("How is this estimated?")
         }
     }

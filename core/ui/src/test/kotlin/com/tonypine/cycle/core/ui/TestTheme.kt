@@ -9,7 +9,17 @@ import com.tonypine.cycle.core.designsystem.CycleBottomSheetState
 import com.tonypine.cycle.core.designsystem.CycleSheetValue
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.rememberCycleBottomSheetState
+import com.tonypine.cycle.core.model.BodySymptom
+import com.tonypine.cycle.core.model.DayFeelings
+import com.tonypine.cycle.core.model.EnergyLevel
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.LogCategory
+import com.tonypine.cycle.core.model.Mood
+import com.tonypine.cycle.core.model.Pain
+import com.tonypine.cycle.core.model.PainKind
+import com.tonypine.cycle.core.model.PainLevel
+import com.tonypine.cycle.core.model.SexualActivity
+import com.tonypine.cycle.core.model.SleepQuality
 import java.time.LocalDate
 
 /** [content] in [CycleTheme] on the app's `surface`, with motion reduced so every frame is final. */
@@ -24,7 +34,7 @@ internal fun Themed(darkTheme: Boolean = false, content: @Composable () -> Unit)
 @Composable
 internal fun OpenDayLogSheet(
     entry: DayLogEntry,
-    onLog: (LocalDate, FlowLevel?) -> Unit = { _, _ -> },
+    onLog: (LocalDate, FlowLevel?, DayFeelings) -> Unit = { _, _, _ -> },
     onFill: (LocalDate) -> Unit = {},
     onClear: (LocalDate) -> Unit = {}
 ): CycleBottomSheetState {
@@ -43,4 +53,22 @@ internal object DayLogSamples {
 
     /** A period day with medium flow: Clear shows. */
     val medium = DayLogEntry(LocalDate.of(2027, 3, 3), FlowLevel.MEDIUM, canClear = true, isPeriodDay = true)
+
+    /** How she felt on [medium]'s day, in every category. */
+    val everyFeeling = DayFeelings(
+        date = medium.date,
+        pain = Pain(PainLevel.MODERATE, setOf(PainKind.CRAMPS)),
+        body = setOf(BodySymptom.BLOATING),
+        moods = setOf(Mood.IRRITABLE),
+        energy = EnergyLevel.LOW,
+        sleep = SleepQuality.BADLY,
+        sex = SexualActivity.PROTECTED,
+        note = "A synthetic note."
+    )
+
+    /** A period day with flow and every category logged. */
+    val feelings = medium.copy(feelings = everyFeeling)
+
+    /** [feelings] with Sex and Notes hidden in "What to log". */
+    val hidden = feelings.copy(hiddenCategories = setOf(LogCategory.SEX, LogCategory.NOTES))
 }

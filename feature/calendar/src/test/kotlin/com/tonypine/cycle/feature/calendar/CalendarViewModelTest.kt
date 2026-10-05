@@ -10,6 +10,7 @@ import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
 import com.tonypine.cycle.core.designsystem.CycleDayState
+import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.model.Period
@@ -51,7 +52,7 @@ class CalendarViewModelTest {
         .inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext<Context>(), CycleDatabase::class.java)
         .allowMainThreadQueries()
         .build()
-    private val dayLogs = DayLogRepository(database.dayLogDao())
+    private val dayLogs = DayLogRepository(database)
 
     @Before
     fun setMain() = Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -93,13 +94,13 @@ class CalendarViewModelTest {
         viewModel.onDayClick(day("2027-03-10"))
         assertEquals(DayLogEntry(day("2027-03-10"), fillDays = 5), viewModel.awaitState().selectedLog)
 
-        viewModel.onLogDay(day("2027-03-10"), FlowLevel.MEDIUM)
+        viewModel.onLogDay(day("2027-03-10"), FlowLevel.MEDIUM, DayFeelings(day("2027-03-10")))
         val logged = viewModel.awaitState { it.days.periods.isNotEmpty() }
         assertEquals(CycleDayState.Period, logged.days.stateOf(day("2027-03-10")))
         assertEquals(FlowLevel.MEDIUM, logged.selectedLog?.flow)
         assertEquals(day("2027-04-07"), logged.days.predicted.first().start)
 
-        viewModel.onLogDay(day("2027-03-10"), FlowLevel.NONE)
+        viewModel.onLogDay(day("2027-03-10"), FlowLevel.NONE, DayFeelings(day("2027-03-10")))
         val changed = viewModel.awaitState { it.days.periods.isEmpty() }
         assertEquals(CycleDayState.Plain, changed.days.stateOf(day("2027-03-10")))
         assertEquals(emptyList<ClosedRange<LocalDate>>(), changed.days.predicted)
@@ -161,11 +162,11 @@ class CalendarViewModelTest {
         viewModel.awaitState()
 
         viewModel.onDayClick(today.plusDays(1))
-        viewModel.onLogDay(today.plusDays(1), FlowLevel.HEAVY)
+        viewModel.onLogDay(today.plusDays(1), FlowLevel.HEAVY, DayFeelings(today.plusDays(1)))
         viewModel.onFillPeriod(today.plusDays(1))
         viewModel.onClearDay(today.plusDays(2))
         // Written after the others, in order, so once it shows, they have run.
-        viewModel.onLogDay(today, FlowLevel.SPOTTING)
+        viewModel.onLogDay(today, FlowLevel.SPOTTING, DayFeelings(today))
         viewModel.awaitState { it.days.withoutPeriodFlow.isNotEmpty() }
 
         assertNull(viewModel.awaitState().selected)

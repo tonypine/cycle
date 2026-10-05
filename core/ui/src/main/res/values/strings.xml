@@ -3,7 +3,7 @@
     <!-- Copy rules: docs/research/product-implications.md. StringsTest guards against the words the
          app never says. -->
 
-    <!-- The day log sheet, for any day up to today. MOT-36 adds how she feels. -->
+    <!-- The day log sheet, for any day up to today: flow, then how she feels. -->
     <string name="day_log_flow">Flow</string>
     <string name="day_log_flow_none">None</string>
     <string name="day_log_flow_spotting">Spotting</string>
@@ -15,6 +15,78 @@
         <item quantity="other">Period started this day: fill in %1$d days</item>
     </plurals>
     <string name="day_log_clear">Clear this day</string>
+
+    <!-- How she feels, in the day log sheet. Each section title is read as a heading. -->
+    <string name="day_log_pain">Pain</string>
+    <string name="day_log_pain_where">Where?</string>
+    <string name="day_log_body">Body</string>
+    <string name="day_log_mood">Mood</string>
+    <string name="day_log_energy">Energy</string>
+    <string name="day_log_sleep">Sleep</string>
+    <string name="day_log_sex">Sex</string>
+    <string name="day_log_notes">Notes</string>
+    <string name="day_log_note_label">Your note</string>
+    <string name="day_log_note_placeholder">Anything else? Spill it here.</string>
+    <string name="day_log_note_supporting">Only on this phone.</string>
+
+    <string name="pain_none">None</string>
+    <string name="pain_mild">Mild</string>
+    <string name="pain_moderate">Moderate</string>
+    <string name="pain_severe">Severe</string>
+    <string name="pain_cramps">Cramps</string>
+    <string name="pain_headache">Headache</string>
+    <string name="pain_lower_back">Lower back</string>
+    <string name="pain_breasts">Breasts</string>
+    <string name="pain_ovulation">Ovulation pain</string>
+    <string name="pain_during_sex">During sex</string>
+
+    <string name="body_bloating">Bloating</string>
+    <string name="body_tender_breasts">Tender breasts</string>
+    <string name="body_acne">Acne</string>
+    <string name="body_cravings">Cravings</string>
+    <string name="body_nausea">Nausea</string>
+    <string name="body_tired">Tired</string>
+    <string name="body_hot_flushes">Hot flushes</string>
+    <string name="body_night_sweats">Night sweats</string>
+
+    <string name="mood_calm">Calm</string>
+    <string name="mood_happy">Happy</string>
+    <string name="mood_sensitive">Sensitive</string>
+    <string name="mood_sad">Sad</string>
+    <string name="mood_anxious">Anxious</string>
+    <string name="mood_irritable">Irritable</string>
+    <string name="mood_angry">Angry</string>
+    <string name="mood_low">Low</string>
+    <string name="mood_mood_swings">Mood swings</string>
+
+    <string name="energy_low">Low</string>
+    <string name="energy_normal">Normal</string>
+    <string name="energy_high">High</string>
+    <string name="sleep_well">Slept well</string>
+    <string name="sleep_badly">Slept badly</string>
+    <string name="sex_protected">Protected</string>
+    <string name="sex_unprotected">Unprotected</string>
+
+    <!-- A day in a few words, such as "Cramps, moderate · Bloating · Low energy". -->
+    <string name="summary_separator">" · "</string>
+    <string name="summary_pain_where">%1$s, %2$s</string>
+    <string name="summary_pain_mild">mild</string>
+    <string name="summary_pain_moderate">moderate</string>
+    <string name="summary_pain_severe">severe</string>
+    <string name="summary_pain_none">No pain</string>
+    <string name="summary_pain_mild_only">Mild pain</string>
+    <string name="summary_pain_moderate_only">Moderate pain</string>
+    <string name="summary_pain_severe_only">Severe pain</string>
+    <string name="summary_flow_none">No flow</string>
+    <string name="summary_flow_spotting">Spotting</string>
+    <string name="summary_flow_light">Light flow</string>
+    <string name="summary_flow_medium">Medium flow</string>
+    <string name="summary_flow_heavy">Heavy flow</string>
+    <string name="summary_energy_low">Low energy</string>
+    <string name="summary_energy_normal">Normal energy</string>
+    <string name="summary_energy_high">High energy</string>
+    <string name="summary_sex_protected">Protected sex</string>
+    <string name="summary_sex_unprotected">Unprotected sex</string>
     <string name="day_log_dismiss">Nah</string>
     <string name="day_log_save">Log it</string>
 

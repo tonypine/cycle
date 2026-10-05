@@ -32,6 +32,11 @@
     <string name="today_started_card">Period started today</string>
     <string name="today_ended_card">Period ended today</string>
 
+    <!-- What she logged today, once she has: the summary line comes from core:ui. -->
+    <string name="today_logged_title">Logged today</string>
+    <string name="today_logged_note_only">A note</string>
+    <string name="today_logged_edit">Edit</string>
+
     <!-- Late: calm, no alarm. -->
     <string name="today_late_title">Cycles vary</string>
     <string name="today_late_body">Cycle lengths often change by a few days from one month to the next. The estimate below now starts today. Tap My period started when it does.</string>

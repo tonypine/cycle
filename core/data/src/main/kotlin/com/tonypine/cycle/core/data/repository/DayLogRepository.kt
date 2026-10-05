@@ -1,17 +1,25 @@
 package com.tonypine.cycle.core.data.repository
 
-import com.tonypine.cycle.core.data.database.DayLogDao
+import androidx.room.withTransaction
+import com.tonypine.cycle.core.data.database.CycleDatabase
 import com.tonypine.cycle.core.data.database.toEntity
 import com.tonypine.cycle.core.data.database.toModel
 import com.tonypine.cycle.core.domain.DayLogEdits
+import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-/** What she logged, day by day. A day with nothing logged has no row. */
-class DayLogRepository(private val dao: DayLogDao) {
+/**
+ * What she logged, day by day: her flow and period markers ([DayLog]) and how she felt
+ * ([DayFeelings]). A day with nothing logged has no row.
+ */
+class DayLogRepository(private val database: CycleDatabase) {
+    private val dao = database.dayLogDao()
+    private val feelingsDao = database.feelingsDao()
+
     /** Every logged day, oldest first. */
     fun observeDayLogs(): Flow<List<DayLog>> = dao.observeAll().map { days -> days.map { it.toModel() } }
 
@@ -21,6 +29,21 @@ class DayLogRepository(private val dao: DayLogDao) {
 
     /** What she logged on [date], or an empty log. */
     suspend fun get(date: LocalDate): DayLog = dao.get(date)?.toModel() ?: DayLog(date)
+
+    /** Every day she logged how she felt, oldest first. */
+    fun observeFeelings(): Flow<List<DayFeelings>> = feelingsDao.observeAll()
+
+    /** How she felt on [date], or nothing logged. */
+    suspend fun getFeelings(date: LocalDate): DayFeelings = feelingsDao.get(date)
+
+    /**
+     * "Log it" in the day log sheet: the [flow] and how she felt on [date], in one write. Every
+     * category is replaced, so the caller passes the ones she hid as they were.
+     */
+    suspend fun logDay(date: LocalDate, flow: FlowLevel?, feelings: DayFeelings) = database.withTransaction {
+        update(date) { it.copy(flow = flow) }
+        feelingsDao.save(feelings.copy(date = date).normalized())
+    }
 
     /** Replaces the day with [log]; an empty log removes the day. */
     suspend fun save(log: DayLog) = update(log.date) { log }
@@ -33,8 +56,11 @@ class DayLogRepository(private val dao: DayLogDao) {
     /** The one-tap "period ended" on [date], or its undo. */
     suspend fun setPeriodEnded(date: LocalDate, ended: Boolean) = update(date) { it.copy(periodEnded = ended) }
 
-    /** Removes everything logged on [date]. */
-    suspend fun clear(date: LocalDate) = dao.delete(date)
+    /** Removes everything logged on [date], how she felt included. */
+    suspend fun clear(date: LocalDate) = database.withTransaction {
+        dao.delete(date)
+        feelingsDao.delete(date)
+    }
 
     /**
      * "Period started this day: fill in [length] days" on [start], by [DayLogEdits.fill]: nothing
@@ -45,9 +71,13 @@ class DayLogRepository(private val dao: DayLogDao) {
 
     /**
      * "Clear this day" on [date], by [DayLogEdits.clear]: the day no longer counts as a period day
-     * and the rest of its period stays. One write, with any day next to it the edit moves.
+     * and the rest of its period stays, and how she felt that day goes. One write, with any day next
+     * to it the edit moves.
      */
-    suspend fun clearDay(date: LocalDate, today: LocalDate) = edit { logs -> DayLogEdits.clear(logs, date, today) }
+    suspend fun clearDay(date: LocalDate, today: LocalDate) = database.withTransaction {
+        edit { logs -> DayLogEdits.clear(logs, date, today) }
+        feelingsDao.delete(date)
+    }
 
     private suspend fun edit(edit: (List<DayLog>) -> List<DayLog>) {
         dao.edit { stored ->

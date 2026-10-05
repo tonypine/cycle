@@ -115,7 +115,9 @@ internal fun LogOverview.entry(date: LocalDate, days: CalendarDays): DayLogEntry
     flow = log(date).flow,
     fillDays = usualPeriodLength.takeIf { canFill(date) },
     canClear = canClear(date),
-    isPeriodDay = days.isPeriodDay(date)
+    isPeriodDay = days.isPeriodDay(date),
+    feelings = feelings(date),
+    hiddenCategories = hiddenCategories
 )
 
 /** Where she is in her cycle today. */

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
+import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.FlowLevel
 import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -66,9 +67,9 @@ class TodayViewModel(
         dayLogs.setPeriodStarted(start, started = true)
     }
 
-    /** "Log it" in the day log sheet: the flow she picked for [date], or null for none. */
-    fun onLogDay(date: LocalDate, flow: FlowLevel?) = write {
-        if (date <= day.value) dayLogs.setFlow(date, flow)
+    /** "Log it" in the day log sheet: the flow she picked for [date] (null for none) and how she felt. */
+    fun onLogDay(date: LocalDate, flow: FlowLevel?, feelings: DayFeelings) = write {
+        if (date <= day.value) dayLogs.logDay(date, flow, feelings)
     }
 
     /** "Period started this day: fill in N days" on [start], N being her usual period length. */
