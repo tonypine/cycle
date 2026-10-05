@@ -112,4 +112,24 @@ class SettingsRepositoryTest {
         settings.setCategoryShown(LogCategory.MOOD, shown = true)
         assertEquals(setOf(LogCategory.NOTES), settings.settings.first().hiddenCategories)
     }
+
+    @Test
+    fun `remembers the day she last exported, and clearing forgets every setting`() = runTest {
+        val settings = settingsRepository(folder.root, backgroundScope)
+        assertEquals(null, settings.lastExported.first())
+
+        settings.setLastExported(day("2027-03-20"))
+        settings.saveSetup(cycleLength = 31, periodLength = 4)
+        settings.setWelcomeDone(true)
+        assertEquals(day("2027-03-20"), settings.lastExported.first())
+
+        settings.clear()
+
+        assertEquals(null, settings.lastExported.first())
+        assertFalse(settings.welcomeDone.first())
+        assertEquals(
+            CycleSettings(usualCycleLength = 28, usualPeriodLength = 5, setupDone = false),
+            settings.settings.first()
+        )
+    }
 }
