@@ -45,6 +45,10 @@ import java.time.LocalDate
 /**
  * The Settings tab, wired to its [viewModel]: Export my data opens Android's save screen and Import
  * from a file its file picker. [versionName] is the app's version, if known.
+ *
+ * The note that Cycle isn't backed up shows while the phone has no screen lock, checked each time
+ * Cycle comes back to the front. "Hide for now" hides it until Cycle next opens, so it comes back
+ * while the phone still has no lock.
  */
 @Composable
 fun SettingsRoute(
@@ -58,6 +62,8 @@ fun SettingsRoute(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val export = rememberExportLauncher(viewModel)
     val import = rememberImportLauncher(viewModel)
+    val hasScreenLock = rememberHasScreenLock()
+    var backupNoteHidden by rememberSaveable { mutableStateOf(false) }
     val shown = state
     if (shown == null) {
         Column(modifier.fillMaxSize()) {
@@ -79,6 +85,8 @@ fun SettingsRoute(
         onDismissDialog = viewModel::onDismissDialog,
         onDeleteEverything = viewModel::onDeleteEverything,
         onNotices = onNotices,
+        showBackupNote = !hasScreenLock && !backupNoteHidden,
+        onHideBackupNote = { backupNoteHidden = true },
         modifier = modifier
     )
 }
@@ -86,10 +94,11 @@ fun SettingsRoute(
 /**
  * Settings, in four sections:
  * - Your cycle: "Usual cycle and period" and "What to log", each opening its page.
- * - Your data: a card saying everything stays on this phone, then Lock Cycle, which asks for the
- *   phone's lock before it turns on or off, with the note when Cycle turned it off itself, Export my
- *   data, with the day of the last export, Import from a file, and Delete everything, which asks
- *   first.
+ * - Your data: a card saying everything stays on this phone, then, when [showBackupNote], a note
+ *   that Cycle isn't backed up without a screen lock, with "Hide for now"; then Lock Cycle, which
+ *   asks for the phone's lock before it turns on or off, with the note when Cycle turned it off
+ *   itself; then Export my data, with the day of the last export, Import from a file, and Delete
+ *   everything, which asks first.
  * - About: the open-source notices, then that Cycle is not a contraceptive or a diagnosis, and the
  *   version.
  *
@@ -110,6 +119,8 @@ fun SettingsScreen(
     onDismissDialog: () -> Unit,
     onDeleteEverything: () -> Unit,
     onNotices: () -> Unit,
+    showBackupNote: Boolean,
+    onHideBackupNote: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = CycleTheme.colors
@@ -154,6 +165,7 @@ fun SettingsScreen(
                     body = stringResource(R.string.settings_on_this_phone_body)
                 )
             }
+            if (showBackupNote) BackupNote(onHide = onHideBackupNote)
             SwitchRow(
                 title = stringResource(R.string.settings_lock_title),
                 checked = state.appLock,
@@ -257,6 +269,26 @@ private fun LockTurnedOffNote(onDismiss: () -> Unit) {
     }
 }
 
+/**
+ * That Cycle isn't in the phone's backup because the phone has no screen lock, why, and that an
+ * export keeps a copy, with "Hide for now" under it.
+ */
+@Composable
+private fun BackupNote(onHide: () -> Unit) {
+    Card(Modifier.fillMaxWidth()) {
+        RowContent(
+            icon = CycleIcons.Info,
+            title = stringResource(R.string.settings_not_backed_up_title),
+            body = stringResource(R.string.settings_not_backed_up_body)
+        )
+        TextButton(
+            text = stringResource(R.string.settings_not_backed_up_hide),
+            onClick = onHide,
+            modifier = Modifier.align(Alignment.End)
+        )
+    }
+}
+
 /** A row that does something, as one button; [opensPage] adds the chevron of a row that opens a page. */
 @Composable
 private fun SettingsRow(
@@ -316,7 +348,9 @@ private fun SettingsPreview() {
             onConfirmImport = {},
             onDismissDialog = {},
             onDeleteEverything = {},
-            onNotices = {}
+            onNotices = {},
+            showBackupNote = true,
+            onHideBackupNote = {}
         )
     }
 }

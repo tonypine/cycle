@@ -24,7 +24,8 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * The Settings tab and its pages, in light, dark and at 200% font scale: Settings, after an export,
- * on a screen tall enough for every section; Usual cycle and period; the open-source notices; and,
+ * on a screen tall enough for every section, with and without the note that Cycle isn't backed up
+ * on a phone with no screen lock; Usual cycle and period; the open-source notices; and,
  * over Settings, "Delete everything?", "Import 42 days?" and a file that can't be imported. Each
  * records `src/test/screenshots/settings_<screen>_<appearance>.png`. Synthetic dates only.
  */
@@ -38,7 +39,7 @@ class SettingsScreenshotTest(private val screen: Screen, private val appearance:
     @OptIn(ExperimentalRoborazziApi::class)
     @Test
     fun capture() {
-        if (screen == Screen.Home) RuntimeEnvironment.setQualifiers("+h1400dp")
+        if (screen == Screen.Home || screen == Screen.NotBackedUp) RuntimeEnvironment.setQualifiers("+h1400dp")
         composeRule.setContent {
             val density = LocalDensity.current
             val fontScale = if (appearance == Appearance.FontScale200) 2f else 1f
@@ -62,6 +63,7 @@ class SettingsScreenshotTest(private val screen: Screen, private val appearance:
 
     enum class Screen(val fileName: String, val content: @Composable () -> Unit) {
         Home("home", { Settings() }),
+        NotBackedUp("not_backed_up", { Settings(showBackupNote = true) }),
         UsualLengths("usual_lengths", {
             UsualLengthsScreen(UsualLengthsUiState.Editing(29, 4), onSave = { _, _ -> }, onBack = {})
         }),
@@ -89,7 +91,7 @@ class SettingsScreenshotTest(private val screen: Screen, private val appearance:
 }
 
 @Composable
-private fun Settings(dialog: DataDialog? = null) = SettingsScreen(
+private fun Settings(dialog: DataDialog? = null, showBackupNote: Boolean = false) = SettingsScreen(
     state = SettingsUiState(29, 4, lastExported = LocalDate.of(2027, 3, 20), dialog = dialog),
     versionName = "1.4.27",
     onUsualLengths = {},
@@ -101,5 +103,7 @@ private fun Settings(dialog: DataDialog? = null) = SettingsScreen(
     onConfirmImport = {},
     onDismissDialog = {},
     onDeleteEverything = {},
-    onNotices = {}
+    onNotices = {},
+    showBackupNote = showBackupNote,
+    onHideBackupNote = {}
 )

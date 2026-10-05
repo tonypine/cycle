@@ -100,5 +100,7 @@ private fun Settings(state: SettingsUiState) = SettingsScreen(
     onConfirmImport = {},
     onDismissDialog = {},
     onDeleteEverything = {},
-    onNotices = {}
+    onNotices = {},
+    showBackupNote = false,
+    onHideBackupNote = {}
 )

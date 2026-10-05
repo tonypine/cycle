@@ -48,6 +48,10 @@ without a screen lock, the app is not backed up at all.
 - Without a screen lock, nothing is backed up and Android does not say so. Losing the phone then
   loses her history unless she has exported it. Export is planned from the start
   ([`product-implications.md`](../research/product-implications.md)).
+- So Cycle says so itself: while the phone has no screen lock (`KeyguardManager.isDeviceSecure`,
+  read on the phone and again each time Cycle comes back to the front), Settings shows a note under
+  "Your data" that Cycle isn't backed up until she sets one, and that an export keeps a copy. "Hide
+  for now" hides it until Cycle next opens; setting a lock removes it.
 - The rules list the files to back up, so a new storage location outside `databases/` and
   `files/datastore/` is not backed up until it is added to both rule files. `BackupRulesTest` writes
   a day and a setting and fails if either file is missed; a new store needs a write there too.

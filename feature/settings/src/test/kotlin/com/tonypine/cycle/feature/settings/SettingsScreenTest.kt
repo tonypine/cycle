@@ -41,6 +41,7 @@ class SettingsScreenTest {
 
     private val calls = mutableListOf<String>()
     private var state by mutableStateOf(SettingsUiState(28, 5, lastExported = null))
+    private var showBackupNote by mutableStateOf(false)
 
     private fun show() = composeRule.setContent {
         Themed {
@@ -56,7 +57,9 @@ class SettingsScreenTest {
                 onConfirmImport = { calls += "confirm import" },
                 onDismissDialog = { calls += "dismiss" },
                 onDeleteEverything = { calls += "delete everything" },
-                onNotices = { calls += "notices" }
+                onNotices = { calls += "notices" },
+                showBackupNote = showBackupNote,
+                onHideBackupNote = { calls += "hide backup note" }
             )
         }
     }
@@ -133,6 +136,28 @@ class SettingsScreenTest {
         composeRule.onNodeWithText("Add one in your phone's settings", substring = true).assertIsDisplayed()
         composeRule.onNodeWithText("OK").performClick()
         assertEquals(listOf("dismiss"), calls)
+    }
+
+    @Test
+    fun `without a screen lock, a note says Cycle isn't backed up, why, and that an export keeps a copy`() {
+        showBackupNote = true
+        show()
+
+        composeRule.onNodeWithText("Cycle isn't backed up").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("only when this phone has a screen lock", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText("To keep a copy, export your data.", substring = true).assertIsDisplayed()
+        composeRule.onNode(hasText("Hide for now") and isButton).performScrollTo().performClick()
+
+        assertEquals(listOf("hide backup note"), calls)
+    }
+
+    @Test
+    fun `with a screen lock, there is no note`() {
+        show()
+
+        composeRule.onNodeWithText("Everything stays on this phone").assertIsDisplayed()
+        composeRule.onNodeWithText("Cycle isn't backed up").assertDoesNotExist()
+        composeRule.onNodeWithText("Hide for now").assertDoesNotExist()
     }
 
     @Test

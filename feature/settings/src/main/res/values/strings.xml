@@ -12,6 +12,9 @@
     <string name="settings_your_data">Your data</string>
     <string name="settings_on_this_phone_title">Everything stays on this phone</string>
     <string name="settings_on_this_phone_body">No account, no cloud, no tracking. A copy leaves this phone only when you export one, to the place you pick, or in Android\'s backup, end-to-end encrypted with your screen lock.</string>
+    <string name="settings_not_backed_up_title">Cycle isn\'t backed up</string>
+    <string name="settings_not_backed_up_body">Android backs up Cycle only when this phone has a screen lock, so the backup is end-to-end encrypted. Until you set a PIN, pattern or password in your phone\'s settings, your days are only on this phone. To keep a copy, export your data.</string>
+    <string name="settings_not_backed_up_hide">Hide for now</string>
     <string name="settings_lock_title">Lock Cycle</string>
     <string name="settings_lock_body">Open Cycle with your fingerprint, face or screen lock.</string>
     <string name="settings_lock_off_title">Lock Cycle is off</string>
