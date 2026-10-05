@@ -14,7 +14,9 @@ decides, through tickets. When a ticket settles one of these, update this page.
    ([`cycle-physiology.md`](cycle-physiology.md)).
 3. **Not contraception, not diagnosis.** No "safe days", no condition names as causes. The app shows
    patterns and says when a doctor would want to hear about them
-   ([`health-signals.md`](health-signals.md)).
+   ([`health-signals.md`](health-signals.md)). It records the contraception she uses so its words
+   and estimates fit, but never acts as contraception and never advises on a method
+   ([`contraception.md`](contraception.md)).
 4. **Nothing leaves the phone** unless a decision record says otherwise. No SDKs that phone home
    ([`apps-and-privacy.md`](apps-and-privacy.md), [`0001-stack.md`](../decisions/0001-stack.md)).
 5. **Fast to log, nothing required.** One tap for a period; every other category optional and
@@ -22,7 +24,8 @@ decides, through tickets. When a ticket settles one of these, update this page.
 6. **Calm.** No alarms for a late period, no red banners, no telling her how to feel. The visual
    direction already says this ([`visual-directions.md`](../design/visual-directions.md)).
 7. **Life changes the cycle.** Contraception, pregnancy, birth, breastfeeding and perimenopause are
-   modes that change or pause predictions, not reasons to start over.
+   modes that change or pause predictions, not reasons to start over. Each contraceptive method
+   changes them differently ([`contraception.md`](contraception.md)).
 8. **Discreet.** Notifications, widgets and the recent-apps preview reveal only what she allows.
 
 ## Candidate features, in order
@@ -59,9 +62,18 @@ health signals need several cycles, a doctor summary needs the signals' data.
   questions below). The `Fertile` and `Ovulation` day states already exist.
 - **Reminders**, all off by default: period expected in N days, log today's period, take the pill.
   Neutral wording she can change.
-- **Life-stage modes**: hormonal contraception (fertility estimates off), pregnant (predictions
-  paused), after birth or breastfeeding (predictions paused until three regular cycles),
-  perimenopause (wider ranges, no fertility estimates by default).
+- **Contraception**: she asked for Cycle to know her method
+  ([MOT-48](https://linear.app/tonypine/issue/MOT-48)), so this can come before the rest of this
+  step. Her method and the dates she started and stopped it, then per method: what to estimate
+  (the next bleed follows the pack on a combined pill, patch or ring; nothing on the implant,
+  injection or progestogen-only pill), what to hide (fertile window and ovulation on every hormonal
+  method), the words ("period", "bleed" or "bleeding"), a 90-day bleeding summary on
+  progestogen-only methods, and the signals that fit the method
+  ([`contraception.md`](contraception.md)). The design is
+  [MOT-50](https://linear.app/tonypine/issue/MOT-50).
+- **Other life-stage modes**: pregnant (predictions paused), after birth or breastfeeding
+  (predictions paused until three regular cycles), perimenopause (wider ranges, no fertility
+  estimates by default).
 
 ### 4. Health signals and a doctor summary
 
@@ -93,7 +105,9 @@ Can move earlier if she wants them sooner; none depend on the steps above.
 
 ### Not planned
 
-- Contraception or "avoid pregnancy" modes.
+- Cycle acting as contraception: "avoid pregnancy" modes, safe or green days, "low chance"
+  wording, protection or missed-pill advice, and advice on choosing, starting or stopping a method.
+  Recording the contraception she uses, and adapting estimates to it, is planned (step 3).
 - Accounts, sync, a backend, analytics, ads, community or content feeds.
 - Diagnoses, risk scores or AI-generated health advice.
 
@@ -105,7 +119,8 @@ Can move earlier if she wants them sooner; none depend on the steps above.
 | Cycles used for predictions | The last 6 complete cycles, median | Matches the calendar rhythm rule and Apple's six-month window; a median resists one odd month. |
 | Prediction range with little data | ±4 days with no cycles, at least ±3 with one or two | About half of FIGO's 7–9-day regularity spread ([FIGO 2018](https://obgyn.onlinelibrary.wiley.com/doi/10.1002/ijgo.12666)). |
 | Cycles shown ahead on the calendar | 3 | Further out, the range grows too wide to help. |
-| Fertile window and ovulation | Depends on her answer to the first question below | Meaningless or unwanted for some goals. |
+| Fertile window and ovulation | Depends on her answer to the first question below; always off on a hormonal method | Meaningless or unwanted for some goals, and meaningless on hormonal contraception ([`contraception.md`](contraception.md)). |
+| Contraception | None set | She sets her method and its start date; nothing is assumed. |
 | Health signal cards | On, dismissible, switchable off; to confirm with her | Useful and calm when worded as in [`health-signals.md`](health-signals.md). |
 | Notifications | All off | She opts in to each. |
 | Temperature unit, first day of the week, date format | From the phone's locale | No setting needed until she asks. |
@@ -123,6 +138,23 @@ Can move earlier if she wants them sooner; none depend on the steps above.
 - **TalkBack reads the same words**, including "estimated" ("18 March, estimated ovulation").
 - **Discreet surfaces** (notifications, widget) use neutral text by default: "Reminder from Cycle".
 
+### On contraception
+
+From [`contraception.md`](contraception.md):
+
+- **"Period" only when she has her own cycle**: with no method or a copper IUD.
+- **"Bleed" for the scheduled bleed on a combined pill, patch or ring**: it is a withdrawal bleed,
+  not a period. "Bleed expected in your pill break", not "period expected".
+- **"Bleeding" on progestogen-only methods** (pill, implant, injection, hormonal IUD) and for
+  unscheduled bleeding on a combined method. These are the accurate words, not euphemisms.
+- **No cycle language where there is no cycle**: no "cycle day", phases or "late" on the implant,
+  injection or progestogen-only pill. Describe bleeding over the last 90 days in plain counts.
+- **Never advise on her method**: no "consider switching", "you may want to stop", "you are
+  protected" or missed-pill guidance. Questions about her method go to her pharmacist, nurse or
+  doctor.
+- **Expected changes read as expected**: in the first months on a method, unpredictable bleeding is
+  common, and the copy says so calmly rather than flagging it.
+
 ## Open questions for her
 
 The answers change features, defaults and copy. Each is worth one short ticket or a comment on the
@@ -132,8 +164,11 @@ next planning ticket.
    moods; trying to conceive, now or later; or noticing changes with age. This decides whether
    fertility estimates appear at all, and whether the narrow six-day window or the wider calendar
    range fits ([`predictions.md`](predictions.md)).
-2. **Does she use hormonal contraception?** If so, fertility estimates should be off and the bleed is
-   not a period in the usual sense.
+2. **Does she use contraception?** Being taken up: she wants Cycle to record whether she has an
+   implant or takes the pill ([MOT-48](https://linear.app/tonypine/issue/MOT-48)). The research is
+   in [`contraception.md`](contraception.md); the screens and the decision come from
+   [MOT-50](https://linear.app/tonypine/issue/MOT-50). Still hers to answer there: whether she wants
+   a next-bleed estimate on the pill, a 90-day summary, and a pill or injection reminder.
 3. **Does she have history in another app** she wants to bring over? Which app, and can it export?
 4. **What does she want to log** beyond her period? The list in
    [`tracking-data.md`](tracking-data.md) is a menu, not a requirement.
@@ -151,6 +186,10 @@ next planning ticket.
   estimates ([MOT-29](https://linear.app/tonypine/issue/MOT-29)).
 - The `Predicted period` day state (dashed edge on a pale fill) already reads as uncertain; the range
   of a predicted period could use the same treatment, with the most likely start emphasised.
+- The Today screen ("Your period could start any day now", "Missed a period?", the late message and
+  the next-period estimate), the calendar's predicted periods and the period labels all assume a
+  natural cycle. On a hormonal method they change as [`contraception.md`](contraception.md)
+  describes; [MOT-50](https://linear.app/tonypine/issue/MOT-50) designs how.
 - Backups to Google Drive carry the database and settings only when end-to-end encrypted with the
   phone's screen lock ([`0004`](../decisions/0004-backup-encryption.md),
   [MOT-28](https://linear.app/tonypine/issue/MOT-28)).
