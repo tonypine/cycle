@@ -24,7 +24,10 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** The app as she opens it: on Today, four tabs, back from a tab to Today. Starts with no data. */
+/**
+ * The app as she opens it: the welcome on the first launch, then Today, four tabs, back from a tab
+ * to Today. Starts with no data.
+ */
 @RunWith(RobolectricTestRunner::class)
 @Config(qualifiers = "w360dp-h800dp")
 class MainActivityTest {
@@ -40,16 +43,46 @@ class MainActivityTest {
     }
 
     @Test
-    fun `the app starts on Today with four tabs`() {
+    fun `the first launch shows the welcome, and Skip opens Today with four tabs`() {
+        waitForText("Hi! Let's get your cycle going")
+        composeRule.onNodeWithText("Get started").assertIsDisplayed()
+        composeRule.onAllNodes(isTab).assertCountEquals(0)
+
+        skipWelcome()
+
         composeRule.onAllNodes(isTab).assertCountEquals(4)
         tab("Today").assertIsSelected()
         listOf("Calendar", "History", "Settings").forEach { tab(it).assertIsNotSelected() }
-        waitForText("No periods logged yet")
         composeRule.onNodeWithText("Log a period").assertIsDisplayed()
     }
 
     @Test
+    fun `back from the welcome leaves the app`() {
+        waitForText("Get started")
+        composeRule.runOnUiThread { composeRule.activity.onBackPressedDispatcher.onBackPressed() }
+        assertTrue(composeRule.activity.isFinishing)
+    }
+
+    @Test
+    fun `setup on her phone's storage opens Today with an estimate from her lengths`() {
+        waitForText("Get started")
+        composeRule.onNodeWithText("Get started").performClick()
+        composeRule.onNode(hasContentDescription("today", substring = true) and hasClickAction()).performClick()
+        composeRule.onNodeWithText("Next").performScrollTo().performClick()
+        composeRule.onNodeWithText("Done").performScrollTo().performClick()
+
+        waitForText("Day 1")
+        composeRule.onAllNodes(isTab).assertCountEquals(4)
+        composeRule.onNodeWithText("Estimated from the lengths you gave", substring = true).performScrollTo()
+        // Coming back to the app, such as after a configuration change, stays on Today.
+        composeRule.activityRule.scenario.recreate()
+        waitForText("Day 1")
+        composeRule.onNodeWithText("Get started").assertDoesNotExist()
+    }
+
+    @Test
     fun `each tab opens and back returns to Today`() {
+        skipWelcome()
         tab("Calendar").performClick()
         tab("Calendar").assertIsSelected()
         waitForText("Predicted periods are estimates", substring = true)
@@ -73,6 +106,7 @@ class MainActivityTest {
 
     @Test
     fun `a period logged today starts, ends and undoes on her phone's database`() {
+        skipWelcome()
         waitForText("Log a period")
         composeRule.onNodeWithText("Log a period").performClick()
         composeRule.onNode(hasContentDescription("today", substring = true) and hasClickAction()).performClick()
@@ -87,6 +121,12 @@ class MainActivityTest {
         composeRule.onNodeWithText("Undo").performScrollTo().performClick()
         waitForText("My period ended")
         composeRule.onNodeWithText("Period started today").assertExists()
+    }
+
+    private fun skipWelcome() {
+        waitForText("Skip for now")
+        composeRule.onNodeWithText("Skip for now").performClick()
+        waitForText("No periods logged yet")
     }
 
     private companion object {
