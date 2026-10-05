@@ -8,6 +8,7 @@ import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.EnergyLevel
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.LogCategory
 import com.tonypine.cycle.core.model.Mood
 import com.tonypine.cycle.core.model.Pain
 import com.tonypine.cycle.core.model.PainKind
@@ -110,7 +111,7 @@ class DayLogRepositoryTest {
     fun `clearing a period's first day moves the start to the next day in one write`() = runTest {
         repository.fillPeriod(day("2027-03-02"), length = 5, today = day("2027-03-20"))
 
-        repository.clearDay(day("2027-03-02"), today = day("2027-03-20"))
+        repository.clearDay(day("2027-03-02"), today = day("2027-03-20"), hidden = emptySet())
 
         assertEquals(
             listOf(DayLog(day("2027-03-03"), periodStarted = true), DayLog(day("2027-03-06"), periodEnded = true)),
@@ -173,10 +174,25 @@ class DayLogRepositoryTest {
         repository.logDay(day("2027-03-09"), null, feelings.copy(date = day("2027-03-09")))
 
         repository.clear(day("2027-03-02"))
-        repository.clearDay(day("2027-03-09"), today = day("2027-03-20"))
+        repository.clearDay(day("2027-03-09"), today = day("2027-03-20"), hidden = emptySet())
 
         assertEquals(emptyList<DayFeelings>(), repository.observeFeelings().first())
         assertEquals(emptyList<DayLog>(), repository.observeDayLogs().first())
+    }
+
+    @Test
+    fun `clearing a day keeps what she logged in the categories she hid`() = runTest {
+        repository.logDay(day("2027-03-02"), FlowLevel.MEDIUM, feelings)
+
+        // Sex hidden in "What to log": she can't see it, so "Clear this day" leaves it.
+        repository.clearDay(day("2027-03-02"), today = day("2027-03-20"), hidden = setOf(LogCategory.SEX))
+
+        // Shown again, it is still there, and only it.
+        assertEquals(DayLog(day("2027-03-02")), repository.get(day("2027-03-02")))
+        assertEquals(
+            DayFeelings(day("2027-03-02"), sex = SexualActivity.PROTECTED),
+            repository.getFeelings(day("2027-03-02"))
+        )
     }
 
     @Test

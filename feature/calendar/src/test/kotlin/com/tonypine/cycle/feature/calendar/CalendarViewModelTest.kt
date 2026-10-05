@@ -13,7 +13,10 @@ import com.tonypine.cycle.core.designsystem.CycleDayState
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.LogCategory
+import com.tonypine.cycle.core.model.Mood
 import com.tonypine.cycle.core.model.Period
+import com.tonypine.cycle.core.model.SexualActivity
 import com.tonypine.cycle.core.ui.DayLogEntry
 import java.io.File
 import java.time.LocalDate
@@ -153,6 +156,27 @@ class CalendarViewModelTest {
         viewModel.onClearDay(day("2027-02-08"))
         val last = viewModel.awaitState { it.days.stateOf(day("2027-02-08")) == CycleDayState.Plain }
         assertEquals(Period(day("2027-02-05"), day("2027-02-07")), last.days.periods.single())
+    }
+
+    @Test
+    fun `clearing a day leaves the categories she hid`() = calendar { viewModel, settings ->
+        val date = day("2027-03-10")
+        val feelings = DayFeelings(date, moods = setOf(Mood.LOW), sex = SexualActivity.PROTECTED)
+        viewModel.onLogDay(date, FlowLevel.MEDIUM, feelings)
+        settings.setCategoryShown(LogCategory.SEX, shown = false)
+        viewModel.onDayClick(date)
+        viewModel.awaitState {
+            it.days.periods.isNotEmpty() &&
+                it.selectedLog?.hiddenCategories == setOf(LogCategory.SEX)
+        }
+
+        viewModel.onClearDay(date)
+
+        viewModel.awaitState { it.days.periods.isEmpty() }
+        settings.setCategoryShown(LogCategory.SEX, shown = true)
+        val shown = viewModel.awaitState { it.selectedLog?.hiddenCategories?.isEmpty() == true }
+        assertEquals(DayFeelings(date, sex = SexualActivity.PROTECTED), shown.selectedLog?.shownFeelings)
+        assertNull(shown.selectedLog?.flow)
     }
 
     @Test

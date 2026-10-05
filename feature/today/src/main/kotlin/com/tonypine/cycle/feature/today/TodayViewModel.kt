@@ -79,9 +79,9 @@ class TodayViewModel(
         dayLogs.fillPeriod(start, cycles.observeLog(today).first().usualPeriodLength, today)
     }
 
-    /** "Clear this day" on [date]. */
+    /** "Clear this day" on [date]: what she logged in the categories she hid stays. */
     fun onClearDay(date: LocalDate) = write {
-        if (date <= day.value) dayLogs.clearDay(date, day.value)
+        if (date <= day.value) dayLogs.clearDay(date, day.value, settings.settings.first().hiddenCategories)
     }
 
     /** "No, I didn't miss one": not asked again in this cycle. */

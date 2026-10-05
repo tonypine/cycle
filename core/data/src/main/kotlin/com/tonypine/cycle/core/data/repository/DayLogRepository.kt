@@ -8,6 +8,7 @@ import com.tonypine.cycle.core.domain.DayLogEdits
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.LogCategory
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -71,12 +72,13 @@ class DayLogRepository(private val database: CycleDatabase) {
 
     /**
      * "Clear this day" on [date], by [DayLogEdits.clear]: the day no longer counts as a period day
-     * and the rest of its period stays, and how she felt that day goes. One write, with any day next
-     * to it the edit moves.
+     * and the rest of its period stays, and how she felt that day goes, but for the categories she
+     * [hidden]: she can't see them, and hiding a category deletes nothing. One write, with any day
+     * next to it the edit moves.
      */
-    suspend fun clearDay(date: LocalDate, today: LocalDate) = database.withTransaction {
+    suspend fun clearDay(date: LocalDate, today: LocalDate, hidden: Set<LogCategory>) = database.withTransaction {
         edit { logs -> DayLogEdits.clear(logs, date, today) }
-        feelingsDao.delete(date)
+        feelingsDao.save(feelingsDao.get(date).without(LogCategory.entries.toSet() - hidden))
     }
 
     private suspend fun edit(edit: (List<DayLog>) -> List<DayLog>) {
