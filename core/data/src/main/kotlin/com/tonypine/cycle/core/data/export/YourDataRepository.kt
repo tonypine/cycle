@@ -16,10 +16,11 @@ import java.nio.charset.CharacterCodingException
 import java.nio.charset.CodingErrorAction
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 /** A Cycle export, read and checked, waiting for her to confirm the import. */
-class ImportFile internal constructor(internal val days: List<LoggedDay>)
+class ImportFile internal constructor(internal val days: List<LoggedDay>, internal val usualLengths: UsualLengths?)
 
 /** What reading a file for import gives. */
 sealed interface ImportRead {
@@ -43,11 +44,17 @@ class YourDataRepository(
     private val dayLogDao = database.dayLogDao()
     private val feelingsDao = database.feelingsDao()
 
-    /** Writes every day she logged to [output], read in one transaction, and closes it. */
+    /**
+     * Writes every day she logged to [output], read in one transaction, and her usual lengths once
+     * she has done setup, then closes it.
+     */
     suspend fun export(output: OutputStream) {
         val days = database.withTransaction { allDays() }
+        val usualLengths = settings.settings.first()
+            .takeIf { it.setupDone }
+            ?.let { UsualLengths(it.usualCycleLength, it.usualPeriodLength) }
         withContext(io) {
-            output.bufferedWriter(Charsets.UTF_8).use { CycleCsv.write(days, it) }
+            output.bufferedWriter(Charsets.UTF_8).use { CycleCsv.write(days, it, usualLengths) }
         }
     }
 
@@ -65,23 +72,29 @@ class YourDataRepository(
 
             is CsvRead.Days -> {
                 val onPhone = database.withTransaction { loggedDates() }
-                ImportRead.Ready(ImportFile(read.days), read.days.count { it.date !in onPhone })
+                ImportRead.Ready(ImportFile(read.days, read.usualLengths), read.days.count { it.date !in onPhone })
             }
         }
     }
 
     /**
      * Adds the days of [file] that are not on the phone yet, in one transaction, and returns how many.
-     * A day she already logged on the phone stays as it is, whatever the file says about it.
+     * A day she already logged on the phone stays as it is, whatever the file says about it. The
+     * file's usual lengths are restored only on a phone where she has not done setup, such as after
+     * "Delete everything": lengths she gave on the phone win too.
      */
-    suspend fun import(file: ImportFile): Int = database.withTransaction {
-        val onPhone = loggedDates()
-        val added = file.days.filter { it.date !in onPhone }
-        added.forEach { day ->
-            if (!day.log.isEmpty) dayLogDao.upsert(day.log.toEntity())
-            if (!day.feelings.isEmpty) feelingsDao.save(day.feelings)
+    suspend fun import(file: ImportFile): Int {
+        val added = database.withTransaction {
+            val onPhone = loggedDates()
+            val added = file.days.filter { it.date !in onPhone }
+            added.forEach { day ->
+                if (!day.log.isEmpty) dayLogDao.upsert(day.log.toEntity())
+                if (!day.feelings.isEmpty) feelingsDao.save(day.feelings)
+            }
+            added.size
         }
-        added.size
+        file.usualLengths?.let { settings.restoreSetup(it.cycle, it.period) }
+        return added
     }
 
     /**

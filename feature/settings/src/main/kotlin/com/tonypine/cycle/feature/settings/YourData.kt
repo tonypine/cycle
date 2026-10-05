@@ -133,6 +133,20 @@ internal fun problemSentence(problem: ImportProblem): String = when (problem) {
 
     is ImportProblem.NoteTooLong ->
         stringResource(R.string.import_problem_note_too_long, problem.line, DayFeelings.NOTE_MAX_LENGTH)
+
+    is ImportProblem.BadLength -> stringResource(
+        R.string.import_problem_bad_length,
+        problem.line,
+        problem.value,
+        problem.setting,
+        problem.range.first,
+        problem.range.last
+    )
+
+    is ImportProblem.RepeatedSetting ->
+        stringResource(R.string.import_problem_repeated_setting, problem.line, problem.setting)
+
+    ImportProblem.OneUsualLength -> stringResource(R.string.import_problem_one_usual_length)
 }
 
 /** [value], or the last non-null value it had, so a closing dialog keeps its text while it animates out. */

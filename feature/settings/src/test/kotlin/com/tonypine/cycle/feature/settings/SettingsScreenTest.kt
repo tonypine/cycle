@@ -145,7 +145,14 @@ class SettingsScreenTest {
             ImportProblem.UnknownValue(8, "flow", "lots") to
                 "Line 8 has “lots” in the flow column, which isn't something Cycle logs there.",
             ImportProblem.PainWhereWithoutPain(9) to "Line 9 says where it hurt but not how much.",
-            ImportProblem.NoteTooLong(10) to "Line 10 has a note longer than 500 characters."
+            ImportProblem.NoteTooLong(10) to "Line 10 has a note longer than 500 characters.",
+            ImportProblem.BadLength(13, "usual_cycle_length", "12", 15..90) to
+                "Line 13 has “12” as usual_cycle_length. Cycle takes a number of days from 15 to 90.",
+            ImportProblem.RepeatedSetting(14, "usual_period_length") to
+                "Line 14 is a second line for usual_period_length.",
+            ImportProblem.WrongValueCount(15, found = 3, expected = 2) to "Line 15 has 3 values instead of 2.",
+            ImportProblem.OneUsualLength to
+                "This file gives only one of usual_cycle_length and usual_period_length. A Cycle export has both or neither."
         )
         state = state.copy(dialog = DataDialog.ImportRefused(ImportProblem.Empty))
         show()

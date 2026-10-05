@@ -2,6 +2,7 @@ package com.tonypine.cycle.core.data.export
 
 import com.tonypine.cycle.core.data.database.Converters
 import com.tonypine.cycle.core.data.database.FeelingCodes
+import com.tonypine.cycle.core.domain.CycleRules
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.Pain
@@ -21,6 +22,9 @@ data class LoggedDay(val log: DayLog, val feelings: DayFeelings = DayFeelings(lo
     val isEmpty: Boolean
         get() = log.isEmpty && feelings.isEmpty
 }
+
+/** Her usual cycle and period lengths, in days, as she gave them at setup or in Settings. */
+data class UsualLengths(val cycle: Int, val period: Int)
 
 /** Why a file cannot be imported. Each one becomes a sentence that says what is wrong. */
 sealed interface ImportProblem {
@@ -42,11 +46,9 @@ sealed interface ImportProblem {
     /** A quoted value that starts on [line] never closes. */
     data class UnclosedQuote(val line: Int) : ImportProblem
 
-    /** The row on [line] has [found] values instead of one per column. */
-    data class WrongValueCount(val line: Int, val found: Int) : ImportProblem {
-        val expected: Int
-            get() = CycleCsv.COLUMNS.size
-    }
+    /** The row on [line] has [found] values instead of [expected], one per column. */
+    data class WrongValueCount(val line: Int, val found: Int, val expected: Int = CycleCsv.COLUMNS.size) :
+        ImportProblem
 
     /** The row on [line] has [value], not an ISO date, as its date. */
     data class BadDate(val line: Int, val value: String) : ImportProblem
@@ -62,12 +64,21 @@ sealed interface ImportProblem {
 
     /** The row on [line] has a note longer than [DayFeelings.NOTE_MAX_LENGTH] characters. */
     data class NoteTooLong(val line: Int) : ImportProblem
+
+    /** The settings line on [line] has [value], not a number of days in [range], as [setting]. */
+    data class BadLength(val line: Int, val setting: String, val value: String, val range: IntRange) : ImportProblem
+
+    /** The settings line on [line] is a second one for [setting]. */
+    data class RepeatedSetting(val line: Int, val setting: String) : ImportProblem
+
+    /** The settings give her usual cycle length without her usual period length, or the other way round. */
+    data object OneUsualLength : ImportProblem
 }
 
 /** What reading an export gives: its days, or the first problem found. */
 sealed interface CsvRead {
-    /** The days with something logged, oldest first. */
-    data class Days(val days: List<LoggedDay>) : CsvRead
+    /** The days with something logged, oldest first, and her usual lengths if the file has them. */
+    data class Days(val days: List<LoggedDay>, val usualLengths: UsualLengths? = null) : CsvRead
 
     data class Refused(val problem: ImportProblem) : CsvRead
 }
@@ -78,13 +89,20 @@ sealed interface CsvRead {
  * stores, a set is its codes joined by `;`, a period marker is `yes` or empty, and anything she did
  * not log is empty. A value with a comma, a quote or a line break, such as a note, is quoted.
  *
+ * Once she has done setup, a blank line and a second table follow the days: her usual lengths, one
+ * `setting,value` line each, so a restore brings back the estimates that use them.
+ *
  * ```
  * date,flow,period_started,period_ended,pain,pain_where,body,mood,energy,sleep,sex,note
  * 2027-03-02,medium,yes,,moderate,cramps;lower_back,bloating,sensitive;low,low,badly,,"Tired, early night"
+ *
+ * setting,value
+ * usual_cycle_length,30
+ * usual_period_length,5
  * ```
  *
  * Reading checks every row and refuses the whole file on the first problem, so a file is imported in
- * full or not at all.
+ * full or not at all. A setting this version does not know, written by a later one, is skipped.
  */
 internal object CycleCsv {
     val COLUMNS = listOf(
@@ -102,15 +120,28 @@ internal object CycleCsv {
         "note"
     )
 
+    val SETTINGS_COLUMNS = listOf("setting", "value")
+    const val USUAL_CYCLE_LENGTH = "usual_cycle_length"
+    const val USUAL_PERIOD_LENGTH = "usual_period_length"
+    private val LENGTH_RANGES = mapOf(
+        USUAL_CYCLE_LENGTH to CycleRules.USUAL_CYCLE_LENGTHS,
+        USUAL_PERIOD_LENGTH to CycleRules.USUAL_PERIOD_LENGTHS
+    )
+
     private const val LINE_END = "\r\n"
     private const val SET_SEPARATOR = ";"
     private const val YES = "yes"
     private const val BYTE_ORDER_MARK = '\uFEFF'
 
-    fun write(days: List<LoggedDay>, out: Appendable) {
+    fun write(days: List<LoggedDay>, out: Appendable, usualLengths: UsualLengths? = null) {
         out.append(COLUMNS.joinToString(",")).append(LINE_END)
         days.sortedBy { it.date }.forEach { day ->
             out.append(day.toValues().joinToString(",", transform = ::quote)).append(LINE_END)
+        }
+        if (usualLengths != null) {
+            out.append(LINE_END).append(SETTINGS_COLUMNS.joinToString(",")).append(LINE_END)
+            out.append("$USUAL_CYCLE_LENGTH,${usualLengths.cycle}").append(LINE_END)
+            out.append("$USUAL_PERIOD_LENGTH,${usualLengths.period}").append(LINE_END)
         }
     }
 
@@ -122,9 +153,14 @@ internal object CycleCsv {
         val header = records.firstOrNull() ?: return CsvRead.Refused(ImportProblem.Empty)
         if (header.values.map { it.trim().lowercase() } != COLUMNS) return CsvRead.Refused(ImportProblem.NotAnExport)
 
+        val rows = records.drop(1)
+        val settingsAt = rows.indexOfFirst { record -> record.values.map { it.trim().lowercase() } == SETTINGS_COLUMNS }
+        val dayRows = if (settingsAt < 0) rows else rows.subList(0, settingsAt)
+        val settingRows = if (settingsAt < 0) emptyList() else rows.subList(settingsAt + 1, rows.size)
+
         val days = mutableListOf<LoggedDay>()
         val seen = mutableSetOf<LocalDate>()
-        for (record in records.drop(1)) {
+        for (record in dayRows) {
             val day = when (val row = record.toDay()) {
                 is Row.Day -> row.day
                 is Row.Problem -> return CsvRead.Refused(row.problem)
@@ -132,7 +168,41 @@ internal object CycleCsv {
             if (!seen.add(day.date)) return CsvRead.Refused(ImportProblem.RepeatedDate(record.line, day.date))
             if (!day.isEmpty) days += day
         }
-        return CsvRead.Days(days.sortedBy { it.date })
+        return when (val lengths = usualLengths(settingRows)) {
+            is Settings.Lengths -> CsvRead.Days(days.sortedBy { it.date }, lengths.lengths)
+            is Settings.Problem -> CsvRead.Refused(lengths.problem)
+        }
+    }
+
+    private sealed interface Settings {
+        class Lengths(val lengths: UsualLengths?) : Settings
+
+        class Problem(val problem: ImportProblem) : Settings
+    }
+
+    /** The usual lengths in the settings table's [records]: both, or neither. */
+    private fun usualLengths(records: List<Record>): Settings {
+        val lengths = mutableMapOf<String, Int>()
+        for (record in records) {
+            if (record.values.size != SETTINGS_COLUMNS.size) {
+                return Settings.Problem(
+                    ImportProblem.WrongValueCount(record.line, record.values.size, SETTINGS_COLUMNS.size)
+                )
+            }
+            val (name, text) = record.values.map { it.trim() }
+            val range = LENGTH_RANGES[name] ?: continue
+            if (name in lengths) return Settings.Problem(ImportProblem.RepeatedSetting(record.line, name))
+            val days = text.toIntOrNull()?.takeIf { it in range }
+                ?: return Settings.Problem(ImportProblem.BadLength(record.line, name, text, range))
+            lengths[name] = days
+        }
+        val cycle = lengths[USUAL_CYCLE_LENGTH]
+        val period = lengths[USUAL_PERIOD_LENGTH]
+        return when {
+            cycle != null && period != null -> Settings.Lengths(UsualLengths(cycle, period))
+            cycle == null && period == null -> Settings.Lengths(null)
+            else -> Settings.Problem(ImportProblem.OneUsualLength)
+        }
     }
 
     private fun LoggedDay.toValues(): List<String> = listOf(

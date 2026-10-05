@@ -109,7 +109,9 @@ class YourDataRepositoryTest {
     fun `exporting then importing round-trips the synthetic history exactly`() = runTest {
         val phone = phone()
         logSyntheticHistory()
+        phone.settings.saveSetup(cycleLength = 30, periodLength = 4)
         val before = database.everything()
+        val settingsBefore = phone.settings.settings.first()
         val exported = phone.repository.exportBytes()
 
         phone.repository.deleteEverything()
@@ -119,7 +121,34 @@ class YourDataRepositoryTest {
         assertEquals(9, read.newDays)
         assertEquals(9, added)
         assertEquals(before, database.everything())
+        assertEquals(settingsBefore, phone.settings.settings.first())
         assertEquals(exported.decodeToString(), phone.repository.exportBytes().decodeToString())
+    }
+
+    @Test
+    fun `the usual lengths go in the export only once she has done setup`() = runTest {
+        val phone = phone()
+        logSyntheticHistory()
+
+        assertFalse("usual_cycle_length" in phone.repository.exportBytes().decodeToString())
+
+        phone.settings.saveSetup(cycleLength = 30, periodLength = 4)
+        assertTrue(
+            "usual_cycle_length,30\r\nusual_period_length,4\r\n" in phone.repository.exportBytes().decodeToString()
+        )
+    }
+
+    @Test
+    fun `usual lengths she gave on the phone win over the file's`() = runTest {
+        val phone = phone()
+        phone.settings.saveSetup(cycleLength = 30, periodLength = 4)
+        val exported = phone.repository.exportBytes()
+        phone.settings.saveSetup(cycleLength = 26, periodLength = 6)
+
+        phone.repository.import((phone.repository.read(ByteArrayInputStream(exported)) as ImportRead.Ready).file)
+
+        val settings = phone.settings.settings.first()
+        assertEquals(26 to 6, settings.usualCycleLength to settings.usualPeriodLength)
     }
 
     @Test

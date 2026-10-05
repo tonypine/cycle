@@ -108,8 +108,10 @@ class YourDataJourneyTest {
         val file = File(folder.root, "cycle-export-2027-09-10.csv")
         val files = OneFile(file)
         showApp(listOf("2027-07-09" to 5, "2027-08-05" to 6, "2027-09-02" to 4), LocalDate.of(2027, 9, 10), files)
+        runBlocking { data.settingsRepository.saveSetup(cycleLength = 30, periodLength = 5) }
         waitForText("Day 9")
         val logsBefore = runBlocking { data.dayLogRepository.observeDayLogs().first() }
+        val settingsBefore = runBlocking { data.settingsRepository.settings.first() }
 
         // 1. Settings shows its sections.
         tab("Settings").performClick()
@@ -120,7 +122,8 @@ class YourDataJourneyTest {
         row("Export my data").performClick()
         waitForText("Last exported 10 September 2027")
         assertEquals("cycle-export-2027-09-10.csv", files.asked.single())
-        assertEquals(16, file.readLines().size)
+        // The header, 15 days, a blank line and the usual lengths' table.
+        assertEquals(20, file.readLines().size)
 
         // 3. Delete everything, confirmed: the welcome.
         row("Delete everything").performClick()
@@ -135,8 +138,11 @@ class YourDataJourneyTest {
         waitForText("Day 9")
         tab("Today").assertExists()
         assertEquals(logsBefore, runBlocking { data.dayLogRepository.observeDayLogs().first() })
+        assertEquals(settingsBefore, runBlocking { data.settingsRepository.settings.first() })
         tab("History").performClick()
         waitForText("Your typical cycle")
+        tab("Settings").performClick()
+        waitForText("30-day cycle, 5-day period")
     }
 
     @Test

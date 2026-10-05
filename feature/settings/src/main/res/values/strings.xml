@@ -68,6 +68,9 @@
     <string name="import_problem_unknown_value">Line %1$d has “%2$s” in the %3$s column, which isn\'t something Cycle logs there.</string>
     <string name="import_problem_pain_where">Line %1$d says where it hurt but not how much.</string>
     <string name="import_problem_note_too_long">Line %1$d has a note longer than %2$d characters.</string>
+    <string name="import_problem_bad_length">Line %1$d has “%2$s” as %3$s. Cycle takes a number of days from %4$d to %5$d.</string>
+    <string name="import_problem_repeated_setting">Line %1$d is a second line for %2$s.</string>
+    <string name="import_problem_one_usual_length">This file gives only one of usual_cycle_length and usual_period_length. A Cycle export has both or neither.</string>
 
     <!-- Export. -->
     <string name="export_failed_title">Couldn\'t save your data</string>

@@ -57,6 +57,66 @@ class CycleCsvTest {
     }
 
     @Test
+    fun `her usual lengths follow the days in a settings table and read back the same`() {
+        val day = LoggedDay(DayLog(day("2027-03-02"), FlowLevel.LIGHT))
+
+        val csv = StringBuilder().also { CycleCsv.write(listOf(day), it, UsualLengths(30, 4)) }.toString()
+
+        assertEquals(
+            "$header\r\n2027-03-02,light,,,,,,,,,,\r\n\r\nsetting,value\r\nusual_cycle_length,30\r\n" +
+                "usual_period_length,4\r\n",
+            csv
+        )
+        assertEquals(CsvRead.Days(listOf(day), UsualLengths(30, 4)), CycleCsv.read(csv))
+    }
+
+    @Test
+    fun `a file without settings has no usual lengths, and a setting from a later version is skipped`() {
+        assertEquals(CsvRead.Days(emptyList()), read(header))
+        assertEquals(
+            CsvRead.Days(emptyList(), UsualLengths(26, 6)),
+            read(header, "setting,value", "usual_period_length, 6 ", "theme,dark", "usual_cycle_length,26")
+        )
+    }
+
+    @Test
+    fun `a usual length Cycle does not accept is refused with its line`() {
+        refused(
+            ImportProblem.BadLength(3, "usual_cycle_length", "12", 15..90),
+            header,
+            "setting,value",
+            "usual_cycle_length,12",
+            "usual_period_length,5"
+        )
+        refused(
+            ImportProblem.BadLength(4, "usual_period_length", "five", 1..14),
+            header,
+            "setting,value",
+            "usual_cycle_length,28",
+            "usual_period_length,five"
+        )
+    }
+
+    @Test
+    fun `a settings table with a repeated, a missing or a malformed length is refused`() {
+        refused(
+            ImportProblem.RepeatedSetting(4, "usual_cycle_length"),
+            header,
+            "setting,value",
+            "usual_cycle_length,28",
+            "usual_cycle_length,30",
+            "usual_period_length,5"
+        )
+        refused(ImportProblem.OneUsualLength, header, "setting,value", "usual_cycle_length,28")
+        refused(
+            ImportProblem.WrongValueCount(line = 3, found = 3, expected = 2),
+            header,
+            "setting,value",
+            "usual_cycle_length,28,5"
+        )
+    }
+
+    @Test
     fun `a note with commas, quotes and line breaks is quoted and reads back the same`() {
         val note = "Synthetic: \"tired\", early night\nand a second line"
         val day = LoggedDay(DayLog(day("2027-03-02")), DayFeelings(day("2027-03-02"), note = note))

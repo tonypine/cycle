@@ -56,6 +56,22 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         }
     }
 
+    /**
+     * Setup's lengths from a Cycle export, saved as [saveSetup] does, unless she has already done
+     * setup on this phone: then her lengths stay.
+     */
+    suspend fun restoreSetup(cycleLength: Int, periodLength: Int) {
+        require(cycleLength > 0) { "A cycle lasts at least a day, got $cycleLength" }
+        require(periodLength > 0) { "A period lasts at least a day, got $periodLength" }
+        dataStore.edit {
+            if (it[SETUP_DONE] != true) {
+                it[USUAL_CYCLE_LENGTH] = cycleLength
+                it[USUAL_PERIOD_LENGTH] = periodLength
+                it[SETUP_DONE] = true
+            }
+        }
+    }
+
     suspend fun setUsualCycleLength(days: Int) {
         require(days > 0) { "A cycle lasts at least a day, got $days" }
         dataStore.edit { it[USUAL_CYCLE_LENGTH] = days }
