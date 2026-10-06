@@ -147,6 +147,18 @@ class CalendarViewModelTest {
     }
 
     @Test
+    fun `on the pill with no start date and no bleed logged nothing is expected yet`() = calendar { viewModel, _ ->
+        contraception.start(ContraceptionMethod.COMBINED_PILL, Breaks.MONTHLY, started = null, today = today)
+
+        val state = viewModel.awaitState { it.hint == CalendarHint.FirstBleed }
+        (-30L..90L).forEach { assertEquals(CycleDayState.Plain, state.days.stateOf(today.plusDays(it))) }
+        assertEquals(emptyList<ClosedRange<LocalDate>>(), state.days.predicted)
+        // The legend: no expected bleed, and the word she would log in today.
+        assertEquals(listOf(CycleLegendEntry.Period, CycleLegendEntry.Today), state.legend.entries)
+        assertEquals(listOf(BleedingWords.Bleed), state.legend.words)
+    }
+
+    @Test
     fun `after the injection nothing is predicted until her first period`() = calendar { viewModel, _ ->
         logPeriod(day("2026-10-08"), day("2026-10-12"))
         contraception.start(ContraceptionMethod.INJECTION, breaks = null, started = day("2026-11-09"), today = today)

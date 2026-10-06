@@ -31,6 +31,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import com.github.takahirom.roborazzi.captureScreenRoboImage
 import com.tonypine.cycle.core.model.BleedingWord
+import com.tonypine.cycle.core.model.Breaks
 import com.tonypine.cycle.core.model.ContraceptionMethod
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.EstimateBasis
@@ -300,6 +301,25 @@ class TodayScreenTest {
                     substring = true
                 )
             )
+        composeRule.onNodeWithText("Bleed started").assertIsDisplayed()
+    }
+
+    @Test
+    fun `on the pill with no start date and no bleed logged Today says the estimate comes with her first bleed`() {
+        show(
+            TodaySamples.pillFirstBreak.copy(
+                phase = TodayPhase.NoEstimate,
+                days = TodaySamples.pillFirstBreak.days.copy(periods = emptyList(), predicted = emptyList()),
+                outlook = TodayOutlook.FirstBleedToLog,
+                method = TodayMethod(ContraceptionMethod.COMBINED_PILL, Breaks.MONTHLY, firstMonths = false)
+            )
+        )
+
+        composeRule.onNodeWithText("Pill").assert(isHeading())
+        composeRule.onNodeWithText("Cycle will estimate your next bleed once you log one.").assertIsDisplayed()
+        listOf("Next bleed", "How is this estimated?").forEach {
+            composeRule.onNodeWithText(it, substring = true).assertDoesNotExist()
+        }
         composeRule.onNodeWithText("Bleed started").assertIsDisplayed()
     }
 

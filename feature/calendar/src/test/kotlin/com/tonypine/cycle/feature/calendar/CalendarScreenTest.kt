@@ -118,6 +118,22 @@ class CalendarScreenTest {
     }
 
     @Test
+    fun `on the pill with no bleed to count from the hint says the estimate comes with her first bleed`() {
+        show(
+            CalendarSamples.pillMarch.copy(
+                days = CalendarSamples.pillMarch.days.copy(predicted = emptyList()),
+                hint = CalendarHint.FirstBleed
+            )
+        )
+
+        composeRule.onNodeWithText("Expected bleed").assertDoesNotExist()
+        composeRule.onNodeWithText("Predicted period").assertDoesNotExist()
+        composeRule.onNodeWithText(
+            "Cycle will estimate your next bleed once you log one. Tap any day up to today to log or change it."
+        ).assertIsDisplayed()
+    }
+
+    @Test
     fun `the top bar goes to today and the header moves between months`() {
         show(CalendarSamples.april)
 

@@ -507,6 +507,24 @@ class TodayViewModelTest {
         }
 
     @Test
+    fun `on the pill with no start date and no bleed logged, Today waits for her first bleed`() =
+        today { viewModel, _ ->
+            contraception.start(ContraceptionMethod.COMBINED_PILL, Breaks.MONTHLY, started = null, today = today)
+
+            val state = viewModel.awaitState<TodayUiState.Tracking> { it.outlook == TodayOutlook.FirstBleedToLog }
+            assertEquals(TodayDisplay.Method(ContraceptionMethod.COMBINED_PILL), state.display)
+            assertEquals(TodayPhase.NoEstimate, state.phase)
+            assertEquals(BleedingWord.BLEED, state.words)
+            assertNull(state.nextPeriod)
+            // An unknown start has no first months.
+            assertEquals(
+                TodayMethod(ContraceptionMethod.COMBINED_PILL, Breaks.MONTHLY, firstMonths = false),
+                state.method
+            )
+            (0L..60L).forEach { assertEquals(CycleDayState.Plain, state.dayState(today.plusDays(it))) }
+        }
+
+    @Test
     fun `on a copper IUD the estimate stays, with the heavier-periods card until Got it`() =
         today { viewModel, settings ->
             logPeriod(day("2027-02-12"), day("2027-02-16"))
