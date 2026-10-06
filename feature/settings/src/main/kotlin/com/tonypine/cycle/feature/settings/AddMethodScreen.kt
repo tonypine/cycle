@@ -49,8 +49,8 @@ import java.time.YearMonth
 
 /**
  * "Add your method" or "Change method", wired to its [viewModel]: [onBack] leaves from the first
- * step, and the page leaves once saved. Choosing None while on a method opens "Mark as stopped" for it
- * through [onStop]; while on none, it leaves.
+ * step, and the page leaves once saved. Choosing None opens "Mark as stopped" through [onStop], or
+ * leaves, as [AddMethodScreen] says.
  */
 @Composable
 fun AddMethodRoute(
@@ -67,14 +67,9 @@ fun AddMethodRoute(
     AddMethodScreen(
         state = state,
         onChoose = viewModel::onChoose,
-        onMethodNext = {
-            val current = state?.current
-            when {
-                state?.choice != MethodChoice.None -> viewModel.onMethodNext()
-                current != null -> onStop(current.id)
-                else -> onBack()
-            }
-        },
+        onMethodNext = viewModel::onMethodNext,
+        onStop = onStop,
+        onDone = onBack,
         onPickStart = viewModel::onPickStart,
         onSinceNext = viewModel::onSinceNext,
         onPickBreaks = viewModel::onPickBreaks,
@@ -90,7 +85,9 @@ fun AddMethodRoute(
  * The steps of adding or changing her method, under a top bar titled "Add your method" (on none) or
  * "Change method":
  * - "Which method?": the method list, nothing chosen at first, with the leaflet line under it after
- *   choosing a pill. Next waits for a choice; on None it reads Done while she is on none.
+ *   choosing a pill. Next waits for a choice. On None, Next opens "Mark as stopped" for her method
+ *   through [onStop]; with no method, or one that already has a stop date (an injection in its 13
+ *   weeks, a method stopped today), it reads Done and calls [onDone], as there is nothing to stop.
  * - Since when: "When did you start the pill?", "Roughly is fine.", and a month of days up to today.
  *   Next on a combined method, Save on the others, once a day is picked.
  * - On a combined pill, patch or ring, its breaks, every month to start with, and Save.
@@ -103,6 +100,8 @@ fun AddMethodScreen(
     state: AddMethodUiState?,
     onChoose: (MethodChoice) -> Unit,
     onMethodNext: () -> Unit,
+    onStop: (id: Long) -> Unit,
+    onDone: () -> Unit,
     onPickStart: (LocalDate) -> Unit,
     onSinceNext: () -> Unit,
     onPickBreaks: (Breaks) -> Unit,
@@ -126,6 +125,7 @@ fun AddMethodScreen(
     }
     BackHandler(enabled = state.step != AddMethodStep.Method, onBack = onBack)
     val method = (state.choice as? MethodChoice.Method)?.method
+    val toStop = state.current?.takeIf { it.stopped == null }
     when (state.step) {
         AddMethodStep.Method -> QuestionPage(
             barTitle = title,
@@ -140,13 +140,19 @@ fun AddMethodScreen(
             }
             PageButton(
                 text = stringResource(
-                    if (state.choice == MethodChoice.None && state.current == null) {
+                    if (state.choice == MethodChoice.None && toStop == null) {
                         R.string.add_method_done
                     } else {
                         R.string.add_method_next
                     }
                 ),
-                onClick = onMethodNext,
+                onClick = {
+                    when {
+                        state.choice != MethodChoice.None -> onMethodNext()
+                        toStop != null -> onStop(toStop.id)
+                        else -> onDone()
+                    }
+                },
                 enabled = state.choice != null
             )
         }

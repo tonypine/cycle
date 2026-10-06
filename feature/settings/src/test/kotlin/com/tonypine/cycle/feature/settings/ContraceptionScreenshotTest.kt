@@ -171,6 +171,8 @@ private fun Add(step: AddMethodStep, choice: MethodChoice?, started: LocalDate? 
     ),
     onChoose = {},
     onMethodNext = {},
+    onStop = {},
+    onDone = {},
     onPickStart = {},
     onSinceNext = {},
     onPickBreaks = {},

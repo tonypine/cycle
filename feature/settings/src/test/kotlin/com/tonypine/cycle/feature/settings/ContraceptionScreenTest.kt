@@ -62,6 +62,28 @@ class ContraceptionScreenTest {
         }
     }
 
+    /** "Which method?" with [choice] chosen, while her method is [current]. */
+    private fun showMethodStep(current: ContraceptionStretch?, choice: MethodChoice?) {
+        composeRule.setContent {
+            Themed {
+                AddMethodScreen(
+                    AddMethodUiState(today, current, AddMethodStep.Method, choice, started = null, breaks = null),
+                    onChoose = { calls += "choose $it" },
+                    onMethodNext = { calls += "next" },
+                    onStop = { calls += "stop $it" },
+                    onDone = { calls += "done" },
+                    onPickStart = {},
+                    onSinceNext = {},
+                    onPickBreaks = {},
+                    onSave = {},
+                    onBack = {},
+                    onMove = {},
+                    onDismissDialog = {}
+                )
+            }
+        }
+    }
+
     /** What TalkBack reads for each button, in order. */
     private fun spokenButtons(): List<String> = composeRule.onAllNodes(hasClickAction()).fetchSemanticsNodes()
         .filter { it.config.getOrNull(SemanticsProperties.Role) == Role.Button }
@@ -139,22 +161,7 @@ class ContraceptionScreenTest {
 
     @Test
     fun `the method list reads each method with its line, and Next waits for a choice`() {
-        composeRule.setContent {
-            Themed {
-                AddMethodScreen(
-                    AddMethodUiState(today, null, AddMethodStep.Method, choice = null, started = null, breaks = null),
-                    onChoose = { calls += "choose $it" },
-                    onMethodNext = { calls += "next" },
-                    onPickStart = {},
-                    onSinceNext = {},
-                    onPickBreaks = {},
-                    onSave = {},
-                    onBack = {},
-                    onMove = {},
-                    onDismissDialog = {}
-                )
-            }
-        }
+        showMethodStep(current = null, choice = null)
 
         composeRule.onNode(hasText("Which method?") and isHeading()).assertExists()
         val isRadio = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.RadioButton)
@@ -164,6 +171,47 @@ class ContraceptionScreenTest {
             .performClick()
         composeRule.onNodeWithText("Next").assertIsNotEnabled()
         assertEquals(listOf("choose ${MethodChoice.Method(ContraceptionMethod.IMPLANT)}"), calls)
+    }
+
+    @Test
+    fun `a method chosen goes on to since when`() {
+        showMethodStep(current = iud, choice = MethodChoice.Method(ContraceptionMethod.IMPLANT))
+
+        composeRule.onNodeWithText("Next").performScrollTo().assertIsEnabled().performClick()
+        assertEquals(listOf("next"), calls)
+    }
+
+    @Test
+    fun `None while on none reads Done and leaves`() {
+        showMethodStep(current = null, choice = MethodChoice.None)
+
+        composeRule.onAllNodesWithText("Next").assertCountEquals(0)
+        composeRule.onNodeWithText("Done").performScrollTo().assertIsEnabled().performClick()
+        assertEquals(listOf("done"), calls)
+    }
+
+    @Test
+    fun `None while on a method reads Next and opens mark as stopped for it`() {
+        showMethodStep(current = iud, choice = MethodChoice.None)
+
+        composeRule.onAllNodesWithText("Done").assertCountEquals(0)
+        composeRule.onNodeWithText("Next").performScrollTo().assertIsEnabled().performClick()
+        assertEquals(listOf("stop 2"), calls)
+    }
+
+    @Test
+    fun `None on a method that already has a stop date reads Done and leaves its date alone`() {
+        val injection = ContraceptionStretch(
+            ContraceptionMethod.INJECTION,
+            LocalDate.of(2027, 8, 10),
+            stopped = LocalDate.of(2027, 11, 9),
+            id = 4
+        )
+        showMethodStep(current = injection, choice = MethodChoice.None)
+
+        composeRule.onAllNodesWithText("Next").assertCountEquals(0)
+        composeRule.onNodeWithText("Done").performScrollTo().assertIsEnabled().performClick()
+        assertEquals(listOf("done"), calls)
     }
 
     @Test
