@@ -2,6 +2,7 @@ package com.tonypine.cycle.feature.today
 
 import android.content.Context
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.lifecycle.viewModelScope
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -25,7 +26,9 @@ import java.time.LocalDate
 import java.time.YearMonth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -348,9 +351,20 @@ class TodayViewModelTest {
         )
         val viewModel = TodayViewModel(CycleRepository(dayLogs, settings), dayLogs, settings) { clock }
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
-        test(viewModel, settings)
+        try {
+            test(viewModel, settings)
+        } finally {
+            // As if the screen were gone: nothing of the ViewModel may still reach Dispatchers.Main while
+            // tearDown resets it, or resetMain fails with "used concurrently".
+            viewModel.viewModelScope.coroutineContext.job.cancelAndJoin()
+        }
     }
 
+    /**
+     * The first state of type [T] that [matches]. Room emits on its own threads, and the ViewModel runs
+     * there on the unconfined Main, so a state can still be on its way after a call returns: wait for
+     * what the call changes, not just any state.
+     */
     private suspend inline fun <reified T : TodayUiState> TodayViewModel.awaitState(
         crossinline matches: (T) -> Boolean = { true }
     ): T = uiState.first { it is T && matches(it) } as T
