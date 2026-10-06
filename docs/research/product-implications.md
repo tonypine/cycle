@@ -66,7 +66,7 @@ health signals need several cycles, a doctor summary needs the signals' data.
   ([MOT-48](https://linear.app/tonypine/issue/MOT-48)), so this can come before the rest of this
   step. Her method and the dates she started and stopped it, then per method: what to estimate
   (the next bleed follows the pack on a combined pill, patch or ring; nothing on the implant,
-  injection or progestogen-only pill, nor by default on the hormonal IUD or the monthly combined
+  injection, progestogen-only pill or hormonal IUD, nor by default on the monthly combined
   injection), what to hide (fertile window and ovulation on every hormonal method), the words
   ("period", "bleed" or "bleeding"), a 90-day bleeding summary on progestogen-only methods and the
   monthly combined injection, and the signals that fit the method

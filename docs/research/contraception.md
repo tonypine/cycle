@@ -90,7 +90,7 @@ So Cycle needs the date she started a method, not just its name.
 | Progestogen-only pill, traditional (levonorgestrel, norethisterone) | Not reliably stopped | Bleeding | None | Hidden | Fast |
 | Progestogen-only pill, desogestrel or drospirenone | Stopped | Bleeding | None | Hidden | Fast |
 | Implant | Stopped, nearly always | Bleeding | None | Hidden | Fast |
-| Hormonal IUD | Usually continues | Bleeding | None by default | Hidden | Fast |
+| Hormonal IUD | Usually continues | Bleeding | None ([`0006`](../decisions/0006-contraception.md)) | Hidden | Fast |
 | Copper IUD | Continues | Periods | As without a method | As without a method | Immediate |
 | Injection (DMPA, NET-EN) | Stopped | Bleeding | None | Hidden | Slow: months, up to a year |
 | Monthly combined injection | Stopped | A withdrawal bleed after each injection; unscheduled bleeding | None by default | Hidden | Months: pregnancy about 5 months after the last injection on average |
@@ -333,10 +333,10 @@ device in the womb. What she logs is bleeding.
 - A replacement device brings a small, short rise in bleeding in its first 90 days
   ([FSRH IUC 2023](https://www.cosrh.org/Common/Uploaded%20files/documents/fsrh-clinical-guideline-intrauterine-contraception-mar-23-amended.pdf)).
 
-**Predictions.** None by default. In the first six months there is no pattern to predict. Later,
-some users bleed lightly at regular intervals because they still ovulate, and a next-bleed estimate
-from her own logged bleeds could then make sense, labelled like any estimate; Cycle does not offer
-it for now ([`0006`](../decisions/0006-contraception.md)). Fertility estimates stay
+**Predictions.** None. In the first six months there is no pattern to predict. Later, some users
+bleed lightly at regular intervals because they still ovulate, and a next-bleed estimate from her
+own logged bleeds could then make sense, labelled like any estimate; Cycle does not offer it, even
+then ([`0006`](../decisions/0006-contraception.md)). Fertility estimates stay
 hidden: ovulation may happen, but estimating it on a contraceptive would invite the "safe day"
 reading Cycle must never give.
 
@@ -344,7 +344,8 @@ reading Cycle must never give.
 ([NHS](https://www.nhs.uk/contraception/methods-of-contraception/ius-hormonal-coil/what-is-it/)),
 and most users were ovulating all along, so periods usually come back with her next cycle.
 
-**For Cycle.** No next-bleed estimate by default; call it bleeding; hide the fertile window and
+**For Cycle.** No next-bleed estimate, even once her bleeds look regular
+([`0006`](../decisions/0006-contraception.md)); call it bleeding; hide the fertile window and
 ovulation; show a 90-day summary; expect a lot of bleeding in the first months and say so calmly.
 
 ## Copper IUD
@@ -485,9 +486,9 @@ there is something to estimate, but less precisely: the sources put it anywhere 
 after the injection, and a third of users bleed irregularly. The injection itself must not follow
 the bleeding: the WHO and the label say to give it every 4 weeks whatever the bleeding does
 ([WHO FP Handbook, ch. 5, Q5](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf),
-[Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)). So, as
-for the hormonal IUD, no next bleed by default; whether to offer one, counted from her injection
-date once her own logged bleeds follow her injections, is a design question for
+[Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)). So no
+next bleed by default; whether to offer one, counted from her injection date once her own logged
+bleeds follow her injections, is a design question for
 [MOT-50](https://linear.app/tonypine/issue/MOT-50). The useful date is the next injection, which
 she knows from her clinic. Fertile window and ovulation estimates mean nothing.
 
