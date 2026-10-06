@@ -30,6 +30,8 @@ import androidx.compose.ui.test.swipeRight
 import com.tonypine.cycle.core.data.export.ImportProblem
 import com.tonypine.cycle.core.model.ContraceptionMethod
 import com.tonypine.cycle.core.model.ContraceptionStretch
+import com.tonypine.cycle.core.model.Language
+import com.tonypine.cycle.core.testing.renderIn
 import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -106,6 +108,32 @@ class SettingsScreenTest {
         row("Contraception").assert(hasText("Implant, since 9 Nov 2026"))
         state = state.copy(contraception = ContraceptionStretch(ContraceptionMethod.IMPLANT, started = null, id = 1))
         row("Contraception").assert(hasText("Implant, start not known"))
+    }
+
+    @Test
+    fun `a 1-day period reads in the singular`() {
+        state = state.copy(usualPeriodLength = 1)
+        show()
+
+        row("Usual cycle and period").assert(hasText("28-day cycle, 1-day period"))
+    }
+
+    @Test
+    fun `a 1-day period reads in the singular in Portuguese`() {
+        renderIn(Language("pt-BR"))
+        state = state.copy(usualPeriodLength = 1)
+        show()
+
+        composeRule.onNode(hasText("Ciclo de 28 dias, menstruação de 1 dia") and isButton).assertExists()
+    }
+
+    @Test
+    fun `a 1-day period reads in the singular in German`() {
+        renderIn(Language("de"))
+        state = state.copy(usualPeriodLength = 1)
+        show()
+
+        composeRule.onNode(hasText("Zyklus von 28 Tagen, Periode von 1 Tag") and isButton).assertExists()
     }
 
     @Test
