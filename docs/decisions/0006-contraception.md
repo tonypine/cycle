@@ -126,6 +126,20 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
   change would overlap a neighbour, a dialog offers to move the neighbour's edge ("Move the end of
   your pill?"); a change that would swallow a neighbour entirely is refused with the dates to use.
   A stopped date before the started date is refused.
+- **An edit that reaches more than one neighbour.** A start moved earlier can only cut short the
+  stretch it lands in, and covers every stretch after that one whole; a stop moved later works the
+  same way forwards. Any stretch covered whole refuses the change, with no move dialog, even when
+  the new date also lies inside another. The refusal names the neighbour next to the edge she moved
+  (just before for a start, just after for a stop): it is covered whole whenever any stretch is,
+  and a day past its start (or before its stop) is as far as the edge can go. Implant 9 November
+  2026 to 3 November 2027, ring 20 November 2027 to 10 January 2028, pill since 11 January 2028;
+  today is 15 February 2028. She moves the pill's start to 1 November 2027: "That would cover all
+  of your time on the ring. Delete the ring's dates first, or pick a later day." Any start up to 20
+  November is refused the same way; from 21 November to 10 January, the dialog offers to move the
+  ring's end. She moves the implant's stop to 15 January 2028: "That would cover all of your time
+  on the ring. Delete the ring's dates first, or pick an earlier day." Any stop from 10 January is
+  refused the same way; from 20 November to 9 January, the dialog offers "Move the start of your
+  ring?"; up to 19 November, nothing overlaps.
 - **Delete.** Deleting a stretch forgets the method for those dates. The days she logged stay and
   count as her own cycle again.
 - **None** is no row: Cycle is on "none" on any day outside every stretch.
@@ -256,7 +270,11 @@ The method is health data and stays on the phone with the rest:
   [`0004`](0004-backup-encryption.md)). The export gains a third section after the settings, with
   the columns `method,started,stopped,breaks`, and import adds the stretches that do not overlap
   ones already on the phone, refusing the file with a line number otherwise, like its other
-  problems. A null start overlaps every stretch that starts on or before its stop, as above.
+  problems. A null start overlaps every stretch that starts on or before its stop, as above. A row
+  that reaches several stretches is refused like one that reaches one, with no move dialog and
+  nothing from the file added. The problem names only the latest stretch it overlaps, with its dates
+  as "Your methods" writes them, so it stays one sentence like the file's others: "Line 14 overlaps
+  your time on the ring, 20 Nov 2027 to 10 Jan 2028."
 - Never in a notification, a widget or any text outside the app. "Delete everything" deletes it.
 
 ### Thresholds

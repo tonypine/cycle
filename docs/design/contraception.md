@@ -338,7 +338,11 @@ enters 13 September by mistake.
 Deleting dates asks first: "Delete these dates?" "Cycle forgets you used the combined pill from 3 May
 to 5 September 2027. The days you logged stay, and count as your own cycle again." Keep them ·
 **Delete**. A correction that would swallow another method whole is refused: "That would cover all
-of your time on the pill. Delete the pill's dates first, or pick a later day."
+of your time on the pill. Delete the pill's dates first, or pick a later day." So is one that lies
+inside one method and would swallow another, with no dialog: the refusal names the method next to
+the date she moved. A later end works the same way forwards: a day inside the next method offers
+"Move the start of your IUD?", and one that would swallow it ends "…or pick an earlier day." The
+example with three methods is in 0006 ([Stored](../decisions/0006-contraception.md#stored-dated-stretches)).
 
 ### F. Copper IUD
 
