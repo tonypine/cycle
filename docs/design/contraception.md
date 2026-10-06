@@ -110,10 +110,12 @@ Hormonal IUD, Copper IUD, Injection.
 Body: "Roughly is fine." A `MonthCalendar` with days up to today; days before the method's start are
 not tappable when stopping.
 
-When she adds a method while on none, every day up to today is tappable. A day inside an earlier
+When she adds a method while on none, every day up to today is tappable. A day inside a stopped
 method's dates asks to move that method's end, as in E7 ("Move the end of your implant?"); a day on
-or before an earlier method's start is refused, as after E8 ("That would cover all of your time on
-the implant. Delete the implant's dates first, or pick a later day."). Journey D shows both.
+or before a stopped method's start is refused, as after E8 ("That would cover all of your time on
+the implant. Delete the implant's dates first, or pick a later day."). When the day reaches more
+than one method, any method covered whole refuses it, with no move dialog, and the refusal names
+the latest method it would cover. Journey D shows all three.
 
 ### Breaks (combined pill, patch, ring)
 
@@ -285,6 +287,13 @@ calendar. A day on or before 9 November 2026 would cover all of the implant and 
 would cover all of your time on the implant. Delete the implant's dates first, or pick a later
 day." A day after 3 November needs no dialog.
 
+**After two methods.** Say she used the ring after the implant, from 20 November 2027 to 10
+January 2028, and on 15 February 2028 adds the pill from 1 November 2027. That day is inside the
+implant's dates but would cover all of the ring, so it is refused, with no dialog for the implant:
+"That would cover all of your time on the ring. Delete the ring's dates first, or pick a later
+day." Any day up to 20 November is refused the same way. From 21 November to 10 January the dialog
+offers to move the ring's end ("Move the end of your ring?"); from 11 January nothing overlaps.
+
 **After the pill.** A bleed in the 7 days after a combined method stops is the withdrawal bleed,
 part of the time on it, not a period. Her last pill was on 3 November 2027 and she logs a bleed on 6
 November:
@@ -346,7 +355,7 @@ Today is Tuesday 22 June 2027. Her last period started on 14 June; the IUD was f
 
 | Step | Screen | Where | Copy |
 | -- | -- | -- | -- |
-| F1 | Contraception | Settings › Your cycle › Contraception | "None". **Add your method**. With an earlier method under "Your methods", a start inside its dates offers to move its end, and one on or before its start is refused ([Since when](#since-when), journey D). |
+| F1 | Contraception | Settings › Your cycle › Contraception | "None". **Add your method**. With an earlier method under "Your methods", a start inside its dates offers to move its end, and one on or before its start, or one that would cover a later method whole, is refused ([Since when](#since-when), journey D). |
 | F2 | Choose copper IUD | Settings › Contraception › Add | The list, Copper IUD chosen. **Next** |
 | F3 | Since when | Settings › Contraception › Add | "When was your IUD fitted?" 15 June chosen, during her period. **Save** |
 | F4 | Contraception: copper IUD | Settings › Your cycle › Contraception | "Copper IUD", "Since 15 June 2027", "Your cycle stays your own, so Cycle keeps estimating your periods. They can be heavier or longer at first." |
