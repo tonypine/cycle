@@ -19,9 +19,11 @@ What there is today:
 
 - Every string the app shows is in `res/values/strings.xml`, about 520 lines across `app`,
   `core:designsystem`, `core:ui` and the five features, plurals included. No screen hard-codes copy.
-- Dates, month names and weekday letters are formatted with `LocalConfiguration.current.locales[0]`
-  (`Dates.kt` in `core:ui`, `Calendar.kt` and `DayCell.kt` in `core:designsystem`), and the first day
-  of the week is `WeekFields.of` that locale.
+- Dates, month names and weekday letters are formatted with `LocalConfiguration.current.locales[0]`,
+  read in six places: `Dates.kt` and `DaySummary.kt` in `core:ui`, `Calendar.kt` and `DayCell.kt` in
+  `core:designsystem`, `TodaySheets.kt` in `feature:today` and `HistoryDates.kt` in
+  `feature:history`. The first day of the week is `WeekFields.of` that locale, in `Calendar.kt` and
+  in `TodaySheets.kt`'s `weeksOf`.
 - Each module's `*StringsTest` checks its English strings against the words the app never says.
 - `MainActivity` is a `FragmentActivity`, which the unlock prompt needs ([`0005`](0005-app-lock.md)).
   The minimum SDK is 29; Android's own per-app language setting starts at 13 (API 33).
@@ -54,7 +56,7 @@ languages, and take a language's closest region when the exact one is missing:
 
 | Phone's languages | Cycle's words | Dates and numbers | First day of the week |
 | -- | -- | -- | -- |
-| Português (Portugal) | Brazilian Portuguese | Portugal's: "20 de março de 2027" | Monday |
+| Português (Portugal) | Brazilian Portuguese | Portugal's: "20 de março de 2027" | Sunday |
 | Español (México) | Spanish | Mexico's | Sunday |
 | Deutsch (Österreich) | German | Austria's ("Jänner" for January) | Monday |
 | Deutsch (Schweiz) | German, with the ß that Swiss German writes as ss | Switzerland's | Monday |
@@ -82,7 +84,10 @@ One helper in `core:designsystem` gives it to every formatter. It cannot be
 `Configuration.locales[0]`: on a phone with French then Spanish, Android shows the Spanish strings
 while `locales[0]` stays French, and the dates would come out in French. Each `values` folder carries
 its own tag in a string (`en`, `pt-BR`, `es`, `de`), so the resources themselves say which language
-Android picked.
+Android picked. MOT-92 replaces every `LocalConfiguration.current.locales[0]` with the helper, the
+six above included, and a unit test greps the main sources of every module for `locales[0]` and
+`locales.get(0)` and fails on any it finds outside the helper, so no formatter is left on the
+phone's first locale.
 
 **The first day of the week** comes from the phone: Android 14's "First day of week" regional
 preference when she set one, otherwise the region of the phone's first locale, read with
@@ -94,7 +99,7 @@ phone's own calendar does (question 1).
 | | Android 13 and later (API 33+) | Android 10 to 12 (API 29–32) |
 | -- | -- | -- |
 | Applied by | Android: `LocaleManager.setApplicationLocales`, with `android:localeConfig` listing the languages Cycle has. Android stores it, applies it to Cycle's process before any activity starts, recreates the activity when it changes, and shows it on its own per-app page. | Cycle: `MainActivity.attachBaseContext` wraps its context in a configuration with the chosen locale (`createConfigurationContext`), and sets `Locale.setDefault`. A change calls `recreate()`. |
-| Source of truth | Android's per-app setting, so a change made on Android's page wins. | Cycle's stored choice. |
+| Source of truth | Android's per-app setting, so a change made on Android's page wins, once Cycle has handed its stored choice to Android on this install (below). | Cycle's stored choice. |
 | Cycle's own copy | The same value, written to the settings DataStore at every start and return to the front, so a backup restored on an older phone keeps it. | `SettingsRepository` in `core:data` stores it in the settings DataStore: no value for the phone's language, otherwise a tag. |
 | "Phone's language" | An empty locale list, which Android's page shows as System default. | No stored tag: the context stays as Android gives it. |
 
@@ -104,12 +109,35 @@ phone's own calendar does (question 1).
   settings file in `onCreate`, and `attachBaseContext` waits for that one read, of a file of a few
   hundred bytes, once per process. Later recreations use the value already in memory. A Robolectric
   test at SDK 29 checks that the first composition already uses the stored language.
+- **A choice made below 13 reaches Android once.** A phone updated from Android 12 to 13, or a
+  backup from an Android 10–12 phone restored onto a 13+ phone, starts with an empty per-app list
+  and a tag in Cycle's DataStore. Copying Android's empty list over it would erase her choice. So
+  the first start on 13 or later hands the stored choice to Android before mirroring anything
+  back:
+  - A marker file in `noBackupFilesDir`, written only on 13 and later, says Cycle has already handed
+    its choice to Android on this install. A phone updated from 12 has none, and the file is outside
+    every backup, so it never comes back with a restore.
+  - With no marker, the `Application`'s `onCreate` waits for the same one settings read as below 13.
+    If Android's list is empty and the DataStore holds a tag, it calls
+    `LocaleManager.setApplicationLocales` with that tag; if Android's list is not empty (Android
+    restored its own setting, or she chose on Android's page), Android's value wins and is written
+    to the DataStore. Then it writes the marker. This runs before the first activity, so even this
+    start shows no frame in the phone's language.
+  - With the marker, Android's value is mirrored to the DataStore as in the table, and nothing
+    waits.
+
+  Robolectric tests at SDK 33 check each case: a stored `de` with an empty list and no marker ends
+  with Android's list `de` and the DataStore still `de`; the same with the marker present ends with
+  both empty (she chose System default on Android's page); a non-empty list with no marker is
+  mirrored into the DataStore.
 - **The switch keeps her place.** A language change recreates the activity like a rotation:
   ViewModels, the navigation back stack, the selected tab and saved scroll positions survive, as they
   must already. The Language page redraws with the new choice selected.
 - **Backup.** The choice is in the settings DataStore file, which both of `0004`'s rule files back
   up only end-to-end encrypted, and which `BackupRulesTest` already covers. Android 13 and later also
-  keep the per-app language in the system's own settings. It is never in the export.
+  keep the per-app language in the system's own settings. Restored onto 13 or later from any phone,
+  the DataStore's choice is handed to Android once, as above, when Android has not restored one of
+  its own; restored onto 10 to 12, it applies as stored. It is never in the export.
 - **Delete everything** forgets it with the other settings (on 13 and later, an empty locale list),
   so Cycle starts over following the phone.
 - **Text comes from the activity.** Below 13, the `Application`'s own context keeps the phone's
@@ -319,10 +347,13 @@ case, as each `*StringsTest` does today for English.
 
 ## Consequences
 
-- **MOT-92**: the language in `SettingsRepository`, applied on both API ranges as above;
+- **MOT-92**: the language in `SettingsRepository`, applied on both API ranges as above, with the
+  one-time hand-over to Android on 13 and later (a phone updated from 12 to 13, a backup from 10–12
+  restored on 13+) and its tests;
   `localeFilters` and `localeConfig` for `en`, with the test that keeps them in step with the
-  folders; Cycle's locale in `core:designsystem` for every date and number, and the first day of the
-  week from the phone; a Robolectric helper to render under a language; the shared copy check with
+  folders; Cycle's locale in `core:designsystem` for every date and number, replacing all six readers of
+  `locales[0]`, with the grep test that keeps any from coming back; the first day of the week from
+  the phone; a Robolectric helper to render under a language; the shared copy check with
   the lists above (English behaves exactly as today); the "same PR" rule in `AGENTS.md` and
   `design-system.md`. No screen changes.
 - **MOT-93**: every string in the three languages with the glossary and the rules above, marked as

@@ -31,8 +31,8 @@ Refined from the plan on MOT-87. Stories 7 and 11 are new or reworded; the rest 
    or German, Cycle opens in that language with nothing to set up, from the welcome screen on.
 2. **Other languages fall back.** Cycle uses the first language in my phone's list that it has. If my
    phone says French and then Spanish, Cycle opens in Spanish. If my phone has none of the four,
-   Cycle opens in English, and Settings › Language says why ("French isn't in Cycle yet, so Cycle
-   uses English.").
+   Cycle opens in English, and Settings › Language says why ("French isn't in Cycle yet, so this
+   option uses English.").
 3. **I can choose Cycle's language myself.** Settings › Language lists every language under its own
    name (Deutsch, English, Español, Português (Brasil)), so I can find mine even when I can't read the
    screen, and a "Phone's language" option. Choosing one switches Cycle at once: I stay on the same
@@ -85,7 +85,7 @@ their numbers in every language.
 | `settings_language_phone`: the row, following the phone | Phone's language, %1$s | Idioma do celular, %1$s | Idioma del teléfono, %1$s | Sprache des Telefons, %1$s |
 | `language_intro`: the page's intro | Cycle's words and dates change. Everything you logged stays, and your notes keep your own words. | As palavras e as datas do Cycle mudam. Tudo o que você registrou continua aqui, e suas anotações ficam com as suas palavras. | Cambian las palabras y las fechas de Cycle. Tus registros se quedan como están, y tus notas conservan tus propias palabras. | Texte und Datumsangaben in Cycle ändern sich. Alles, was du eingetragen hast, bleibt, und deine Notizen behalten deine eigenen Worte. |
 | `language_phone`: the first option | Phone's language | Idioma do celular | Idioma del teléfono | Sprache des Telefons |
-| `language_phone_not_in_cycle`: its second line, when the phone's first language isn't one of the four | %1$s isn't in Cycle yet, so Cycle uses %2$s. | %1$s ainda não está no Cycle, então o Cycle usa %2$s. | %1$s aún no está en Cycle, así que Cycle usa %2$s. | %1$s gibt es in Cycle noch nicht, deshalb nutzt Cycle %2$s. |
+| `language_phone_not_in_cycle`: its second line, when the phone's first language isn't one of the four | %1$s isn't in Cycle yet, so this option uses %2$s. | %1$s ainda não está no Cycle, então esta opção usa %2$s. | %1$s aún no está en Cycle, así que esta opción usa %2$s. | %1$s gibt es in Cycle noch nicht, deshalb nutzt diese Option %2$s. |
 | `language_name_en` | English | Inglês | Inglés | Englisch |
 | `language_name_pt_br` | Portuguese (Brazil) | Português (Brasil) | Portugués (Brasil) | Portugiesisch (Brasilien) |
 | `language_name_es` | Spanish | Espanhol | Español | Spanisch |
@@ -108,18 +108,20 @@ then this line.
 
 ### The "isn't in Cycle yet" line
 
-The second line of Phone's language when the phone's first language is none of the four. Both names
-come from Android (`Locale.getDisplayLanguage` of the phone's first language, and the display name of
-the language Cycle would use), in Cycle's current language, so the whole line reads in one language
+The second line of Phone's language when the phone's first language is none of the four. It says
+what that option does, not what Cycle is doing, so it stays true whichever option is selected: with
+Español chosen, the line still names the language Phone's language would give. Both names come from
+Android (`Locale.getDisplayLanguage` of the phone's first language, and the display name of the
+language this option uses), in Cycle's current language, so the whole line reads in one language
 and one TalkBack voice. The first name is capitalized as the start of a sentence; the second is
 written as the language writes a name mid-sentence (lower case in Portuguese and Spanish).
 
 | Phone's languages | Cycle in | Line |
 | -- | -- | -- |
-| Français | English (following the phone) | French isn't in Cycle yet, so Cycle uses English. |
-| Français | Español (chosen) | Francés aún no está en Cycle, así que Cycle usa inglés. |
-| Français, Español | Deutsch (chosen) | Französisch gibt es in Cycle noch nicht, deshalb nutzt Cycle Spanisch. |
-| Français, Español | Português (Brasil) (chosen) | Francês ainda não está no Cycle, então o Cycle usa espanhol. |
+| Français | English (following the phone) | French isn't in Cycle yet, so this option uses English. |
+| Français | Español (chosen) | Francés aún no está en Cycle, así que esta opción usa inglés. |
+| Français, Español | Deutsch (chosen) | Französisch gibt es in Cycle noch nicht, deshalb nutzt diese Option Spanisch. |
+| Français, Español | Português (Brasil) (chosen) | Francês ainda não está no Cycle, então esta opção usa espanhol. |
 
 When the phone's first language is one of the four (any region: Português (Portugal) counts as
 Portuguese), the second line is that language's name from the table above, such as "English" or
@@ -182,8 +184,8 @@ period was 3 to 7 May.
 | Step | Screen | Where | Copy |
 | -- | -- | -- | -- |
 | B1 | Settings | Settings, scrolled to its end | …Export my data · Import from a file · Delete everything; **App**: Language · "Phone's language, English" ›; **About**: Open-source notices ›; "Not a contraceptive, and not a diagnosis."; "Version 0.1.80". |
-| B2 | Language | Settings › App › Language | Top bar "Language", Back. "Cycle's words and dates change. Everything you logged stays, and your notes keep your own words." Phone's language (selected) · "French isn't in Cycle yet, so Cycle uses English."; Deutsch · German; English; Español · Spanish; Português (Brasil) · Portuguese (Brazil). |
-| B3 | Español chosen | Same page, redrawn in Spanish | She taps Español. At once: top bar "Idioma", "Cambian las palabras y las fechas de Cycle. Tus registros se quedan como están, y tus notas conservan tus propias palabras." Idioma del teléfono · "Francés aún no está en Cycle, así que Cycle usa inglés."; Deutsch · Alemán; English · Inglés; Español (selected); Português (Brasil) · Portugués (Brasil). |
+| B2 | Language | Settings › App › Language | Top bar "Language", Back. "Cycle's words and dates change. Everything you logged stays, and your notes keep your own words." Phone's language (selected) · "French isn't in Cycle yet, so this option uses English."; Deutsch · German; English; Español · Spanish; Português (Brasil) · Portuguese (Brazil). |
+| B3 | Español chosen | Same page, redrawn in Spanish | She taps Español. At once: top bar "Idioma", "Cambian las palabras y las fechas de Cycle. Tus registros se quedan como están, y tus notas conservan tus propias palabras." Idioma del teléfono · "Francés aún no está en Cycle, así que esta opción usa inglés."; Deutsch · Alemán; English · Inglés; Español (selected); Português (Brasil) · Portugués (Brasil). |
 | B4 | Settings | Settings, in Spanish | Back. Top bar "Ajustes", scrolled as she left it: Exportar mis datos · Importar desde un archivo · Borrar todo; **Aplicación**: Idioma · "Español" ›; **Acerca de**; "No es un anticonceptivo ni un diagnóstico." Tabs: Hoy, Calendario, Historial, Ajustes. |
 | B5 | Calendar | Calendar, in Spanish | "Mayo de 2027", weekday letters L M X J V S D (the week starts on Monday, as in France), her period on 3 to 7 May, today ringed, the predicted period from 31 May. Legend: Periodo, Periodo previsto, Hoy. "Los periodos previstos son estimaciones. Toca cualquier día hasta hoy para registrarlo o cambiarlo." |
 
@@ -270,8 +272,8 @@ build adds first with their catalog entries, previews and tests
 **`RadioRow`: two changes to the contraception spec.**
 
 1. **The body wraps.** The spec gives "an optional one-line body". Here the second line can be a
-   sentence ("Französisch gibt es in Cycle noch nicht, deshalb nutzt Cycle Englisch."), and at 200%
-   font size every line wraps. Title and body wrap to as many lines as they need, with no ellipsis,
+   sentence ("Französisch gibt es in Cycle noch nicht, deshalb nutzt diese Option Englisch."), and
+   at 200% font size every line wraps. Title and body wrap to as many lines as they need, with no ellipsis,
    and the row grows; the radio stays vertically centred. This applies to the method list too.
 2. **A language for the title.** An optional `titleLocale` (a `LocaleList`), applied to the title as
    a `SpanStyle(localeList = …)`. TalkBack then reads "Deutsch" with a German voice on an English
