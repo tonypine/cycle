@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.layout
+import com.tonypine.cycle.core.designsystem.BleedingWords
 import com.tonypine.cycle.core.designsystem.CycleDayState
 import com.tonypine.cycle.core.designsystem.CycleLegend
 import com.tonypine.cycle.core.designsystem.CycleLegendEntry
@@ -187,6 +188,18 @@ internal fun CycleLegendSection() {
         "The caller chooses the entries: the MVP shows period, predicted period and today, since fertility " +
             "estimates are off by default. Each swatch is the day cell's shape. The legend wraps when text is " +
             "large, and TalkBack reads it as a list of its entries."
+    )
+    SubsectionTitle("In a method's words")
+    CycleLegend(entries = CycleLegendEntry.WithoutFertility, words = listOf(BleedingWords.Bleed))
+    CycleLegend(
+        entries = listOf(CycleLegendEntry.Period, CycleLegendEntry.Today),
+        words = listOf(BleedingWords.Period, BleedingWords.Bleeding)
+    )
+    CatalogNote(
+        "BleedingWords name the days on a method: bleed and expected bleed on a combined pill with a break " +
+            "every month, bleeding on the implant and the other methods with nothing expected. The shapes stay. " +
+            "A month spanning a method's start lists each word on screen. Day cells read the same words to " +
+            "TalkBack: \"14 October, bleeding\"."
     )
 }
 

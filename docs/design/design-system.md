@@ -429,6 +429,9 @@ description is the date in the locale's day-and-month form, then "today" and the
 today, period", "14 March, predicted period", "17 March, estimated ovulation". Ovulation and the
 fertile window are estimates from period dates, so they always say "estimated". The visible number is
 hidden from TalkBack, so it is not read twice. The words live in `core:designsystem`'s `strings.xml`.
+On a method, `words: BleedingWords` (`Period` by default, `Bleed`, `Bleeding`) names a period day
+"bleed" or "bleeding" and a predicted one "expected bleed" ("14 October, bleeding"); the shapes and
+colours stay ([`contraception.md`](contraception.md#components)).
 
 Do not use it for a date picker that has no cycle meaning, and do not tint a cell with other colours:
 a new cycle state needs a new `CycleDayState` with its own shape.
@@ -439,11 +442,12 @@ a new cycle state needs a new `CycleDayState` with its own shape.
 week in a `WeekRow`.
 
 - `MonthCalendar(month, stateOf, onDayClick, today, onPreviousMonth, onNextMonth, selected = null,
-  isEnabled = { true })`: a header with the previous and next `IconButton`s ("Previous month", "Next
+  isEnabled = { true }, wordsOf = { BleedingWords.Period })`: a header with the previous and next `IconButton`s ("Previous month", "Next
   month", `ChevronStart` and `ChevronEnd`, so they mirror in right-to-left) around the month name in
   `title`; the narrow weekday names in `labelSmall` `onSurfaceVariant`; then a seven-column grid of
   `DayCell`s. The days outside `month` are left blank, so a month takes four to six rows.
-- `WeekRow(weekOf, stateOf, onDayClick, today, selected = null, isEnabled = { true })`: the weekday
+- `WeekRow(weekOf, stateOf, onDayClick, today, selected = null, isEnabled = { true }, wordsOf = {
+  BleedingWords.Period })`: the weekday
   names and the seven days of the week around `weekOf`, for Today and for picking a recent day. Days
   of the previous or next month show like any other.
 
@@ -452,7 +456,9 @@ week in a `WeekRow`.
 pass `{ !it.isAfter(today) }` to keep a predicted period readable while only past days can be
 logged. The week starts on the locale's first day (`WeekFields.of(locale)`): Monday in the UK, Sunday
 in the US, and the columns run right to left in right-to-left layouts. Each cell is keyed by its date,
-so moving to another month never replays the logging morph.
+so moving to another month never replays the logging morph. `wordsOf` gives each day's
+`BleedingWords`, so a month spanning the start of a method reads "period" before it and "bleeding"
+after.
 
 ```kotlin
 var month by rememberSaveable { mutableStateOf(YearMonth.from(today)) }
@@ -494,6 +500,11 @@ fertility estimates are off, as in the MVP. The default is all five. It is a `Fl
 wrap when the text is large, and it exposes `CollectionInfo` with one `CollectionItemInfo` per entry,
 so TalkBack reads it as a list of as many items as it shows. The swatches are decorative; the label
 says what each one is. Put it under the calendar it explains.
+
+`words` lists the `BleedingWords` of the logged days on screen, in order: the `Period` entry shows
+once per word ("Period", then "Bleeding" in a month where she started the implant) and
+`PredictedPeriod` reads in the last ("Expected bleed"). Leave `PredictedPeriod` out when nothing is
+predicted, as on the implant.
 
 ## Cards
 

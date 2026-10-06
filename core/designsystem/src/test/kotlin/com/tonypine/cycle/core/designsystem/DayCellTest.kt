@@ -86,6 +86,31 @@ class DayCellTest {
     }
 
     @Test
+    fun aPeriodDayReadsInTheMethodsWords() {
+        composeRule.setContent {
+            CycleTheme(darkTheme = false) {
+                Column {
+                    BleedingWords.entries.forEach { words ->
+                        DayCell(today, CycleDayState.Period, onClick = {}, Modifier.testTag("$words"), words = words)
+                        DayCell(
+                            today,
+                            CycleDayState.PredictedPeriod,
+                            onClick = null,
+                            Modifier.testTag("$words-expected"),
+                            words = words
+                        )
+                    }
+                }
+            }
+        }
+        composeRule.onNodeWithTag("Period").assertContentDescriptionEquals("20 March, period")
+        composeRule.onNodeWithTag("Bleed").assertContentDescriptionEquals("20 March, bleed")
+        composeRule.onNodeWithTag("Bleeding").assertContentDescriptionEquals("20 March, bleeding")
+        composeRule.onNodeWithTag("Period-expected").assertContentDescriptionEquals("20 March, predicted period")
+        composeRule.onNodeWithTag("Bleed-expected").assertContentDescriptionEquals("20 March, expected bleed")
+    }
+
+    @Test
     @Config(qualifiers = "en-rUS")
     fun theDateFollowsTheLocale() {
         composeRule.setContent {

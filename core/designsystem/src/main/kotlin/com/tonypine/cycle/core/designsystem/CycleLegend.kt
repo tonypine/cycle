@@ -40,18 +40,33 @@ enum class CycleLegendEntry(
 /**
  * The key to the calendar: one swatch per entry, drawn with the same shapes as [DayCell], each with
  * its label. Show only the [entries] the calendar can draw: [CycleLegendEntry.WithoutFertility] when
- * fertility estimates are off. The default is all five. The entries wrap onto more lines when the text
- * is large, and TalkBack reads them as a list of as many items as there are entries.
+ * fertility estimates are off, no [CycleLegendEntry.PredictedPeriod] when nothing is predicted. The
+ * default is all five. The entries wrap onto more lines when the text is large, and TalkBack reads
+ * them as a list of as many items as there are entries.
+ *
+ * [words] are what the calendar calls its logged days, in order ([BleedingWords]): the
+ * [CycleLegendEntry.Period] entry shows once per word, "Period" then "Bleeding" in a month where she
+ * started the implant, and [CycleLegendEntry.PredictedPeriod] reads in the last, "Expected bleed".
  */
 @Composable
-fun CycleLegend(modifier: Modifier = Modifier, entries: List<CycleLegendEntry> = CycleLegendEntry.entries) {
+fun CycleLegend(
+    modifier: Modifier = Modifier,
+    entries: List<CycleLegendEntry> = CycleLegendEntry.entries,
+    words: List<BleedingWords> = listOf(BleedingWords.Period)
+) {
+    val shown = entries.flatMap { entry ->
+        when (entry) {
+            CycleLegendEntry.Period -> words.distinct().map { entry to it }
+            else -> listOf(entry to (words.lastOrNull() ?: BleedingWords.Period))
+        }
+    }
     FlowRow(
-        modifier = modifier.semantics { collectionInfo = CollectionInfo(rowCount = entries.size, columnCount = 1) },
+        modifier = modifier.semantics { collectionInfo = CollectionInfo(rowCount = shown.size, columnCount = 1) },
         horizontalArrangement = Arrangement.spacedBy(CycleTheme.spacing.medium),
         verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.extraSmall),
         itemVerticalAlignment = Alignment.CenterVertically
     ) {
-        entries.forEachIndexed { index, entry ->
+        shown.forEachIndexed { index, (entry, word) ->
             Row(
                 modifier = Modifier.semantics(mergeDescendants = true) {
                     collectionItemInfo =
@@ -62,12 +77,30 @@ fun CycleLegend(modifier: Modifier = Modifier, entries: List<CycleLegendEntry> =
             ) {
                 DaySwatch(entry.state, entry.isToday)
                 BasicText(
-                    stringResource(entry.label),
+                    stringResource(entry.label(word)),
                     style = CycleTheme.typography.bodySmall.copy(color = CycleTheme.colors.onSurfaceVariant)
                 )
             }
         }
     }
+}
+
+/** The entry's label with its day cells called [words]. */
+@StringRes
+private fun CycleLegendEntry.label(words: BleedingWords): Int = when (this) {
+    CycleLegendEntry.Period -> when (words) {
+        BleedingWords.Period -> label
+        BleedingWords.Bleed -> R.string.legend_bleed
+        BleedingWords.Bleeding -> R.string.legend_bleeding
+    }
+
+    CycleLegendEntry.PredictedPeriod -> when (words) {
+        BleedingWords.Period -> label
+        BleedingWords.Bleed -> R.string.legend_expected_bleed
+        BleedingWords.Bleeding -> R.string.legend_expected_bleeding
+    }
+
+    else -> label
 }
 
 /** A day cell's shape without its number, for the legend. Decorative: the label next to it says what it is. */
@@ -101,4 +134,19 @@ private fun CycleLegendWithoutFertilityLightPreview() = PreviewSurface(darkTheme
 @Composable
 private fun CycleLegendWithoutFertilityDarkPreview() = PreviewSurface(darkTheme = true) {
     CycleLegend(entries = CycleLegendEntry.WithoutFertility)
+}
+
+@Preview(name = "Cycle legend · bleed · light", widthDp = 360)
+@Composable
+private fun CycleLegendBleedPreview() = PreviewSurface(darkTheme = false) {
+    CycleLegend(entries = CycleLegendEntry.WithoutFertility, words = listOf(BleedingWords.Bleed))
+}
+
+@Preview(name = "Cycle legend · period then bleeding · light", widthDp = 360)
+@Composable
+private fun CycleLegendPeriodThenBleedingPreview() = PreviewSurface(darkTheme = false) {
+    CycleLegend(
+        entries = listOf(CycleLegendEntry.Period, CycleLegendEntry.Today),
+        words = listOf(BleedingWords.Period, BleedingWords.Bleeding)
+    )
 }
