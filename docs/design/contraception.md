@@ -305,6 +305,10 @@ Today is Monday 15 November 2027. The implant came out on 3 November.
 | D5 | Today: fresh estimates | Today | "MONDAY 15 NOVEMBER", display "12 days", "since your implant came out". **My period started** · Log how you feel. "Next period": "Around 2 December", "Between 25 November and 9 December", "Estimated from your usual 29-day cycle. Cycles can take a few months to settle after the implant, so the range is wider." How is this estimated? |
 | D6 | History | History | The implant's card now reads "9 Nov 2026 to 3 Nov 2027", "Not part of your typical cycle.", "In its last 90 days you logged bleeding or spotting on 10 days, in 3 episodes. The longest lasted 5 days." |
 
+The stop date is her last day on the implant. Had she marked it stopped with today's date, Settings
+would show "None" at once, but Today would keep the implant's words until tomorrow, and D5's
+estimates would start then.
+
 Once she logs her first period after it, Today is "Day 1" again, with the ±7-day range until she has
 logged three cycles. "Missed a period?" is not asked before that first period. Other methods:
 "since you stopped the pill", "since your IUD came out".
