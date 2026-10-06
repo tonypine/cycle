@@ -2,8 +2,10 @@ package com.tonypine.cycle.feature.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tonypine.cycle.core.data.repository.ContraceptionRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import java.time.LocalDate
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +23,7 @@ import kotlinx.coroutines.launch
 class OnboardingViewModel(
     private val settings: SettingsRepository,
     private val dayLogs: DayLogRepository,
+    private val contraception: ContraceptionRepository,
     private val clock: () -> LocalDate = LocalDate::now
 ) : ViewModel() {
     /**
@@ -54,13 +57,21 @@ class OnboardingViewModel(
     fun onRestored() = finish { }
 
     /**
-     * Setup's Done: her usual lengths, and the period she picked, if any, as a period of
-     * [periodLength] days. She leaves the welcome only once everything is saved, so Today's first
-     * estimate already uses what she entered.
+     * Setup's Done, or Skip on its last step: her usual lengths, the period she picked, if any, as a
+     * period of [periodLength] days, and her [contraception], if any, from its start or with no start.
+     * None and Skip store no method. She leaves the welcome only once everything is saved, so Today's
+     * first estimate already uses what she entered.
      */
-    fun onDone(lastPeriodStart: LocalDate?, cycleLength: Int, periodLength: Int) = finish {
+    fun onDone(
+        lastPeriodStart: LocalDate?,
+        cycleLength: Int,
+        periodLength: Int,
+        contraception: ContraceptionStretch? = null
+    ) = finish {
         settings.saveSetup(cycleLength, periodLength)
         lastPeriodStart?.let { dayLogs.logPeriod(it, periodLength, today()) }
+        // Setup runs before any method is stored, so nothing overlaps it and it is saved as given.
+        contraception?.let { this.contraception.start(it.method, it.breaks, it.started, today()) }
     }
 
     private suspend fun alreadyInUse(): Boolean =

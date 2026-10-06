@@ -96,7 +96,9 @@ fun CycleApp(
     modifier: Modifier = Modifier,
     today: () -> LocalDate = LocalDate::now
 ) {
-    val onboarding = viewModel { OnboardingViewModel(data.settingsRepository, data.dayLogRepository, today) }
+    val onboarding = viewModel {
+        OnboardingViewModel(data.settingsRepository, data.dayLogRepository, data.contraceptionRepository, today)
+    }
     val showWelcome by onboarding.showWelcome.collectAsStateWithLifecycle()
     Box(modifier.fillMaxSize().background(CycleTheme.colors.surface)) {
         when (showWelcome) {
