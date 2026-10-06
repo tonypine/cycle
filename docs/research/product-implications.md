@@ -70,8 +70,10 @@ health signals need several cycles, a doctor summary needs the signals' data.
   injection), what to hide (fertile window and ovulation on every hormonal method), the words
   ("period", "bleed" or "bleeding"), a 90-day bleeding summary on progestogen-only methods and the
   monthly combined injection, and the signals that fit the method
-  ([`contraception.md`](contraception.md)). The design is
-  [MOT-50](https://linear.app/tonypine/issue/MOT-50).
+  ([`contraception.md`](contraception.md)). Designed in
+  [`docs/design/contraception.md`](../design/contraception.md) and decided in
+  [`0006`](../decisions/0006-contraception.md) ([MOT-50](https://linear.app/tonypine/issue/MOT-50)),
+  whose method list has no monthly combined injection yet (open question 2 below).
 - **Other life-stage modes**: pregnant (predictions paused), after birth or breastfeeding
   (predictions paused until three regular cycles), perimenopause (wider ranges, no fertility
   estimates by default).
@@ -151,9 +153,10 @@ From [`contraception.md`](contraception.md):
   unscheduled bleeding on a combined method. These are the accurate words, not euphemisms.
 - **No cycle language where there is no cycle**: no "cycle day", phases or "late" on the implant,
   either injection, progestogen-only pill or hormonal IUD. Describe bleeding over the last 90 days
-  in plain counts. Whether a hormonal IUD user with regular bleeds, or a monthly combined injection
-  user whose bleeds follow her injections, later gets a next-bleed estimate is
-  [MOT-50](https://linear.app/tonypine/issue/MOT-50)'s call.
+  in plain counts. A hormonal IUD gets no next-bleed estimate, even once her bleeds look regular
+  ([`0006`](../decisions/0006-contraception.md)). Whether a monthly combined injection user whose
+  bleeds follow her injections gets one waits on whether her method list needs it (open question 2
+  below).
 - **Never advise on her method**: no "consider switching", "you may want to stop", "you are
   protected" or missed-pill guidance. Questions about her method go to her pharmacist, nurse or
   doctor.
@@ -169,11 +172,12 @@ next planning ticket.
    moods; trying to conceive, now or later; or noticing changes with age. This decides whether
    fertility estimates appear at all, and whether the narrow six-day window or the wider calendar
    range fits ([`predictions.md`](predictions.md)).
-2. **Does she use contraception?** Being taken up: she wants Cycle to record whether she has an
-   implant or takes the pill ([MOT-48](https://linear.app/tonypine/issue/MOT-48)). The research is
-   in [`contraception.md`](contraception.md); the screens and the decision come from
-   [MOT-50](https://linear.app/tonypine/issue/MOT-50). Still hers to answer there: whether she wants
-   a next-bleed estimate on the pill, a 90-day summary, and a pill or injection reminder; and, if
+2. **Does she use contraception?** Answered: she wants Cycle to record whether she has an implant
+   or takes the pill ([MOT-48](https://linear.app/tonypine/issue/MOT-48)). The research is in
+   [`contraception.md`](contraception.md); the stories and screens are in
+   [`docs/design/contraception.md`](../design/contraception.md), and the decision, including a
+   next-bleed estimate on the pill with a break every month and a 90-day summary on the others, is
+   [`0006`](../decisions/0006-contraception.md). Still open: a pill or injection reminder and, if
    she uses or might use a monthly combined injection (sold mainly outside the UK and US), whether
    the method list needs it.
 3. **Does she have history in another app** she wants to bring over? Which app, and can it export?
@@ -196,7 +200,7 @@ next planning ticket.
 - The Today screen ("Your period could start any day now", "Missed a period?", the late message and
   the next-period estimate), the calendar's predicted periods and the period labels all assume a
   natural cycle. On a hormonal method they change as [`contraception.md`](contraception.md)
-  describes; [MOT-50](https://linear.app/tonypine/issue/MOT-50) designs how.
+  describes; [`0006`](../decisions/0006-contraception.md) decides how.
 - Backups to Google Drive carry the database and settings only when end-to-end encrypted with the
   phone's screen lock ([`0004`](../decisions/0004-backup-encryption.md),
   [MOT-28](https://linear.app/tonypine/issue/MOT-28)).

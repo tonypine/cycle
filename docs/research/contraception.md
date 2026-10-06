@@ -335,8 +335,8 @@ device in the womb. What she logs is bleeding.
 
 **Predictions.** None by default. In the first six months there is no pattern to predict. Later,
 some users bleed lightly at regular intervals because they still ovulate, and a next-bleed estimate
-from her own logged bleeds could then make sense, labelled like any estimate; whether to offer it is
-a design question for [MOT-50](https://linear.app/tonypine/issue/MOT-50). Fertility estimates stay
+from her own logged bleeds could then make sense, labelled like any estimate; Cycle does not offer
+it for now ([`0006`](../decisions/0006-contraception.md)). Fertility estimates stay
 hidden: ovulation may happen, but estimating it on a contraceptive would invite the "safe day"
 reading Cycle must never give.
 
@@ -583,7 +583,7 @@ pharmacist or clinic, not for Cycle.
   | Combined, continuous | Nothing | Next bleed, fertile window, ovulation, phases | What she logged |
   | Progestogen-only pill | Nothing | Next bleed, cycle day, fertile window, ovulation, phases | A 90-day summary |
   | Implant | Nothing | Next bleed, cycle day, fertile window, ovulation, phases | A 90-day summary |
-  | Hormonal IUD | Nothing by default; maybe the next bleed once her own bleeds are regular (a design question for MOT-50) | Next bleed (by default), cycle day, fertile window, ovulation, phases | A 90-day summary |
+  | Hormonal IUD | Nothing, even once her own bleeds are regular ([`0006`](../decisions/0006-contraception.md)) | Next bleed, cycle day, fertile window, ovulation, phases | A 90-day summary |
   | Copper IUD | As without a method | As without a method | Periods, as without a method |
   | Injection (DMPA, NET-EN) | Nothing (a next-injection reminder only if she asks) | Next bleed, cycle day, fertile window, ovulation, phases | A 90-day summary |
   | Monthly combined injection | Nothing by default; maybe the next bleed from her injection date once her own bleeds follow it (a design question for MOT-50); a next-injection reminder only if she asks | Next bleed (by default), cycle day, fertile window, ovulation, phases | What she logged and a 90-day summary |
