@@ -30,6 +30,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
             setupDone = preferences[SETUP_DONE] ?: false,
             dismissedStillGoing = preferences[DISMISSED_STILL_GOING].toDates(),
             dismissedMissedPeriod = preferences[DISMISSED_MISSED_PERIOD].toDates(),
+            dismissedCopperIudNote = preferences[DISMISSED_COPPER_IUD_NOTE].toDates(),
             hiddenCategories = preferences[HIDDEN_CATEGORIES].orEmpty()
                 .mapNotNullTo(mutableSetOf()) { code -> CATEGORY_CODES.entries.firstOrNull { it.value == code }?.key }
         )
@@ -93,6 +94,11 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
             is CyclePrompt.MissedPeriod -> DISMISSED_MISSED_PERIOD
         }
         dataStore.edit { it[key] = it[key].orEmpty() + prompt.cycleStart.toString() }
+    }
+
+    /** "Got it" on the copper IUD fitted on [fitted]: its "Periods can be heavier at first" card goes. */
+    suspend fun dismissCopperIudNote(fitted: LocalDate) {
+        dataStore.edit { it[DISMISSED_COPPER_IUD_NOTE] = it[DISMISSED_COPPER_IUD_NOTE].orEmpty() + fitted.toString() }
     }
 
     /**
@@ -169,6 +175,9 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         // ISO dates of the first day of each cycle whose prompt she dismissed.
         val DISMISSED_STILL_GOING = stringSetPreferencesKey("dismissed_still_going")
         val DISMISSED_MISSED_PERIOD = stringSetPreferencesKey("dismissed_missed_period")
+
+        // ISO fitting dates of the copper IUDs whose heavier-periods card she dismissed.
+        val DISMISSED_COPPER_IUD_NOTE = stringSetPreferencesKey("dismissed_copper_iud_note")
 
         // The codes of the categories she hid. A code this version does not know is ignored.
         val HIDDEN_CATEGORIES = stringSetPreferencesKey("hidden_log_categories")

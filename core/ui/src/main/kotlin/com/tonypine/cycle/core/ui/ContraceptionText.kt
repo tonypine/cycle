@@ -89,6 +89,21 @@ fun methodTitle(method: ContraceptionMethod): String = stringResource(
     }
 )
 
+/** Its short name on its own, for Today's display and History's card: "Pill", "Implant". */
+@Composable
+fun methodShortName(method: ContraceptionMethod): String = stringResource(
+    when (method) {
+        COMBINED_PILL -> R.string.method_short_combined_pill
+        PROGESTOGEN_PILL -> R.string.method_short_progestogen_pill
+        PATCH -> R.string.method_short_patch
+        RING -> R.string.method_short_ring
+        IMPLANT -> R.string.method_short_implant
+        HORMONAL_IUD -> R.string.method_short_hormonal_iud
+        COPPER_IUD -> R.string.method_short_copper_iud
+        INJECTION -> R.string.method_short_injection
+    }
+)
+
 /** Its short name inside a sentence: "pill", as in "Move the end of your pill?". */
 @Composable
 fun methodInSentence(method: ContraceptionMethod): String = stringResource(

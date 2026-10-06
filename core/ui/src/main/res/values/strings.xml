@@ -133,6 +133,16 @@
     <string name="method_injection_line">Such as Depo-Provera</string>
     <string name="method_which_pill">Not sure which pill you take? The leaflet in the pack says.</string>
 
+    <!-- Short names, for Today's display and History's card: "Implant". -->
+    <string name="method_short_combined_pill">Pill</string>
+    <string name="method_short_progestogen_pill">Mini pill</string>
+    <string name="method_short_patch">Patch</string>
+    <string name="method_short_ring">Ring</string>
+    <string name="method_short_implant">Implant</string>
+    <string name="method_short_hormonal_iud">Hormonal IUD</string>
+    <string name="method_short_copper_iud">Copper IUD</string>
+    <string name="method_short_injection">Injection</string>
+
     <!-- In a sentence, short: "Move the end of your pill?", "the implant's dates". -->
     <string name="method_sentence_combined_pill">pill</string>
     <string name="method_sentence_progestogen_pill">mini pill</string>
