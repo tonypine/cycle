@@ -23,7 +23,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         EnergyEntity::class,
         SleepEntity::class,
         SexEntity::class,
-        NoteEntity::class
+        NoteEntity::class,
+        ContraceptionEntity::class
     ],
     version = CycleDatabase.VERSION,
     exportSchema = true
@@ -34,8 +35,10 @@ abstract class CycleDatabase : RoomDatabase() {
 
     abstract fun feelingsDao(): FeelingsDao
 
+    abstract fun contraceptionDao(): ContraceptionDao
+
     companion object {
-        const val VERSION = 2
+        const val VERSION = 3
         const val FILE_NAME = "cycle.db"
 
         fun build(context: Context): CycleDatabase = Room
@@ -64,5 +67,18 @@ object CycleMigrations {
         }
     }
 
-    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2)
+    /**
+     * Version 3 adds her contraception: one row per stretch on a method
+     * (`docs/decisions/0006-contraception.md`). Every other table is untouched.
+     */
+    val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `contraception` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`method` TEXT NOT NULL, `started` TEXT, `stopped` TEXT, `breaks` TEXT)"
+            )
+        }
+    }
+
+    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
 }

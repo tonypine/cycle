@@ -176,6 +176,14 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun `after an import of only methods, the row says how many`() {
+        state = SettingsUiState(28, 5, lastExported = null, importedMethods = 2)
+        show()
+
+        row("Import from a file").assert(hasText("Added 2 methods"))
+    }
+
+    @Test
     fun `delete everything asks first, and Keep it keeps everything`() {
         show()
 
@@ -206,7 +214,7 @@ class SettingsScreenTest {
 
     @Test
     fun `a picked file with only the usual lengths asks to import them`() {
-        state = state.copy(dialog = DataDialog.ConfirmImport(newDays = 0))
+        state = state.copy(dialog = DataDialog.ConfirmImport(newDays = 0, restoresLengths = true))
         show()
 
         composeRule.onNode(hasText("Import your usual lengths?") and isHeading()).assertIsDisplayed()
@@ -214,6 +222,20 @@ class SettingsScreenTest {
         composeRule.onNodeWithText("Import").performClick()
 
         assertEquals(listOf("confirm import"), calls)
+    }
+
+    @Test
+    fun `a picked file with only methods asks to import them, whatever its lengths do`() {
+        state = state.copy(dialog = DataDialog.ConfirmImport(newDays = 0, newStretches = 1))
+        show()
+
+        composeRule.onNode(hasText("Import 1 method?") and isHeading()).assertIsDisplayed()
+        composeRule.onNodeWithText("only contraception methods and their dates", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText("usual lengths", substring = true).assertDoesNotExist()
+
+        state = state.copy(dialog = DataDialog.ConfirmImport(newDays = 0, newStretches = 2, restoresLengths = true))
+        composeRule.onNode(hasText("Import 2 methods?") and isHeading()).assertIsDisplayed()
+        composeRule.onNodeWithText("only contraception methods and your usual", substring = true).assertIsDisplayed()
     }
 
     @Test

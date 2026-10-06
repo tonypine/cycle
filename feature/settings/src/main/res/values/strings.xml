@@ -29,6 +29,10 @@
         <item quantity="one">Added %1$d day</item>
         <item quantity="other">Added %1$d days</item>
     </plurals>
+    <plurals name="settings_imported_methods">
+        <item quantity="one">Added %1$d method</item>
+        <item quantity="other">Added %1$d methods</item>
+    </plurals>
     <string name="settings_delete_title">Delete everything</string>
     <string name="settings_delete_body">Every day you logged and every setting</string>
     <string name="settings_about">About</string>
@@ -59,6 +63,12 @@
     <string name="import_confirm_text">Days already logged on this phone stay as they are.</string>
     <string name="import_lengths_title">Import your usual lengths?</string>
     <string name="import_lengths_text">This file has no new days, only your usual cycle and period lengths. Cycle uses them for its estimates.</string>
+    <plurals name="import_methods_title">
+        <item quantity="one">Import %1$d method?</item>
+        <item quantity="other">Import %1$d methods?</item>
+    </plurals>
+    <string name="import_methods_text">This file has no new days, only contraception methods and their dates. Cycle uses them for its estimates.</string>
+    <string name="import_methods_and_lengths_text">This file has no new days, only contraception methods and your usual cycle and period lengths. Cycle uses them for its estimates.</string>
     <string name="import_confirm">Import</string>
     <string name="import_cancel">Cancel</string>
     <string name="import_nothing_title">Nothing new to import</string>
@@ -85,6 +95,9 @@
     <string name="import_problem_bad_length">Line %1$d has “%2$s” as %3$s. Cycle takes a number of days from %4$d to %5$d.</string>
     <string name="import_problem_repeated_setting">Line %1$d is a second line for %2$s.</string>
     <string name="import_problem_one_usual_length">This file gives only one of usual_cycle_length and usual_period_length. A Cycle export has both or neither.</string>
+    <string name="import_problem_missing_breaks">Line %1$d has a combined pill, patch or ring without its breaks.</string>
+    <string name="import_problem_stops_before_starts">Line %1$d has a method that stops before it starts.</string>
+    <string name="import_problem_overlapping_method">Line %1$d has a method whose dates overlap another one, in the file or already on this phone.</string>
 
     <!-- Export. -->
     <string name="export_failed_title">Couldn\'t save your data</string>

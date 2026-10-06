@@ -187,6 +187,7 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_import_title),
                 body = state.importedDays
                     ?.let { pluralStringResource(R.plurals.settings_imported, it, it) }
+                    ?: state.importedMethods?.let { pluralStringResource(R.plurals.settings_imported_methods, it, it) }
                     ?: stringResource(R.string.settings_import_body),
                 onClick = onImport
             )

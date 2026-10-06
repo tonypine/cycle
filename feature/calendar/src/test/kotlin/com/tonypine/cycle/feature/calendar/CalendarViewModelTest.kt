@@ -7,6 +7,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.tonypine.cycle.core.data.database.CycleDatabase
+import com.tonypine.cycle.core.data.repository.ContraceptionRepository
 import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
@@ -59,6 +60,7 @@ class CalendarViewModelTest {
         .allowMainThreadQueries()
         .build()
     private val dayLogs = DayLogRepository(database)
+    private val contraception = ContraceptionRepository(database)
 
     @Before
     fun setMain() = Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -224,7 +226,7 @@ class CalendarViewModelTest {
         val settings = SettingsRepository(
             PreferenceDataStoreFactory.create(scope = backgroundScope) { File(folder.root, "test.preferences_pb") }
         )
-        val viewModel = CalendarViewModel(CycleRepository(dayLogs, settings), dayLogs) { today }
+        val viewModel = CalendarViewModel(CycleRepository(dayLogs, settings, contraception), dayLogs) { today }
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
         try {
             test(viewModel, settings)

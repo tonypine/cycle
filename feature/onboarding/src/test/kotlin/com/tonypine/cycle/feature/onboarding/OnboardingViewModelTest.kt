@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.tonypine.cycle.core.data.database.CycleDatabase
+import com.tonypine.cycle.core.data.repository.ContraceptionRepository
 import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
@@ -50,6 +51,7 @@ class OnboardingViewModelTest {
         .allowMainThreadQueries()
         .build()
     private val dayLogs = DayLogRepository(database)
+    private val contraception = ContraceptionRepository(database)
 
     @Before
     fun setMain() = Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -76,7 +78,7 @@ class OnboardingViewModelTest {
                 CycleSettings(usualCycleLength = 28, usualPeriodLength = 5, setupDone = true),
                 settings.settings.first()
             )
-            val overview = CycleRepository(dayLogs, settings).observeOverview(today).first()
+            val overview = CycleRepository(dayLogs, settings, contraception).observeOverview(today).first()
             assertEquals(19, overview.cycleDay)
             assertEquals(listOf(Period(day("2027-03-02"), day("2027-03-06"))), overview.periods)
             val estimate = checkNotNull(overview.estimate)
@@ -100,7 +102,8 @@ class OnboardingViewModelTest {
         viewModel.onDone(day("2027-03-02"), cycleLength = 32, periodLength = 4)
 
         viewModel.awaitWelcome(shown = false)
-        val estimate = checkNotNull(CycleRepository(dayLogs, settings).observeOverview(today).first().estimate)
+        val estimate =
+            checkNotNull(CycleRepository(dayLogs, settings, contraception).observeOverview(today).first().estimate)
         assertEquals(day("2027-04-03"), estimate.next.expectedStart)
         assertEquals(
             listOf(DayLog(day("2027-03-02"), periodStarted = true), DayLog(day("2027-03-05"), periodEnded = true)),

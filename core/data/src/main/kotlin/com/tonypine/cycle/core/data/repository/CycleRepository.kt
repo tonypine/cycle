@@ -13,10 +13,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 /**
- * Her periods, cycles, estimates and prompts, recomputed from the log and settings whenever either
- * changes. Nothing derived is stored.
+ * Her periods, cycles, estimates and prompts, recomputed from the log, her contraception and settings
+ * whenever any of them changes. Nothing derived is stored.
  */
-class CycleRepository(private val dayLogs: DayLogRepository, private val settings: SettingsRepository) {
+class CycleRepository(
+    private val dayLogs: DayLogRepository,
+    private val settings: SettingsRepository,
+    private val contraception: ContraceptionRepository
+) {
     /**
      * The overview on [today]. The caller passes the day, from its own clock in the phone's current
      * zone, and collects again when the day changes.
@@ -36,17 +40,21 @@ class CycleRepository(private val dayLogs: DayLogRepository, private val setting
      * that show and edit any day: the calendar, and Today's day log sheet. How she felt comes along,
      * with the categories she hid; it never changes the overview.
      */
-    fun observeLog(today: LocalDate): Flow<LogOverview> =
-        combine(dayLogs.observeDayLogs(), dayLogs.observeFeelings(), settings.settings) { logs, feelings, settings ->
-            val overview = CycleCalculator.overview(logs, settings, today)
-            LogOverview(
-                overview = overview,
-                logs = logs,
-                usualPeriodLength = CycleCalculator.usualPeriodLength(overview.typical, settings),
-                feelings = feelings,
-                hiddenCategories = settings.hiddenCategories
-            )
-        }
+    fun observeLog(today: LocalDate): Flow<LogOverview> = combine(
+        dayLogs.observeDayLogs(),
+        dayLogs.observeFeelings(),
+        settings.settings,
+        contraception.observeStretches()
+    ) { logs, feelings, settings, stretches ->
+        val overview = CycleCalculator.overview(logs, settings, today, stretches)
+        LogOverview(
+            overview = overview,
+            logs = logs,
+            usualPeriodLength = CycleCalculator.usualPeriodLength(overview.typical, settings),
+            feelings = feelings,
+            hiddenCategories = settings.hiddenCategories
+        )
+    }
 }
 
 /** The [overview] on a day and the [log] of that day. */
