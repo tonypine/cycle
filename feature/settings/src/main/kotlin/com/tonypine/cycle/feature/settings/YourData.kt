@@ -76,6 +76,7 @@ internal fun DataDialogs(dialog: DataDialog?, onConfirmImport: () -> Unit, onDis
         },
         text = stringResource(
             when {
+                confirm != null && confirm.newDays > 0 && confirm.hasMethods -> R.string.import_confirm_methods_text
                 confirm == null || confirm.newDays > 0 -> R.string.import_confirm_text
                 confirm.newStretches == 0 -> R.string.import_lengths_text
                 confirm.restoresLengths -> R.string.import_methods_and_lengths_text
@@ -86,11 +87,14 @@ internal fun DataDialogs(dialog: DataDialog?, onConfirmImport: () -> Unit, onDis
         onConfirm = onConfirmImport,
         dismissText = stringResource(R.string.import_cancel)
     )
+    val nothing = rememberLast(dialog as? DataDialog.NothingToImport)
     CycleAlertDialog(
-        visible = dialog == DataDialog.NothingToImport,
+        visible = dialog is DataDialog.NothingToImport,
         onDismissRequest = onDismiss,
         title = stringResource(R.string.import_nothing_title),
-        text = stringResource(R.string.import_nothing_text),
+        text = stringResource(
+            if (nothing?.hasMethods == true) R.string.import_nothing_methods_text else R.string.import_nothing_text
+        ),
         confirmText = stringResource(R.string.import_ok),
         onConfirm = onDismiss
     )
@@ -179,6 +183,9 @@ internal fun problemSentence(problem: ImportProblem): String = when (problem) {
     is ImportProblem.StopsBeforeStarts -> stringResource(R.string.import_problem_stops_before_starts, problem.line)
 
     is ImportProblem.OverlappingMethod -> stringResource(R.string.import_problem_overlapping_method, problem.line)
+
+    is ImportProblem.OverlappingRows ->
+        stringResource(R.string.import_problem_overlapping_rows, problem.earlier, problem.line)
 }
 
 /** [value], or the last non-null value it had, so a closing dialog keeps its text while it animates out. */

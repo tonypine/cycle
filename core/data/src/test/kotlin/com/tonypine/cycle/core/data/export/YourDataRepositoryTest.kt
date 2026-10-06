@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.tonypine.cycle.core.data.database.CycleDatabase
+import com.tonypine.cycle.core.data.database.toEntity
 import com.tonypine.cycle.core.data.day
 import com.tonypine.cycle.core.data.inMemoryDatabase
 import com.tonypine.cycle.core.data.repository.ContraceptionRepository
@@ -159,6 +160,7 @@ class YourDataRepositoryTest {
 
         assertEquals(1, read.newDays)
         assertEquals(0, read.newStretches)
+        assertFalse(read.hasStretches)
         assertEquals(emptyList<Any>(), stretches())
         assertEquals(
             listOf(DayLog(day("2027-03-02"), FlowLevel.MEDIUM, periodStarted = true)),
@@ -166,18 +168,136 @@ class YourDataRepositoryTest {
         )
     }
 
+    /** The implant from 9 November 2026 to 3 November 2027, then the pill from 20 November 2027. */
+    private suspend fun logImplantThenPill() {
+        val dao = database.contraceptionDao()
+        dao.upsert(ContraceptionStretch(ContraceptionMethod.IMPLANT, day("2026-11-09"), day("2027-11-03")).toEntity())
+        dao.upsert(
+            ContraceptionStretch(ContraceptionMethod.COMBINED_PILL, day("2027-11-20"), breaks = Breaks.MONTHLY)
+                .toEntity()
+        )
+    }
+
+    /** A file with no days and these lines of contraception, from line 3. */
+    private fun methodsFile(vararg rows: String): ByteArrayInputStream = ByteArrayInputStream(
+        (
+            "date,flow,period_started,period_ended,pain,pain_where,body,mood,energy,sleep,sex,note\r\n" +
+                "method,started,stopped,breaks\r\n" + rows.joinToString("") { "$it\r\n" }
+            ).toByteArray()
+    )
+
     @Test
-    fun `a file whose stretches overlap the phone's is refused at the line, and nothing is written`() = runTest {
+    fun `re-importing her export with methods on the phone adds nothing`() = runTest {
         val phone = phone()
+        logSyntheticHistory()
         logSyntheticContraception()
         val exported = phone.repository.exportBytes()
+        val before = database.everything()
         val stretchesBefore = stretches()
 
-        assertEquals(
-            ImportRead.Refused(ImportProblem.OverlappingMethod(4)),
-            phone.repository.read(ByteArrayInputStream(exported))
-        )
+        val read = phone.repository.read(ByteArrayInputStream(exported)) as ImportRead.Ready
+        val added = phone.repository.import(read.file)
+
+        assertEquals(0, read.newDays)
+        assertEquals(0, read.newStretches)
+        assertTrue(read.hasStretches)
+        assertEquals(0, added)
+        assertEquals(before, database.everything())
         assertEquals(stretchesBefore, stretches())
+    }
+
+    @Test
+    fun `a row with the method and start of a stretch on the phone is skipped, whatever its stop or breaks`() =
+        runTest {
+            val phone = phone()
+            logImplantThenPill()
+            val stretchesBefore = stretches()
+
+            // An export from before she marked the implant stopped: skipped, not checked against the pill.
+            val beforeStopping = methodsFile("implant,2026-11-09,,")
+            val otherBreaks = methodsFile("combined_pill,2027-11-20,2027-12-01,none")
+
+            listOf(beforeStopping, otherBreaks).forEach { file ->
+                val read = phone.repository.read(file) as ImportRead.Ready
+                phone.repository.import(read.file)
+
+                assertEquals(0, read.newStretches)
+                assertTrue(read.hasStretches)
+                assertEquals(stretchesBefore, stretches())
+            }
+        }
+
+    @Test
+    fun `a null start matches a null start on the phone`() = runTest {
+        val phone = phone()
+        logSyntheticContraception()
+        val stretchesBefore = stretches()
+
+        val read = phone.repository.read(methodsFile("implant,,2026-12-31,")) as ImportRead.Ready
+        phone.repository.import(read.file)
+
+        assertEquals(0, read.newStretches)
+        assertEquals(stretchesBefore, stretches())
+        assertEquals(
+            ImportRead.Refused(ImportProblem.OverlappingMethod(3)),
+            phone.repository.read(methodsFile("copper_iud,,2026-12-31,"))
+        )
+    }
+
+    @Test
+    fun `only the rows new to the phone are counted and added`() = runTest {
+        val phone = phone()
+        logImplantThenPill()
+
+        val read = phone.repository.read(
+            methodsFile("copper_iud,2026-01-10,2026-10-31,", "implant,2026-11-09,2027-11-03,")
+        ) as ImportRead.Ready
+        phone.repository.import(read.file)
+
+        assertEquals(1, read.newStretches)
+        assertEquals(
+            listOf(
+                ContraceptionStretch(ContraceptionMethod.COPPER_IUD, day("2026-01-10"), day("2026-10-31")),
+                ContraceptionStretch(ContraceptionMethod.IMPLANT, day("2026-11-09"), day("2027-11-03")),
+                ContraceptionStretch(ContraceptionMethod.COMBINED_PILL, day("2027-11-20"), breaks = Breaks.MONTHLY)
+            ),
+            stretches()
+        )
+    }
+
+    @Test
+    fun `a new row that overlaps a stretch on the phone refuses the file at its line, and nothing is written`() =
+        runTest {
+            val phone = phone()
+            logImplantThenPill()
+            val stretchesBefore = stretches()
+
+            assertEquals(
+                ImportRead.Refused(ImportProblem.OverlappingMethod(4)),
+                phone.repository.read(
+                    methodsFile("implant,2026-11-09,2027-11-03,", "copper_iud,2027-11-04,2027-12-01,")
+                )
+            )
+            assertEquals(stretchesBefore, stretches())
+        }
+
+    @Test
+    fun `rows that overlap each other refuse the file even when one is on the phone`() = runTest {
+        val phone = phone()
+        logImplantThenPill()
+
+        assertEquals(
+            ImportRead.Refused(ImportProblem.OverlappingRows(3, 4)),
+            phone.repository.read(
+                methodsFile("implant,2026-11-09,2027-11-03,", "implant,2027-01-01,2027-06-01,")
+            )
+        )
+        assertEquals(
+            ImportRead.Refused(ImportProblem.OverlappingRows(3, 4)),
+            phone.repository.read(
+                methodsFile("implant,2026-11-09,2027-11-03,", "implant,2026-11-09,2027-11-03,")
+            )
+        )
     }
 
     @Test
