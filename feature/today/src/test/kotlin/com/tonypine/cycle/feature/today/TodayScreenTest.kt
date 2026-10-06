@@ -346,6 +346,36 @@ class TodayScreenTest {
     }
 
     @Test
+    fun `late for her first period after the implant the estimate sheet still counts from the day it came out`() {
+        // The implant came out on February 15; her period was due 29 days later, on March 16.
+        show(
+            TodaySamples.stoppedImplant.copy(
+                display = TodayDisplay.DaysSince(days = 33, method = ContraceptionMethod.IMPLANT),
+                phase = TodayPhase.Late(daysLate = 4),
+                outlook = (TodaySamples.stoppedImplant.outlook as NextPeriod).copy(
+                    expectedStart = LocalDate.of(2027, 3, 20),
+                    earliestStart = LocalDate.of(2027, 3, 20),
+                    latestStart = LocalDate.of(2027, 3, 23),
+                    lastStart = LocalDate.of(2027, 2, 15),
+                    daysLate = 4
+                )
+            )
+        )
+        composeRule.onNodeWithText("How is this estimated?").performScrollTo().performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText(
+            "Your period was expected around March 16, 29 days after you stopped the implant on February 15: " +
+                "the middle length of your last 6 cycles."
+        ).assertExists()
+        composeRule.onNodeWithText("It is 4 days later than that, so the estimate now starts today.").assertExists()
+        composeRule.onNodeWithText("It may start any day from today to March 23.").assertExists()
+        composeRule.onAllNodesWithText("first day of your last period", substring = true).assertCountEquals(0)
+        composeRule.waitForIdle()
+        captureScreenRoboImage("src/test/screenshots/today_sheet_estimate_stopped_late.png")
+    }
+
+    @Test
     fun `after her first period since stopping each basis ends its sentence before the settling line`() {
         val settling = (TodaySamples.midCycle.outlook as NextPeriod).copy(settlingAfter = ContraceptionMethod.IMPLANT)
         val bases = mapOf(
