@@ -492,8 +492,8 @@ date once her own logged bleeds follow her injections, is a design question for
 she knows from her clinic. Fertile window and ovulation estimates mean nothing.
 
 **Stopping.** Slower than the pill, much faster than DMPA. Users become pregnant on average about
-5 months after the last injection, about one month later than after most other methods; the WHO
-says not to worry before 12 months. Her earlier bleeding pattern generally returns a few months
+5 months after the last injection, about one month later than after most other methods, and the
+WHO says not being pregnant even 12 months after stopping is no cause for worry. Her earlier bleeding pattern generally returns a few months
 after the last injection, and she may ovulate before her first bleed
 ([WHO FP Handbook, ch. 5, Q10–11](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf)).
 In small studies, 52% ovulated in the first month after three months of Lunelle and 71% by the
