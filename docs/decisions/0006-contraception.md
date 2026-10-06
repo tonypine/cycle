@@ -100,14 +100,22 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
   start is refused: "That's before you started the pill on 3 May. Pick a later day, or change the
   pill's dates first."
 - **Adding a method while she is on none.** The new stretch starts on the day she picks, today or
-  earlier, with no stop date. A start inside an earlier stretch would overlap it, so a dialog offers
+  earlier, with no stop date. A start inside a stopped stretch would overlap it, so a dialog offers
   to move that stretch's end to the day before, as in Edits below. Implant 9 November 2026 to 3
   November 2027; on 15 November she adds the pill from 20 October: "Move the end of your implant?"
   "Your implant would end on 19 October instead of 3 November, so the two don't overlap. Cycle works
   out its estimates again." Cancel · **Move it**. Cancel goes back to the calendar. A start on or
-  before an earlier stretch's start would cover all of it and is refused with the dates to use:
+  before a stopped stretch's start would cover all of it and is refused with the dates to use:
   "That would cover all of your time on the implant. Delete the implant's dates first, or pick a
   later day."
+- **A start that reaches more than one stopped stretch.** The new stretch runs to today, so only the
+  stretch holding its start can be cut short; every stretch after it would be covered whole. Any
+  stretch covered whole refuses the start, with no move dialog, even when the start also lies inside
+  another. The refusal names the latest stretch it would cover, because a day after that one's start
+  is the earliest that can be saved. After the implant above, the ring from 20 November 2027 to 10
+  January 2028; on 15 February 2028 she adds the pill from 1 November 2027: "That would cover all of
+  your time on the ring. Delete the ring's dates first, or pick a later day." From 21 November to 10
+  January, the dialog offers to move the ring's end; from 11 January, nothing overlaps.
 - **Unknown start.** In every date comparison, here, in edits and in import, a null start counts as
   earlier than any date and a null stop as later than any. So a new start always ends a stretch
   with an unknown start the day before (or offers to, when she is on none), and is never refused
@@ -282,6 +290,10 @@ the copper IUD note.
 - **Storing the method in DataStore with the settings.** Easy for the current method, but History
   needs the dates of every past method, and `0003` already says life stages are date ranges in their
   own table.
+- **Deleting or moving every stretch a new start covers, in one dialog.** Fewer steps when a start
+  reaches back over several methods, but one tap on "Move it" would forget whole stretches she
+  logged. Deleting dates keeps its own page and its own question; the refusal names the stretch to
+  delete or the day to pick after.
 - **Asking for the start date of her current pack** to place the break exactly. More precise, but one
   more date to keep right, and wrong as soon as she starts a pack a day late. Her logged bleeds
   follow the pack anyway, so the estimate anchors on them after the first break.
