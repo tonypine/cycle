@@ -962,7 +962,8 @@ reads is a string resource in its module's `res/values/strings.xml`, never a lit
   `NeverSaid` in `core:testing` (`core/testing/src/main/kotlin/.../CopyRules.kt`), copied from 0008's
   "Copy checks in every language", with the glossary and typography rules beside them in 0008. Each
   module's `*StringsTest` runs `assertNeverSaid` over its strings and plurals in every language. A
-  list changes only with 0008.
+  module's own words (`also`) need a list in every language it checks, or the check fails. A list
+  changes only with 0008.
 - **Text that is not language**, such as the app's name, is `translatable="false"`.
 - **Dates and numbers** are formatted in `cycleLocale()`, the language of the strings Android picked,
   never in `LocalConfiguration.current.locales[0]` (`LocaleReadersTest` fails on it). The first day

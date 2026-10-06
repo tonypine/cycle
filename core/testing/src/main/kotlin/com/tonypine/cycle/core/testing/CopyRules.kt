@@ -46,7 +46,8 @@ object NeverSaid {
 /**
  * Reads every string and plural of a module in each of [languages], and fails on any that says one of
  * that language's [NeverSaid.everywhere] words, or of [also] (a module's own words, such as
- * [NeverSaid.history]). Pass the module's `R.string::class.java` and `R.plurals::class.java`.
+ * [NeverSaid.history]). Pass the module's `R.string::class.java` and `R.plurals::class.java`. A
+ * module with words of its own has them in every language checked, or the check fails.
  *
  * Returns what it read in each language, for the module's own checks on it.
  */
@@ -68,12 +69,20 @@ fun assertNeverSaid(
     return read
 }
 
-/** Each of [texts] that says a word of its language's [NeverSaid.everywhere] or [also], as "tag: text". */
+/**
+ * Each of [texts] that says a word of its language's [NeverSaid.everywhere] or [also], as "tag: text".
+ * Fails on a language with no words in either, so a new language cannot skip a module's own words.
+ */
 fun neverSaidIn(texts: Map<Language, List<String>>, also: Map<Language, List<String>> = emptyMap()): List<String> =
     texts.flatMap { (language, inLanguage) ->
         val words = NeverSaid.everywhere[language]
             ?: throw AssertionError("No words to check in ${language.tag}: add them to NeverSaid, with 0008")
-        val all = words + also[language].orEmpty()
+        val extra = if (also.isEmpty()) {
+            emptyList()
+        } else {
+            also[language] ?: throw AssertionError("No module words in ${language.tag}: add them in every language")
+        }
+        val all = words + extra
         inLanguage.distinct()
             .filter { text -> all.any { text.contains(it, ignoreCase = true) } }
             .map { "${language.tag}: $it" }

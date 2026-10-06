@@ -41,6 +41,15 @@ class CopyRulesTest {
     }
 
     @Test
+    fun `a module's own words missing in a language fail, so they cannot be skipped there`() {
+        val texts = mapOf(Language("en") to listOf("Your cycle"), Language("de") to listOf("Dein Zyklus"))
+
+        assertThrows(AssertionError::class.java) {
+            neverSaidIn(texts, also = mapOf(Language("en") to listOf("ovulat")))
+        }
+    }
+
+    @Test
     fun `every language Cycle has has its words`() {
         Language.Supported.forEach { assertEquals(true, it in NeverSaid.everywhere) }
     }
