@@ -11,6 +11,8 @@ import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.Period
 import com.tonypine.cycle.core.model.bleedingWord
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import kotlin.math.abs
 
 /**
  * The cycle state of every calendar day, for Today's week and the calendar's month.
@@ -42,19 +44,20 @@ data class CalendarDays(
     fun wordsOf(date: LocalDate): BleedingWords = bleedingWord(date, periods, stretches).words
 
     /**
-     * The legend for [days] on screen, with [today]: the logged days in each word they show in, or the
-     * word she would log in today when none shows; the predicted days only when some show, in the
-     * first one's word; then today.
+     * The legend for [days] on screen, with [today]: the logged days in each word they show in, or when
+     * none shows the word of the day on screen nearest [today] (today itself when it shows); the
+     * predicted days only when some show, in the first one's word; then today.
      */
     fun legend(days: List<LocalDate>, today: LocalDate): CalendarLegend {
-        val words = days.filter(::isPeriodDay).map(::wordsOf).distinct().ifEmpty { listOf(wordsOf(today)) }
+        val nearest = wordsOf(days.minByOrNull { abs(ChronoUnit.DAYS.between(it, today)) } ?: today)
+        val words = days.filter(::isPeriodDay).map(::wordsOf).distinct().ifEmpty { listOf(nearest) }
         val predicted = days.firstOrNull { stateOf(it) == CycleDayState.PredictedPeriod }
         val entries = listOfNotNull(
             CycleLegendEntry.Period,
             CycleLegendEntry.PredictedPeriod.takeIf { predicted != null },
             CycleLegendEntry.Today.takeIf { today in days }
         )
-        return CalendarLegend(entries, words, predicted?.let(::wordsOf) ?: wordsOf(today))
+        return CalendarLegend(entries, words, predicted?.let(::wordsOf) ?: nearest)
     }
 
     companion object {
