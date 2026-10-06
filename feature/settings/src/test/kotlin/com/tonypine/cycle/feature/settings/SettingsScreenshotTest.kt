@@ -27,7 +27,9 @@ import org.robolectric.annotation.GraphicsMode
  * on a screen tall enough for every section, with and without the note that Cycle isn't backed up
  * on a phone with no screen lock; Usual cycle and period; the open-source notices; and,
  * over Settings, "Delete everything?", "Import 42 days?" and a file that can't be imported. Each
- * records `src/test/screenshots/settings_<screen>_<appearance>.png`. Synthetic dates only.
+ * records `src/test/screenshots/settings_<screen>_<appearance>.png`. Usual cycle and period is also
+ * recorded on a phone on its side, at the top and scrolled to Save, which fails if it stops
+ * scrolling. Synthetic dates only.
  */
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -40,6 +42,7 @@ class SettingsScreenshotTest(private val screen: Screen, private val appearance:
     @Test
     fun capture() {
         if (screen == Screen.Home || screen == Screen.NotBackedUp) RuntimeEnvironment.setQualifiers("+h1400dp")
+        if (appearance == Appearance.Landscape) RuntimeEnvironment.setQualifiers(LANDSCAPE)
         composeRule.setContent {
             val density = LocalDensity.current
             val fontScale = if (appearance == Appearance.FontScale200) 2f else 1f
@@ -56,6 +59,12 @@ class SettingsScreenshotTest(private val screen: Screen, private val appearance:
             }
 
             Screen.ImportDialog, Screen.RefusedDialog -> captureScreenRoboImage(path)
+
+            Screen.UsualLengths if appearance == Appearance.Landscape -> {
+                composeRule.onRoot().captureRoboImage(path)
+                composeRule.onNodeWithText("Save").performScrollTo()
+                composeRule.onRoot().captureRoboImage(path.replace(".png", "_scrolled.png"))
+            }
 
             else -> composeRule.onRoot().captureRoboImage(path)
         }
@@ -78,15 +87,18 @@ class SettingsScreenshotTest(private val screen: Screen, private val appearance:
     enum class Appearance(val fileName: String) {
         Light("light"),
         Dark("dark"),
-        FontScale200("font_scale_200")
+        FontScale200("font_scale_200"),
+        Landscape("landscape")
     }
 
     companion object {
+        private const val LANDSCAPE = "+w800dp-h360dp-land"
+
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "{0}_{1}")
         fun cases(): List<Array<Any>> = Screen.entries.flatMap { screen ->
-            Appearance.entries.map { arrayOf<Any>(screen, it) }
-        }
+            listOf(Appearance.Light, Appearance.Dark, Appearance.FontScale200).map { arrayOf<Any>(screen, it) }
+        } + listOf(arrayOf<Any>(Screen.UsualLengths, Appearance.Landscape))
     }
 }
 
