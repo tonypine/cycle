@@ -49,7 +49,27 @@ internal fun EstimateSheet(sheet: CycleBottomSheetState, next: NextPeriod) {
         }
         val lastStart = formatDate(next.lastStart)
         val stopped = next.stoppedMethod
-        if (stopped != null && next.daysLate == 0) {
+        if (next.daysLate > 0) {
+            val due = formatDate(next.due)
+            SheetText(
+                if (stopped != null) {
+                    stringResource(
+                        R.string.estimate_date_stopped_late,
+                        due,
+                        lastStart,
+                        next.cycleLength,
+                        methodInSentence(stopped),
+                        cycle
+                    )
+                } else {
+                    stringResource(R.string.estimate_date_late, due, lastStart, next.cycleLength, cycle)
+                }
+            )
+            SheetText(pluralStringResource(R.plurals.estimate_late, next.daysLate, next.daysLate))
+            if (next.latestStart > next.expectedStart) {
+                SheetText(stringResource(R.string.estimate_late_range, formatDate(next.latestStart)))
+            }
+        } else if (stopped != null) {
             val expected = formatDate(next.expectedStart)
             SheetText(
                 stringResource(
@@ -65,13 +85,6 @@ internal fun EstimateSheet(sheet: CycleBottomSheetState, next: NextPeriod) {
                 stringResource(R.string.estimate_range, formatDate(next.earliestStart), formatDate(next.latestStart)) +
                     " " + stringResource(R.string.estimate_range_settling)
             )
-        } else if (next.daysLate > 0) {
-            val due = formatDate(next.expectedStart.minusDays(next.daysLate.toLong()))
-            SheetText(stringResource(R.string.estimate_date_late, due, lastStart, next.cycleLength, cycle))
-            SheetText(pluralStringResource(R.plurals.estimate_late, next.daysLate, next.daysLate))
-            if (next.latestStart > next.expectedStart) {
-                SheetText(stringResource(R.string.estimate_late_range, formatDate(next.latestStart)))
-            }
         } else {
             val expected = formatDate(next.expectedStart)
             SheetText(stringResource(R.string.estimate_date, expected, lastStart, next.cycleLength, cycle))

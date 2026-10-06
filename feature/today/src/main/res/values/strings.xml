@@ -249,5 +249,6 @@
 
     <!-- How is this estimated, after stopping a method. -->
     <string name="estimate_date_stopped">Your next period is expected around %1$s, %3$d days after you stopped the %4$s on %2$s: %5$s.</string>
+    <string name="estimate_date_stopped_late">Your period was expected around %1$s, %3$d days after you stopped the %4$s on %2$s: %5$s.</string>
     <string name="estimate_range_settling">The first cycles after stopping a method can vary more, so the range stays at least 7 days either side until you have logged three cycles.</string>
 </resources>
