@@ -28,8 +28,8 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * Settings › Contraception in each state, in light, dark and at 200% font scale: on none, on the pill
- * (E1), on none after the implant (D4), on the hormonal IUD after the pill (E4) and on the injection
- * in its 13 weeks; then the steps of adding a method (B3 to B5), "Mark as stopped" (D3), a method's
+ * (E1) and on the hormonal IUD after the pill (E4), each with its "When to get help", on none after the
+ * implant (D4) and on the injection in its 13 weeks; then the steps of adding a method (B3 to B5), "Mark as stopped" (D3), a method's
  * page (E5), its date sheet (E6), and its dialogs: moving the pill's end (E7), a refusal and deleting dates. Each records
  * `src/test/screenshots/contraception_<screen>_<appearance>.png`, on a screen tall enough for the
  * whole page. Synthetic dates only.
@@ -115,7 +115,7 @@ class ContraceptionScreenshotTest(private val screen: Screen, private val appear
 
     companion object {
         private const val TALL = "+h1100dp"
-        private const val TALLER = "+h1800dp"
+        private const val TALLER = "+h2600dp"
 
         // Each state of the page in every appearance; the steps and dialogs in light and at 200%.
         private val pageStates = listOf(Screen.None, Screen.Current, Screen.Stopped, Screen.PastStretches)

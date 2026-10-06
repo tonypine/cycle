@@ -150,6 +150,41 @@
     <string name="contraception_stop">Mark as stopped</string>
     <string name="contraception_note">Cycle isn\'t a contraceptive and doesn\'t advise on methods. Questions about yours are for your pharmacist, nurse or doctor. Your method stays on this phone.</string>
 
+    <!-- When to get help: every word here is docs/decisions/0007-urgent-symptoms-on-a-method.md, and
+         changes only with that record, in the same PR. WhenToGetHelp.kt says which method shows
+         which lines; WhenToGetHelpTest pins them. No phone numbers and no condition names (0007). -->
+    <string name="get_help_title">When to get help</string>
+    <!-- 0007: the intro line. On the patch or ring screen it names that method only
+         (docs/design/contraception.md, When to get help). -->
+    <string name="get_help_intro_combined_pill">Clinics give these signs to everyone who uses the combined pill, patch or ring.</string>
+    <string name="get_help_intro_patch">Clinics give these signs to everyone who uses the patch.</string>
+    <string name="get_help_intro_ring">Clinics give these signs to everyone who uses the ring.</string>
+    <string name="get_help_intro_iud">Clinics give these signs to everyone who has an IUD.</string>
+    <!-- 0007: the two action lines, headings for TalkBack. -->
+    <string name="get_help_emergency">Get emergency help now if you have:</string>
+    <string name="get_help_urgent">Get urgent medical advice today if you have:</string>
+    <!-- Combined pill, patch and ring. FSRH CHC 2019, Box 4, urgent review: "Chest pain and/or
+         breathlessness and/or coughing up blood"; NHS, blood clots: call 999 or go to A&E with
+         shortness of breath or chest pain. Emergency help. -->
+    <string name="get_help_combined_chest">chest pain, or you feel short of breath, or you cough up blood</string>
+    <!-- FSRH CHC 2019, Box 4, urgent review: "Loss of motor or sensory function"; NHS, stroke: face,
+         arm, speech, "Call 999 now". Emergency help. -->
+    <string name="get_help_combined_weakness">sudden weakness or numbness in your face, an arm or a leg, or trouble speaking</string>
+    <!-- FSRH CHC 2019, Box 4, urgent review: "Calf pain, swelling and/or redness"; NHS, blood clots:
+         pain or swelling in one leg, usually the calf; an urgent GP appointment or 111. Urgent advice. -->
+    <string name="get_help_combined_leg">pain, swelling or redness in one leg, usually the calf</string>
+    <!-- Copper IUD and hormonal IUD: each line is the NHS's, under "ask for an urgent GP appointment or
+         get help from NHS 111", on its copper IUD side effects and hormonal IUD side effects and risks
+         pages, in second person and without the medical words. Urgent advice. -->
+    <string name="get_help_iud_painkillers">pain low in your tummy that painkillers do not help</string>
+    <string name="get_help_iud_sudden_pain">sudden pain low in your tummy that gets worse or does not go away</string>
+    <string name="get_help_iud_temperature">a high temperature</string>
+    <string name="get_help_iud_discharge">unusual or smelly discharge</string>
+    <string name="get_help_iud_bleeding">very heavy bleeding</string>
+    <!-- 0007, What Cycle does not watch: the section ends by saying so, so its silence elsewhere is
+         never read as "all clear". -->
+    <string name="get_help_not_checked">Cycle does not check your log for these signs.</string>
+
     <!-- Add your method, or change it: which method, since when, breaks. -->
     <string name="add_method_which">Which method?</string>
     <string name="add_method_which_body">Some methods change bleeding, so Cycle changes what it estimates.</string>
