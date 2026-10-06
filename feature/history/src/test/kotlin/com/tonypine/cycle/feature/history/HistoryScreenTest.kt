@@ -45,10 +45,11 @@ class HistoryScreenTest {
     private fun showHistory(state: HistoryUiState) {
         composeRule.setContent {
             Themed {
-                HistoryScreen(state, onCycleClick = { calls += "cycle $it" }, onSeeInCalendar = {
-                    calls +=
-                        "calendar $it"
-                })
+                HistoryScreen(
+                    state,
+                    onCycleClick = { calls += "cycle $it" },
+                    onSeeInCalendar = { calls += "calendar $it" }
+                )
             }
         }
         composeRule.waitForIdle()

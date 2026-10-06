@@ -298,8 +298,9 @@ The rest of History's copy for a method ([MOT-55](https://linear.app/tonypine/is
   "You logged 6 bleeds on it." ("You logged no bleeds on it."), the withdrawal bleed after it
   stopped included.
 - A method younger than 90 days counts since its start, as on Today: "Since September 6: you logged
-  bleeding or spotting on 4 days, in 2 episodes. The longest lasted 3 days." Once stopped, one shorter than 90 days counts all
-  of it: "In that time you logged …". With nothing logged: "… you logged no bleeding or spotting."
+  bleeding or spotting on 4 days, in 2 episodes. The longest lasted 3 days."
+  Once stopped, one shorter than 90 days counts all of it: "In that time you logged …". With nothing
+  logged: "… you logged no bleeding or spotting."
 - The cycle a method cut short says how: "cut short when you started the pill" (the mini pill, the
   patch, the ring), "when the implant was fitted", "when the IUD was fitted", "when you had your
   first injection". Its detail adds "Cut short when the implant was fitted. Not part of your typical
