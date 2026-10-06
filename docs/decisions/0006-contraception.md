@@ -117,9 +117,9 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
   your time on the ring. Delete the ring's dates first, or pick a later day." From 21 November to 10
   January, the dialog offers to move the ring's end; from 11 January, nothing overlaps.
 - **Unknown start.** In every date comparison, here, in edits and in import, a null start counts as
-  earlier than any date and a null stop as later than any. So a new start always ends a stretch
-  with an unknown start the day before (or offers to, when she is on none), and is never refused
-  because of it.
+  earlier than any date and a null stop as later than any. So a new start ends a stretch with an
+  unknown start the day before (or, when she is on none, offers to, unless it would cover a later
+  stretch whole, as above), and is never refused because of the unknown start itself.
 - **Unknown start, in what she reads.** Where the copy prints the start date, a stretch with no
   start says so instead: Settings' row "Implant, start not known"; the Now card "Start not known"
   under the method's name (in place of "Since 9 November 2026"); "Your methods" and History's card

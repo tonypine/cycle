@@ -355,7 +355,7 @@ Today is Tuesday 22 June 2027. Her last period started on 14 June; the IUD was f
 
 | Step | Screen | Where | Copy |
 | -- | -- | -- | -- |
-| F1 | Contraception | Settings › Your cycle › Contraception | "None". **Add your method**. With an earlier method under "Your methods", a start inside its dates offers to move its end, and one on or before its start is refused ([Since when](#since-when), journey D). |
+| F1 | Contraception | Settings › Your cycle › Contraception | "None". **Add your method**. With an earlier method under "Your methods", a start inside its dates offers to move its end, and one on or before its start, or one that would cover a later method whole, is refused ([Since when](#since-when), journey D). |
 | F2 | Choose copper IUD | Settings › Contraception › Add | The list, Copper IUD chosen. **Next** |
 | F3 | Since when | Settings › Contraception › Add | "When was your IUD fitted?" 15 June chosen, during her period. **Save** |
 | F4 | Contraception: copper IUD | Settings › Your cycle › Contraception | "Copper IUD", "Since 15 June 2027", "Your cycle stays your own, so Cycle keeps estimating your periods. They can be heavier or longer at first." |
