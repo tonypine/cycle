@@ -18,14 +18,16 @@ They are research notes, not decisions: a decision that comes out of them goes i
 ## How these were written
 
 Researched in October 2026 for [MOT-26](https://linear.app/tonypine/issue/MOT-26);
-[`contraception.md`](contraception.md) for [MOT-49](https://linear.app/tonypine/issue/MOT-49). Sources,
+[`contraception.md`](contraception.md) for [MOT-49](https://linear.app/tonypine/issue/MOT-49), and its
+monthly combined injection section for [MOT-67](https://linear.app/tonypine/issue/MOT-67). Sources,
 in order of preference:
 
 1. Clinical bodies and their guidance: WHO, FIGO, ACOG, NICE, the NHS, the CDC, STRAW+10, the FSRH
    (the UK's Faculty of Sexual and Reproductive Healthcare, now the CoSRH).
 2. Peer-reviewed studies, favouring large prospective ones (Wilcox's hormone-measured cycles) and
    large real-world app datasets (Natural Cycles, Flo, the Apple Women's Health Study).
-3. Product labels (the Nexplanon prescribing information) for what a method's trials found.
+3. Product labels (the Nexplanon and Lunelle prescribing information) for what a method's trials
+   found.
 4. Product documentation and regulators' actions (Apple, Android, the FTC, Mozilla's reviews) for
    how apps behave and fail.
 

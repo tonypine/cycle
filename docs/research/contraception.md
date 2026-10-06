@@ -18,7 +18,8 @@ about her method belong to her and her clinician.
 - **A period** is the bleed that follows ovulation, when progesterone from the ovary falls
   ([`cycle-physiology.md`](cycle-physiology.md)). Only cycles with ovulation have one.
 - **A withdrawal bleed** is the bleed in the break of a combined pill, patch or ring, when the
-  hormones she takes stop for a few days. The FSRH says to make clear to users that "this bleed does
+  hormones she takes stop for a few days, and the bleed two to three weeks after a monthly combined
+  injection, when its oestrogen falls. The FSRH says to make clear to users that "this bleed does
   not represent physiological menstruation" and has no health benefit
   ([FSRH CHC 2019, 6.1.1](https://www.cosrh.org/Common/Uploaded%20files/documents/fsrh-guideline-combined-hormonal-contraception-october-2023.pdf));
   ACOG calls the monthly withdrawal bleed a holdover from the pill's design that is not needed for
@@ -91,7 +92,8 @@ So Cycle needs the date she started a method, not just its name.
 | Implant | Stopped, nearly always | Bleeding | None | Hidden | Fast |
 | Hormonal IUD | Usually continues | Bleeding | None by default | Hidden | Fast |
 | Copper IUD | Continues | Periods | As without a method | As without a method | Immediate |
-| Injection | Stopped | Bleeding | None | Hidden | Slow: months, up to a year |
+| Injection (DMPA, NET-EN) | Stopped | Bleeding | None | Hidden | Slow: months, up to a year |
+| Monthly combined injection | Stopped | A withdrawal bleed after each injection; unscheduled bleeding | None by default | Hidden | Months: pregnancy about 5 months after the last injection on average |
 
 Each row is detailed below, with sources.
 
@@ -375,9 +377,10 @@ than 8 days, from three months after insertion
 ## Injection
 
 The common injection is DMPA (medroxyprogesterone acetate): Depo-Provera into the muscle, or Sayana
-Press under the skin, every 13 weeks. NET-EN is given every 8 weeks
-([WHO FP Handbook](https://fphandbook.org/chapter-4-progestin-only-injectables)). Monthly combined
-injectables ([WHO FP Handbook, ch. 5](https://fphandbook.org/chapter-5-monthly-injectables)) are not covered here.
+Press under the skin, every 13 weeks. NET-EN (Noristerat) is given every 8 weeks
+([WHO FP Handbook](https://fphandbook.org/chapter-4-progestin-only-injectables)). Both are
+progestogen only. The monthly combined injection, which adds an oestrogen, behaves differently and
+has [its own section](#monthly-combined-injection).
 
 **Ovulation and what she logs.** Injections stop ovulation
 ([WHO FP Handbook](https://fphandbook.org/chapter-4-progestin-only-injectables)). What she logs is
@@ -419,6 +422,93 @@ for the next bleed ([WHO FP Handbook, ch. 18](https://fphandbook.org/sites/defau
 after the last injection, do not treat months without bleeding as a missed period, and count natural
 cycles from the first period after the injection would have run out.
 
+## Monthly combined injection
+
+A progestogen and an oestrogen, injected into the muscle every 4 weeks, up to 7 days early or late.
+There are two: medroxyprogesterone acetate 25 mg with estradiol cypionate 5 mg (Cyclofem,
+Ciclofemina, Cyclo-Provera, Lunelle, Novafem and other names) and norethisterone enanthate 50 mg
+with estradiol valerate 5 mg (Mesigyna, Norigynon). The WHO says what it knows may also apply to
+older formulations, about which less is known
+([WHO FP Handbook, ch. 5](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf)):
+dihydroxyprogesterone (algestone) acetophenide with estradiol enanthate (Perlutan, Topasel,
+Uno-Ciclo and other names), sold in many Latin American countries and Spain, and Chinese Injectable
+No. 1 ([d'Arcangues and Snow, GFMER](https://www.gfmer.ch/Endo/Lectures_11/Arcangues.htm)).
+Mesigyna has the same progestogen as Noristerat, at a lower dose and with an oestrogen; the method
+list should not let one pass for the other.
+
+**Where she might meet it.** Not in the UK, where the NHS lists only progestogen-only injections
+([NHS](https://www.nhs.uk/contraception/methods-of-contraception/contraceptive-injection/what-is-it/)),
+nor in the US, where Lunelle has not been sold since 2003
+([Kaunitz, GLOWM 2008](https://www.glowm.com/section-view/heading/Injectable%20Contraception/item/392)).
+Injectables are little known in Europe; Cyclofem was registered in 18 countries and Mesigyna in 35
+([d'Arcangues and Snow, GFMER](https://www.gfmer.ch/Endo/Lectures_11/Arcangues.htm)). Whether
+Cycle's method list needs it depends on where she lives and gets her contraception.
+
+**Ovulation and what she logs.** It stops ovulation, and works much like the combined pill
+([WHO FP Handbook, ch. 5](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf)).
+The oestrogen level falls about two weeks after each injection, and a withdrawal bleed follows
+([d'Arcangues and Snow, GFMER](https://www.gfmer.ch/Endo/Lectures_11/Arcangues.htm)); the WHO and
+the Lunelle label both call it a withdrawal bleed
+([WHO FP Handbook, ch. 5, Q6](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf),
+[Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)). So what
+she logs is a bleed after each injection, set by the injection rather than by a cycle, and
+sometimes bleeding at other times.
+
+**Bleeding.** More regular than on the progestogen-only injection, because of the oestrogen and the
+lower progestogen dose
+([WHO FP Handbook, ch. 5, Q1](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf),
+[Gallo 2008, Cochrane](https://pubmed.ncbi.nlm.nih.gov/18843662/)).
+
+- When the bleed comes: 14 to 20 days after the first injection in a trial of over 5,000 users in
+  China ([Sang 1995](https://pubmed.ncbi.nlm.nih.gov/7621686/)); 20 to 25 days after (median 21 to
+  22) for about half of users in the US Lunelle trial
+  ([Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)).
+- First months: more bleeding days and episodes, and more variation, in the first 90 days than
+  later ([Sang 1995](https://pubmed.ncbi.nlm.nih.gov/7621686/)). In the first injection interval the
+  bleed lasted more than 7 days for 42% of Lunelle users
+  ([Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)). The WHO
+  lists lighter and fewer days of bleeding, irregular, infrequent or prolonged bleeding, or none,
+  and says the changes usually lessen or stop within the first few months
+  ([WHO FP Handbook, ch. 5](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf)).
+- Later: in any one injection interval, about 75% of users had a single bleed and nothing else, 15%
+  no bleed, and 10% bleeding or spotting at other times. At a year, 29% still had a bleed of more
+  than 7 days. Irregular bleeding stayed at about 30% through the first year, and only 4.1% had no
+  bleeding at all ([Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)).
+  About two-thirds settle into one bleed a month and a third have irregular or prolonged bleeding
+  ([d'Arcangues and Snow, GFMER](https://www.gfmer.ch/Endo/Lectures_11/Arcangues.htm)). The
+  norethisterone version brings more regular and fewer prolonged bleeds than the
+  medroxyprogesterone one ([Gallo 2008](https://pubmed.ncbi.nlm.nih.gov/18843662/),
+  [Sang 1995](https://pubmed.ncbi.nlm.nih.gov/7621686/)).
+
+**Predictions.** The bleed follows the injection, as the combined pill's follows the pack, so
+there is something to estimate, but less precisely: the sources put it anywhere from 14 to 25 days
+after the injection, and a third of users bleed irregularly. The injection itself must not follow
+the bleeding: the WHO and the label say to give it every 4 weeks whatever the bleeding does
+([WHO FP Handbook, ch. 5, Q5](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf),
+[Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)). So, as
+for the hormonal IUD, no next bleed by default; whether to offer one, counted from her injection
+date once her own logged bleeds follow her injections, is a design question for
+[MOT-50](https://linear.app/tonypine/issue/MOT-50). The useful date is the next injection, which
+she knows from her clinic. Fertile window and ovulation estimates mean nothing.
+
+**Stopping.** Slower than the pill, much faster than DMPA. Users become pregnant on average about
+5 months after the last injection, about one month later than after most other methods; the WHO
+says not to worry before 12 months. Her earlier bleeding pattern generally returns a few months
+after the last injection, and she may ovulate before her first bleed
+([WHO FP Handbook, ch. 5, Q10–11](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf)).
+In small studies, 52% ovulated in the first month after three months of Lunelle and 71% by the
+second, 60% by the third month after two years of use, and in another study 11 of 14 women
+ovulated 63 to 112 days after their third and last injection
+([Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)). Of 70
+women who stopped Cyclofem to conceive, more than half were pregnant at 6 months and 82.9% at 12
+([d'Arcangues and Snow, GFMER](https://www.gfmer.ch/Endo/Lectures_11/Arcangues.htm)). The bleed two
+to three weeks after the last injection is still a withdrawal bleed.
+
+**For Cycle.** No next-bleed estimate by default (MOT-50 decides whether to estimate one from the
+injection date); call the bleed after each injection a bleed, and anything else bleeding; hide the
+fertile window, ovulation and cycle day; show what she logged and a 90-day summary; count natural
+cycles from the first period after the next injection would have been due.
+
 ## Stopping a method, in numbers
 
 How quickly people who stopped a method to conceive became pregnant within a year, pooled from 22
@@ -451,12 +541,13 @@ signs of heavy bleeding (soaking through in an hour or two, large clots) apply a
 | Pattern | Applies to | Example wording (synthetic numbers) | Source |
 | -- | -- | -- | -- |
 | Bleeding after sex, pain during sex, pelvic pain | Every method | "You logged bleeding after sex on 14 May. That is worth mentioning to a doctor or nurse, each time it happens." | [FSRH bleeding 2015, 5.5.2](https://www.cosrh.org/Common/Uploaded%20files/documents/ceuguidanceproblematicbleedinghormonalcontraception.pdf), [`health-signals.md`](health-signals.md) |
-| Bleeding outside the break that continues after the first three months | Combined pill, patch, ring | "You have logged bleeding outside your pill breaks in each of the last three packs. Bleeding like this after the first few months on the pill is worth mentioning to a doctor or nurse." | [FSRH CHC 2019, Box 4](https://www.cosrh.org/Common/Uploaded%20files/documents/fsrh-guideline-combined-hormonal-contraception-october-2023.pdf), [FSRH bleeding 2015](https://www.cosrh.org/Common/Uploaded%20files/documents/ceuguidanceproblematicbleedinghormonalcontraception.pdf) |
+| Bleeding outside the break (or, on the monthly injection, outside the bleed after each injection) that continues after the first three months | Combined pill, patch, ring, monthly combined injection | "You have logged bleeding outside your pill breaks in each of the last three packs. Bleeding like this after the first few months on the pill is worth mentioning to a doctor or nurse." | [FSRH CHC 2019, Box 4](https://www.cosrh.org/Common/Uploaded%20files/documents/fsrh-guideline-combined-hormonal-contraception-october-2023.pdf), [FSRH bleeding 2015](https://www.cosrh.org/Common/Uploaded%20files/documents/ceuguidanceproblematicbleedinghormonalcontraception.pdf), [WHO FP Handbook, ch. 5](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf) |
 | Bleeding that keeps going after three months (a guide; six for the hormonal IUD) | Progestogen-only pill, implant, injection, hormonal IUD | "In the last 90 days you logged bleeding or spotting on 41 days, once for 16 days in a row. Bleeding like this after the first months on the implant is worth mentioning to a doctor or nurse." | [FSRH bleeding 2015, 5.5.2](https://www.cosrh.org/Common/Uploaded%20files/documents/ceuguidanceproblematicbleedinghormonalcontraception.pdf), [NHS](https://www.nhs.uk/contraception/methods-of-contraception/ius-hormonal-coil/side-effects-and-risks/) |
-| A change after a settled pattern: bleeding again after months of little or none, or new irregular bleeding | Every hormonal method, after at least three months | "You logged no bleeding from January to April, and bleeding on 9 days since 2 May. A change like this after a settled stretch is worth mentioning to a doctor or nurse." | [WHO FP Handbook, implants](https://fphandbook.org/managing-any-problems-0), [injectables](https://fphandbook.org/managing-any-problems-2), [hormonal IUD](https://fphandbook.org/managing-any-problems-3), [FSRH injectable 2014, 12.1](https://www.cosrh.org/Common/Uploaded%20files/documents/progestogen-only-injectable-december-2014-amended-11july2023.pdf) |
+| A change after a settled pattern: bleeding again after months of little or none, or new irregular bleeding | Every hormonal method, after at least three months | "You logged no bleeding from January to April, and bleeding on 9 days since 2 May. A change like this after a settled stretch is worth mentioning to a doctor or nurse." | [WHO FP Handbook, implants](https://fphandbook.org/managing-any-problems-0), [injectables](https://fphandbook.org/managing-any-problems-2), [hormonal IUD](https://fphandbook.org/managing-any-problems-3), [monthly injectables](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf), [Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf), [FSRH injectable 2014, 12.1](https://www.cosrh.org/Common/Uploaded%20files/documents/progestogen-only-injectable-december-2014-amended-11july2023.pdf) |
 | Heavy bleeding: about twice her usual or longer than 8 days, from three months after the start date (six for the hormonal IUD); the signs in `health-signals.md` at any time | Every method, the copper IUD most of all | "Your last three periods lasted 9, 10 and 9 days, six months after the copper IUD went in. Periods longer than 8 days are worth mentioning to a doctor or nurse." | [WHO FP Handbook, copper IUD](https://fphandbook.org/managing-any-problems), [NHS](https://www.nhs.uk/contraception/methods-of-contraception/iud-coil/side-effects/), [`health-signals.md`](health-signals.md) |
 | No period three months after stopping | Pill, patch, ring, progestogen-only pill, implant, IUDs | "You stopped the pill on 3 March and have not logged a period since. After three months, that is worth mentioning to a doctor or nurse." | [`health-signals.md`](health-signals.md) (90 days; the NHS says three missed periods), [FSRH CHC 2019, 6.2.6](https://www.cosrh.org/Common/Uploaded%20files/documents/fsrh-guideline-combined-hormonal-contraception-october-2023.pdf) |
-| No period a year after the last injection | Injection | "Your last injection was on 10 January last year and you have not logged a period since. A gap this long is worth mentioning to a doctor or nurse." | [FSRH injectable 2014, 11.1](https://www.cosrh.org/Common/Uploaded%20files/documents/progestogen-only-injectable-december-2014-amended-11july2023.pdf), [NHS](https://www.nhs.uk/contraception/methods-of-contraception/contraceptive-injection/what-is-it/) |
+| No period three months after the next injection would have been due, about four months after the last one | Monthly combined injection | "Your last injection was on 10 January and you have not logged a period since. A gap this long is worth mentioning to a doctor or nurse." | [`health-signals.md`](health-signals.md) (90 days), counted from when the next injection was due because ovulation can take up to 112 days to return ([Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)) |
+| No period a year after the last injection | Injection (DMPA, NET-EN) | "Your last injection was on 10 January last year and you have not logged a period since. A gap this long is worth mentioning to a doctor or nurse." | [FSRH injectable 2014, 11.1](https://www.cosrh.org/Common/Uploaded%20files/documents/progestogen-only-injectable-december-2014-amended-11july2023.pdf), [NHS](https://www.nhs.uk/contraception/methods-of-contraception/contraceptive-injection/what-is-it/) |
 | Bleeding that bothers her | Every method | Not a signal card. Where the app explains what a method does to bleeding, the NHS's own words fit: if the bleeding becomes a problem for her, a GP or sexual health clinic can help. | [NHS, implant](https://www.nhs.uk/contraception/methods-of-contraception/contraceptive-implant/side-effects-and-risks/) |
 
 Not for the app: urgent symptoms the sources list, such as calf pain, chest pain or sudden severe
@@ -472,13 +563,15 @@ pharmacist or clinic, not for Cycle.
   she started and stopped it, as date ranges like the other life stages
   ([`tracking-data.md`](tracking-data.md)). For combined methods, optionally the regimen (21 days
   and a break, an everyday pack with dummy pills, a shortened break, tricycling, flexible,
-  continuous) and the date her current pack, patch cycle or ring started. No method
-  recommendations, no comparisons, no "should I stop?" content, no missed-pill or protection
-  advice, no safe days.
+  continuous) and the date her current pack, patch cycle or ring started, or of her last monthly
+  injection. No method recommendations, no comparisons, no "should I stop?" content, no missed-pill
+  or protection advice, no safe days.
 - **The words follow the method.** "Period" without a method or with a copper IUD; "bleed" for the
   scheduled bleed on a combined pill, patch or ring; "bleeding" on progestogen-only methods and for
-  unscheduled bleeding on combined ones. The log itself does not change: bleeding days, flow and
-  spotting are stored the same way, and only the labels and the estimates built on them differ.
+  unscheduled bleeding on combined ones; on the monthly combined injection, "bleed" for the bleed
+  after each injection and "bleeding" for the rest. The log itself does not change: bleeding days,
+  flow and spotting are stored the same way, and only the labels and the estimates built on them
+  differ.
 - **What to estimate, hide and say, per method:**
 
   | Method | Estimate | Hide | Say |
@@ -490,11 +583,13 @@ pharmacist or clinic, not for Cycle.
   | Implant | Nothing | Next bleed, cycle day, fertile window, ovulation, phases | A 90-day summary |
   | Hormonal IUD | Nothing by default; maybe the next bleed once her own bleeds are regular (a design question for MOT-50) | Next bleed (by default), cycle day, fertile window, ovulation, phases | A 90-day summary |
   | Copper IUD | As without a method | As without a method | Periods, as without a method |
-  | Injection | Nothing (a next-injection reminder only if she asks) | Next bleed, cycle day, fertile window, ovulation, phases | A 90-day summary |
+  | Injection (DMPA, NET-EN) | Nothing (a next-injection reminder only if she asks) | Next bleed, cycle day, fertile window, ovulation, phases | A 90-day summary |
+  | Monthly combined injection | Nothing by default; maybe the next bleed from her injection date once her own bleeds follow it (a design question for MOT-50); a next-injection reminder only if she asks | Next bleed (by default), cycle day, fertile window, ovulation, phases | What she logged and a 90-day summary |
 
-- **A 90-day summary instead of cycle lengths** on progestogen-only methods: days of bleeding or
-  spotting and the number of episodes in the last 90 days, and the longest episode, in plain
-  words. It follows the WHO's reference periods, so it is also what a clinician will ask about.
+- **A 90-day summary instead of cycle lengths** on progestogen-only methods and the monthly
+  combined injection: days of bleeding or spotting and the number of episodes in the last 90 days,
+  and the longest episode, in plain words. It follows the WHO's reference periods, so it is also
+  what a clinician will ask about.
 - **Her natural-cycle numbers stay clean.** Cycles on a hormonal method are left out of her median
   cycle and period length and her prediction ranges, as [`predictions.md`](predictions.md) already
   says; the days stay in her log and history. Copper IUD cycles count.
@@ -503,9 +598,9 @@ pharmacist or clinic, not for Cycle.
   assume a natural cycle and do not apply.
 - **Stopping a method** ends that mode on the stop date. On a combined method, the bleed just after
   stopping is still a withdrawal bleed. Natural cycles count from the first period after it (after
-  the injection, from the first period after the next injection would have been due). Until she has
-  logged a complete cycle, predictions use her usual lengths with the wide little-data range, and
-  say why: there are no natural cycles logged since she stopped.
+  either injection, from the first period after the next injection would have been due). Until she
+  has logged a complete cycle, predictions use her usual lengths with the wide little-data range,
+  and say why: there are no natural cycles logged since she stopped.
 - **The first months on a method are noisy.** Signals about bleeding on a method wait for three
   months after the start date (six for the hormonal IUD), except bleeding after sex and the signs of
   heavy bleeding in [`health-signals.md`](health-signals.md) (soaking through in an hour or two,
