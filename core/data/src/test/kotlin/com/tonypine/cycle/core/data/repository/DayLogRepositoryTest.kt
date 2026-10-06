@@ -13,6 +13,8 @@ import com.tonypine.cycle.core.model.Mood
 import com.tonypine.cycle.core.model.Pain
 import com.tonypine.cycle.core.model.PainKind
 import com.tonypine.cycle.core.model.PainLevel
+import com.tonypine.cycle.core.model.PeriodChange
+import com.tonypine.cycle.core.model.PeriodRefusal
 import com.tonypine.cycle.core.model.SexualActivity
 import com.tonypine.cycle.core.model.SleepQuality
 import kotlinx.coroutines.flow.first
@@ -148,6 +150,43 @@ class DayLogRepositoryTest {
             listOf(DayLog(day("2027-03-03"), periodStarted = true), DayLog(day("2027-03-06"), periodEnded = true)),
             repository.observeDayLogs().first()
         )
+    }
+
+    @Test
+    fun `editing a period's dates moves its markers in one write`() = runTest {
+        repository.fillPeriod(day("2027-03-02"), length = 5, today = day("2027-03-20"))
+
+        val change = repository.editPeriod(day("2027-03-02"), day("2027-03-03"), day("2027-03-08"), day("2027-03-20"))
+
+        assertEquals(PeriodChange.Saved, change)
+        assertEquals(
+            listOf(DayLog(day("2027-03-03"), periodStarted = true), DayLog(day("2027-03-08"), periodEnded = true)),
+            repository.observeDayLogs().first()
+        )
+    }
+
+    @Test
+    fun `a refused period edit writes nothing`() = runTest {
+        repository.fillPeriod(day("2027-03-02"), length = 5, today = day("2027-03-20"))
+
+        val change = repository.editPeriod(day("2027-03-02"), day("2027-03-02"), day("2027-03-21"), day("2027-03-20"))
+
+        assertEquals(PeriodChange.Refused(PeriodRefusal.AfterToday), change)
+        assertEquals(
+            listOf(DayLog(day("2027-03-02"), periodStarted = true), DayLog(day("2027-03-06"), periodEnded = true)),
+            repository.observeDayLogs().first()
+        )
+    }
+
+    @Test
+    fun `deleting a period removes its days and keeps how she felt`() = runTest {
+        repository.fillPeriod(day("2027-03-02"), length = 5, today = day("2027-03-20"))
+        repository.logDay(day("2027-03-02"), FlowLevel.MEDIUM, feelings)
+
+        repository.deletePeriod(day("2027-03-02"), today = day("2027-03-20"))
+
+        assertEquals(emptyList<DayLog>(), repository.observeDayLogs().first())
+        assertEquals(feelings, repository.getFeelings(day("2027-03-02")))
     }
 
     private val feelings = DayFeelings(

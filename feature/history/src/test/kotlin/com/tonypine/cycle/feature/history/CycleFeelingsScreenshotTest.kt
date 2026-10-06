@@ -31,7 +31,13 @@ class CycleFeelingsScreenshotTest(private val appearance: Appearance) {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density, appearance.fontScale)) {
                 Themed(darkTheme = appearance == Appearance.Dark) {
-                    CycleDetailScreen(HistorySamples.pastCycle, onBack = {}, onSeeInCalendar = {})
+                    CycleDetailScreen(
+                        HistorySamples.pastCycle,
+                        onBack = {},
+                        onSeeInCalendar = {},
+                        onEditPeriod = {},
+                        onDeletePeriod = {}
+                    )
                 }
             }
         }
@@ -39,9 +45,9 @@ class CycleFeelingsScreenshotTest(private val appearance: Appearance) {
     }
 
     enum class Appearance(val fileName: String, val heightDp: Int, val fontScale: Float = 1f) {
-        Light("light", heightDp = 1280),
-        Dark("dark", heightDp = 1280),
-        FontScale200("font_scale_200", heightDp = 2200, fontScale = 2f)
+        Light("light", heightDp = 1400),
+        Dark("dark", heightDp = 1400),
+        FontScale200("font_scale_200", heightDp = 2500, fontScale = 2f)
     }
 
     companion object {

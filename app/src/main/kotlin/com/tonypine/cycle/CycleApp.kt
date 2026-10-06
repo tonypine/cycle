@@ -41,6 +41,8 @@ import com.tonypine.cycle.feature.calendar.CalendarRoute
 import com.tonypine.cycle.feature.calendar.CalendarViewModel
 import com.tonypine.cycle.feature.history.CycleDetailRoute
 import com.tonypine.cycle.feature.history.CycleDetailViewModel
+import com.tonypine.cycle.feature.history.EditPeriodRoute
+import com.tonypine.cycle.feature.history.EditPeriodViewModel
 import com.tonypine.cycle.feature.history.HistoryRoute
 import com.tonypine.cycle.feature.history.HistoryViewModel
 import com.tonypine.cycle.feature.onboarding.OnboardingRoute
@@ -177,11 +179,25 @@ private fun CycleTabs(
                 composable(HISTORY_CYCLE_ROUTE) { entry ->
                     val start = LocalDate.parse(entry.arguments?.getString(START_ARG))
                     CycleDetailRoute(
-                        viewModel { CycleDetailViewModel(data.cycleRepository, start, today) },
+                        viewModel { CycleDetailViewModel(data.cycleRepository, data.dayLogRepository, start, today) },
                         onBack = { navController.popBackStack() },
                         onSeeInCalendar = { month ->
                             calendarMonth = month
                             navController.navigateToTab(TopLevelDestination.Calendar)
+                        },
+                        onEditPeriod = { navController.navigate("$HISTORY_CYCLE_PREFIX$it$HISTORY_EDIT_SUFFIX") }
+                    )
+                }
+                composable(HISTORY_EDIT_ROUTE) { entry ->
+                    val start = LocalDate.parse(entry.arguments?.getString(START_ARG))
+                    EditPeriodRoute(
+                        viewModel { EditPeriodViewModel(data.cycleRepository, data.dayLogRepository, start, today) },
+                        onBack = { navController.popBackStack() },
+                        // The cycle may start on another day now: its detail replaces the old one.
+                        onSaved = { newStart ->
+                            navController.navigate("$HISTORY_CYCLE_PREFIX$newStart") {
+                                popUpTo(HISTORY_LIST_ROUTE)
+                            }
                         }
                     )
                 }
@@ -257,3 +273,7 @@ private const val START_ARG = "start"
 /** A cycle's details, by the day it started, as `2027-08-05`. */
 private const val HISTORY_CYCLE_PREFIX = "history/cycle/"
 private const val HISTORY_CYCLE_ROUTE = "$HISTORY_CYCLE_PREFIX{$START_ARG}"
+
+/** The editor for the period of the cycle that starts on a day: `history/cycle/2027-08-05/edit`. */
+private const val HISTORY_EDIT_SUFFIX = "/edit"
+private const val HISTORY_EDIT_ROUTE = "$HISTORY_CYCLE_ROUTE$HISTORY_EDIT_SUFFIX"

@@ -8,9 +8,11 @@ import com.tonypine.cycle.core.model.Mood
 import com.tonypine.cycle.core.model.PainKind
 import com.tonypine.cycle.core.model.PainLevel
 import com.tonypine.cycle.core.model.Period
+import com.tonypine.cycle.core.model.PeriodRefusal
 import com.tonypine.cycle.core.model.SexualActivity
 import com.tonypine.cycle.core.model.SleepQuality
 import java.time.LocalDate
+import java.time.YearMonth
 
 /**
  * One synthetic History per state, for previews and screenshots. Made-up dates in 2027, never anyone's
@@ -94,6 +96,42 @@ internal object HistorySamples {
 
     val missing = CycleDetailUiState.Missing
 
+    /** August's period in the editor, its last day moved from August 10 to August 8 and picking it. */
+    val editPast = EditPeriodUiState.Editing(
+        today = today,
+        period = past.first().period,
+        canStillGo = false,
+        draft = PeriodDraft(
+            start = day("2027-08-05"),
+            end = day("2027-08-08"),
+            picking = PeriodDay.Last,
+            month = YearMonth.of(2027, 8)
+        )
+    )
+
+    /** The current cycle's period in the editor, set still going. */
+    val editCurrent = EditPeriodUiState.Editing(
+        today = today,
+        period = current.period,
+        canStillGo = true,
+        draft = PeriodDraft(
+            start = day("2027-09-02"),
+            end = null,
+            picking = PeriodDay.First,
+            month = YearMonth.of(2027, 9)
+        )
+    )
+
+    /** August's period moved to start on July 12, refused: it runs into July's. */
+    val editRefused = editPast.copy(
+        draft = editPast.draft.copy(
+            start = day("2027-07-12"),
+            picking = PeriodDay.First,
+            month = YearMonth.of(2027, 7),
+            refusal = PeriodRefusal.TooClose(past[1].period)
+        )
+    )
+
     /** Every list state by name, for the screenshot tests. */
     val all: Map<String, HistoryUiState> = mapOf(
         "loading" to loading,
@@ -107,6 +145,13 @@ internal object HistorySamples {
         "past" to pastCycle,
         "current" to currentCycle,
         "missing" to missing
+    )
+
+    /** Every editor state by name, for the screenshot tests. */
+    val allEdits: Map<String, EditPeriodUiState> = mapOf(
+        "past" to editPast,
+        "current" to editCurrent,
+        "refused" to editRefused
     )
 
     private fun cycle(start: String, length: Int, periodLength: Int): CycleSummary {
