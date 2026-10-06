@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- The language of these strings, as a BCP 47 tag. Each language's folder has its own ("de",
+         "pt-BR"), so the strings say which language Android picked, and Cycle's dates and numbers
+         follow it (cycleLocale, docs/decisions/0008-languages.md). Not shown. -->
+    <string name="cycle_language_tag">en</string>
+
     <!-- What TalkBack reads for a text field's character counter, such as "12 of 200 characters". -->
     <string name="cycle_text_field_counter">%1$d of %2$d characters</string>
 

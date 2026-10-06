@@ -82,8 +82,9 @@ environment variables, which Java ignores). The build handles the Robolectric si
 - Gradle resolves Robolectric's `android-all` runtime into its cache, and Robolectric reads it from
   there through `robolectric-deps.properties`, instead of downloading it into `~/.m2` under a lock
   file in `$HOME`. `after_create` in `WORKFLOW.md` runs `writeRobolectricDeps`, which downloads it
-  before an agent starts. The version is pinned as `robolectricAndroidAll` in
-  `gradle/libs.versions.toml`; after a Robolectric or SDK bump, a test fails with
+  before an agent starts. The versions are pinned as `robolectricAndroidAll` and, for the tests at
+  the minimum SDK, `robolectricAndroidAllSdk29` in `gradle/libs.versions.toml`; after a Robolectric
+  or SDK bump, a test fails with
   `no artifacts found for DependencyJar{…}`, naming the version to pin.
 - Tests write temp files under each module's `build/tmp`, not the system temp dir.
 

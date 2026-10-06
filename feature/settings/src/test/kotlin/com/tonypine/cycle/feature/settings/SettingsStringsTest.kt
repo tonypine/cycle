@@ -1,28 +1,19 @@
 package com.tonypine.cycle.feature.settings
 
-import android.content.Context
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Assert.assertEquals
+import com.tonypine.cycle.core.model.Language
+import com.tonypine.cycle.core.testing.assertNeverSaid
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** Every Settings string follows the copy rules in `docs/research/product-implications.md`. */
+/** Every Settings string follows the copy rules in `docs/research/product-implications.md`, in every language. */
 @RunWith(AndroidJUnit4::class)
 class SettingsStringsTest {
-    private val resources = ApplicationProvider.getApplicationContext<Context>().resources
-
     @Test
     fun `no string says what the app never says`() {
-        val strings = R.string::class.java.fields.map { resources.getString(it.getInt(null)) }
-        assertTrue("Found no strings to check", strings.size > 10)
+        val strings = assertNeverSaid(R.string::class.java)
 
-        val offending = strings.filter { text -> ForbiddenWords.any { text.contains(it, ignoreCase = true) } }
-        assertEquals(emptyList<String>(), offending)
-    }
-
-    private companion object {
-        val ForbiddenWords = listOf("safe", "fertile", "you should feel", "pregnan")
+        assertTrue("Found no strings to check", strings.getValue(Language.English).size > 10)
     }
 }

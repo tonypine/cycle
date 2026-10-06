@@ -20,4 +20,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     testImplementation(libs.roborazzi.accessibility.check)
+    // The copy check in every language, and rendering in one (core:testing).
+    testImplementation(projects.core.testing)
 }

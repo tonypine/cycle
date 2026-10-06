@@ -1,5 +1,6 @@
 package com.tonypine.cycle
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -14,15 +15,20 @@ import kotlinx.coroutines.launch
 /**
  * The one activity. A [FragmentActivity], as the phone's fingerprint, face or screen-lock prompt
  * needs. With "Lock Cycle" on, the app shows the lock screen until she unlocks, and the recent-apps
- * screen shows none of it.
+ * screen shows none of it. It opens in Cycle's language, and changing it recreates it.
  */
 class MainActivity : FragmentActivity() {
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext((newBase.applicationContext as CycleApplication).language.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val application = application as CycleApplication
         val data = application.data
         val appLock = application.appLock
+        application.language.attach(this)
         application.phoneLock.attach(this)
         lifecycle.addObserver(
             object : DefaultLifecycleObserver {

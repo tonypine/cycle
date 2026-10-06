@@ -11,7 +11,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.tonypine.cycle.core.designsystem.CycleBottomSheet
@@ -21,6 +20,7 @@ import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.FilledButton
 import com.tonypine.cycle.core.designsystem.MonthCalendar
 import com.tonypine.cycle.core.designsystem.WeekRow
+import com.tonypine.cycle.core.designsystem.firstDayOfWeek
 import com.tonypine.cycle.core.model.BleedingWord
 import com.tonypine.cycle.core.model.ContraceptionMethod
 import com.tonypine.cycle.core.model.EstimateBasis
@@ -28,10 +28,10 @@ import com.tonypine.cycle.core.ui.formatDate
 import com.tonypine.cycle.core.ui.methodInFull
 import com.tonypine.cycle.core.ui.methodInSentence
 import com.tonypine.cycle.core.ui.words
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.temporal.WeekFields
-import java.util.Locale
 import kotlinx.coroutines.launch
 
 /**
@@ -212,11 +212,11 @@ internal fun LastDaySheet(
     onEndedOn: (lastDay: LocalDate) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val locale = LocalConfiguration.current.locales[0]
+    val firstDayOfWeek = firstDayOfWeek()
     CycleBottomSheet(sheet, title = stringResource(R.string.today_last_day_title)) {
         var lastDay by rememberSaveable { mutableStateOf<LocalDate?>(null) }
         val days = stillGoing.days
-        val weeks = remember(days, locale) { weeksOf(days, locale) }
+        val weeks = remember(days, firstDayOfWeek) { weeksOf(days, firstDayOfWeek) }
         SheetText(stringResource(words.lastDayBody()))
         weeks.forEach { week ->
             WeekRow(
@@ -268,9 +268,9 @@ private fun SheetText(text: String) {
     BasicText(text, style = CycleTheme.typography.body.copy(color = CycleTheme.colors.onSurfaceVariant))
 }
 
-/** The first day of each week [days] touches, in [locale]'s weeks, oldest first. */
-internal fun weeksOf(days: ClosedRange<LocalDate>, locale: Locale): List<LocalDate> {
-    val firstDay = WeekFields.of(locale).dayOfWeek()
+/** The first day of each week [days] touches, in weeks that start on [firstDayOfWeek], oldest first. */
+internal fun weeksOf(days: ClosedRange<LocalDate>, firstDayOfWeek: DayOfWeek): List<LocalDate> {
+    val firstDay = WeekFields.of(firstDayOfWeek, 1).dayOfWeek()
     return generateSequence(days.start) { it.plusDays(1) }
         .takeWhile { it <= days.endInclusive }
         .map { it.with(firstDay, 1) }

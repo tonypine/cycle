@@ -38,7 +38,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
-import java.time.temporal.WeekFields
 
 /**
  * A month of the calendar: a header with the previous and next month [IconButton]s around the month
@@ -122,14 +121,8 @@ private fun daysFromWeekStart(date: LocalDate, firstDayOfWeek: DayOfWeek): Int =
 private const val DAYS_IN_WEEK = 7
 
 @Composable
-private fun firstDayOfWeek(): DayOfWeek {
-    val locale = locale()
-    return remember(locale) { WeekFields.of(locale).firstDayOfWeek }
-}
-
-@Composable
 private fun MonthHeader(month: YearMonth, onPreviousMonth: () -> Unit, onNextMonth: () -> Unit) {
-    val locale = locale()
+    val locale = cycleLocale()
     val name = remember(month, locale) {
         DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "MMMMyyyy"), locale).format(month)
     }
@@ -214,7 +207,7 @@ private fun ScrollTodayIntoView(scroll: ScrollState, width: Int, todayColumn: In
 /** The narrow weekday names, in `labelSmall`. TalkBack reads each day's full name. */
 @Composable
 private fun WeekdayInitials(firstDayOfWeek: DayOfWeek) {
-    val locale = locale()
+    val locale = cycleLocale()
     val style = CycleTheme.typography.labelSmall.copy(
         color = CycleTheme.colors.onSurfaceVariant,
         textAlign = TextAlign.Center
