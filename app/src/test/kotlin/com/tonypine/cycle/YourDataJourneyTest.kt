@@ -59,7 +59,11 @@ class YourDataJourneyTest {
 
     private fun tab(label: String): SemanticsNodeInteraction = composeRule.onNode(hasText(label) and isTab)
 
-    private fun row(title: String) = composeRule.onNode(hasText(title) and isButton).performScrollTo()
+    // Settings shows once its settings and her methods are read.
+    private fun row(title: String): SemanticsNodeInteraction {
+        waitFor(hasText(title) and isButton)
+        return composeRule.onNode(hasText(title) and isButton).performScrollTo()
+    }
 
     private fun dialogButton(text: String) = composeRule.onNode(hasText(text) and hasAnyAncestor(isDialog()))
 

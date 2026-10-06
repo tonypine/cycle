@@ -5,6 +5,7 @@ import com.tonypine.cycle.core.data.database.CycleDatabase
 import com.tonypine.cycle.core.data.database.toEntity
 import com.tonypine.cycle.core.data.database.toModel
 import com.tonypine.cycle.core.data.settings.SettingsRepository
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import java.io.ByteArrayOutputStream
@@ -20,16 +21,25 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 /** A Cycle export, read and checked, waiting for her to confirm the import. */
-class ImportFile internal constructor(internal val days: List<LoggedDay>, internal val usualLengths: UsualLengths?)
+class ImportFile internal constructor(
+    internal val days: List<LoggedDay>,
+    internal val usualLengths: UsualLengths?,
+    internal val stretches: List<ImportedStretch> = emptyList()
+)
 
 /** What reading a file for import gives. */
 sealed interface ImportRead {
     /**
-     * The file can be imported: [newDays] of its days are not on the phone yet, and
-     * [restoresLengths] says whether its usual lengths would be restored, on a phone where she has
-     * not done setup.
+     * The file can be imported: [newDays] of its days are not on the phone yet, [restoresLengths]
+     * says whether its usual lengths would be restored, on a phone where she has not done setup, and
+     * [newStretches] of its contraception are not on the phone yet and would be added.
      */
-    data class Ready(val file: ImportFile, val newDays: Int, val restoresLengths: Boolean) : ImportRead
+    data class Ready(val file: ImportFile, val newDays: Int, val restoresLengths: Boolean, val newStretches: Int = 0) :
+        ImportRead {
+        /** The file has contraception, new to the phone or not. */
+        val hasStretches: Boolean
+            get() = file.stretches.isNotEmpty()
+    }
 
     /** The file cannot be imported, because of [problem]. */
     data class Refused(val problem: ImportProblem) : ImportRead
@@ -47,24 +57,26 @@ class YourDataRepository(
 ) {
     private val dayLogDao = database.dayLogDao()
     private val feelingsDao = database.feelingsDao()
+    private val contraceptionDao = database.contraceptionDao()
 
     /**
-     * Writes every day she logged to [output], read in one transaction, and her usual lengths once
-     * she has done setup, then closes it.
+     * Writes every day she logged and her contraception to [output], read in one transaction, and her
+     * usual lengths once she has done setup, then closes it.
      */
     suspend fun export(output: OutputStream) {
-        val days = database.withTransaction { allDays() }
+        val (days, stretches) = database.withTransaction { allDays() to stretches() }
         val usualLengths = settings.settings.first()
             .takeIf { it.setupDone }
             ?.let { UsualLengths(it.usualCycleLength, it.usualPeriodLength) }
         withContext(io) {
-            output.bufferedWriter(Charsets.UTF_8).use { CycleCsv.write(days, it, usualLengths) }
+            output.bufferedWriter(Charsets.UTF_8).use { CycleCsv.write(days, it, usualLengths, stretches) }
         }
     }
 
     /**
      * Reads and checks the export in [input], and closes it. Nothing is written: [import] does that
-     * once she confirms.
+     * once she confirms. A stretch of the file already on the phone is skipped; any other that
+     * overlaps one on the phone refuses the file (`docs/decisions/0006-contraception.md`, Privacy).
      */
     suspend fun read(input: InputStream): ImportRead {
         val text = when (val decoded = withContext(io) { decode(input) }) {
@@ -75,21 +87,27 @@ class YourDataRepository(
             is CsvRead.Refused -> ImportRead.Refused(read.problem)
 
             is CsvRead.Days -> {
-                val onPhone = database.withTransaction { loggedDates() }
+                val (onPhone, stretchesOnPhone) = database.withTransaction { loggedDates() to stretches() }
+                val newStretches = read.stretches.filterNot { it.stretch.isIn(stretchesOnPhone) }
+                newStretches.filter { imported -> stretchesOnPhone.any { it.overlaps(imported.stretch) } }
+                    .minByOrNull { it.line }
+                    ?.let { return ImportRead.Refused(ImportProblem.OverlappingMethod(it.line)) }
                 ImportRead.Ready(
-                    ImportFile(read.days, read.usualLengths),
+                    ImportFile(read.days, read.usualLengths, read.stretches),
                     newDays = read.days.count { it.date !in onPhone },
-                    restoresLengths = read.usualLengths != null && !settings.settings.first().setupDone
+                    restoresLengths = read.usualLengths != null && !settings.settings.first().setupDone,
+                    newStretches = newStretches.size
                 )
             }
         }
     }
 
     /**
-     * Adds the days of [file] that are not on the phone yet, in one transaction, and returns how many.
-     * A day she already logged on the phone stays as it is, whatever the file says about it. The
-     * file's usual lengths are restored only on a phone where she has not done setup, such as after
-     * "Delete everything": lengths she gave on the phone win too.
+     * Adds the days of [file] that are not on the phone yet, and its stretches of contraception that
+     * overlap none on the phone, in one transaction, and returns how many days. A day or a stretch
+     * already on the phone stays as it is, whatever the file says about it. The file's usual lengths
+     * are restored only on a phone where she has not done setup, such as after "Delete everything":
+     * lengths she gave on the phone win too.
      */
     suspend fun import(file: ImportFile): Int {
         val added = database.withTransaction {
@@ -99,6 +117,10 @@ class YourDataRepository(
                 if (!day.log.isEmpty) dayLogDao.upsert(day.log.toEntity())
                 if (!day.feelings.isEmpty) feelingsDao.save(day.feelings)
             }
+            val stretchesOnPhone = stretches()
+            file.stretches.map { it.stretch }
+                .filter { imported -> stretchesOnPhone.none { it.overlaps(imported) } }
+                .forEach { contraceptionDao.upsert(it.copy(id = 0).toEntity()) }
             added.size
         }
         file.usualLengths?.let { settings.restoreSetup(it.cycle, it.period) }
@@ -106,7 +128,7 @@ class YourDataRepository(
     }
 
     /**
-     * "Delete everything": every logged day, then every setting. The settings go last: clearing
+     * "Delete everything": every logged day and her contraception, then every setting. The settings go last: clearing
      * them is what brings back the welcome, which then finds no log.
      */
     suspend fun deleteEverything() {
@@ -121,6 +143,15 @@ class YourDataRepository(
             LoggedDay(logs[date] ?: DayLog(date), feelings[date] ?: DayFeelings(date))
         }
     }
+
+    private suspend fun stretches(): List<ContraceptionStretch> = contraceptionDao.getAll().map { it.toModel() }
+
+    /**
+     * This stretch is one of [onPhone]: the same method and start, as a line for a date is that day,
+     * whatever its stop or breaks. A null start matches a null start.
+     */
+    private fun ContraceptionStretch.isIn(onPhone: List<ContraceptionStretch>): Boolean =
+        onPhone.any { it.method == method && it.started == started }
 
     private suspend fun loggedDates() = dayLogDao.getAll().mapTo(mutableSetOf()) { it.date } +
         feelingsDao.getAll().map { it.date }

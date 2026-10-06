@@ -6,9 +6,13 @@ import java.time.LocalDate
  * Everything derived from her log on [today]: her periods and cycles, her typical lengths, the next
  * period estimate and the prompts to ask. Recomputed from the log every time, never stored.
  *
- * @property periods oldest first.
- * @property cycles oldest first. The last one is the current cycle, open until the next period.
- * @property estimate null until she has logged a period.
+ * @property periods every run of bleeding, oldest first: her periods, and the bleeding on a hormonal
+ *   method ([Period.stretch]).
+ * @property cycles her own cycles, oldest first. The last one is the current cycle, open until the
+ *   next period; there is none on a hormonal method or after stopping one, until her first period.
+ * @property estimate her next periods: null until she has logged a period, and whenever
+ *   [ContraceptionOverview.estimates] is not [EstimateKind.PERIOD].
+ * @property contraception her method today and what it changes.
  */
 data class CycleOverview(
     val today: LocalDate,
@@ -16,7 +20,8 @@ data class CycleOverview(
     val cycles: List<Cycle>,
     val typical: TypicalLengths,
     val estimate: CycleEstimate?,
-    val prompts: List<CyclePrompt>
+    val prompts: List<CyclePrompt>,
+    val contraception: ContraceptionOverview = ContraceptionOverview()
 ) {
     /** The cycle she is in today. */
     val currentCycle: Cycle?
@@ -29,6 +34,22 @@ data class CycleOverview(
     /** The period she is on today, if any. */
     val currentPeriod: Period?
         get() = periods.lastOrNull()?.takeIf { today in it.start..it.end }
+
+    /**
+     * What her bleeding on [date] is called: the word of the hormonal method its bleeding belongs to,
+     * or of the method on that day, else "period". A day before she started a method keeps "period".
+     */
+    fun bleedingWord(date: LocalDate): BleedingWord = bleedingWord(date, periods, contraception.stretches)
+}
+
+/**
+ * What her bleeding on [date] is called, from her [periods] and the [stretches] she recorded: the word
+ * of the hormonal method its bleeding belongs to, or of the method on that day, else "period".
+ */
+fun bleedingWord(date: LocalDate, periods: List<Period>, stretches: List<ContraceptionStretch>): BleedingWord {
+    val stretch = periods.lastOrNull { date in it.start..it.end }?.stretch
+        ?: stretches.firstOrNull { it.method.isHormonal && date in it }
+    return stretch?.behaviour?.word ?: BleedingWord.PERIOD
 }
 
 /**
@@ -62,12 +83,15 @@ sealed interface EstimateBasis {
  *   Once late, the next period is shown starting today.
  * @property cycleBasis where the cycle length, and so each start, comes from.
  * @property periodBasis where each expected period length comes from.
+ * @property settlingAfter the hormonal method she stopped, while her cycles may still be settling
+ *   after it: the range is wider, and says why.
  */
 data class CycleEstimate(
     val periods: List<EstimatedPeriod>,
     val daysLate: Int,
     val cycleBasis: EstimateBasis,
-    val periodBasis: EstimateBasis
+    val periodBasis: EstimateBasis,
+    val settlingAfter: ContraceptionMethod? = null
 ) {
     val next: EstimatedPeriod
         get() = periods.first()

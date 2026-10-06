@@ -110,4 +110,105 @@
         <item quantity="one">%1$d day</item>
         <item quantity="other">%1$d days</item>
     </plurals>
+
+    <!-- Contraception, shared by setup and Settings: docs/design/contraception.md, "The method list",
+         "Since when", "Breaks" and "The calm line per method". -->
+    <string name="method_none">None</string>
+    <string name="method_none_line">Or a barrier method, such as condoms</string>
+    <string name="method_combined_pill">Combined pill</string>
+    <string name="method_combined_pill_line">Two hormones, often with a break</string>
+    <string name="method_progestogen_pill">Progestogen-only pill</string>
+    <string name="method_progestogen_pill_line">Also called the mini pill</string>
+    <string name="method_patch">Patch</string>
+    <string name="method_patch_line">A new patch every week</string>
+    <string name="method_ring">Vaginal ring</string>
+    <string name="method_ring_line">Kept in for three weeks at a time</string>
+    <string name="method_implant">Implant</string>
+    <string name="method_implant_line">A rod in the arm, such as Nexplanon</string>
+    <string name="method_hormonal_iud">Hormonal IUD</string>
+    <string name="method_hormonal_iud_line">Hormonal coil or IUS, such as Mirena</string>
+    <string name="method_copper_iud">Copper IUD</string>
+    <string name="method_copper_iud_line">Copper coil, with no hormones</string>
+    <string name="method_injection">Injection</string>
+    <string name="method_injection_line">Such as Depo-Provera</string>
+    <string name="method_which_pill">Not sure which pill you take? The leaflet in the pack says.</string>
+
+    <!-- Short names, for Today's display and History's card: "Implant". -->
+    <string name="method_short_combined_pill">Pill</string>
+    <string name="method_short_progestogen_pill">Mini pill</string>
+    <string name="method_short_patch">Patch</string>
+    <string name="method_short_ring">Ring</string>
+    <string name="method_short_implant">Implant</string>
+    <string name="method_short_hormonal_iud">Hormonal IUD</string>
+    <string name="method_short_copper_iud">Copper IUD</string>
+    <string name="method_short_injection">Injection</string>
+
+    <!-- In a sentence, short: "Move the end of your pill?", "the implant's dates". -->
+    <string name="method_sentence_combined_pill">pill</string>
+    <string name="method_sentence_progestogen_pill">mini pill</string>
+    <string name="method_sentence_patch">patch</string>
+    <string name="method_sentence_ring">ring</string>
+    <string name="method_sentence_implant">implant</string>
+    <string name="method_sentence_hormonal_iud">hormonal IUD</string>
+    <string name="method_sentence_copper_iud">copper IUD</string>
+    <string name="method_sentence_injection">injection</string>
+
+    <!-- In a sentence, in full: "Your combined pill would end on 5 September". -->
+    <string name="method_full_combined_pill">combined pill</string>
+    <string name="method_full_progestogen_pill">progestogen-only pill</string>
+    <string name="method_full_patch">patch</string>
+    <string name="method_full_ring">vaginal ring</string>
+    <string name="method_full_implant">implant</string>
+    <string name="method_full_hormonal_iud">hormonal IUD</string>
+    <string name="method_full_copper_iud">copper IUD</string>
+    <string name="method_full_injection">injection</string>
+
+    <!-- Since when, and when she stops. -->
+    <string name="method_since_body">Roughly is fine.</string>
+    <string name="method_since_combined_pill">When did you start the pill?</string>
+    <string name="method_since_progestogen_pill">When did you start the mini pill?</string>
+    <string name="method_since_patch">When did you start the patch?</string>
+    <string name="method_since_ring">When did you start the ring?</string>
+    <string name="method_since_implant">When was your implant fitted?</string>
+    <string name="method_since_iud">When was your IUD fitted?</string>
+    <string name="method_since_injection">When was your first injection?</string>
+    <string name="method_stop_pill">When did you take your last pill?</string>
+    <string name="method_stop_patch">When did you take off your last patch?</string>
+    <string name="method_stop_ring">When did you take out your last ring?</string>
+    <string name="method_stop_implant">When was your implant taken out?</string>
+    <string name="method_stop_iud">When was your IUD taken out?</string>
+    <string name="method_stop_injection">When was your last injection?</string>
+    <string name="method_stop_injection_body">Cycle counts 13 weeks from it.</string>
+
+    <!-- A stretch's dates, in "Your methods" and History: "3 May to 12 Sep 2027". -->
+    <string name="stretch_since">Since %1$s</string>
+    <string name="stretch_from_to">%1$s to %2$s</string>
+    <string name="stretch_until">Until %1$s</string>
+    <string name="stretch_start_not_known">Start not known</string>
+
+    <!-- Breaks, on a combined pill, patch or ring. -->
+    <string name="breaks_question_pill">Do you take a break between packs?</string>
+    <string name="breaks_question_patch">Do you have a patch-free week?</string>
+    <string name="breaks_question_ring">Do you have a ring-free week?</string>
+    <string name="breaks_monthly">Every month</string>
+    <string name="breaks_monthly_pill_line">A week off, or dummy pills, in every pack</string>
+    <string name="breaks_monthly_patch_line">A patch-free week after three patches</string>
+    <string name="breaks_monthly_ring_line">A ring-free week after three weeks</string>
+    <string name="breaks_every_few_packs">Every few packs</string>
+    <string name="breaks_every_few_packs_line">Two or more packs in a row, then a break</string>
+    <string name="breaks_none">No breaks</string>
+    <string name="breaks_none_line">One pack straight after another</string>
+
+    <!-- The calm line: what Cycle stops estimating on the method, and why. -->
+    <string name="calm_none">Cycle estimates your periods from your own cycle.</string>
+    <string name="calm_copper_iud">Your cycle stays your own, so Cycle keeps estimating your periods. They can be heavier or longer at first.</string>
+    <string name="calm_pill_monthly">The pill sets your bleeds, so Cycle expects one in each break and calls it a bleed, not a period.</string>
+    <string name="calm_patch_monthly">The patch sets your bleeds, so Cycle expects one in each patch-free week and calls it a bleed, not a period.</string>
+    <string name="calm_ring_monthly">The ring sets your bleeds, so Cycle expects one in each ring-free week and calls it a bleed, not a period.</string>
+    <string name="calm_every_few_packs">You choose when your breaks come, so Cycle doesn\'t estimate your next bleed.</string>
+    <string name="calm_no_breaks">With no breaks there\'s no bleed to expect, so Cycle doesn\'t estimate one.</string>
+    <string name="calm_progestogen_pill">Bleeding on the mini pill doesn\'t follow a cycle, so Cycle doesn\'t estimate it.</string>
+    <string name="calm_implant">Bleeding on the implant can come at any time, so Cycle doesn\'t estimate it.</string>
+    <string name="calm_hormonal_iud">Bleeding with a hormonal IUD doesn\'t follow a cycle you can count on, so Cycle doesn\'t estimate it.</string>
+    <string name="calm_injection">Bleeding on the injection doesn\'t follow a cycle, so Cycle doesn\'t estimate it.</string>
 </resources>

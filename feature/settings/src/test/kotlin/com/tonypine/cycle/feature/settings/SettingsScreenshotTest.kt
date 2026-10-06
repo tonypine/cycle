@@ -108,6 +108,7 @@ private fun Settings(dialog: DataDialog? = null, showBackupNote: Boolean = false
     versionName = "1.4.27",
     onUsualLengths = {},
     onWhatToLog = {},
+    onContraception = {},
     onAppLockChange = {},
     onDismissLockNote = {},
     onExport = {},

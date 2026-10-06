@@ -3,6 +3,7 @@ package com.tonypine.cycle.core.data.export
 import com.tonypine.cycle.core.data.database.Converters
 import com.tonypine.cycle.core.data.database.FeelingCodes
 import com.tonypine.cycle.core.domain.CycleRules
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.Pain
@@ -25,6 +26,9 @@ data class LoggedDay(val log: DayLog, val feelings: DayFeelings = DayFeelings(lo
 
 /** Her usual cycle and period lengths, in days, as she gave them at setup or in Settings. */
 data class UsualLengths(val cycle: Int, val period: Int)
+
+/** A stretch of her contraception read from an export, and the [line] of the file it is on. */
+data class ImportedStretch(val line: Int, val stretch: ContraceptionStretch)
 
 /** Why a file cannot be imported. Each one becomes a sentence that says what is wrong. */
 sealed interface ImportProblem {
@@ -73,12 +77,31 @@ sealed interface ImportProblem {
 
     /** The settings give her usual cycle length without her usual period length, or the other way round. */
     data object OneUsualLength : ImportProblem
+
+    /** The method on [line] is a combined pill, patch or ring with no breaks given. */
+    data class MissingBreaks(val line: Int) : ImportProblem
+
+    /** The method on [line] stops before it starts. */
+    data class StopsBeforeStarts(val line: Int) : ImportProblem
+
+    /** The method on [line] overlaps one already on the phone. */
+    data class OverlappingMethod(val line: Int) : ImportProblem
+
+    /** The method on [line] overlaps the one on [earlier], the earliest row of the file it overlaps. */
+    data class OverlappingRows(val earlier: Int, val line: Int) : ImportProblem
 }
 
 /** What reading an export gives: its days, or the first problem found. */
 sealed interface CsvRead {
-    /** The days with something logged, oldest first, and her usual lengths if the file has them. */
-    data class Days(val days: List<LoggedDay>, val usualLengths: UsualLengths? = null) : CsvRead
+    /**
+     * The days with something logged, oldest first, her usual lengths if the file has them, and her
+     * contraception, oldest first.
+     */
+    data class Days(
+        val days: List<LoggedDay>,
+        val usualLengths: UsualLengths? = null,
+        val stretches: List<ImportedStretch> = emptyList()
+    ) : CsvRead
 
     data class Refused(val problem: ImportProblem) : CsvRead
 }
@@ -90,7 +113,10 @@ sealed interface CsvRead {
  * not log is empty. A value with a comma, a quote or a line break, such as a note, is quoted.
  *
  * Once she has done setup, a blank line and a second table follow the days: her usual lengths, one
- * `setting,value` line each, so a restore brings back the estimates that use them.
+ * `setting,value` line each, so a restore brings back the estimates that use them. When she recorded
+ * any contraception, a third table follows: one line per stretch, oldest first, its method and
+ * breaks as the database stores them and an empty date where it has none
+ * (`docs/decisions/0006-contraception.md`). A file from before it, without that table, still reads.
  *
  * ```
  * date,flow,period_started,period_ended,pain,pain_where,body,mood,energy,sleep,sex,note
@@ -99,6 +125,10 @@ sealed interface CsvRead {
  * setting,value
  * usual_cycle_length,30
  * usual_period_length,5
+ *
+ * method,started,stopped,breaks
+ * implant,2026-11-09,2027-11-03,
+ * combined_pill,2027-11-20,,monthly
  * ```
  *
  * Reading checks every row and refuses the whole file on the first problem, so a file is imported in
@@ -123,6 +153,7 @@ internal object CycleCsv {
     val SETTINGS_COLUMNS = listOf("setting", "value")
     const val USUAL_CYCLE_LENGTH = "usual_cycle_length"
     const val USUAL_PERIOD_LENGTH = "usual_period_length"
+    val STRETCH_COLUMNS = listOf("method", "started", "stopped", "breaks")
     private val LENGTH_RANGES = mapOf(
         USUAL_CYCLE_LENGTH to CycleRules.USUAL_CYCLE_LENGTHS,
         USUAL_PERIOD_LENGTH to CycleRules.USUAL_PERIOD_LENGTHS
@@ -133,7 +164,12 @@ internal object CycleCsv {
     private const val YES = "yes"
     private const val BYTE_ORDER_MARK = '\uFEFF'
 
-    fun write(days: List<LoggedDay>, out: Appendable, usualLengths: UsualLengths? = null) {
+    fun write(
+        days: List<LoggedDay>,
+        out: Appendable,
+        usualLengths: UsualLengths? = null,
+        stretches: List<ContraceptionStretch> = emptyList()
+    ) {
         out.append(COLUMNS.joinToString(",")).append(LINE_END)
         days.sortedBy { it.date }.forEach { day ->
             out.append(day.toValues().joinToString(",", transform = ::quote)).append(LINE_END)
@@ -142,6 +178,18 @@ internal object CycleCsv {
             out.append(LINE_END).append(SETTINGS_COLUMNS.joinToString(",")).append(LINE_END)
             out.append("$USUAL_CYCLE_LENGTH,${usualLengths.cycle}").append(LINE_END)
             out.append("$USUAL_PERIOD_LENGTH,${usualLengths.period}").append(LINE_END)
+        }
+        if (stretches.isNotEmpty()) {
+            out.append(LINE_END).append(STRETCH_COLUMNS.joinToString(",")).append(LINE_END)
+            stretches.sortedBy { it.startKey }.forEach { stretch ->
+                val values = listOf(
+                    Converters.METHOD.encode(stretch.method),
+                    stretch.started?.toString().orEmpty(),
+                    stretch.stopped?.toString().orEmpty(),
+                    stretch.breaks?.let(Converters.BREAKS::encode).orEmpty()
+                )
+                out.append(values.joinToString(",")).append(LINE_END)
+            }
         }
     }
 
@@ -154,9 +202,15 @@ internal object CycleCsv {
         if (header.values.map { it.trim().lowercase() } != COLUMNS) return CsvRead.Refused(ImportProblem.NotAnExport)
 
         val rows = records.drop(1)
-        val settingsAt = rows.indexOfFirst { record -> record.values.map { it.trim().lowercase() } == SETTINGS_COLUMNS }
-        val dayRows = if (settingsAt < 0) rows else rows.subList(0, settingsAt)
-        val settingRows = if (settingsAt < 0) emptyList() else rows.subList(settingsAt + 1, rows.size)
+        val headers = rows.indices.filter { rows[it].isHeader(SETTINGS_COLUMNS) || rows[it].isHeader(STRETCH_COLUMNS) }
+
+        /** The rows of the table under [columns], up to the next table. */
+        fun table(columns: List<String>): List<Record> {
+            val at = headers.firstOrNull { rows[it].isHeader(columns) } ?: return emptyList()
+            return rows.subList(at + 1, headers.firstOrNull { it > at } ?: rows.size)
+        }
+        val dayRows = rows.subList(0, headers.firstOrNull() ?: rows.size)
+        val settingRows = table(SETTINGS_COLUMNS)
 
         val days = mutableListOf<LoggedDay>()
         val seen = mutableSetOf<LocalDate>()
@@ -168,10 +222,60 @@ internal object CycleCsv {
             if (!seen.add(day.date)) return CsvRead.Refused(ImportProblem.RepeatedDate(record.line, day.date))
             if (!day.isEmpty) days += day
         }
-        return when (val lengths = usualLengths(settingRows)) {
-            is Settings.Lengths -> CsvRead.Days(days.sortedBy { it.date }, lengths.lengths)
-            is Settings.Problem -> CsvRead.Refused(lengths.problem)
+        val lengths = when (val read = usualLengths(settingRows)) {
+            is Settings.Lengths -> read.lengths
+            is Settings.Problem -> return CsvRead.Refused(read.problem)
         }
+        val stretches = mutableListOf<ImportedStretch>()
+        for (record in table(STRETCH_COLUMNS)) {
+            val stretch = when (val row = record.toStretch()) {
+                is StretchRow.Stretch -> row.stretch
+                is StretchRow.Problem -> return CsvRead.Refused(row.problem)
+            }
+            stretches.firstOrNull { it.stretch.overlaps(stretch) }?.let { earlier ->
+                return CsvRead.Refused(ImportProblem.OverlappingRows(earlier.line, record.line))
+            }
+            stretches += ImportedStretch(record.line, stretch)
+        }
+        return CsvRead.Days(days.sortedBy { it.date }, lengths, stretches.sortedBy { it.stretch.startKey })
+    }
+
+    private fun Record.isHeader(columns: List<String>) = values.map { it.trim().lowercase() } == columns
+
+    private sealed interface StretchRow {
+        class Stretch(val stretch: ContraceptionStretch) : StretchRow
+
+        class Problem(val problem: ImportProblem) : StretchRow
+    }
+
+    /** A line of the contraception table as a stretch: a known method, ISO or empty dates, its breaks. */
+    private fun Record.toStretch(): StretchRow {
+        if (values.size != STRETCH_COLUMNS.size) {
+            return StretchRow.Problem(ImportProblem.WrongValueCount(line, values.size, STRETCH_COLUMNS.size))
+        }
+        val (methodText, startedText, stoppedText, breaksText) = values.map { it.trim() }
+        val method = Converters.METHOD.decode(methodText)
+            ?: return StretchRow.Problem(ImportProblem.UnknownValue(line, "method", methodText))
+
+        fun date(text: String): Result<LocalDate?> = when {
+            text.isEmpty() -> Result.success(null)
+            else -> runCatching { LocalDate.parse(text) }
+        }
+        val started = date(startedText).getOrElse {
+            return StretchRow.Problem(ImportProblem.BadDate(line, startedText))
+        }
+        val stopped = date(stoppedText).getOrElse {
+            return StretchRow.Problem(ImportProblem.BadDate(line, stoppedText))
+        }
+        val breaks = breaksText.takeIf { it.isNotEmpty() }?.let(Converters.BREAKS::decode)
+        if (breaksText.isNotEmpty() && (breaks == null || !method.isCombined)) {
+            return StretchRow.Problem(ImportProblem.UnknownValue(line, "breaks", breaksText))
+        }
+        if (method.isCombined && breaks == null) return StretchRow.Problem(ImportProblem.MissingBreaks(line))
+        if (started != null && stopped != null && stopped < started) {
+            return StretchRow.Problem(ImportProblem.StopsBeforeStarts(line))
+        }
+        return StretchRow.Stretch(ContraceptionStretch(method, started, stopped, breaks))
     }
 
     private sealed interface Settings {

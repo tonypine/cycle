@@ -1,7 +1,11 @@
 package com.tonypine.cycle.feature.history
 
 import com.tonypine.cycle.core.domain.CycleCalculator
+import com.tonypine.cycle.core.model.BleedingSummary
 import com.tonypine.cycle.core.model.BodySymptom
+import com.tonypine.cycle.core.model.Breaks
+import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
@@ -14,6 +18,7 @@ import com.tonypine.cycle.core.model.Period
 import java.time.LocalDate
 import java.time.YearMonth
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -21,16 +26,30 @@ import org.junit.Test
 class HistoryUiStateTest {
     private val today = HistorySamples.today
 
-    private fun history(logs: List<DayLog>, on: LocalDate = today) =
-        HistoryUiState.from(CycleCalculator.overview(logs, notSetUp, on))
+    private fun history(
+        logs: List<DayLog>,
+        on: LocalDate = today,
+        stretches: List<ContraceptionStretch> = emptyList()
+    ) = HistoryUiState.from(CycleCalculator.overview(logs, notSetUp, on, stretches), logs)
 
     private fun detail(
         logs: List<DayLog>,
         start: String,
         on: LocalDate = today,
         feelings: List<DayFeelings> = syntheticFeelings,
-        hidden: Set<LogCategory> = emptySet()
-    ) = CycleDetailUiState.from(CycleCalculator.overview(logs, notSetUp, on), logs, day(start), feelings, hidden)
+        hidden: Set<LogCategory> = emptySet(),
+        stretches: List<ContraceptionStretch> = emptyList()
+    ) = CycleDetailUiState.from(
+        CycleCalculator.overview(logs, notSetUp, on, stretches),
+        logs,
+        day(start),
+        feelings,
+        hidden
+    )
+
+    private val c5 = day("2027-10-14")
+    private val d6 = day("2027-11-15")
+    private val removed = syntheticImplant.copy(stopped = day("2027-11-03"))
 
     private fun pastDetail(feelings: List<DayFeelings> = syntheticFeelings, hidden: Set<LogCategory> = emptySet()) =
         detail(syntheticHistory, "2027-08-05", feelings = feelings, hidden = hidden) as CycleDetailUiState.Detail
@@ -200,5 +219,135 @@ class HistoryUiStateTest {
     fun `a cycle whose period was edited away is missing`() {
         assertEquals(CycleDetailUiState.Missing, detail(syntheticHistory, "2027-08-06"))
         assertEquals(CycleDetailUiState.Missing, detail(emptyList(), "2027-08-05"))
+    }
+
+    @Test
+    fun `on the implant, History marks its time, cuts the cycle before short and leaves both out (C5)`() {
+        val state = history(syntheticBeforeAndOnImplant, on = c5, stretches = listOf(syntheticImplant))
+
+        assertEquals(HistorySamples.onImplant, state)
+    }
+
+    @Test
+    fun `once the implant is out, its card has its dates and its last 90 days (D6)`() {
+        val state = history(syntheticBeforeAndOnImplant, on = d6, stretches = listOf(removed))
+
+        assertEquals(HistorySamples.implantRemoved, state)
+    }
+
+    @Test
+    fun `her typical values are the calculator's, from her own cycles before and after a method`() {
+        val after = bleed("2027-11-20", 5) + bleed("2027-12-19", 4) + bleed("2028-01-17", 6)
+        val logs = syntheticBeforeAndOnImplant + after
+        val on = day("2028-01-20")
+        val overview = CycleCalculator.overview(logs, notSetUp, on, listOf(removed))
+
+        val state = HistoryUiState.from(overview, logs) as HistoryUiState.Cycles
+
+        assertEquals(overview.typical.cycle, state.typicalCycle)
+        assertEquals(overview.typical.period, state.typicalPeriod)
+        // The last six that count: four before the implant (30, 28, 29, 29) and two after it (29, 29).
+        assertEquals(LengthSummary(median = 29, shortest = 28, longest = 30, count = 6), state.typicalCycle)
+        assertEquals(
+            listOf("2028-01-17", "2027-12-19", "2027-11-20", "2026-11-09", "2026-10-08", "2026-09-09"),
+            state.entries.take(6).map { it.startKey.toString() }
+        )
+        assertTrue(state.leftOut)
+    }
+
+    @Test
+    fun `with the implant's dates deleted, every cycle counts again and nothing is marked`() {
+        val state = history(syntheticBeforeAndOnImplant, on = c5) as HistoryUiState.Cycles
+
+        assertFalse(state.leftOut)
+        assertTrue(state.entries.none { it is MethodSummary })
+        assertTrue(state.cycles.none { it.cutShortBy != null })
+        // The bleeding on the implant is her own periods again, so cycles run through its dates.
+        assertEquals(day("2027-10-14"), state.cycles.first().start)
+        assertEquals(day("2026-10-08"), state.cycles.single { it.end == day("2026-12-19") }.start)
+    }
+
+    @Test
+    fun `each cycle keeps its own period when bleeding on a method comes before it`() {
+        val after = bleed("2027-11-20", 5) + bleed("2027-12-19", 4)
+        val state = history(
+            syntheticBeforeAndOnImplant + after,
+            on = day("2027-12-25"),
+            stretches = listOf(removed)
+        ) as HistoryUiState.Cycles
+
+        assertEquals(
+            listOf(
+                Period(day("2027-12-19"), day("2027-12-22")),
+                Period(day("2027-11-20"), day("2027-11-24")),
+                Period(day("2026-10-08"), day("2026-10-13"))
+            ),
+            state.cycles.take(3).map { it.period }
+        )
+    }
+
+    @Test
+    fun `on a method since before her first log, History has the method's card and no typical cycle`() {
+        val stretch = syntheticImplant.copy(started = null)
+
+        val state = history(bleed("2027-09-20", 5), on = c5, stretches = listOf(stretch))
+
+        assertEquals(HistorySamples.methodOnly, state)
+    }
+
+    @Test
+    fun `a method younger than 90 days counts from its start, and an empty one counts nothing`() {
+        val implant = syntheticImplant.copy(started = day("2027-09-06"))
+
+        val young = history(syntheticHistory, stretches = listOf(implant)) as HistoryUiState.Cycles
+        val method = young.entries.first() as MethodSummary
+
+        assertEquals(
+            MethodBleeding.Days(
+                BleedingSummary(day("2027-09-06"), today, sinceStart = true, days = 0, episodes = 0, longest = 0)
+            ),
+            method.bleeding
+        )
+        assertTrue(method.isCurrent)
+        assertEquals(YearMonth.of(2027, 9), method.month)
+        // The cycle running on September 6 is cut short the day before.
+        assertEquals(ContraceptionMethod.IMPLANT, young.cycles.first().cutShortBy)
+        assertEquals(day("2027-09-05"), young.cycles.first().end)
+    }
+
+    @Test
+    fun `on the pill with a break every month, its card counts its bleeds, the withdrawal bleed included`() {
+        val pill = ContraceptionStretch(
+            ContraceptionMethod.COMBINED_PILL,
+            started = day("2027-06-01"),
+            stopped = day("2027-08-31"),
+            breaks = Breaks.MONTHLY
+        )
+        val logs = bleed("2027-05-02", 5) + bleed("2027-06-22", 4) + bleed("2027-07-20", 4) +
+            bleed("2027-09-03", 3) + bleed("2027-10-02", 5)
+
+        val state = history(logs, on = day("2027-10-10"), stretches = listOf(pill)) as HistoryUiState.Cycles
+
+        assertEquals(MethodBleeding.Bleeds(3), (state.entries[1] as MethodSummary).bleeding)
+        assertEquals(YearMonth.of(2027, 8), (state.entries[1] as MethodSummary).month)
+        assertEquals(ContraceptionMethod.COMBINED_PILL, state.cycles.last().cutShortBy)
+    }
+
+    @Test
+    fun `a copper IUD has no card and its cycles count`() {
+        val copper = ContraceptionStretch(ContraceptionMethod.COPPER_IUD, started = day("2027-06-01"))
+
+        val state = history(syntheticHistory, stretches = listOf(copper)) as HistoryUiState.Cycles
+
+        assertEquals(HistorySamples.cycles.entries, state.entries)
+        assertEquals(HistorySamples.cycles.typicalCycle, state.typicalCycle)
+        assertFalse(state.leftOut)
+    }
+
+    @Test
+    fun `the cycle a method cut short says which, in its detail`() {
+        val state = detail(syntheticBeforeAndOnImplant, "2026-10-08", on = c5, stretches = listOf(syntheticImplant))
+
+        assertEquals(HistorySamples.cutShortCycle, state)
     }
 }

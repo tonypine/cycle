@@ -56,7 +56,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** What TalkBack and touch get from buttons, icon buttons, chips, button groups and switches. */
+/** What TalkBack and touch get from buttons, icon buttons, chips, button groups, switches and radio rows. */
 @RunWith(RobolectricTestRunner::class)
 class ControlSemanticsTest {
     @get:Rule
@@ -360,6 +360,70 @@ class ControlSemanticsTest {
                 ?.joinToString()
         }
         assertEquals(listOf("Sleep, How long you slept and how well.", "Energy", "Log sex"), stops)
+    }
+
+    @Test
+    fun aRadioRowIsOneRadioButtonThatReadsItsTitleAndBodyAndSelectsFromAnywhere() {
+        var selected by mutableStateOf(false)
+        show { RadioRow("Implant", selected, { selected = true }, body = "A rod in the arm, such as Nexplanon") }
+        val row = composeRule.onNode(hasClickAction())
+        row.assert(hasRole(Role.RadioButton))
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.Text,
+                    texts("Implant", "A rod in the arm, such as Nexplanon")
+                )
+            )
+            .assertIsNotSelected()
+            .assertTouchTarget()
+        composeRule.onAllNodes(hasClickAction()).assertCountEquals(1)
+
+        row.performTouchInput { click(centerLeft + Offset(8f, 0f)) }
+        row.assertIsSelected()
+        assertEquals(true, selected)
+    }
+
+    @Test
+    fun aDisabledRadioRowKeepsItsStateAndIgnoresTaps() {
+        var clicks = 0
+        show { RadioRow("Implant", selected = true, { clicks++ }, enabled = false) }
+        composeRule.onNodeWithText("Implant").assertIsSelected().assertIsNotEnabled().performClick()
+        assertEquals(0, clicks)
+    }
+
+    @Test
+    fun aRadioGroupIsOneGroupThatReadsEachRowsPlaceAndSelectsOne() {
+        var selected by mutableStateOf<String?>(null)
+        show {
+            RadioGroup(
+                options = listOf("None", "Implant", "Injection"),
+                selected = selected,
+                onSelect = { selected = it },
+                title = { it },
+                body = { if (it == "Implant") "A rod in the arm" else null },
+                modifier = Modifier.testTag("group")
+            )
+        }
+        composeRule.onNodeWithTag("group")
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
+            .assert(
+                SemanticsMatcher("a collection of 3 rows") {
+                    it.config.getOrNull(SemanticsProperties.CollectionInfo)?.rowCount == 3
+                }
+            )
+        composeRule.onAllNodes(isNotSelected() and hasClickAction()).assertCountEquals(3)
+
+        composeRule.onNodeWithText("Implant").performClick()
+        assertEquals("Implant", selected)
+        val implant = composeRule.onNode(hasClickAction() and isSelected())
+        implant.assert(SemanticsMatcher.expectValue(SemanticsProperties.Text, texts("Implant", "A rod in the arm")))
+            // "2 of 3".
+            .assert(
+                SemanticsMatcher("the second row") {
+                    it.config.getOrNull(SemanticsProperties.CollectionItemInfo)?.rowIndex == 1
+                }
+            )
+        composeRule.onAllNodes(isSelected()).assertCountEquals(1)
     }
 
     private fun show(content: @Composable () -> Unit) {
