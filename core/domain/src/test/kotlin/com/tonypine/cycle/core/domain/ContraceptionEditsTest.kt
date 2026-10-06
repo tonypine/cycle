@@ -212,8 +212,39 @@ class ContraceptionEditsTest {
             ContraceptionEdits.edit(listOf(implant, ring), longer, day("2028-02-15"))
         )
         assertEquals(
-            refused(StretchRefusal.CoversWhole(ring)),
+            refused(StretchRefusal.CoversWhole(ring, endMovedLater = true)),
             ContraceptionEdits.edit(listOf(implant, ring), implant.copy(stopped = day("2028-01-10")), day("2028-02-15"))
+        )
+    }
+
+    @Test
+    fun `a stop that reaches more than one stretch is refused for the earliest one it covers`() {
+        val pill = stretch(ContraceptionMethod.COMBINED_PILL, "2028-01-11", id = 3)
+        val all = listOf(implant, ring, pill)
+        val today = day("2028-02-15")
+        fun stopOn(date: String) = ContraceptionEdits.edit(all, implant.copy(stopped = day(date)), today)
+
+        assertEquals(refused(StretchRefusal.CoversWhole(ring, endMovedLater = true)), stopOn("2028-01-15"))
+        assertEquals(refused(StretchRefusal.CoversWhole(ring, endMovedLater = true)), stopOn("2028-01-10"))
+        val moved = ring.copy(started = day("2028-01-10"))
+        assertEquals(
+            StretchPlan.Ready(
+                listOf(moved, implant.copy(stopped = day("2028-01-09"))),
+                listOf(StretchMove(ring, moved))
+            ),
+            stopOn("2028-01-09")
+        )
+        assertEquals(StretchPlan.Ready(listOf(implant.copy(stopped = day("2027-11-19")))), stopOn("2027-11-19"))
+    }
+
+    @Test
+    fun `a start moved earlier over more than one stretch is refused for the latest one it covers`() {
+        val pill = stretch(ContraceptionMethod.COMBINED_PILL, "2028-01-11", id = 3)
+        val all = listOf(implant, ring, pill)
+
+        assertEquals(
+            refused(StretchRefusal.CoversWhole(ring)),
+            ContraceptionEdits.edit(all, pill.copy(started = day("2027-11-01")), day("2028-02-15"))
         )
     }
 
