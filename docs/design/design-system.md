@@ -502,9 +502,10 @@ so TalkBack reads it as a list of as many items as it shows. The swatches are de
 says what each one is. Put it under the calendar it explains.
 
 `words` lists the `BleedingWords` of the logged days on screen, in order: the `Period` entry shows
-once per word ("Period", then "Bleeding" in a month where she started the implant) and
-`PredictedPeriod` reads in the last ("Expected bleed"). Leave `PredictedPeriod` out when nothing is
-predicted, as on the implant.
+once per word ("Period", then "Bleeding" in a month where she started the implant). `predictedWords`
+names the predicted days on their own, so `PredictedPeriod` reads "Expected bleed" on a combined pill
+with a break every month even when the only logged days on screen are a period before it ("Period",
+"Expected bleed"). Leave `PredictedPeriod` out when nothing is predicted, as on the implant.
 
 ## Cards
 
