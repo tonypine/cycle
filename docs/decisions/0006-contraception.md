@@ -255,6 +255,13 @@ still ahead (the injection's weeks, above):
 - **Settings › Your cycle › Contraception** shows the current method with its calm line, "Mark as
   stopped" and "Change method", the earlier stretches, and each stretch's edit page (dates, breaks,
   delete). The flows and copy are in the design doc.
+- **When to get help.** On the combined pill, patch or ring and on both IUDs, the Contraception page
+  shows the fixed "When to get help" section straight under the current method's card, above the
+  earlier stretches, in full and for as long as that method is the current one. Its words, look and
+  limits are [`0007`](0007-urgent-symptoms-on-a-method.md)'s; where it sits on the page, and the
+  screens, are in the design doc
+  ([When to get help](../design/contraception.md#when-to-get-help)). It is never part of setup or
+  the steps that set a method, and nothing she logs changes it.
 
 ### Privacy
 
@@ -329,6 +336,9 @@ the copper IUD note.
   `SwitchRow`; a `BleedingWords` parameter (`Period`, `Bleed`, `Bleeding`) on `DayCell`,
   `MonthCalendar`, `WeekRow` and `CycleLegend`, for the legend labels and TalkBack; and
   `CycleIcons.Medication` for the Settings row.
+- `feature:settings` gains the When to get help section on the Contraception page, built from
+  `Card`, its `SectionTitle` and the typography tokens. Its strings live in one place, each with its
+  source in a comment, and a test pins each method's text, as `0007` says.
 - Health signals, when they arrive, follow the per-method table in
   [`contraception.md`](../research/contraception.md#worth-mentioning-to-a-doctor-on-a-method), using
   the stretches' start and stop dates.
