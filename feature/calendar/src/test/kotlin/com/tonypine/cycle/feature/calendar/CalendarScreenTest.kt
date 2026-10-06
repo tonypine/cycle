@@ -105,10 +105,12 @@ class CalendarScreenTest {
     }
 
     @Test
-    fun `on the pill the legend says bleed and expected bleed`() {
+    fun `on the pill the legend names her period before it and the expected bleed`() {
         show(CalendarSamples.pillMarch)
 
-        listOf("Bleed", "Expected bleed", "Today").forEach { composeRule.onNodeWithText(it).assertIsDisplayed() }
+        // Only 1 and 2 March are logged, a period before the pill, so no day shows as a bleed.
+        listOf("Period", "Expected bleed", "Today").forEach { composeRule.onNodeWithText(it).assertIsDisplayed() }
+        composeRule.onNodeWithText("Bleed").assertDoesNotExist()
         composeRule.onNodeWithText("Predicted period").assertDoesNotExist()
         composeRule.onNodeWithContentDescription("March 27, expected bleed").assertExists()
         composeRule.onNodeWithText("Expected bleeds are estimates. Tap any day up to today to log or change it.")

@@ -73,9 +73,17 @@ class CycleLegendTest {
 
     @Test
     fun namesTheDaysInTheMethodsWords() {
-        show(Appearance.Light, CycleLegendEntry.WithoutFertility, listOf(BleedingWords.Bleed))
+        show(Appearance.Light, CycleLegendEntry.WithoutFertility, listOf(BleedingWords.Bleed), BleedingWords.Bleed)
         listOf("Bleed", "Expected bleed", "Today").forEach { composeRule.onNodeWithText(it).assertExists() }
         composeRule.onNodeWithText("Period").assertDoesNotExist()
+        composeRule.onNodeWithText("Predicted period").assertDoesNotExist()
+    }
+
+    @Test
+    fun namesThePredictedDaysInTheirOwnWord() {
+        show(Appearance.Light, CycleLegendEntry.WithoutFertility, listOf(BleedingWords.Period), BleedingWords.Bleed)
+        listOf("Period", "Expected bleed", "Today").forEach { composeRule.onNodeWithText(it).assertExists() }
+        composeRule.onNodeWithText("Bleed").assertDoesNotExist()
         composeRule.onNodeWithText("Predicted period").assertDoesNotExist()
     }
 
@@ -119,12 +127,13 @@ class CycleLegendTest {
     private fun show(
         appearance: Appearance,
         entries: List<CycleLegendEntry> = CycleLegendEntry.entries,
-        words: List<BleedingWords> = listOf(BleedingWords.Period)
+        words: List<BleedingWords> = listOf(BleedingWords.Period),
+        predictedWords: BleedingWords = BleedingWords.Period
     ) {
         composeRule.setContent {
             Themed(appearance) {
                 Box(Modifier.padding(CycleTheme.spacing.large)) {
-                    CycleLegend(Modifier.testTag(LEGEND), entries, words)
+                    CycleLegend(Modifier.testTag(LEGEND), entries, words, predictedWords)
                 }
             }
         }

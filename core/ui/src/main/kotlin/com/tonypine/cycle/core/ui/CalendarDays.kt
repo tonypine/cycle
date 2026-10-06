@@ -43,17 +43,18 @@ data class CalendarDays(
 
     /**
      * The legend for [days] on screen, with [today]: the logged days in each word they show in, or the
-     * word she would log in today when none shows; the predicted days only when some show; then today.
+     * word she would log in today when none shows; the predicted days only when some show, in the
+     * first one's word; then today.
      */
     fun legend(days: List<LocalDate>, today: LocalDate): CalendarLegend {
-        val drawn = days.filter { stateOf(it) != CycleDayState.Plain }
-        val words = drawn.map(::wordsOf).distinct().ifEmpty { listOf(wordsOf(today)) }
+        val words = days.filter(::isPeriodDay).map(::wordsOf).distinct().ifEmpty { listOf(wordsOf(today)) }
+        val predicted = days.firstOrNull { stateOf(it) == CycleDayState.PredictedPeriod }
         val entries = listOfNotNull(
             CycleLegendEntry.Period,
-            CycleLegendEntry.PredictedPeriod.takeIf { drawn.any { stateOf(it) == CycleDayState.PredictedPeriod } },
+            CycleLegendEntry.PredictedPeriod.takeIf { predicted != null },
             CycleLegendEntry.Today.takeIf { today in days }
         )
-        return CalendarLegend(entries, words)
+        return CalendarLegend(entries, words, predicted?.let(::wordsOf) ?: wordsOf(today))
     }
 
     companion object {
@@ -81,8 +82,15 @@ data class CalendarDays(
     }
 }
 
-/** What [CycleLegend][com.tonypine.cycle.core.designsystem.CycleLegend] shows under a calendar. */
-data class CalendarLegend(val entries: List<CycleLegendEntry>, val words: List<BleedingWords>)
+/**
+ * What [CycleLegend][com.tonypine.cycle.core.designsystem.CycleLegend] shows under a calendar: its
+ * [entries], the [words] of the logged days and the [predictedWords] of the predicted ones.
+ */
+data class CalendarLegend(
+    val entries: List<CycleLegendEntry>,
+    val words: List<BleedingWords>,
+    val predictedWords: BleedingWords
+)
 
 /** The design system's words for her bleeding. */
 val BleedingWord.words: BleedingWords

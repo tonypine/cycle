@@ -88,9 +88,37 @@ class CalendarDaysTest {
         assertEquals(
             CalendarLegend(
                 listOf(CycleLegendEntry.Period, CycleLegendEntry.PredictedPeriod, CycleLegendEntry.Today),
-                listOf(BleedingWords.Bleed)
+                listOf(BleedingWords.Bleed),
+                BleedingWords.Bleed
             ),
             days.legend(may, today = day("2027-05-10"))
+        )
+    }
+
+    @Test
+    fun `a month with a period before the pill and an expected bleed names each in its own word`() {
+        val pill = ContraceptionStretch(ContraceptionMethod.COMBINED_PILL, day("2027-03-06"), breaks = Breaks.MONTHLY)
+        val firstBreak = EstimatedPeriod(day("2027-03-27"), day("2027-03-27"), day("2027-04-02"), 5)
+        val onThePill = overview.copy(
+            estimate = null,
+            contraception = ContraceptionOverview(
+                stretches = listOf(pill),
+                current = pill,
+                estimates = EstimateKind.NEXT_BLEED,
+                nextBleed = BleedEstimate(listOf(firstBreak), BleedBasis.START_DATE, missedBreak = false)
+            )
+        )
+        val days = CalendarDays.from(onThePill, emptyList())
+
+        val march = (1..31).map { day("2027-03-%02d".format(it)) }
+        // Only 1 and 2 March are logged, a period; 27 to 31 March are expected bleeds.
+        assertEquals(
+            CalendarLegend(
+                listOf(CycleLegendEntry.Period, CycleLegendEntry.PredictedPeriod, CycleLegendEntry.Today),
+                listOf(BleedingWords.Period),
+                BleedingWords.Bleed
+            ),
+            days.legend(march, today = day("2027-03-20"))
         )
     }
 
@@ -136,14 +164,15 @@ class CalendarDaysTest {
         assertEquals(
             CalendarLegend(
                 listOf(CycleLegendEntry.Period, CycleLegendEntry.Today),
-                listOf(BleedingWords.Period, BleedingWords.Bleeding)
+                listOf(BleedingWords.Period, BleedingWords.Bleeding),
+                BleedingWords.Bleeding
             ),
             days.legend(march, today = day("2027-03-20"))
         )
         // A month with nothing logged shows the word she would log in today.
         val april = (1..30).map { day("2027-04-%02d".format(it)) }
         assertEquals(
-            CalendarLegend(listOf(CycleLegendEntry.Period), listOf(BleedingWords.Bleeding)),
+            CalendarLegend(listOf(CycleLegendEntry.Period), listOf(BleedingWords.Bleeding), BleedingWords.Bleeding),
             days.legend(april, today = day("2027-03-20"))
         )
     }

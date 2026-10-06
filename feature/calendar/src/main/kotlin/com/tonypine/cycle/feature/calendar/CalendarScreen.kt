@@ -144,7 +144,7 @@ private fun Month(state: CalendarUiState.Ready, actions: CalendarActions) {
             wordsOf = state.days::wordsOf
         )
         val legend = state.legend
-        CycleLegend(margin, entries = legend.entries, words = legend.words)
+        CycleLegend(margin, entries = legend.entries, words = legend.words, predictedWords = legend.predictedWords)
         BasicText(
             text = hint(state.hint),
             modifier = margin,

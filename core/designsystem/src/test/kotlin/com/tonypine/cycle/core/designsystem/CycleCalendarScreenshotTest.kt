@@ -38,7 +38,20 @@ class CycleCalendarScreenshotTest(private val case: MatrixCase) {
 
     @Test
     fun legendBleed() = matrix.capture("legend_bleed", case) {
-        CycleLegend(entries = CycleLegendEntry.WithoutFertility, words = listOf(BleedingWords.Bleed))
+        CycleLegend(
+            entries = CycleLegendEntry.WithoutFertility,
+            words = listOf(BleedingWords.Bleed),
+            predictedWords = BleedingWords.Bleed
+        )
+    }
+
+    @Test
+    fun legendPeriodThenExpectedBleed() = matrix.capture("legend_period_then_expected_bleed", case) {
+        CycleLegend(
+            entries = CycleLegendEntry.WithoutFertility,
+            words = listOf(BleedingWords.Period),
+            predictedWords = BleedingWords.Bleed
+        )
     }
 
     @Test

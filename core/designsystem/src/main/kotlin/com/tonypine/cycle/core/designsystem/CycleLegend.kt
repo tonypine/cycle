@@ -46,18 +46,22 @@ enum class CycleLegendEntry(
  *
  * [words] are what the calendar calls its logged days, in order ([BleedingWords]): the
  * [CycleLegendEntry.Period] entry shows once per word, "Period" then "Bleeding" in a month where she
- * started the implant, and [CycleLegendEntry.PredictedPeriod] reads in the last, "Expected bleed".
+ * started the implant. [predictedWords] name its predicted days: [CycleLegendEntry.PredictedPeriod]
+ * reads "Expected bleed" on a combined pill with a break every month, even in a month whose only
+ * logged days are a period before it.
  */
 @Composable
 fun CycleLegend(
     modifier: Modifier = Modifier,
     entries: List<CycleLegendEntry> = CycleLegendEntry.entries,
-    words: List<BleedingWords> = listOf(BleedingWords.Period)
+    words: List<BleedingWords> = listOf(BleedingWords.Period),
+    predictedWords: BleedingWords = BleedingWords.Period
 ) {
     val shown = entries.flatMap { entry ->
         when (entry) {
             CycleLegendEntry.Period -> words.distinct().map { entry to it }
-            else -> listOf(entry to (words.lastOrNull() ?: BleedingWords.Period))
+            CycleLegendEntry.PredictedPeriod -> listOf(entry to predictedWords)
+            else -> listOf(entry to BleedingWords.Period)
         }
     }
     FlowRow(
@@ -139,7 +143,21 @@ private fun CycleLegendWithoutFertilityDarkPreview() = PreviewSurface(darkTheme 
 @Preview(name = "Cycle legend · bleed · light", widthDp = 360)
 @Composable
 private fun CycleLegendBleedPreview() = PreviewSurface(darkTheme = false) {
-    CycleLegend(entries = CycleLegendEntry.WithoutFertility, words = listOf(BleedingWords.Bleed))
+    CycleLegend(
+        entries = CycleLegendEntry.WithoutFertility,
+        words = listOf(BleedingWords.Bleed),
+        predictedWords = BleedingWords.Bleed
+    )
+}
+
+@Preview(name = "Cycle legend · period then expected bleed · light", widthDp = 360)
+@Composable
+private fun CycleLegendPeriodThenExpectedBleedPreview() = PreviewSurface(darkTheme = false) {
+    CycleLegend(
+        entries = CycleLegendEntry.WithoutFertility,
+        words = listOf(BleedingWords.Period),
+        predictedWords = BleedingWords.Bleed
+    )
 }
 
 @Preview(name = "Cycle legend · period then bleeding · light", widthDp = 360)

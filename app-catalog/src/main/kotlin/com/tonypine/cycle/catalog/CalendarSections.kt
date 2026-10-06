@@ -190,15 +190,26 @@ internal fun CycleLegendSection() {
             "large, and TalkBack reads it as a list of its entries."
     )
     SubsectionTitle("In a method's words")
-    CycleLegend(entries = CycleLegendEntry.WithoutFertility, words = listOf(BleedingWords.Bleed))
+    CycleLegend(
+        entries = CycleLegendEntry.WithoutFertility,
+        words = listOf(BleedingWords.Bleed),
+        predictedWords = BleedingWords.Bleed
+    )
     CycleLegend(
         entries = listOf(CycleLegendEntry.Period, CycleLegendEntry.Today),
         words = listOf(BleedingWords.Period, BleedingWords.Bleeding)
     )
+    CycleLegend(
+        entries = CycleLegendEntry.WithoutFertility,
+        words = listOf(BleedingWords.Period),
+        predictedWords = BleedingWords.Bleed
+    )
     CatalogNote(
         "BleedingWords name the days on a method: bleed and expected bleed on a combined pill with a break " +
             "every month, bleeding on the implant and the other methods with nothing expected. The shapes stay. " +
-            "A month spanning a method's start lists each word on screen. Day cells read the same words to " +
+            "words lists the logged days on screen, each word once: a month spanning a method's start lists " +
+            "both. predictedWords names the predicted days on their own, so a month with a period before the " +
+            "pill and an expected bleed reads Period, Expected bleed. Day cells read the same words to " +
             "TalkBack: \"14 October, bleeding\"."
     )
 }

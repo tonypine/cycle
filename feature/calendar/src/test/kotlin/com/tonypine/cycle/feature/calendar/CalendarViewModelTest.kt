@@ -143,6 +143,7 @@ class CalendarViewModelTest {
             state.legend.entries
         )
         assertEquals(listOf(BleedingWords.Bleed), state.legend.words)
+        assertEquals(BleedingWords.Bleed, state.legend.predictedWords)
     }
 
     @Test
