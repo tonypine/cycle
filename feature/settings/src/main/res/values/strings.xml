@@ -247,6 +247,7 @@
     <string name="refused_after_today">That\'s after today. Pick today or an earlier day.</string>
     <string name="refused_before_current">That\'s before you started the %1$s on %2$s. Pick a later day, or change the %1$s\'s dates first.</string>
     <string name="refused_covers_whole">That would cover all of your time on the %1$s. Delete the %1$s\'s dates first, or pick a later day.</string>
+    <string name="refused_covers_whole_earlier">That would cover all of your time on the %1$s. Delete the %1$s\'s dates first, or pick an earlier day.</string>
     <string name="refused_stop_before_start">That\'s before it started. Pick a later day.</string>
     <string name="refused_stop_too_late">Pick a day up to %1$s.</string>
     <string name="refused_gone">These dates have been deleted.</string>
