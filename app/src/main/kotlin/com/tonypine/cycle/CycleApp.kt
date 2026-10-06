@@ -41,14 +41,23 @@ import com.tonypine.cycle.feature.calendar.CalendarRoute
 import com.tonypine.cycle.feature.calendar.CalendarViewModel
 import com.tonypine.cycle.feature.history.CycleDetailRoute
 import com.tonypine.cycle.feature.history.CycleDetailViewModel
+import com.tonypine.cycle.feature.history.EditPeriodRoute
+import com.tonypine.cycle.feature.history.EditPeriodViewModel
 import com.tonypine.cycle.feature.history.HistoryRoute
 import com.tonypine.cycle.feature.history.HistoryViewModel
 import com.tonypine.cycle.feature.onboarding.OnboardingRoute
 import com.tonypine.cycle.feature.onboarding.OnboardingViewModel
+import com.tonypine.cycle.feature.settings.AddMethodRoute
+import com.tonypine.cycle.feature.settings.AddMethodViewModel
+import com.tonypine.cycle.feature.settings.ContraceptionRoute
+import com.tonypine.cycle.feature.settings.ContraceptionViewModel
 import com.tonypine.cycle.feature.settings.OpenSourceNoticeScreen
 import com.tonypine.cycle.feature.settings.OpenSourceNoticesScreen
 import com.tonypine.cycle.feature.settings.SettingsRoute
 import com.tonypine.cycle.feature.settings.SettingsViewModel
+import com.tonypine.cycle.feature.settings.StopMethodRoute
+import com.tonypine.cycle.feature.settings.StretchRoute
+import com.tonypine.cycle.feature.settings.StretchViewModel
 import com.tonypine.cycle.feature.settings.UsualLengthsRoute
 import com.tonypine.cycle.feature.settings.UsualLengthsViewModel
 import com.tonypine.cycle.feature.settings.WhatToLogRoute
@@ -87,15 +96,24 @@ fun CycleApp(
     modifier: Modifier = Modifier,
     today: () -> LocalDate = LocalDate::now
 ) {
-    val onboarding = viewModel { OnboardingViewModel(data.settingsRepository, data.dayLogRepository, today) }
+    val onboarding = viewModel {
+        OnboardingViewModel(data.settingsRepository, data.dayLogRepository, data.contraceptionRepository, today)
+    }
     val showWelcome by onboarding.showWelcome.collectAsStateWithLifecycle()
     Box(modifier.fillMaxSize().background(CycleTheme.colors.surface)) {
         when (showWelcome) {
             null -> Unit
 
             true -> {
-                val restore =
-                    viewModel { SettingsViewModel(data.settingsRepository, data.yourDataRepository, deviceLock, today) }
+                val restore = viewModel {
+                    SettingsViewModel(
+                        data.settingsRepository,
+                        data.yourDataRepository,
+                        deviceLock,
+                        data.contraceptionRepository,
+                        today
+                    )
+                }
                 OnboardingRoute(
                     onboarding,
                     onRestore = rememberRestoreFromExport(restore, onRestored = onboarding::onRestored)
@@ -171,17 +189,35 @@ private fun CycleTabs(
                 composable(HISTORY_LIST_ROUTE) {
                     HistoryRoute(
                         viewModel { HistoryViewModel(data.cycleRepository, today) },
-                        onCycleClick = { start -> navController.navigate("$HISTORY_CYCLE_PREFIX$start") }
+                        onCycleClick = { start -> navController.navigate("$HISTORY_CYCLE_PREFIX$start") },
+                        onSeeInCalendar = { month ->
+                            calendarMonth = month
+                            navController.navigateToTab(TopLevelDestination.Calendar)
+                        }
                     )
                 }
                 composable(HISTORY_CYCLE_ROUTE) { entry ->
                     val start = LocalDate.parse(entry.arguments?.getString(START_ARG))
                     CycleDetailRoute(
-                        viewModel { CycleDetailViewModel(data.cycleRepository, start, today) },
+                        viewModel { CycleDetailViewModel(data.cycleRepository, data.dayLogRepository, start, today) },
                         onBack = { navController.popBackStack() },
                         onSeeInCalendar = { month ->
                             calendarMonth = month
                             navController.navigateToTab(TopLevelDestination.Calendar)
+                        },
+                        onEditPeriod = { navController.navigate("$HISTORY_CYCLE_PREFIX$it$HISTORY_EDIT_SUFFIX") }
+                    )
+                }
+                composable(HISTORY_EDIT_ROUTE) { entry ->
+                    val start = LocalDate.parse(entry.arguments?.getString(START_ARG))
+                    EditPeriodRoute(
+                        viewModel { EditPeriodViewModel(data.cycleRepository, data.dayLogRepository, start, today) },
+                        onBack = { navController.popBackStack() },
+                        // The cycle may start on another day now: its detail replaces the old one.
+                        onSaved = { newStart ->
+                            navController.navigate("$HISTORY_CYCLE_PREFIX$newStart") {
+                                popUpTo(HISTORY_LIST_ROUTE)
+                            }
                         }
                     )
                 }
@@ -190,12 +226,54 @@ private fun CycleTabs(
                 composable(SETTINGS_HOME_ROUTE) {
                     SettingsRoute(
                         viewModel {
-                            SettingsViewModel(data.settingsRepository, data.yourDataRepository, deviceLock, today)
+                            SettingsViewModel(
+                                data.settingsRepository,
+                                data.yourDataRepository,
+                                deviceLock,
+                                data.contraceptionRepository,
+                                today
+                            )
                         },
                         versionName = versionName,
                         onUsualLengths = { navController.navigate(USUAL_LENGTHS_ROUTE) },
                         onWhatToLog = { navController.navigate(WHAT_TO_LOG_ROUTE) },
+                        onContraception = { navController.navigate(CONTRACEPTION_ROUTE) },
                         onNotices = { navController.navigate(NOTICES_ROUTE) }
+                    )
+                }
+                composable(CONTRACEPTION_ROUTE) {
+                    ContraceptionRoute(
+                        viewModel { ContraceptionViewModel(data.contraceptionRepository, today) },
+                        onBack = { navController.popBackStack() },
+                        onAdd = { navController.navigate(ADD_METHOD_ROUTE) },
+                        onStop = { id -> navController.navigate("$STOP_METHOD_PREFIX$id") },
+                        onOpen = { id -> navController.navigate("$STRETCH_PREFIX$id") }
+                    )
+                }
+                composable(ADD_METHOD_ROUTE) {
+                    AddMethodRoute(
+                        viewModel { AddMethodViewModel(data.contraceptionRepository, today) },
+                        onBack = { navController.popBackStack() },
+                        // None while on a method: "Mark as stopped" takes this page's place.
+                        onStop = { id ->
+                            navController.navigate("$STOP_METHOD_PREFIX$id") {
+                                popUpTo(ADD_METHOD_ROUTE) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+                composable(STOP_METHOD_ROUTE) { entry ->
+                    val id = entry.arguments?.getString(ID_ARG)?.toLongOrNull() ?: 0L
+                    StopMethodRoute(
+                        viewModel { StretchViewModel(data.contraceptionRepository, id, today) },
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+                composable(STRETCH_ROUTE) { entry ->
+                    val id = entry.arguments?.getString(ID_ARG)?.toLongOrNull() ?: 0L
+                    StretchRoute(
+                        viewModel { StretchViewModel(data.contraceptionRepository, id, today) },
+                        onBack = { navController.popBackStack() }
                     )
                 }
                 composable(USUAL_LENGTHS_ROUTE) {
@@ -236,7 +314,18 @@ private const val SETTINGS_HOME_ROUTE = "settings/home"
 private const val USUAL_LENGTHS_ROUTE = "settings/usual_lengths"
 private const val WHAT_TO_LOG_ROUTE = "settings/what_to_log"
 private const val NOTICES_ROUTE = "settings/notices"
+private const val CONTRACEPTION_ROUTE = "settings/contraception"
+private const val ADD_METHOD_ROUTE = "settings/contraception/add"
 private const val INDEX_ARG = "index"
+private const val ID_ARG = "id"
+
+/** "Mark as stopped" for a stretch of contraception, by its id. */
+private const val STOP_METHOD_PREFIX = "settings/contraception/stop/"
+private const val STOP_METHOD_ROUTE = "$STOP_METHOD_PREFIX{$ID_ARG}"
+
+/** A stretch of contraception's page, by its id. */
+private const val STRETCH_PREFIX = "settings/contraception/stretch/"
+private const val STRETCH_ROUTE = "$STRETCH_PREFIX{$ID_ARG}"
 
 /** One open-source notice, by its place in `OpenSourceNotices`. */
 private const val NOTICE_PREFIX = "settings/notice/"
@@ -257,3 +346,7 @@ private const val START_ARG = "start"
 /** A cycle's details, by the day it started, as `2027-08-05`. */
 private const val HISTORY_CYCLE_PREFIX = "history/cycle/"
 private const val HISTORY_CYCLE_ROUTE = "$HISTORY_CYCLE_PREFIX{$START_ARG}"
+
+/** The editor for the period of the cycle that starts on a day: `history/cycle/2027-08-05/edit`. */
+private const val HISTORY_EDIT_SUFFIX = "/edit"
+private const val HISTORY_EDIT_ROUTE = "$HISTORY_CYCLE_ROUTE$HISTORY_EDIT_SUFFIX"

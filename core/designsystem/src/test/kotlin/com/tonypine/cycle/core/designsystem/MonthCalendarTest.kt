@@ -192,6 +192,35 @@ class MonthCalendarTest {
         composeRule.onAllNodesWithContentDescription("Monday").assertCountEquals(1)
     }
 
+    @Test
+    fun eachDayReadsInItsOwnWords() {
+        // A method started on 10 March: the period before it stays a period, the days after are bleeding.
+        val started = LocalDate.of(2027, 3, 10)
+        composeRule.setContent {
+            Themed(Appearance.Light) {
+                MonthCalendar(
+                    month = SampleMonth,
+                    stateOf = { date ->
+                        if (date.dayOfMonth in 2..6 ||
+                            date.dayOfMonth in 14..15
+                        ) {
+                            CycleDayState.Period
+                        } else {
+                            CycleDayState.Plain
+                        }
+                    },
+                    onDayClick = {},
+                    today = SampleToday,
+                    onPreviousMonth = {},
+                    onNextMonth = {},
+                    wordsOf = { if (it >= started) BleedingWords.Bleeding else BleedingWords.Period }
+                )
+            }
+        }
+        composeRule.onNodeWithContentDescription("2 March, period").assertExists()
+        composeRule.onNodeWithContentDescription("14 March, bleeding").assertExists()
+    }
+
     private fun show(
         appearance: Appearance = Appearance.Light,
         month: () -> YearMonth = { SampleMonth },

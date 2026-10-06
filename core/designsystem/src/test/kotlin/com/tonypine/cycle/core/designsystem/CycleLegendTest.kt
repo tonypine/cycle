@@ -72,6 +72,44 @@ class CycleLegendTest {
     }
 
     @Test
+    fun namesTheDaysInTheMethodsWords() {
+        show(Appearance.Light, CycleLegendEntry.WithoutFertility, listOf(BleedingWords.Bleed), BleedingWords.Bleed)
+        listOf("Bleed", "Expected bleed", "Today").forEach { composeRule.onNodeWithText(it).assertExists() }
+        composeRule.onNodeWithText("Period").assertDoesNotExist()
+        composeRule.onNodeWithText("Predicted period").assertDoesNotExist()
+    }
+
+    @Test
+    fun namesThePredictedDaysInTheirOwnWord() {
+        show(Appearance.Light, CycleLegendEntry.WithoutFertility, listOf(BleedingWords.Period), BleedingWords.Bleed)
+        listOf("Period", "Expected bleed", "Today").forEach { composeRule.onNodeWithText(it).assertExists() }
+        composeRule.onNodeWithText("Bleed").assertDoesNotExist()
+        composeRule.onNodeWithText("Predicted period").assertDoesNotExist()
+    }
+
+    @Test
+    fun showsOneLoggedEntryPerWordOnScreen() {
+        show(
+            Appearance.Light,
+            listOf(CycleLegendEntry.Period, CycleLegendEntry.Today),
+            listOf(BleedingWords.Period, BleedingWords.Bleeding)
+        )
+        val chosen = listOf("Period", "Bleeding", "Today")
+        composeRule.onNodeWithTag(LEGEND).assert(
+            SemanticsMatcher("a list of ${chosen.size}") {
+                it.config.getOrNull(SemanticsProperties.CollectionInfo)?.rowCount == chosen.size
+            }
+        )
+        chosen.forEachIndexed { index, label ->
+            composeRule.onNodeWithText(label).assert(
+                SemanticsMatcher("item $index of the list") {
+                    it.config.getOrNull(SemanticsProperties.CollectionItemInfo)?.rowIndex == index
+                }
+            )
+        }
+    }
+
+    @Test
     fun wrapsAtDoubleFontScaleWithoutClipping() {
         show(Appearance.FontScale200)
         val legend = composeRule.onNodeWithTag(LEGEND).getBoundsInRoot()
@@ -86,10 +124,17 @@ class CycleLegendTest {
         }
     }
 
-    private fun show(appearance: Appearance, entries: List<CycleLegendEntry> = CycleLegendEntry.entries) {
+    private fun show(
+        appearance: Appearance,
+        entries: List<CycleLegendEntry> = CycleLegendEntry.entries,
+        words: List<BleedingWords> = listOf(BleedingWords.Period),
+        predictedWords: BleedingWords = BleedingWords.Period
+    ) {
         composeRule.setContent {
             Themed(appearance) {
-                Box(Modifier.padding(CycleTheme.spacing.large)) { CycleLegend(Modifier.testTag(LEGEND), entries) }
+                Box(Modifier.padding(CycleTheme.spacing.large)) {
+                    CycleLegend(Modifier.testTag(LEGEND), entries, words, predictedWords)
+                }
             }
         }
     }

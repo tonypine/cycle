@@ -9,6 +9,9 @@ robolectric = "4.17"
 # Gradle resolves it (see RobolectricRuntime.kt), so it must match what this Robolectric version
 # asks for: after bumping either, a failing test names the new one ("no artifacts found for ...").
 robolectricAndroidAll = "16-robolectric-13921718-i7"
+# Android 10 (SDK 29), the minimum SDK, for the tests that apply Cycle's language below Android 13
+# (`@Config(sdk = [29])`, docs/decisions/0008-languages.md). Same Robolectric instrumentation, `-i7`.
+robolectricAndroidAllSdk29 = "10-robolectric-5803371-i7"
 composeBom = "2026.09.00"
 activityCompose = "1.13.0"
 # The phone's fingerprint, face or screen-lock prompt for the app lock. 1.1.0 is the latest stable.
@@ -61,6 +64,7 @@ junit = { module = "junit:junit", version.ref = "junit" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 robolectric-android-all-instrumented = { module = "org.robolectric:android-all-instrumented", version.ref = "robolectricAndroidAll" }
+robolectric-android-all-instrumented-sdk29 = { module = "org.robolectric:android-all-instrumented", version.ref = "robolectricAndroidAllSdk29" }
 roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = "roborazzi" }
 roborazzi-accessibility-check = { module = "io.github.takahirom.roborazzi:roborazzi-accessibility-check", version.ref = "roborazzi" }
 roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi" }

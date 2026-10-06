@@ -29,6 +29,10 @@
         <item quantity="one">Added %1$d day</item>
         <item quantity="other">Added %1$d days</item>
     </plurals>
+    <plurals name="settings_imported_methods">
+        <item quantity="one">Added %1$d method</item>
+        <item quantity="other">Added %1$d methods</item>
+    </plurals>
     <string name="settings_delete_title">Delete everything</string>
     <string name="settings_delete_body">Every day you logged and every setting</string>
     <string name="settings_about">About</string>
@@ -57,12 +61,20 @@
         <item quantity="other">Import %1$d days?</item>
     </plurals>
     <string name="import_confirm_text">Days already logged on this phone stay as they are.</string>
+    <string name="import_confirm_methods_text">Days and methods already on this phone stay as they are.</string>
     <string name="import_lengths_title">Import your usual lengths?</string>
     <string name="import_lengths_text">This file has no new days, only your usual cycle and period lengths. Cycle uses them for its estimates.</string>
+    <plurals name="import_methods_title">
+        <item quantity="one">Import %1$d method?</item>
+        <item quantity="other">Import %1$d methods?</item>
+    </plurals>
+    <string name="import_methods_text">This file has no new days, only contraception methods and their dates. Cycle uses them for its estimates.</string>
+    <string name="import_methods_and_lengths_text">This file has no new days, only contraception methods and your usual cycle and period lengths. Cycle uses them for its estimates.</string>
     <string name="import_confirm">Import</string>
     <string name="import_cancel">Cancel</string>
     <string name="import_nothing_title">Nothing new to import</string>
     <string name="import_nothing_text">Every day in this file is already on this phone.</string>
+    <string name="import_nothing_methods_text">Everything in this file is already on this phone.</string>
     <string name="import_ok">OK</string>
     <string name="import_refused_title">This file can\'t be imported</string>
 
@@ -85,6 +97,10 @@
     <string name="import_problem_bad_length">Line %1$d has “%2$s” as %3$s. Cycle takes a number of days from %4$d to %5$d.</string>
     <string name="import_problem_repeated_setting">Line %1$d is a second line for %2$s.</string>
     <string name="import_problem_one_usual_length">This file gives only one of usual_cycle_length and usual_period_length. A Cycle export has both or neither.</string>
+    <string name="import_problem_missing_breaks">Line %1$d has a combined pill, patch or ring without its breaks.</string>
+    <string name="import_problem_stops_before_starts">Line %1$d has a method that stops before it starts.</string>
+    <string name="import_problem_overlapping_method">Line %1$d has a method whose dates overlap one already on this phone.</string>
+    <string name="import_problem_overlapping_rows">Lines %1$d and %2$d have methods whose dates overlap.</string>
 
     <!-- Export. -->
     <string name="export_failed_title">Couldn\'t save your data</string>
@@ -112,4 +128,116 @@
 
     <!-- Open-source notices: the bundled fonts and icons, and their licences. -->
     <string name="notices_title">Open-source notices</string>
+
+    <!-- Contraception: docs/design/contraception.md, journeys B, D and E. The method's own words
+         (names, since when, breaks, the calm line) are in core:ui, shared with setup. -->
+    <string name="contraception_title">Contraception</string>
+    <string name="contraception_none">None</string>
+    <string name="contraception_row_since">%1$s, since %2$s</string>
+    <string name="contraception_row_start_not_known">%1$s, start not known</string>
+    <string name="contraception_now">Now</string>
+    <string name="contraception_your_methods">Your methods</string>
+    <string name="contraception_since">Since %1$s</string>
+    <string name="contraception_start_not_known">Start not known</string>
+    <string name="contraception_with_breaks">%1$s · %2$s</string>
+    <string name="contraception_breaks_monthly">a break every month</string>
+    <string name="contraception_breaks_every_few_packs">a break every few packs</string>
+    <string name="contraception_breaks_none">no breaks</string>
+    <string name="contraception_counts_until">Cycle counts it until %1$s.</string>
+    <string name="contraception_counts_until_injection">Cycle counts it until %1$s, 13 weeks after your last injection.</string>
+    <string name="contraception_add">Add your method</string>
+    <string name="contraception_change">Change method</string>
+    <string name="contraception_stop">Mark as stopped</string>
+    <string name="contraception_note">Cycle isn\'t a contraceptive and doesn\'t advise on methods. Questions about yours are for your pharmacist, nurse or doctor. Your method stays on this phone.</string>
+
+    <!-- When to get help: every word here is docs/decisions/0007-urgent-symptoms-on-a-method.md, and
+         changes only with that record, in the same PR. WhenToGetHelp.kt says which method shows
+         which lines; WhenToGetHelpTest pins them. No phone numbers and no condition names (0007). -->
+    <string name="get_help_title">When to get help</string>
+    <!-- 0007: the intro line. On the patch or ring screen it names that method only
+         (docs/design/contraception.md, When to get help). -->
+    <string name="get_help_intro_combined_pill">Clinics give these signs to everyone who uses the combined pill, patch or ring.</string>
+    <string name="get_help_intro_patch">Clinics give these signs to everyone who uses the patch.</string>
+    <string name="get_help_intro_ring">Clinics give these signs to everyone who uses the ring.</string>
+    <string name="get_help_intro_iud">Clinics give these signs to everyone who has an IUD.</string>
+    <!-- 0007: the two action lines, headings for TalkBack. -->
+    <string name="get_help_emergency">Get emergency help now if you have:</string>
+    <string name="get_help_urgent">Get urgent medical advice today if you have:</string>
+    <!-- Combined pill, patch and ring. FSRH CHC 2019, Box 4, urgent review: "Chest pain and/or
+         breathlessness and/or coughing up blood"; NHS, blood clots: call 999 or go to A&E with
+         shortness of breath or chest pain. Emergency help. -->
+    <string name="get_help_combined_chest">chest pain, or you feel short of breath, or you cough up blood</string>
+    <!-- FSRH CHC 2019, Box 4, urgent review: "Loss of motor or sensory function"; NHS, stroke: face,
+         arm, speech, "Call 999 now". Emergency help. -->
+    <string name="get_help_combined_weakness">sudden weakness or numbness in your face, an arm or a leg, or trouble speaking</string>
+    <!-- FSRH CHC 2019, Box 4, urgent review: "Calf pain, swelling and/or redness"; NHS, blood clots:
+         pain or swelling in one leg, usually the calf; an urgent GP appointment or 111. Urgent advice. -->
+    <string name="get_help_combined_leg">pain, swelling or redness in one leg, usually the calf</string>
+    <!-- Copper IUD and hormonal IUD: each line is the NHS's, under "ask for an urgent GP appointment or
+         get help from NHS 111", on its copper IUD side effects and hormonal IUD side effects and risks
+         pages, in second person and without the medical words. Urgent advice. -->
+    <string name="get_help_iud_painkillers">pain low in your tummy that painkillers do not help</string>
+    <string name="get_help_iud_sudden_pain">sudden pain low in your tummy that gets worse or does not go away</string>
+    <string name="get_help_iud_temperature">a high temperature</string>
+    <string name="get_help_iud_discharge">unusual or smelly discharge</string>
+    <string name="get_help_iud_bleeding">very heavy bleeding</string>
+    <!-- 0007, What Cycle does not watch: the section ends by saying so, so its silence elsewhere is
+         never read as "all clear". -->
+    <string name="get_help_not_checked">Cycle does not check your log for these signs.</string>
+
+    <!-- Add your method, or change it: which method, since when, breaks. -->
+    <string name="add_method_which">Which method?</string>
+    <string name="add_method_which_body">Some methods change bleeding, so Cycle changes what it estimates.</string>
+    <string name="add_method_next">Next</string>
+    <string name="add_method_save">Save</string>
+    <string name="add_method_done">Done</string>
+
+    <!-- Mark as stopped. -->
+    <string name="stop_method_save">Save</string>
+
+    <!-- A method's page: its dates, its breaks, and deleting them. -->
+    <string name="stretch_started">Started</string>
+    <string name="stretch_fitted">Fitted</string>
+    <string name="stretch_first_injection">First injection</string>
+    <string name="stretch_stopped">Stopped</string>
+    <string name="stretch_taken_out">Taken out</string>
+    <string name="stretch_counted_until">Counted until</string>
+    <string name="stretch_not_known">Not known</string>
+    <string name="stretch_still_in">Still in</string>
+    <string name="stretch_still_on_it">Still on it</string>
+    <string name="stretch_counted_until_body">Any day up to 13 weeks from today.</string>
+    <string name="stretch_breaks">Breaks</string>
+    <string name="stretch_delete">Delete these dates</string>
+    <string name="stretch_delete_body">Cycle forgets this method for these dates. What you logged stays.</string>
+    <string name="stretch_save">Save</string>
+    <string name="stretch_delete_title">Delete these dates?</string>
+    <string name="stretch_delete_from_to">Cycle forgets you used the %1$s from %2$s to %3$s. The days you logged stay, and count as your own cycle again.</string>
+    <string name="stretch_delete_since">Cycle forgets you\'ve used the %1$s since %2$s. The days you logged stay, and count as your own cycle again.</string>
+    <string name="stretch_delete_until">Cycle forgets you used the %1$s until %2$s. The days you logged stay, and count as your own cycle again.</string>
+    <string name="stretch_delete_on">Cycle forgets you used the %1$s on %2$s. The days you logged stay, and count as your own cycle again.</string>
+    <string name="stretch_delete_ongoing">Cycle forgets you use the %1$s. The days you logged stay, and count as your own cycle again.</string>
+    <string name="stretch_delete_confirm">Delete</string>
+    <string name="stretch_delete_keep">Keep them</string>
+
+    <!-- When new dates overlap another method's. -->
+    <string name="move_end_title">Move the end of your %1$s?</string>
+    <string name="move_end_text">Your %1$s would end on %2$s instead of %3$s, so the two don\'t overlap. Cycle works out its estimates again.</string>
+    <string name="move_start_title">Move the start of your %1$s?</string>
+    <string name="move_start_text">Your %1$s would start on %2$s instead of %3$s, so the two don\'t overlap. Cycle works out its estimates again.</string>
+    <string name="move_several_title">Move your other methods\' dates?</string>
+    <string name="move_end_line">Your %1$s would end on %2$s instead of %3$s.</string>
+    <string name="move_start_line">Your %1$s would start on %2$s instead of %3$s.</string>
+    <string name="move_several_end">That way none of them overlap. Cycle works out its estimates again.</string>
+    <string name="move_confirm">Move it</string>
+    <string name="move_cancel">Cancel</string>
+
+    <!-- When the dates can't be saved. -->
+    <string name="refused_title">Pick another day</string>
+    <string name="refused_ok">OK</string>
+    <string name="refused_after_today">That\'s after today. Pick today or an earlier day.</string>
+    <string name="refused_before_current">That\'s before you started the %1$s on %2$s. Pick a later day, or change the %1$s\'s dates first.</string>
+    <string name="refused_covers_whole">That would cover all of your time on the %1$s. Delete the %1$s\'s dates first, or pick a later day.</string>
+    <string name="refused_stop_before_start">That\'s before it started. Pick a later day.</string>
+    <string name="refused_stop_too_late">Pick a day up to %1$s.</string>
+    <string name="refused_gone">These dates have been deleted.</string>
 </resources>

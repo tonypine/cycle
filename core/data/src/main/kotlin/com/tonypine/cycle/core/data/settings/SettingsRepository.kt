@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.tonypine.cycle.core.domain.CycleRules
 import com.tonypine.cycle.core.model.CyclePrompt
 import com.tonypine.cycle.core.model.CycleSettings
+import com.tonypine.cycle.core.model.Language
 import com.tonypine.cycle.core.model.LogCategory
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
@@ -19,8 +20,9 @@ import kotlinx.coroutines.flow.map
 /**
  * Her settings, in DataStore: the usual lengths, whether setup is done, whether she is past the
  * welcome, the prompts she has dismissed, each under the first day of its cycle, the day log
- * categories she hid, the day she last exported her data and whether the app lock is on. Until she sets them, the lengths are
- * [CycleRules.DEFAULT_CYCLE_LENGTH] and [CycleRules.DEFAULT_PERIOD_LENGTH], and every category shows.
+ * categories she hid, the day she last exported her data, whether the app lock is on and Cycle's
+ * language. Until she sets them, the lengths are [CycleRules.DEFAULT_CYCLE_LENGTH] and
+ * [CycleRules.DEFAULT_PERIOD_LENGTH], every category shows, and Cycle follows the phone's language.
  */
 class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     val settings: Flow<CycleSettings> = dataStore.data.map { preferences ->
@@ -30,6 +32,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
             setupDone = preferences[SETUP_DONE] ?: false,
             dismissedStillGoing = preferences[DISMISSED_STILL_GOING].toDates(),
             dismissedMissedPeriod = preferences[DISMISSED_MISSED_PERIOD].toDates(),
+            dismissedCopperIudNote = preferences[DISMISSED_COPPER_IUD_NOTE].toDates(),
             hiddenCategories = preferences[HIDDEN_CATEGORIES].orEmpty()
                 .mapNotNullTo(mutableSetOf()) { code -> CATEGORY_CODES.entries.firstOrNull { it.value == code }?.key }
         )
@@ -95,6 +98,11 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         dataStore.edit { it[key] = it[key].orEmpty() + prompt.cycleStart.toString() }
     }
 
+    /** "Got it" on the copper IUD fitted on [fitted]: its "Periods can be heavier at first" card goes. */
+    suspend fun dismissCopperIudNote(fitted: LocalDate) {
+        dataStore.edit { it[DISMISSED_COPPER_IUD_NOTE] = it[DISMISSED_COPPER_IUD_NOTE].orEmpty() + fitted.toString() }
+    }
+
     /**
      * "What to log": shows or hides [category] in the day log and on Today. Hiding it keeps what she
      * logged in it.
@@ -147,6 +155,17 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         dataStore.edit { it.remove(APP_LOCK_TURNED_OFF) }
     }
 
+    /**
+     * Cycle's language, as the settings keep it: null for the phone's. [LanguageRepository] applies it
+     * and keeps it in step with Android's own per-app setting.
+     */
+    val language: Flow<Language?> =
+        dataStore.data.map { preferences -> preferences[LANGUAGE]?.let(::Language) }.distinctUntilChanged()
+
+    suspend fun setLanguage(language: Language?) {
+        dataStore.edit { if (language == null) it.remove(LANGUAGE) else it[LANGUAGE] = language.tag }
+    }
+
     /** "Delete everything": every setting goes, so the app opens on the welcome with the defaults. */
     suspend fun clear() {
         dataStore.edit { it.clear() }
@@ -166,9 +185,15 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         val APP_LOCK = booleanPreferencesKey("app_lock")
         val APP_LOCK_TURNED_OFF = booleanPreferencesKey("app_lock_turned_off")
 
+        // The BCP 47 tag of the language she chose ("de", "pt-BR"). None: the phone's language.
+        val LANGUAGE = stringPreferencesKey("language")
+
         // ISO dates of the first day of each cycle whose prompt she dismissed.
         val DISMISSED_STILL_GOING = stringSetPreferencesKey("dismissed_still_going")
         val DISMISSED_MISSED_PERIOD = stringSetPreferencesKey("dismissed_missed_period")
+
+        // ISO fitting dates of the copper IUDs whose heavier-periods card she dismissed.
+        val DISMISSED_COPPER_IUD_NOTE = stringSetPreferencesKey("dismissed_copper_iud_note")
 
         // The codes of the categories she hid. A code this version does not know is ignored.
         val HIDDEN_CATEGORIES = stringSetPreferencesKey("hidden_log_categories")

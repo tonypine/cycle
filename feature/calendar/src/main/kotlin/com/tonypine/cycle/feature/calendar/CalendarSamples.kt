@@ -1,5 +1,8 @@
 package com.tonypine.cycle.feature.calendar
 
+import com.tonypine.cycle.core.model.Breaks
+import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.Period
 import com.tonypine.cycle.core.ui.CalendarDays
 import com.tonypine.cycle.core.ui.DayLogEntry
@@ -40,11 +43,61 @@ internal object CalendarSamples {
         selectedLog = DayLogEntry(LocalDate.of(2027, 3, 9), fillDays = 5)
     )
 
+    private val implant = ContraceptionStretch(ContraceptionMethod.IMPLANT, LocalDate.of(2027, 3, 4))
+
+    /**
+     * C4: the implant fitted on 4 March, after a period that keeps its word; bleeding logged on the 10th
+     * and 11th; nothing predicted.
+     */
+    val implantMarch = march.copy(
+        days = CalendarDays(
+            periods = listOf(
+                Period(LocalDate.of(2027, 2, 26), LocalDate.of(2027, 3, 2)),
+                Period(LocalDate.of(2027, 3, 10), LocalDate.of(2027, 3, 11), stretch = implant)
+            ),
+            predicted = emptyList(),
+            stretches = listOf(implant)
+        ),
+        hint = CalendarHint.NoEstimate(ContraceptionMethod.IMPLANT)
+    )
+
+    private val pill =
+        ContraceptionStretch(ContraceptionMethod.COMBINED_PILL, LocalDate.of(2027, 3, 6), breaks = Breaks.MONTHLY)
+
+    /** B7: the pill since 6 March; the first bleed expected in the first break, 27 March to 2 April. */
+    val pillMarch = march.copy(
+        days = CalendarDays(
+            periods = days.periods,
+            predicted = listOf(
+                LocalDate.of(2027, 3, 27)..LocalDate.of(2027, 4, 2),
+                LocalDate.of(2027, 4, 24)..LocalDate.of(2027, 4, 30),
+                LocalDate.of(2027, 5, 22)..LocalDate.of(2027, 5, 28)
+            ),
+            stretches = listOf(pill)
+        ),
+        hint = CalendarHint.Bleeds
+    )
+
+    /** D: the implant came out on 8 March; her next period from her usual cycle, the range wider. */
+    val stoppedImplantMarch = implantMarch.copy(
+        days = implantMarch.days.copy(
+            predicted = (0L until 3L).map { ahead ->
+                val start = LocalDate.of(2027, 4, 5).plusDays(ahead * 28)
+                start..start.plusDays(4)
+            },
+            stretches = listOf(implant.copy(stopped = LocalDate.of(2027, 3, 8)))
+        ),
+        hint = CalendarHint.Periods
+    )
+
     /** Every month, by name, in the order the screenshots list them. */
     val all: Map<String, CalendarUiState.Ready> = linkedMapOf(
         "march" to march,
         "february" to february,
         "april" to april,
-        "selected" to selected
+        "selected" to selected,
+        "implant_march" to implantMarch,
+        "pill_march" to pillMarch,
+        "stopped_implant_march" to stoppedImplantMarch
     )
 }

@@ -14,4 +14,6 @@ dependencies {
     api(projects.core.designsystem)
     api(projects.core.model)
     implementation(projects.core.domain)
+    // The copy check in every language, and rendering in one (core:testing).
+    testImplementation(projects.core.testing)
 }

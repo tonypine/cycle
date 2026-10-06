@@ -1,5 +1,6 @@
 package com.tonypine.cycle.feature.today
 
+import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -40,15 +41,21 @@ import com.tonypine.cycle.core.designsystem.LoadingState
 import com.tonypine.cycle.core.designsystem.TextButton
 import com.tonypine.cycle.core.designsystem.TonalButton
 import com.tonypine.cycle.core.designsystem.WeekRow
+import com.tonypine.cycle.core.designsystem.cycleLocale
 import com.tonypine.cycle.core.designsystem.rememberCycleBottomSheetState
+import com.tonypine.cycle.core.model.BleedBasis
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.EstimateBasis
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.ui.DAY_AND_DATE
+import com.tonypine.cycle.core.ui.DAY_AND_MONTH
 import com.tonypine.cycle.core.ui.DayLogEntry
 import com.tonypine.cycle.core.ui.DayLogSheet
+import com.tonypine.cycle.core.ui.calmLine
 import com.tonypine.cycle.core.ui.daySummary
 import com.tonypine.cycle.core.ui.formatDate
+import com.tonypine.cycle.core.ui.methodInSentence
+import com.tonypine.cycle.core.ui.methodShortName
 import com.tonypine.cycle.core.ui.summaryLine
 import java.time.LocalDate
 import java.time.YearMonth
@@ -80,7 +87,8 @@ fun TodayRoute(viewModel: TodayViewModel, modifier: Modifier = Modifier, onAddPa
                 onStillGoing = viewModel::onStillGoing,
                 onEndedOn = viewModel::onEndedOn,
                 onAddPastPeriod = onAddPastPeriod,
-                onNoMissedPeriod = viewModel::onNoMissedPeriod
+                onNoMissedPeriod = viewModel::onNoMissedPeriod,
+                onDismissCopperIudNote = viewModel::onDismissCopperIudNote
             )
         },
         modifier = modifier
@@ -100,12 +108,14 @@ class TodayActions(
     val onStillGoing: () -> Unit = {},
     val onEndedOn: (lastDay: LocalDate) -> Unit = {},
     val onAddPastPeriod: (month: YearMonth) -> Unit = {},
-    val onNoMissedPeriod: () -> Unit = {}
+    val onNoMissedPeriod: () -> Unit = {},
+    val onDismissCopperIudNote: () -> Unit = {}
 )
 
 /**
- * Today: the day and date, her cycle day, a line of context, this week, the one-tap period buttons,
- * what she logged today and the next period estimate. Scrolls when the text is large, so nothing clips at 200%.
+ * Today: the day and date, her cycle day (or her method, or the days since she stopped one), a line
+ * of context, this week, the one-tap period buttons, what she logged today and what is expected next.
+ * Scrolls when the text is large, so nothing clips at 200%.
  */
 @Composable
 fun TodayScreen(state: TodayUiState, actions: TodayActions, modifier: Modifier = Modifier) {
@@ -139,6 +149,7 @@ private fun EmptyToday(state: TodayUiState.Empty, actions: TodayActions, modifie
 @Composable
 private fun TrackingToday(state: TodayUiState.Tracking, actions: TodayActions, modifier: Modifier) {
     val estimateSheet = rememberCycleBottomSheetState(skipPartiallyExpanded = true)
+    val methodSheet = rememberCycleBottomSheetState(skipPartiallyExpanded = true)
     val dayLogSheet = rememberCycleBottomSheetState(skipPartiallyExpanded = true)
     val lastDaySheet = rememberCycleBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
@@ -161,19 +172,31 @@ private fun TrackingToday(state: TodayUiState.Tracking, actions: TodayActions, m
             onDayClick = {},
             today = state.today,
             modifier = Modifier.padding(horizontal = spacing.medium),
-            isEnabled = { false }
+            isEnabled = { false },
+            wordsOf = state.days::wordsOf
         )
         StatusCard(state, actions, onEndedEarlier = { scope.launch { lastDaySheet.show() } }, modifier = margin)
+        state.copperIudNote?.let { CopperIudCard(actions.onDismissCopperIudNote, margin) }
         Actions(state, actions, onLog = { scope.launch { dayLogSheet.show() } }, modifier = margin)
         if (state.todayLog.isLogged) {
             LoggedTodayCard(state.todayLog, onEdit = { scope.launch { dayLogSheet.show() } }, modifier = margin)
         }
-        NextPeriodCard(state.nextPeriod, onExplain = { scope.launch { estimateSheet.show() } }, modifier = margin)
+        OutlookCard(
+            state,
+            onExplain = { scope.launch { estimateSheet.show() } },
+            onWhatChanges = { scope.launch { methodSheet.show() } },
+            modifier = margin
+        )
     }
 
-    EstimateSheet(estimateSheet, state.nextPeriod)
+    when (val outlook = state.outlook) {
+        is NextPeriod -> EstimateSheet(estimateSheet, outlook)
+        is NextBleed -> NextBleedSheet(estimateSheet, outlook.method)
+        else -> Unit
+    }
+    state.method?.let { MethodSheet(methodSheet, it.method) }
     DayLogSheet(dayLogSheet, state.todayLog, actions.onLogDay, actions.onFillPeriod, actions.onClearDay)
-    state.stillGoing?.let { LastDaySheet(lastDaySheet, state.today, it, actions.onEndedOn) }
+    state.stillGoing?.let { LastDaySheet(lastDaySheet, state.today, it, state.words, actions.onEndedOn) }
 }
 
 @Composable
@@ -186,33 +209,71 @@ private fun Header(state: TodayUiState.Tracking, modifier: Modifier) {
             style = typography.label.copy(color = colors.onSurfaceVariant)
         )
         BasicText(
-            text = stringResource(R.string.today_cycle_day, state.cycleDay),
+            text = when (val display = state.display) {
+                is TodayDisplay.CycleDay -> stringResource(R.string.today_cycle_day, display.day)
+
+                is TodayDisplay.Method -> methodShortName(display.method)
+
+                is TodayDisplay.DaysSince -> pluralStringResource(
+                    R.plurals.today_days_since,
+                    display.days,
+                    display.days
+                )
+            },
             modifier = Modifier.semantics { heading() },
             style = typography.display.copy(color = colors.onSurface)
         )
-        BasicText(text = contextLine(state.phase), style = typography.body.copy(color = colors.onSurface))
+        BasicText(text = contextLine(state), style = typography.body.copy(color = colors.onSurface))
     }
 }
 
+/**
+ * The line under the big one: what is expected or how long she has bled, in the day's words; after
+ * stopping a method, since when; on a method with no estimate, its calm line.
+ */
 @Composable
-private fun contextLine(phase: TodayPhase): String = when (phase) {
-    is TodayPhase.BetweenPeriods ->
-        pluralStringResource(R.plurals.today_context_between, phase.daysUntil, phase.daysUntil)
+private fun contextLine(state: TodayUiState.Tracking): String {
+    val display = state.display
+    if (display is TodayDisplay.DaysSince) return sinceLine(display.method)
+    val bleed = state.outlook as? NextBleed
+    val words = state.words
+    return when (val phase = state.phase) {
+        is TodayPhase.BetweenPeriods -> when {
+            bleed == null -> pluralStringResource(R.plurals.today_context_between, phase.daysUntil, phase.daysUntil)
 
-    TodayPhase.Due -> stringResource(R.string.today_context_due)
+            bleed.basis == BleedBasis.START_DATE && !bleed.missedBreak ->
+                pluralStringResource(R.plurals.today_context_bleed_between_first, phase.daysUntil, phase.daysUntil)
 
-    is TodayPhase.Late -> pluralStringResource(R.plurals.today_context_late, phase.daysLate, phase.daysLate)
+            else -> pluralStringResource(R.plurals.today_context_bleed_between, phase.daysUntil, phase.daysUntil)
+        }
 
-    TodayPhase.PeriodStartedToday -> stringResource(R.string.today_context_started)
+        TodayPhase.Due -> stringResource(
+            if (bleed == null) R.string.today_context_due else R.string.today_context_bleed_due
+        )
 
-    is TodayPhase.OnPeriod -> stringResource(R.string.today_context_on_period, phase.periodDay)
+        is TodayPhase.Late -> pluralStringResource(R.plurals.today_context_late, phase.daysLate, phase.daysLate)
 
-    is TodayPhase.PeriodEndedToday -> pluralStringResource(R.plurals.today_context_ended, phase.length, phase.length)
+        TodayPhase.NoEstimate -> when (val method = state.method) {
+            null -> ""
+
+            else -> if (state.outlook == TodayOutlook.FirstBleedToLog) {
+                stringResource(R.string.today_context_first_bleed_to_log)
+            } else {
+                calmLine(method.method, method.breaks)
+            }
+        }
+
+        TodayPhase.PeriodStartedToday -> stringResource(words.startedLine())
+
+        is TodayPhase.OnPeriod -> stringResource(words.dayLine(), phase.periodDay)
+
+        is TodayPhase.PeriodEndedToday -> pluralStringResource(words.endedLine(), phase.length, phase.length)
+    }
 }
 
 /**
- * The card under the week: "Missed a period?", "Still going?", Undo after a one-tap log, or the calm
- * late card.
+ * The card under the week: "Missed a period?", "Still going?", Undo after a one-tap log, the calm
+ * late card, or a break that passed with no bleed.
  */
 @Composable
 private fun StatusCard(
@@ -238,9 +299,9 @@ private fun StatusCard(
         }
 
         stillGoing != null -> Card(modifier.fillMaxWidth()) {
-            CardTitle(stringResource(R.string.today_still_going_title))
+            CardTitle(stringResource(state.words.stillGoingTitle()))
             val days = stillGoing.prompt.periodDay
-            CardBody(pluralStringResource(R.plurals.today_still_going_body, days, days))
+            CardBody(pluralStringResource(state.words.stillGoingBody(), days, days))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small)) {
                 TonalButton(stringResource(R.string.today_still_going_yes), onClick = actions.onStillGoing)
                 TextButton(stringResource(R.string.today_still_going_ended_earlier), onClick = onEndedEarlier)
@@ -248,15 +309,36 @@ private fun StatusCard(
         }
 
         state.phase == TodayPhase.PeriodStartedToday ->
-            UndoCard(stringResource(R.string.today_started_card), actions.onUndoPeriodStarted, modifier)
+            UndoCard(stringResource(state.words.startedCard()), actions.onUndoPeriodStarted, modifier)
 
         state.phase is TodayPhase.PeriodEndedToday ->
-            UndoCard(stringResource(R.string.today_ended_card), actions.onUndoPeriodEnded, modifier)
+            UndoCard(stringResource(state.words.endedCard()), actions.onUndoPeriodEnded, modifier)
 
         state.phase is TodayPhase.Late -> Card(modifier.fillMaxWidth()) {
             CardTitle(stringResource(R.string.today_late_title))
             CardBody(stringResource(R.string.today_late_body))
         }
+
+        // No "late" on a scheduled bleed, and nothing about why.
+        (state.outlook as? NextBleed)?.missedBreak == true && !state.onPeriod -> Card(modifier.fillMaxWidth()) {
+            CardTitle(stringResource(R.string.today_missed_break_title))
+            CardBody(stringResource(R.string.today_missed_break_body))
+        }
+    }
+}
+
+/** "Periods can be heavier at first", on a copper IUD for six months after fitting, until Got it. */
+@Composable
+private fun CopperIudCard(onGotIt: () -> Unit, modifier: Modifier) {
+    Card(modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.semantics(mergeDescendants = true) {},
+            verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.extraSmall)
+        ) {
+            CardTitle(stringResource(R.string.today_copper_iud_title))
+            CardBody(stringResource(R.string.today_copper_iud_body))
+        }
+        TextButton(stringResource(R.string.today_got_it), onClick = onGotIt)
     }
 }
 
@@ -274,20 +356,20 @@ private fun UndoCard(text: String, onUndo: () -> Unit, modifier: Modifier) {
     }
 }
 
-/** The one-tap period button, then the day log. */
+/** The one-tap period button, in the day's words, then the day log. */
 @Composable
 private fun Actions(state: TodayUiState.Tracking, actions: TodayActions, onLog: () -> Unit, modifier: Modifier) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small)) {
         when (state.phase) {
-            is TodayPhase.BetweenPeriods, TodayPhase.Due, is TodayPhase.Late -> FilledButton(
-                text = stringResource(R.string.today_period_started),
+            is TodayPhase.BetweenPeriods, TodayPhase.Due, is TodayPhase.Late, TodayPhase.NoEstimate -> FilledButton(
+                text = stringResource(state.words.startButton()),
                 onClick = actions.onPeriodStarted,
                 modifier = Modifier.fillMaxWidth(),
                 icon = CycleIcons.WaterDrop
             )
 
             TodayPhase.PeriodStartedToday, is TodayPhase.OnPeriod -> FilledButton(
-                text = stringResource(R.string.today_period_ended),
+                text = stringResource(state.words.endButton()),
                 onClick = actions.onPeriodEnded,
                 modifier = Modifier.fillMaxWidth(),
                 icon = CycleIcons.Check
@@ -330,49 +412,186 @@ private fun LoggedTodayCard(log: DayLogEntry, onEdit: () -> Unit, modifier: Modi
     }
 }
 
+/** The card of what is expected next: the next period or bleed, the last 90 days, or neither. */
+@Composable
+private fun OutlookCard(
+    state: TodayUiState.Tracking,
+    onExplain: () -> Unit,
+    onWhatChanges: () -> Unit,
+    modifier: Modifier
+) {
+    when (val outlook = state.outlook) {
+        is NextPeriod -> NextPeriodCard(outlook, onExplain, modifier)
+
+        is NextBleed -> NextBleedCard(outlook, state.method, onExplain, modifier)
+
+        is TodayOutlook.Bleeding -> state.method?.let { BleedingCard(outlook, it, onWhatChanges, modifier) }
+
+        TodayOutlook.AfterInjection -> EstimateCard(modifier) {
+            CardLabel(stringResource(R.string.today_next_period))
+            BasicText(
+                text = stringResource(R.string.today_after_injection),
+                style = CycleTheme.typography.body.copy(color = CycleTheme.colors.onSurface)
+            )
+        }
+
+        // Nothing to expect until she logs a bleed: the line under the method says so.
+        TodayOutlook.FirstBleedToLog -> Unit
+    }
+}
+
 /**
  * "Around 23 October, between 19 and 27 October, estimated from ...". TalkBack reads the estimate as
  * one item, "estimated" included, then the button that explains it.
  */
 @Composable
 private fun NextPeriodCard(next: NextPeriod, onExplain: () -> Unit, modifier: Modifier) {
-    val colors = CycleTheme.colors
-    val typography = CycleTheme.typography
+    EstimateCard(
+        modifier,
+        button = {
+            TextButton(stringResource(R.string.today_how_estimated), onClick = onExplain, icon = CycleIcons.Info)
+        }
+    ) {
+        CardLabel(stringResource(R.string.today_next_period))
+        CardHeadline(stringResource(R.string.today_next_around, formatDate(next.expectedStart)))
+        if (next.earliestStart != next.latestStart) {
+            CardLine(
+                stringResource(
+                    R.string.today_next_between,
+                    formatDate(next.earliestStart),
+                    formatDate(next.latestStart)
+                )
+            )
+        }
+        CardNote(basisLine(next))
+    }
+}
+
+/**
+ * The next bleed: "24 to 30 May" in the first break, then "Around 21 June, between 19 and 23 June",
+ * with where it comes from and, in the first months, that bleeding between breaks is common.
+ */
+@Composable
+private fun NextBleedCard(next: NextBleed, method: TodayMethod?, onExplain: () -> Unit, modifier: Modifier) {
+    EstimateCard(
+        modifier,
+        button = {
+            TextButton(stringResource(R.string.today_how_estimated), onClick = onExplain, icon = CycleIcons.Info)
+        }
+    ) {
+        CardLabel(stringResource(R.string.today_next_bleed))
+        when (next.basis) {
+            BleedBasis.START_DATE -> CardHeadline(dateRange(next.earliestStart, next.latestStart))
+
+            BleedBasis.LAST_BLEED -> {
+                CardHeadline(stringResource(R.string.today_next_around, formatDate(next.expectedStart)))
+                CardLine(
+                    stringResource(
+                        R.string.today_next_between,
+                        formatDate(next.earliestStart),
+                        formatDate(next.latestStart)
+                    )
+                )
+            }
+        }
+        CardNote(bleedBasisLine(next))
+        if (method?.firstMonths == true) firstMonthsLine(method.method, method.breaks)?.let { CardNote(it) }
+    }
+}
+
+/**
+ * "Last 90 days" on a method with no estimate: her bleeding in plain counts, the first-months line
+ * while it applies, and what changes on the method.
+ */
+@Composable
+private fun BleedingCard(
+    bleeding: TodayOutlook.Bleeding,
+    method: TodayMethod,
+    onWhatChanges: () -> Unit,
+    modifier: Modifier
+) {
+    EstimateCard(
+        modifier,
+        button = { TextButton(methodSheetButton(method.method), onClick = onWhatChanges, icon = CycleIcons.Info) }
+    ) {
+        CardLabel(bleedingTitle(bleeding.summary))
+        CardLine(bleedingCounts(bleeding.summary))
+        if (method.firstMonths) firstMonthsLine(method.method, method.breaks)?.let { CardNote(it) }
+    }
+}
+
+/** A card whose [content] TalkBack reads as one item, then its [button]. */
+@Composable
+private fun EstimateCard(modifier: Modifier, button: @Composable () -> Unit = {}, content: @Composable () -> Unit) {
     Card(modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.semantics(mergeDescendants = true) {},
             verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.extraSmall)
-        ) {
-            BasicText(
-                text = stringResource(R.string.today_next_period),
-                style = typography.label.copy(color = colors.onSurfaceVariant)
-            )
-            BasicText(
-                text = stringResource(R.string.today_next_around, formatDate(next.expectedStart)),
-                style = typography.headline.copy(color = colors.onSurface)
-            )
-            if (next.earliestStart != next.latestStart) {
-                BasicText(
-                    text = stringResource(
-                        R.string.today_next_between,
-                        formatDate(next.earliestStart),
-                        formatDate(next.latestStart)
-                    ),
-                    style = typography.body.copy(color = colors.onSurface)
-                )
-            }
-            BasicText(text = basisLine(next), style = typography.bodySmall.copy(color = colors.onSurfaceVariant))
-        }
-        TextButton(stringResource(R.string.today_how_estimated), onClick = onExplain, icon = CycleIcons.Info)
+        ) { content() }
+        button()
     }
 }
 
 @Composable
-private fun basisLine(next: NextPeriod): String = when (val basis = next.basis) {
-    EstimateBasis.Typical -> stringResource(R.string.today_basis_typical, next.cycleLength)
-    EstimateBasis.Setup -> stringResource(R.string.today_basis_setup)
-    is EstimateBasis.Logged -> pluralStringResource(R.plurals.today_basis_logged, basis.count, basis.count)
+private fun CardLabel(text: String) {
+    BasicText(text, style = CycleTheme.typography.label.copy(color = CycleTheme.colors.onSurfaceVariant))
 }
+
+@Composable
+private fun CardHeadline(text: String) {
+    BasicText(text, style = CycleTheme.typography.headline.copy(color = CycleTheme.colors.onSurface))
+}
+
+@Composable
+private fun CardLine(text: String) {
+    BasicText(text, style = CycleTheme.typography.body.copy(color = CycleTheme.colors.onSurface))
+}
+
+@Composable
+private fun CardNote(text: String) {
+    BasicText(text, style = CycleTheme.typography.bodySmall.copy(color = CycleTheme.colors.onSurfaceVariant))
+}
+
+/**
+ * Where the estimate comes from. After stopping a method, her usual cycle, and that cycles can take a
+ * few months to settle, so the range is wider.
+ */
+@Composable
+private fun basisLine(next: NextPeriod): String {
+    val basis = when {
+        next.stoppedMethod != null -> stringResource(R.string.today_basis_usual, next.cycleLength)
+
+        else -> when (val basis = next.basis) {
+            EstimateBasis.Typical -> stringResource(R.string.today_basis_typical, next.cycleLength)
+            EstimateBasis.Setup -> stringResource(R.string.today_basis_setup)
+            is EstimateBasis.Logged -> pluralStringResource(R.plurals.today_basis_logged, basis.count, basis.count)
+        }
+    }
+    val settling = next.settlingAfter ?: return basis
+    return stringResource(
+        R.string.today_basis_then_settling,
+        basis,
+        stringResource(R.string.today_basis_settling, methodInSentence(settling))
+    )
+}
+
+/**
+ * "24 to 30 May" ("May 24 to 30" where the month comes first), or "28 May to 3 June" across two
+ * months.
+ */
+@Composable
+private fun dateRange(from: LocalDate, to: LocalDate): String {
+    val locale = cycleLocale()
+    val dayFirst = remember(locale) { DateFormat.getBestDateTimePattern(locale, DAY_AND_MONTH).startsWith("d") }
+    val sameMonth = from.month == to.month && from.year == to.year
+    return stringResource(
+        R.string.today_next_bleed_range,
+        if (sameMonth && dayFirst) formatDate(from, DAY) else formatDate(from),
+        if (sameMonth && !dayFirst) formatDate(to, DAY) else formatDate(to)
+    )
+}
+
+private const val DAY = "d"
 
 @Composable
 internal fun CardTitle(text: String, modifier: Modifier = Modifier) {

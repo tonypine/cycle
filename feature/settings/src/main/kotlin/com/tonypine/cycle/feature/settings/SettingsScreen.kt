@@ -56,6 +56,7 @@ fun SettingsRoute(
     versionName: String?,
     onUsualLengths: () -> Unit,
     onWhatToLog: () -> Unit,
+    onContraception: () -> Unit,
     onNotices: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -77,6 +78,7 @@ fun SettingsRoute(
         versionName = versionName,
         onUsualLengths = onUsualLengths,
         onWhatToLog = onWhatToLog,
+        onContraception = onContraception,
         onAppLockChange = viewModel::onAppLockChange,
         onDismissLockNote = viewModel::onDismissLockNote,
         onExport = export,
@@ -93,7 +95,8 @@ fun SettingsRoute(
 
 /**
  * Settings, in four sections:
- * - Your cycle: "Usual cycle and period" and "What to log", each opening its page.
+ * - Your cycle: "Usual cycle and period", "What to log" and "Contraception", with her method today
+ *   or "None", each opening its page.
  * - Your data: a card saying everything stays on this phone, then, when [showBackupNote], a note
  *   that Cycle isn't backed up without a screen lock, with "Hide for now"; then Lock Cycle, which
  *   asks for the phone's lock before it turns on or off, with the note when Cycle turned it off
@@ -111,6 +114,7 @@ fun SettingsScreen(
     versionName: String?,
     onUsualLengths: () -> Unit,
     onWhatToLog: () -> Unit,
+    onContraception: () -> Unit,
     onAppLockChange: (Boolean) -> Unit,
     onDismissLockNote: () -> Unit,
     onExport: () -> Unit,
@@ -156,6 +160,13 @@ fun SettingsScreen(
                 onClick = onWhatToLog,
                 opensPage = true
             )
+            SettingsRow(
+                icon = CycleIcons.Medication,
+                title = stringResource(R.string.contraception_title),
+                body = contraceptionSummary(state.contraception),
+                onClick = onContraception,
+                opensPage = true
+            )
 
             SectionTitle(stringResource(R.string.settings_your_data))
             Card(Modifier.fillMaxWidth()) {
@@ -187,6 +198,7 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_import_title),
                 body = state.importedDays
                     ?.let { pluralStringResource(R.plurals.settings_imported, it, it) }
+                    ?: state.importedMethods?.let { pluralStringResource(R.plurals.settings_imported_methods, it, it) }
                     ?: stringResource(R.string.settings_import_body),
                 onClick = onImport
             )
@@ -241,7 +253,7 @@ fun SettingsScreen(
 
 /** A section's title, read as a heading. */
 @Composable
-private fun SectionTitle(text: String) {
+internal fun SectionTitle(text: String) {
     BasicText(
         text,
         modifier = Modifier
@@ -291,7 +303,7 @@ private fun BackupNote(onHide: () -> Unit) {
 
 /** A row that does something, as one button; [opensPage] adds the chevron of a row that opens a page. */
 @Composable
-private fun SettingsRow(
+internal fun SettingsRow(
     icon: CycleIcons,
     title: String,
     body: String,
@@ -310,7 +322,7 @@ private fun SettingsRow(
 
 /** An icon, a title with a line under it, then [trailing]. */
 @Composable
-private fun RowContent(
+internal fun RowContent(
     icon: CycleIcons,
     title: String,
     body: String,
@@ -341,6 +353,7 @@ private fun SettingsPreview() {
             versionName = "1.0.0",
             onUsualLengths = {},
             onWhatToLog = {},
+            onContraception = {},
             onAppLockChange = {},
             onDismissLockNote = {},
             onExport = {},

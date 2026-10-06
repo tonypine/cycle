@@ -27,6 +27,7 @@ class TimeZoneTest {
 
     private val database = inMemoryDatabase()
     private val dayLogs = DayLogRepository(database)
+    private val contraception = ContraceptionRepository(database)
     private val originalZone = TimeZone.getDefault()
 
     @After
@@ -50,7 +51,7 @@ class TimeZoneTest {
             assertEquals(day("2027-03-02"), loggedOn)
             assertEquals(day("2027-03-03"), today)
             assertEquals(listOf(DayLog(day("2027-03-02"), periodStarted = true)), dayLogs.observeDayLogs().first())
-            val overview = CycleRepository(dayLogs, settingsRepository(folder.root, backgroundScope))
+            val overview = CycleRepository(dayLogs, settingsRepository(folder.root, backgroundScope), contraception)
                 .observeOverview(today)
                 .first()
             assertEquals(day("2027-03-02"), overview.currentCycle?.start)

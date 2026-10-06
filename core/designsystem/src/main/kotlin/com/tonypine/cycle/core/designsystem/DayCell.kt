@@ -36,7 +36,6 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -53,7 +52,6 @@ import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.toPath
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 import kotlin.math.roundToInt
 
 /** Where a day sits in the cycle. Today, selection and disabled are separate, and combine with every state. */
@@ -90,7 +88,7 @@ enum class CycleDayState {
  *
  * The cell is at least 48dp square and grows with large text, so its shape always holds the number.
  * It is a `Role.Button` that exposes [selected], and reads its date and state to TalkBack
- * ("20 March, today, period").
+ * ("20 March, today, period"), a period day in [words]: "14 October, bleeding" on a method.
  */
 @Composable
 fun DayCell(
@@ -101,6 +99,7 @@ fun DayCell(
     isToday: Boolean = false,
     selected: Boolean = false,
     enabled: Boolean = true,
+    words: BleedingWords = BleedingWords.Period,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val colors = CycleTheme.colors
@@ -110,7 +109,7 @@ fun DayCell(
         end = CyclePolygons.squircle,
         atEnd = state == CycleDayState.Period
     )
-    val description = dayDescription(date, state, isToday)
+    val description = dayDescription(date, state, isToday, words)
     Box(
         modifier = modifier
             .then(
@@ -278,27 +277,43 @@ private fun CycleDayState.numberColor(colors: CycleColors): Color = when (this) 
 }
 
 @Composable
-internal fun locale(): Locale = LocalConfiguration.current.locales[0]
-
-@Composable
 private fun dayNumber(date: LocalDate): String {
-    val locale = locale()
+    val locale = cycleLocale()
     return remember(date, locale) { String.format(locale, "%d", date.dayOfMonth) }
 }
 
-/** The date in the locale's day-and-month form ("20 March", "March 20"), then today and the state. */
+/**
+ * The date in the locale's day-and-month form ("20 March", "March 20"), then today and the state, a
+ * period day in [words].
+ */
 @Composable
-private fun dayDescription(date: LocalDate, state: CycleDayState, isToday: Boolean): String {
-    val locale = locale()
+private fun dayDescription(date: LocalDate, state: CycleDayState, isToday: Boolean, words: BleedingWords): String {
+    val locale = cycleLocale()
     val dayMonth = remember(date, locale) {
         DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "dMMMM"), locale).format(date)
     }
     val today = if (isToday) stringResource(R.string.day_cell_today) else null
     val stateLabel = when (state) {
         CycleDayState.Plain -> null
-        CycleDayState.Period -> stringResource(R.string.day_cell_period)
-        CycleDayState.PredictedPeriod -> stringResource(R.string.day_cell_predicted_period)
+
+        CycleDayState.Period -> stringResource(
+            when (words) {
+                BleedingWords.Period -> R.string.day_cell_period
+                BleedingWords.Bleed -> R.string.day_cell_bleed
+                BleedingWords.Bleeding -> R.string.day_cell_bleeding
+            }
+        )
+
+        CycleDayState.PredictedPeriod -> stringResource(
+            when (words) {
+                BleedingWords.Period -> R.string.day_cell_predicted_period
+                BleedingWords.Bleed -> R.string.day_cell_expected_bleed
+                BleedingWords.Bleeding -> R.string.day_cell_expected_bleeding
+            }
+        )
+
         CycleDayState.Fertile -> stringResource(R.string.day_cell_fertile)
+
         CycleDayState.Ovulation -> stringResource(R.string.day_cell_ovulation)
     }
     return listOfNotNull(dayMonth, today, stateLabel).joinToString(", ")

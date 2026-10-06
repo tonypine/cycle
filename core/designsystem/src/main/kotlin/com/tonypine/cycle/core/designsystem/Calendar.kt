@@ -38,7 +38,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
-import java.time.temporal.WeekFields
 
 /**
  * A month of the calendar: a header with the previous and next month [IconButton]s around the month
@@ -47,7 +46,9 @@ import java.time.temporal.WeekFields
  *
  * [stateOf] gives each day's cycle state, [today] gets the ring and [selected] the frame. A day where
  * [isEnabled] is false shows in full colour but ignores taps, so a predicted period in the future
- * stays readable; the others call [onDayClick].
+ * stays readable; the others call [onDayClick]. [wordsOf] gives what each day's bleeding is called,
+ * for TalkBack, so a month spanning the start of a method reads "period" before it and "bleeding"
+ * after.
  *
  * Each column is at least as wide as a cell (48dp, 58dp at 200% font scale) and the columns share
  * the width left over. Seven 48dp cells fit a 360dp screen inside `spacing.medium` (12dp) margins;
@@ -68,20 +69,21 @@ fun MonthCalendar(
     onNextMonth: () -> Unit,
     modifier: Modifier = Modifier,
     selected: LocalDate? = null,
-    isEnabled: (LocalDate) -> Boolean = { true }
+    isEnabled: (LocalDate) -> Boolean = { true },
+    wordsOf: (LocalDate) -> BleedingWords = { BleedingWords.Period }
 ) {
     val firstDayOfWeek = firstDayOfWeek()
     val weeks = remember(month, firstDayOfWeek) { monthWeeks(month, firstDayOfWeek) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.small)) {
         MonthHeader(month, onPreviousMonth, onNextMonth)
-        CalendarGrid(weeks, firstDayOfWeek, stateOf, onDayClick, today, selected, isEnabled)
+        CalendarGrid(weeks, firstDayOfWeek, stateOf, onDayClick, today, selected, isEnabled, wordsOf)
     }
 }
 
 /**
  * The week around [weekOf], from the locale's first day of the week, with the weekday initials above
- * it: the same columns and cells as [MonthCalendar], for Today and for picking a recent day. Days in
- * the next or previous month show like any other. TalkBack reads it as a collection of one row and
+ * it: the same columns and cells as [MonthCalendar], for Today and for picking a recent day, with the
+ * same [wordsOf]. Days in the next or previous month show like any other. TalkBack reads it as a collection of one row and
  * seven columns.
  */
 @Composable
@@ -92,11 +94,12 @@ fun WeekRow(
     today: LocalDate,
     modifier: Modifier = Modifier,
     selected: LocalDate? = null,
-    isEnabled: (LocalDate) -> Boolean = { true }
+    isEnabled: (LocalDate) -> Boolean = { true },
+    wordsOf: (LocalDate) -> BleedingWords = { BleedingWords.Period }
 ) {
     val firstDayOfWeek = firstDayOfWeek()
     val weeks = remember(weekOf, firstDayOfWeek) { listOf(weekDays(weekOf, firstDayOfWeek)) }
-    CalendarGrid(weeks, firstDayOfWeek, stateOf, onDayClick, today, selected, isEnabled, modifier)
+    CalendarGrid(weeks, firstDayOfWeek, stateOf, onDayClick, today, selected, isEnabled, wordsOf, modifier)
 }
 
 /** The weeks of [month], seven days each from [firstDayOfWeek], with null for the days outside it. */
@@ -118,14 +121,8 @@ private fun daysFromWeekStart(date: LocalDate, firstDayOfWeek: DayOfWeek): Int =
 private const val DAYS_IN_WEEK = 7
 
 @Composable
-private fun firstDayOfWeek(): DayOfWeek {
-    val locale = locale()
-    return remember(locale) { WeekFields.of(locale).firstDayOfWeek }
-}
-
-@Composable
 private fun MonthHeader(month: YearMonth, onPreviousMonth: () -> Unit, onNextMonth: () -> Unit) {
-    val locale = locale()
+    val locale = cycleLocale()
     val name = remember(month, locale) {
         DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "MMMMyyyy"), locale).format(month)
     }
@@ -158,6 +155,7 @@ private fun CalendarGrid(
     today: LocalDate,
     selected: LocalDate?,
     isEnabled: (LocalDate) -> Boolean,
+    wordsOf: (LocalDate) -> BleedingWords,
     modifier: Modifier = Modifier
 ) {
     BoxWithConstraints(modifier) {
@@ -174,7 +172,7 @@ private fun CalendarGrid(
         Layout(
             content = {
                 WeekdayInitials(firstDayOfWeek)
-                DayCells(weeks, stateOf, onDayClick, today, selected, isEnabled)
+                DayCells(weeks, stateOf, onDayClick, today, selected, isEnabled, wordsOf)
             },
             modifier = Modifier.horizontalScroll(scroll)
         ) { measurables, _ ->
@@ -209,7 +207,7 @@ private fun ScrollTodayIntoView(scroll: ScrollState, width: Int, todayColumn: In
 /** The narrow weekday names, in `labelSmall`. TalkBack reads each day's full name. */
 @Composable
 private fun WeekdayInitials(firstDayOfWeek: DayOfWeek) {
-    val locale = locale()
+    val locale = cycleLocale()
     val style = CycleTheme.typography.labelSmall.copy(
         color = CycleTheme.colors.onSurfaceVariant,
         textAlign = TextAlign.Center
@@ -237,7 +235,8 @@ private fun DayCells(
     onDayClick: (LocalDate) -> Unit,
     today: LocalDate,
     selected: LocalDate?,
-    isEnabled: (LocalDate) -> Boolean
+    isEnabled: (LocalDate) -> Boolean,
+    wordsOf: (LocalDate) -> BleedingWords
 ) {
     val slots = remember(weeks) {
         weeks.flatMapIndexed { row, week ->
@@ -256,7 +255,8 @@ private fun DayCells(
                             collectionItemInfo = CollectionItemInfo(slot.row, 1, slot.column, 1)
                         },
                         isToday = slot.date == today,
-                        selected = slot.date == selected
+                        selected = slot.date == selected,
+                        words = wordsOf(slot.date)
                     )
                 }
             }

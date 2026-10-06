@@ -4,17 +4,25 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.tonypine.cycle.core.data.FakePhoneLanguages
 import com.tonypine.cycle.core.data.database.CycleDatabase
+import com.tonypine.cycle.core.data.database.toEntity
 import com.tonypine.cycle.core.data.day
 import com.tonypine.cycle.core.data.inMemoryDatabase
+import com.tonypine.cycle.core.data.repository.ContraceptionRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
+import com.tonypine.cycle.core.data.settings.LanguageRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
 import com.tonypine.cycle.core.model.BodySymptom
+import com.tonypine.cycle.core.model.Breaks
+import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.CyclePrompt
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.EnergyLevel
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.Language
 import com.tonypine.cycle.core.model.LogCategory
 import com.tonypine.cycle.core.model.Mood
 import com.tonypine.cycle.core.model.Pain
@@ -47,6 +55,7 @@ class YourDataRepositoryTest {
 
     private val database = inMemoryDatabase()
     private val dayLogs = DayLogRepository(database)
+    private val contraception = ContraceptionRepository(database)
 
     @After
     fun closeDatabase() = database.close()
@@ -54,7 +63,9 @@ class YourDataRepositoryTest {
     private class Phone(
         val repository: YourDataRepository,
         val settings: SettingsRepository,
-        val preferences: DataStore<Preferences>
+        val preferences: DataStore<Preferences>,
+        val language: LanguageRepository,
+        val android: FakePhoneLanguages
     )
 
     private fun TestScope.phone(): Phone {
@@ -62,7 +73,15 @@ class YourDataRepositoryTest {
             File(folder.root, "settings.preferences_pb")
         }
         val settings = SettingsRepository(preferences)
-        return Phone(YourDataRepository(database, settings), settings, preferences)
+        val android = FakePhoneLanguages()
+        val language = LanguageRepository(settings, android, File(folder.root, "language_handed_over"))
+        return Phone(
+            YourDataRepository(database, settings, forgetLanguage = language::forget),
+            settings,
+            preferences,
+            language,
+            android
+        )
     }
 
     /** Two synthetic cycles: every category, period markers, spotting and a note that needs quoting. */
@@ -105,12 +124,27 @@ class YourDataRepositoryTest {
     private suspend fun YourDataRepository.exportBytes(): ByteArray =
         ByteArrayOutputStream().also { export(it) }.toByteArray()
 
+    /** Two synthetic stretches: an implant with no start date, then the pill, still on it. */
+    private suspend fun logSyntheticContraception() {
+        contraception.start(ContraceptionMethod.IMPLANT, null, started = null, today = day("2026-12-01"))
+        contraception.start(
+            ContraceptionMethod.COMBINED_PILL,
+            Breaks.MONTHLY,
+            day("2027-02-15"),
+            today = day("2027-03-20")
+        )
+    }
+
+    private suspend fun stretches() = contraception.observeStretches().first().map { it.copy(id = 0) }
+
     @Test
     fun `exporting then importing round-trips the synthetic history exactly`() = runTest {
         val phone = phone()
         logSyntheticHistory()
+        logSyntheticContraception()
         phone.settings.saveSetup(cycleLength = 30, periodLength = 4)
         val before = database.everything()
+        val stretchesBefore = stretches()
         val settingsBefore = phone.settings.settings.first()
         val exported = phone.repository.exportBytes()
 
@@ -119,10 +153,184 @@ class YourDataRepositoryTest {
         val added = phone.repository.import(read.file)
 
         assertEquals(9, read.newDays)
+        assertEquals(2, read.newStretches)
         assertEquals(9, added)
         assertEquals(before, database.everything())
+        assertEquals(2, stretchesBefore.size)
+        assertEquals(stretchesBefore, stretches())
         assertEquals(settingsBefore, phone.settings.settings.first())
         assertEquals(exported.decodeToString(), phone.repository.exportBytes().decodeToString())
+    }
+
+    @Test
+    fun `a file from before contraception was recorded still imports`() = runTest {
+        val phone = phone()
+        val older = "date,flow,period_started,period_ended,pain,pain_where,body,mood,energy,sleep,sex,note\r\n" +
+            "2027-03-02,medium,yes,,,,,,,,,\r\n\r\nsetting,value\r\nusual_cycle_length,30\r\nusual_period_length,4\r\n"
+
+        val read = phone.repository.read(ByteArrayInputStream(older.toByteArray())) as ImportRead.Ready
+        phone.repository.import(read.file)
+
+        assertEquals(1, read.newDays)
+        assertEquals(0, read.newStretches)
+        assertFalse(read.hasStretches)
+        assertEquals(emptyList<Any>(), stretches())
+        assertEquals(
+            listOf(DayLog(day("2027-03-02"), FlowLevel.MEDIUM, periodStarted = true)),
+            database.everything().first
+        )
+    }
+
+    /** The implant from 9 November 2026 to 3 November 2027, then the pill from 20 November 2027. */
+    private suspend fun logImplantThenPill() {
+        val dao = database.contraceptionDao()
+        dao.upsert(ContraceptionStretch(ContraceptionMethod.IMPLANT, day("2026-11-09"), day("2027-11-03")).toEntity())
+        dao.upsert(
+            ContraceptionStretch(ContraceptionMethod.COMBINED_PILL, day("2027-11-20"), breaks = Breaks.MONTHLY)
+                .toEntity()
+        )
+    }
+
+    /** A file with no days and these lines of contraception, from line 3. */
+    private fun methodsFile(vararg rows: String): ByteArrayInputStream = ByteArrayInputStream(
+        (
+            "date,flow,period_started,period_ended,pain,pain_where,body,mood,energy,sleep,sex,note\r\n" +
+                "method,started,stopped,breaks\r\n" + rows.joinToString("") { "$it\r\n" }
+            ).toByteArray()
+    )
+
+    @Test
+    fun `re-importing her export with methods on the phone adds nothing`() = runTest {
+        val phone = phone()
+        logSyntheticHistory()
+        logSyntheticContraception()
+        val exported = phone.repository.exportBytes()
+        val before = database.everything()
+        val stretchesBefore = stretches()
+
+        val read = phone.repository.read(ByteArrayInputStream(exported)) as ImportRead.Ready
+        val added = phone.repository.import(read.file)
+
+        assertEquals(0, read.newDays)
+        assertEquals(0, read.newStretches)
+        assertTrue(read.hasStretches)
+        assertEquals(0, added)
+        assertEquals(before, database.everything())
+        assertEquals(stretchesBefore, stretches())
+    }
+
+    @Test
+    fun `a row with the method and start of a stretch on the phone is skipped, whatever its stop or breaks`() =
+        runTest {
+            val phone = phone()
+            logImplantThenPill()
+            val stretchesBefore = stretches()
+
+            // An export from before she marked the implant stopped: skipped, not checked against the pill.
+            val beforeStopping = methodsFile("implant,2026-11-09,,")
+            val otherBreaks = methodsFile("combined_pill,2027-11-20,2027-12-01,none")
+
+            listOf(beforeStopping, otherBreaks).forEach { file ->
+                val read = phone.repository.read(file) as ImportRead.Ready
+                phone.repository.import(read.file)
+
+                assertEquals(0, read.newStretches)
+                assertTrue(read.hasStretches)
+                assertEquals(stretchesBefore, stretches())
+            }
+        }
+
+    @Test
+    fun `a null start matches a null start on the phone`() = runTest {
+        val phone = phone()
+        logSyntheticContraception()
+        val stretchesBefore = stretches()
+
+        val read = phone.repository.read(methodsFile("implant,,2026-12-31,")) as ImportRead.Ready
+        phone.repository.import(read.file)
+
+        assertEquals(0, read.newStretches)
+        assertEquals(stretchesBefore, stretches())
+        assertEquals(
+            ImportRead.Refused(ImportProblem.OverlappingMethod(3)),
+            phone.repository.read(methodsFile("copper_iud,,2026-12-31,"))
+        )
+    }
+
+    @Test
+    fun `only the rows new to the phone are counted and added`() = runTest {
+        val phone = phone()
+        logImplantThenPill()
+
+        val read = phone.repository.read(
+            methodsFile("copper_iud,2026-01-10,2026-10-31,", "implant,2026-11-09,2027-11-03,")
+        ) as ImportRead.Ready
+        phone.repository.import(read.file)
+
+        assertEquals(1, read.newStretches)
+        assertEquals(
+            listOf(
+                ContraceptionStretch(ContraceptionMethod.COPPER_IUD, day("2026-01-10"), day("2026-10-31")),
+                ContraceptionStretch(ContraceptionMethod.IMPLANT, day("2026-11-09"), day("2027-11-03")),
+                ContraceptionStretch(ContraceptionMethod.COMBINED_PILL, day("2027-11-20"), breaks = Breaks.MONTHLY)
+            ),
+            stretches()
+        )
+    }
+
+    @Test
+    fun `a new row that overlaps a stretch on the phone refuses the file at its line, and nothing is written`() =
+        runTest {
+            val phone = phone()
+            logImplantThenPill()
+            val stretchesBefore = stretches()
+
+            assertEquals(
+                ImportRead.Refused(ImportProblem.OverlappingMethod(4)),
+                phone.repository.read(
+                    methodsFile("implant,2026-11-09,2027-11-03,", "copper_iud,2027-11-04,2027-12-01,")
+                )
+            )
+            assertEquals(stretchesBefore, stretches())
+        }
+
+    @Test
+    fun `rows that overlap each other refuse the file even when one is on the phone`() = runTest {
+        val phone = phone()
+        logImplantThenPill()
+
+        assertEquals(
+            ImportRead.Refused(ImportProblem.OverlappingRows(3, 4)),
+            phone.repository.read(
+                methodsFile("implant,2026-11-09,2027-11-03,", "implant,2027-01-01,2027-06-01,")
+            )
+        )
+        assertEquals(
+            ImportRead.Refused(ImportProblem.OverlappingRows(3, 4)),
+            phone.repository.read(
+                methodsFile("implant,2026-11-09,2027-11-03,", "implant,2026-11-09,2027-11-03,")
+            )
+        )
+    }
+
+    @Test
+    fun `stretches that do not overlap the phone's are added`() = runTest {
+        val phone = phone()
+        contraception.start(ContraceptionMethod.COPPER_IUD, null, day("2027-03-01"), today = day("2027-03-20"))
+        val file = "date,flow,period_started,period_ended,pain,pain_where,body,mood,energy,sleep,sex,note\r\n" +
+            "method,started,stopped,breaks\r\nimplant,2026-01-10,2027-02-28,\r\n"
+
+        val read = phone.repository.read(ByteArrayInputStream(file.toByteArray())) as ImportRead.Ready
+        phone.repository.import(read.file)
+
+        assertEquals(1, read.newStretches)
+        assertEquals(
+            listOf(
+                ContraceptionStretch(ContraceptionMethod.IMPLANT, day("2026-01-10"), day("2027-02-28")),
+                ContraceptionStretch(ContraceptionMethod.COPPER_IUD, day("2027-03-01"))
+            ),
+            stretches()
+        )
     }
 
     @Test
@@ -250,17 +458,20 @@ class YourDataRepositoryTest {
     fun `delete everything leaves no rows and no settings`() = runTest {
         val phone = phone()
         logSyntheticHistory()
+        logSyntheticContraception()
         phone.settings.saveSetup(cycleLength = 30, periodLength = 4)
         phone.settings.setWelcomeDone(true)
         phone.settings.dismiss(CyclePrompt.StillGoing(day("2027-02-02"), periodDay = 8))
         phone.settings.dismiss(CyclePrompt.MissedPeriod(day("2027-02-02"), cycleDay = 60))
         phone.settings.setCategoryShown(LogCategory.SEX, shown = false)
         phone.settings.setLastExported(day("2027-03-20"))
+        phone.language.setLanguage(Language("de"))
 
         phone.repository.deleteEverything()
 
         assertEquals(emptyList<DayLog>() to emptyList<DayFeelings>(), database.everything())
-        val tables = listOf("day_log", "pain", "body_symptoms", "mood", "energy", "sleep", "sex", "note")
+        val tables =
+            listOf("day_log", "pain", "body_symptoms", "mood", "energy", "sleep", "sex", "note", "contraception")
         tables.forEach { table ->
             database.query("SELECT COUNT(*) FROM `$table`", null).use { cursor ->
                 assertTrue(cursor.moveToFirst())
@@ -270,5 +481,19 @@ class YourDataRepositoryTest {
         assertTrue(phone.preferences.data.first().asMap().isEmpty())
         assertFalse(phone.settings.welcomeDone.first())
         assertEquals(null, phone.settings.lastExported.first())
+        // On Android 13 and later, Android's per-app page goes back to System default too.
+        assertEquals(null, phone.language.language.first())
+        assertEquals(null, phone.android.appLanguage)
+    }
+
+    @Test
+    fun `her language never goes into the export`() = runTest {
+        val phone = phone()
+        phone.settings.saveSetup(cycleLength = 30, periodLength = 4)
+        val withoutLanguage = phone.repository.exportBytes()
+
+        phone.language.setLanguage(Language("de"))
+
+        assertEquals(withoutLanguage.decodeToString(), phone.repository.exportBytes().decodeToString())
     }
 }

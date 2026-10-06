@@ -14,6 +14,8 @@ import java.time.LocalDate
  *   answered.
  * @property hiddenCategories the day log categories she turned off in "What to log". What she
  *   logged in them stays.
+ * @property dismissedCopperIudNote the fitting dates of the copper IUDs whose "Periods can be
+ *   heavier at first" card she tapped Got it on.
  */
 data class CycleSettings(
     val usualCycleLength: Int,
@@ -21,5 +23,6 @@ data class CycleSettings(
     val setupDone: Boolean,
     val dismissedStillGoing: Set<LocalDate> = emptySet(),
     val dismissedMissedPeriod: Set<LocalDate> = emptySet(),
-    val hiddenCategories: Set<LogCategory> = emptySet()
+    val hiddenCategories: Set<LogCategory> = emptySet(),
+    val dismissedCopperIudNote: Set<LocalDate> = emptySet()
 )

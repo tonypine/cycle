@@ -290,6 +290,40 @@ icon and switch draw at the disabled alphas, the state stays visible and taps ar
 Don't use a switch for choosing between options (use a `ButtonGroup`), for picking several items
 such as symptoms (use `FilterChip`s), or for an action that happens once (use a button).
 
+## Radio row
+
+`RadioRow.kt`. One choice of several, each with a line under it, such as her contraception method or
+whether she takes breaks between packs.
+
+```kotlin
+RadioGroup(
+    options = methods,
+    selected = method,
+    onSelect = { method = it },
+    title = { methodTitle(it) },
+    body = { methodLine(it) }
+)
+RadioRow(title = "Implant", selected = true, onClick = {}, body = "A rod in the arm, such as Nexplanon")
+```
+
+- `RadioGroup(options, selected, onSelect, title, modifier, body = { null }, enabled = true)` is the
+  one to reach for: a `RadioRow` per option, `spacing.small` apart, with nothing selected while
+  `selected` is null. The rows are one `selectableGroup` and a collection, so TalkBack reads each
+  row's place in it: "Implant, A rod in the arm, such as Nexplanon, radio button, selected, 6 of 9".
+- `RadioRow(title, selected, onClick, modifier, body = null, enabled = true, interactionSource)` is
+  one row: a full-width row on `surfaceContainer` with 24dp corners (`shapes.large`), the `title` in
+  `titleSmall` `onSurface`, an optional one-line `body` in `bodySmall` `onSurfaceVariant`, and the
+  radio at the end. The whole row is the target (`selectable`, `Role.RadioButton`), at least 56dp
+  tall. Pressed, focused and hovered come from `cycleIndication` in the row's shape.
+
+Selected, the row is `accentContainer` with `onAccentContainer` text and the radio is a 10dp `accent`
+dot in a 20dp `accent` ring; otherwise the radio is a 2dp `outline` ring, so the dot says the state
+without colour. The colours change on the default effects spring and jump under reduce motion.
+Disabled, the text and radio draw at the disabled alphas and taps are ignored.
+
+Don't use a radio row for two to five short options side by side (use a `ButtonGroup`), for a
+setting that is on or off (use a `SwitchRow`), or for picking several items (use `FilterChip`s).
+
 ## Slider
 
 `Slider.kt`. A whole number picked along a track, such as her usual cycle length in days. Built on
@@ -395,6 +429,9 @@ description is the date in the locale's day-and-month form, then "today" and the
 today, period", "14 March, predicted period", "17 March, estimated ovulation". Ovulation and the
 fertile window are estimates from period dates, so they always say "estimated". The visible number is
 hidden from TalkBack, so it is not read twice. The words live in `core:designsystem`'s `strings.xml`.
+On a method, `words: BleedingWords` (`Period` by default, `Bleed`, `Bleeding`) names a period day
+"bleed" or "bleeding" and a predicted one "expected bleed" ("14 October, bleeding"); the shapes and
+colours stay ([`contraception.md`](contraception.md#components)).
 
 Do not use it for a date picker that has no cycle meaning, and do not tint a cell with other colours:
 a new cycle state needs a new `CycleDayState` with its own shape.
@@ -405,20 +442,23 @@ a new cycle state needs a new `CycleDayState` with its own shape.
 week in a `WeekRow`.
 
 - `MonthCalendar(month, stateOf, onDayClick, today, onPreviousMonth, onNextMonth, selected = null,
-  isEnabled = { true })`: a header with the previous and next `IconButton`s ("Previous month", "Next
+  isEnabled = { true }, wordsOf = { BleedingWords.Period })`: a header with the previous and next `IconButton`s ("Previous month", "Next
   month", `ChevronStart` and `ChevronEnd`, so they mirror in right-to-left) around the month name in
   `title`; the narrow weekday names in `labelSmall` `onSurfaceVariant`; then a seven-column grid of
   `DayCell`s. The days outside `month` are left blank, so a month takes four to six rows.
-- `WeekRow(weekOf, stateOf, onDayClick, today, selected = null, isEnabled = { true })`: the weekday
+- `WeekRow(weekOf, stateOf, onDayClick, today, selected = null, isEnabled = { true }, wordsOf = {
+  BleedingWords.Period })`: the weekday
   names and the seven days of the week around `weekOf`, for Today and for picking a recent day. Days
   of the previous or next month show like any other.
 
 `stateOf` gives each day's `CycleDayState`, `today` gets the ring, `selected` the frame. A day where
 `isEnabled` returns false keeps its full colour and ignores taps (`DayCell` with `onClick = null`), so
 pass `{ !it.isAfter(today) }` to keep a predicted period readable while only past days can be
-logged. The week starts on the locale's first day (`WeekFields.of(locale)`): Monday in the UK, Sunday
-in the US, and the columns run right to left in right-to-left layouts. Each cell is keyed by its date,
-so moving to another month never replays the logging morph.
+logged. The week starts on the phone's first day (`firstDayOfWeek()`), whatever Cycle's language:
+Monday in the UK, Sunday in the US, and the columns run right to left in right-to-left layouts. Each cell is keyed by its date,
+so moving to another month never replays the logging morph. `wordsOf` gives each day's
+`BleedingWords`, so a month spanning the start of a method reads "period" before it and "bleeding"
+after.
 
 ```kotlin
 var month by rememberSaveable { mutableStateOf(YearMonth.from(today)) }
@@ -460,6 +500,12 @@ fertility estimates are off, as in the MVP. The default is all five. It is a `Fl
 wrap when the text is large, and it exposes `CollectionInfo` with one `CollectionItemInfo` per entry,
 so TalkBack reads it as a list of as many items as it shows. The swatches are decorative; the label
 says what each one is. Put it under the calendar it explains.
+
+`words` lists the `BleedingWords` of the logged days on screen, in order: the `Period` entry shows
+once per word ("Period", then "Bleeding" in a month where she started the implant). `predictedWords`
+names the predicted days on their own, so `PredictedPeriod` reads "Expected bleed" on a combined pill
+with a break every month even when the only logged days on screen are a period before it ("Period",
+"Expected bleed"). Leave `PredictedPeriod` out when nothing is predicted, as on the implant.
 
 ## Cards
 
@@ -899,3 +945,33 @@ A whole new token set (motion, for example) gets its own `Immutable` class, a `L
 Feature code uses design system components and tokens only. It never styles Foundation code ad hoc
 (`Modifier.background(Color(...))`, `16.dp` padding, a hand-made `TextStyle`). If a screen needs
 something the design system lacks, add the token or component here first.
+
+## Strings and languages
+
+Cycle speaks every language in `Language.Supported` (English only for now; Brazilian Portuguese,
+Spanish and German come with MOT-93), as
+[`0008-languages.md`](../decisions/0008-languages.md) decides. Every word a screen shows or TalkBack
+reads is a string resource in its module's `res/values/strings.xml`, never a literal in code.
+
+- **Every new user-visible string goes into every language in the same PR**: into `values` (English)
+  and each `values-xx` folder (`values-pt-rBR`, `values-es`, `values-de`). Android Lint's
+  `MissingTranslation` is an error, so a missing one fails the build. A translation not written by a
+  native speaker is marked as a draft at the top of its file, and the PR lists the new strings for a
+  native speaker to read (0008's "Review of translations").
+- **The copy rules hold in each language.** The words the app never says, per language, are in
+  `NeverSaid` in `core:testing` (`core/testing/src/main/kotlin/.../CopyRules.kt`), copied from 0008's
+  "Copy checks in every language", with the glossary and typography rules beside them in 0008. Each
+  module's `*StringsTest` runs `assertNeverSaid` over its strings and plurals in every language. A
+  module's own words (`also`) need a list in every language it checks, or the check fails. A list
+  changes only with 0008.
+- **Text that is not language**, such as the app's name, is `translatable="false"`.
+- **Dates and numbers** are formatted in `cycleLocale()`, the language of the strings Android picked,
+  never in `LocalConfiguration.current.locales[0]` (`LocaleReadersTest` fails on it). The first day
+  of the week is `firstDayOfWeek()`, from the phone. A date is formatted whole, with
+  `DateFormat.getBestDateTimePattern`, never assembled from pieces, and placeholders are numbered
+  (`%1$s`) so each language orders them its own way.
+- **Screenshots in another language**: `@Config(qualifiers = "+de")` on a test, or `renderIn(language)`
+  from `core:testing` before `setContent`.
+- **A new language** is added to `Language.Supported`, `localeFilters` (`CycleLanguages.kt` in
+  `build-logic`), `app`'s `res/xml/locales_config.xml`, every module's strings and `NeverSaid`, in one
+  PR; `LanguagesTest` in `app` fails until all of them name it.

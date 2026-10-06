@@ -26,12 +26,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tonypine.cycle.core.designsystem.AppBarAction
 import com.tonypine.cycle.core.designsystem.CycleIcons
 import com.tonypine.cycle.core.designsystem.CycleLegend
-import com.tonypine.cycle.core.designsystem.CycleLegendEntry
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.LoadingState
 import com.tonypine.cycle.core.designsystem.MonthCalendar
 import com.tonypine.cycle.core.designsystem.TopAppBar
 import com.tonypine.cycle.core.designsystem.rememberCycleBottomSheetState
+import com.tonypine.cycle.core.model.ContraceptionMethod
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.ui.DayLogSheet
@@ -92,8 +92,9 @@ class CalendarActions(
 
 /**
  * The calendar: a top bar with "Go to today", the month with her logged periods, the next three
- * estimated ones, today and the selected day, the legend, and a line saying the predictions are
- * estimates. Tapping a day up to today selects it and opens its day log sheet; the days after today
+ * estimated ones (expected bleeds on a combined method with monthly breaks, nothing on a method with no
+ * estimate), today and the selected day, the legend of what the month shows, in her method's words,
+ * and a line saying the predictions are estimates, or why there are none. Tapping a day up to today selects it and opens its day log sheet; the days after today
  * show their estimates in full colour and do nothing. Scrolls when the text is large.
  */
 @Composable
@@ -139,11 +140,13 @@ private fun Month(state: CalendarUiState.Ready, actions: CalendarActions) {
             onNextMonth = actions.onNextMonth,
             modifier = Modifier.padding(horizontal = spacing.medium),
             selected = state.selected,
-            isEnabled = state::canLog
+            isEnabled = state::canLog,
+            wordsOf = state.days::wordsOf
         )
-        CycleLegend(margin, entries = CycleLegendEntry.WithoutFertility)
+        val legend = state.legend
+        CycleLegend(margin, entries = legend.entries, words = legend.words, predictedWords = legend.predictedWords)
         BasicText(
-            text = stringResource(R.string.calendar_hint),
+            text = hint(state.hint),
             modifier = margin,
             style = CycleTheme.typography.bodySmall.copy(color = CycleTheme.colors.onSurfaceVariant)
         )
@@ -152,6 +155,39 @@ private fun Month(state: CalendarUiState.Ready, actions: CalendarActions) {
         DayLogSheet(sheet, entry, actions.onLogDay, actions.onFillPeriod, actions.onClearDay)
     }
 }
+
+/** The line under the legend: what is estimated, or why nothing is, and that past days can be logged. */
+@Composable
+private fun hint(hint: CalendarHint): String = stringResource(
+    when (hint) {
+        CalendarHint.Periods -> R.string.calendar_hint
+
+        CalendarHint.Bleeds -> R.string.calendar_hint_bleeds
+
+        CalendarHint.FirstBleed -> R.string.calendar_hint_first_bleed
+
+        CalendarHint.AfterInjection -> R.string.calendar_hint_after_injection
+
+        is CalendarHint.NoEstimate -> when (hint.method) {
+            ContraceptionMethod.COMBINED_PILL -> R.string.calendar_hint_none_pill
+
+            ContraceptionMethod.PROGESTOGEN_PILL -> R.string.calendar_hint_none_mini_pill
+
+            ContraceptionMethod.PATCH -> R.string.calendar_hint_none_patch
+
+            ContraceptionMethod.RING -> R.string.calendar_hint_none_ring
+
+            ContraceptionMethod.IMPLANT -> R.string.calendar_hint_none_implant
+
+            ContraceptionMethod.HORMONAL_IUD -> R.string.calendar_hint_none_hormonal_iud
+
+            ContraceptionMethod.INJECTION -> R.string.calendar_hint_none_injection
+
+            // A copper IUD keeps her estimates, so never comes here.
+            ContraceptionMethod.COPPER_IUD -> R.string.calendar_hint
+        }
+    }
+)
 
 @Preview
 @Composable

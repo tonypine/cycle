@@ -32,7 +32,7 @@ Every merge to `main` publishes a signed APK. The newest one is always at
 | `core:designsystem` | `CycleTheme`, the Zest tokens (colour, type, shape, spacing, elevation) and the components (buttons, icon buttons, chips) on Compose Foundation, no Material. See [`docs/design/design-system.md`](docs/design/design-system.md). |
 | `core:ui` | Shared app-level UI built on the design system: the day log sheet Today and the calendar both open, and the cycle state of each calendar day. |
 | `feature:calendar` | Calendar: her logged and estimated periods month by month, and the day log for any day up to today (log, fill in a forgotten period, clear a day). |
-| `feature:onboarding` | The first-run welcome and the optional two-step setup: her last period and her usual lengths. |
+| `feature:onboarding` | The first-run welcome and the optional three-step setup: her last period, her usual lengths and her contraception. |
 | `feature:today` | Today: her cycle day, this week, the next period estimate, the one-tap period buttons and the "missed a period?" question. |
 | `build-logic` | Gradle convention plugins shared by every module. |
 
@@ -82,8 +82,9 @@ environment variables, which Java ignores). The build handles the Robolectric si
 - Gradle resolves Robolectric's `android-all` runtime into its cache, and Robolectric reads it from
   there through `robolectric-deps.properties`, instead of downloading it into `~/.m2` under a lock
   file in `$HOME`. `after_create` in `WORKFLOW.md` runs `writeRobolectricDeps`, which downloads it
-  before an agent starts. The version is pinned as `robolectricAndroidAll` in
-  `gradle/libs.versions.toml`; after a Robolectric or SDK bump, a test fails with
+  before an agent starts. The versions are pinned as `robolectricAndroidAll` and, for the tests at
+  the minimum SDK, `robolectricAndroidAllSdk29` in `gradle/libs.versions.toml`; after a Robolectric
+  or SDK bump, a test fails with
   `no artifacts found for DependencyJar{…}`, naming the version to pin.
 - Tests write temp files under each module's `build/tmp`, not the system temp dir.
 

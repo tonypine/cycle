@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- The language of these strings, as a BCP 47 tag. Each language's folder has its own ("de",
+         "pt-BR"), so the strings say which language Android picked, and Cycle's dates and numbers
+         follow it (cycleLocale, docs/decisions/0008-languages.md). Not shown. -->
+    <string name="cycle_language_tag">en</string>
+
     <!-- What TalkBack reads for a text field's character counter, such as "12 of 200 characters". -->
     <string name="cycle_text_field_counter">%1$d of %2$d characters</string>
 
@@ -8,6 +13,11 @@
     <string name="day_cell_today">today</string>
     <string name="day_cell_period">period</string>
     <string name="day_cell_predicted_period">predicted period</string>
+    <!-- The same on a method (BleedingWords): "14 October, bleed", "14 October, bleeding". -->
+    <string name="day_cell_bleed">bleed</string>
+    <string name="day_cell_expected_bleed">expected bleed</string>
+    <string name="day_cell_bleeding">bleeding</string>
+    <string name="day_cell_expected_bleeding">expected bleeding</string>
     <string name="day_cell_fertile">estimated fertile window</string>
     <string name="day_cell_ovulation">estimated ovulation</string>
 
@@ -18,6 +28,10 @@
     <!-- Cycle phase legend labels, one per day cell state. Ovulation and the fertile window say "Estimated". -->
     <string name="legend_period">Period</string>
     <string name="legend_predicted_period">Predicted period</string>
+    <string name="legend_bleed">Bleed</string>
+    <string name="legend_expected_bleed">Expected bleed</string>
+    <string name="legend_bleeding">Bleeding</string>
+    <string name="legend_expected_bleeding">Expected bleeding</string>
     <string name="legend_fertile">Estimated fertile window</string>
     <string name="legend_ovulation">Estimated ovulation</string>
     <string name="legend_today">Today</string>

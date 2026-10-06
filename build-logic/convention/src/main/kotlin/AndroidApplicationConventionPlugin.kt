@@ -1,5 +1,6 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.tonypine.cycle.buildlogic.configureKotlinAndroid
+import com.tonypine.cycle.buildlogic.configureLocaleFilters
 import com.tonypine.cycle.buildlogic.configureNoMaterialDependencies
 import com.tonypine.cycle.buildlogic.configureReleaseBuild
 import com.tonypine.cycle.buildlogic.libs
@@ -18,6 +19,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             configureKotlinAndroid(this)
             defaultConfig.targetSdk = libs.versionOf("targetSdk").toInt()
             configureReleaseBuild(this)
+            configureLocaleFilters(this)
         }
         configureNoMaterialDependencies()
     }

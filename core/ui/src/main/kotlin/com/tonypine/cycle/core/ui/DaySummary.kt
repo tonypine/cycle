@@ -2,8 +2,8 @@ package com.tonypine.cycle.core.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import com.tonypine.cycle.core.designsystem.cycleLocale
 import com.tonypine.cycle.core.model.BodySymptom
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.EnergyLevel
@@ -37,7 +37,7 @@ fun painSummary(pain: Pain): String {
     val kinds = PainKind.entries.filter { it in pain.kinds }
     if (kinds.isEmpty() || pain.level == PainLevel.NONE) return stringResource(pain.level.summaryAlone)
     // "Cramps, lower back": the places after the first read on in lower case.
-    val locale = LocalConfiguration.current.locales[0]
+    val locale = cycleLocale()
     val where = kinds.mapIndexed { index, kind ->
         stringResource(kind.label).let { if (index == 0) it else it.lowercase(locale) }
     }.joinToString(", ")

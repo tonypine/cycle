@@ -1,8 +1,8 @@
 # 0006: Contraception: what Cycle records, says and estimates on each method
 
 **Status:** accepted, 2026-10-05.
-Designed only: the build tickets (MOT-51 to MOT-55) were canceled, so a later build follows this
-record and [`contraception.md`](../design/contraception.md).
+[MOT-51](https://linear.app/tonypine/issue/MOT-51) stores the stretches and computes the estimates;
+the screens follow this record and [`contraception.md`](../design/contraception.md).
 
 ## Context
 
@@ -93,25 +93,36 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
 
 - **The current stretch.** At most one stretch covers today: the one with no stop date, or with a
   stop date today or later. That stretch is her method "Now" in Settings, on Today and everywhere
-  else, until its stop date has passed.
+  else, until its stop date has passed. One exception: once she marks a method as stopped with
+  today's date, Settings shows "None" straight away, and starting a method treats it as stopped.
+  Today is still its last day for the estimates. The injection, whose stop date runs ahead, stays
+  "Now" until that date has passed.
 - **No overlaps.** Starting or changing a method ends the current stretch the day before the new one
   starts, moving its stop date earlier if it has one. A new start can only be today or earlier, so
   it always falls before the current stretch ends. A new start on or before the current stretch's
   start is refused: "That's before you started the pill on 3 May. Pick a later day, or change the
   pill's dates first."
 - **Adding a method while she is on none.** The new stretch starts on the day she picks, today or
-  earlier, with no stop date. A start inside an earlier stretch would overlap it, so a dialog offers
+  earlier, with no stop date. A start inside a stopped stretch would overlap it, so a dialog offers
   to move that stretch's end to the day before, as in Edits below. Implant 9 November 2026 to 3
   November 2027; on 15 November she adds the pill from 20 October: "Move the end of your implant?"
   "Your implant would end on 19 October instead of 3 November, so the two don't overlap. Cycle works
   out its estimates again." Cancel · **Move it**. Cancel goes back to the calendar. A start on or
-  before an earlier stretch's start would cover all of it and is refused with the dates to use:
+  before a stopped stretch's start would cover all of it and is refused with the dates to use:
   "That would cover all of your time on the implant. Delete the implant's dates first, or pick a
   later day."
+- **A start that reaches more than one stopped stretch.** The new stretch runs to today, so only the
+  stretch holding its start can be cut short; every stretch after it would be covered whole. Any
+  stretch covered whole refuses the start, with no move dialog, even when the start also lies inside
+  another. The refusal names the latest stretch it would cover, because a day after that one's start
+  is the earliest that can be saved. After the implant above, the ring from 20 November 2027 to 10
+  January 2028; on 15 February 2028 she adds the pill from 1 November 2027: "That would cover all of
+  your time on the ring. Delete the ring's dates first, or pick a later day." From 21 November to 10
+  January, the dialog offers to move the ring's end; from 11 January, nothing overlaps.
 - **Unknown start.** In every date comparison, here, in edits and in import, a null start counts as
-  earlier than any date and a null stop as later than any. So a new start always ends a stretch
-  with an unknown start the day before (or offers to, when she is on none), and is never refused
-  because of it.
+  earlier than any date and a null stop as later than any. So a new start ends a stretch with an
+  unknown start the day before (or, when she is on none, offers to, unless it would cover a later
+  stretch whole, as above), and is never refused because of the unknown start itself.
 - **Unknown start, in what she reads.** Where the copy prints the start date, a stretch with no
   start says so instead: Settings' row "Implant, start not known"; the Now card "Start not known"
   under the method's name (in place of "Since 9 November 2026"); "Your methods" and History's card
@@ -261,6 +272,11 @@ still ahead (the injection's weeks, above):
 - **Settings › Your cycle › Contraception** shows the current method with its calm line, "Mark as
   stopped" and "Change method", the earlier stretches, and each stretch's edit page (dates, breaks,
   delete). The flows and copy are in the design doc.
+- **When to get help.** On the combined pill, patch or ring, or either IUD, the same page shows
+  "When to get help" under the current method and above the earlier stretches: fixed text with the
+  signs clinics give every user of the method, in the words of
+  [`0007`](0007-urgent-symptoms-on-a-method.md). It follows the method in force, never what she
+  logs, and appears nowhere else. Its layout is in the design doc.
 
 ### Privacy
 
@@ -268,13 +284,35 @@ The method is health data and stays on the phone with the rest:
 
 - It travels only in her export and in Android's encrypted backup (the Room database,
   [`0004`](0004-backup-encryption.md)). The export gains a third section after the settings, with
-  the columns `method,started,stopped,breaks`, and import adds the stretches that do not overlap
-  ones already on the phone, refusing the file with a line number otherwise, like its other
-  problems. A null start overlaps every stretch that starts on or before its stop, as above. A row
-  that reaches several stretches is refused like one that reaches one, with no move dialog and
-  nothing from the file added. The problem names only the latest stretch it overlaps, with its dates
-  as "Your methods" writes them, so it stays one sentence like the file's others: "Line 14 overlaps
-  your time on the ring, 20 Nov 2027 to 10 Jan 2028."
+  the columns `method,started,stopped,breaks`, and import adds the stretches that are new to the
+  phone and overlap none already on it, refusing the file with a line number otherwise, like its
+  other problems: "Line 7 has a method whose dates overlap one already on this phone." This
+  replaces the current "Line 7 has a method whose dates overlap another one, in the file or already
+  on this phone.", now that rows overlapping each other have their own copy, below. A null start
+  overlaps every stretch that starts on or before its stop, as above. A row that reaches several
+  stretches on the phone, even covering some whole, is refused the same way, with the same one-line
+  problem and no move dialog, and nothing from the file is added: unlike an edit, which names the
+  stretch in the way, the problem names only the line, so it stays one sentence like the file's
+  others and she reads the dates to fix in "Your methods".
+- **A stretch already on the phone.** A row with the same method and start as a stretch on the
+  phone is that stretch, as a line for a date she already logged is that day: import skips it and
+  the phone's copy stays as it is, whatever the row says about its stop or breaks. A null start
+  matches a null start. A skipped row is not checked against the phone's other stretches. So
+  re-importing her own export adds nothing: with the implant from 9 November 2026 to 3 November 2027
+  on the phone, the file's `implant,2026-11-09,2027-11-03,` is skipped, and so is
+  `implant,2026-11-09,,` from an export made before she marked it stopped. The confirm dialog for
+  a file with new days ("Import 3 days?") counts days as now, and on a file with methods its text
+  reads "Days and methods already on this phone stay as they are." in place of "Days already logged
+  on this phone stay as they are." The dialog for a file with no new days, only methods ("Import 1
+  method?"), counts only the methods that are new to the phone and keeps its text. When nothing in
+  a file with methods is new: "Nothing new to import" "Everything in this file is already on this
+  phone." **OK**. A file with no methods keeps the current copy in every dialog.
+- **Rows that overlap each other.** Two rows in the file whose dates overlap, identical rows
+  included, refuse the file: Cycle never writes them, as it never writes two lines for one date. The
+  problem names the first line, reading down, that overlaps an earlier row, and the earliest row it
+  overlaps: "Lines 6 and 7 have methods whose dates overlap." The file is checked on its own first,
+  top to bottom with its other problems, and only then against the phone, so it is refused even
+  when one of the two rows is already on the phone.
 - Never in a notification, a widget or any text outside the app. "Delete everything" deletes it.
 
 ### Thresholds
@@ -300,6 +338,18 @@ the copper IUD note.
 - **Storing the method in DataStore with the settings.** Easy for the current method, but History
   needs the dates of every past method, and `0003` already says life stages are date ranges in their
   own table.
+- **Deleting or moving every stretch a new start covers, in one dialog.** Fewer steps when a start
+  reaches back over several methods, but one tap on "Move it" would forget whole stretches she
+  logged. Deleting dates keeps its own page and its own question; the refusal names the stretch to
+  delete or the day to pick after.
+- **Refusing an imported row that is already on the phone.** Simpler, but re-importing her own
+  export would refuse the whole file over the stretches it holds, while its days are skipped
+  quietly.
+- **Skipping only a row identical in every column.** An export made before she marked a method
+  stopped, or changed its breaks, would then be refused. As with days, the phone's copy is the one
+  she changed last, and the method and start are enough to tell it is the same stretch.
+- **Keeping one of two overlapping rows in a file.** Cycle would have to guess which one she meant;
+  naming both lines lets her fix the file.
 - **Asking for the start date of her current pack** to place the break exactly. More precise, but one
   more date to keep right, and wrong as soon as she starts a pack a day late. Her logged bleeds
   follow the pack anyway, so the estimate anchors on them after the first break.

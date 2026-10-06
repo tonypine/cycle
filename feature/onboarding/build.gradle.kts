@@ -4,7 +4,8 @@ plugins {
     alias(libs.plugins.cycle.screenshot.tests)
 }
 
-// The first-run welcome and the optional two-step setup: her last period and her usual lengths.
+// The first-run welcome and the optional three-step setup: her last period, her usual lengths and her
+// contraception.
 android {
     namespace = "com.tonypine.cycle.feature.onboarding"
 }
@@ -21,4 +22,6 @@ dependencies {
     testImplementation(libs.androidx.room.runtime)
     testImplementation(libs.androidx.datastore.preferences)
     testImplementation(libs.kotlinx.coroutines.test)
+    // The copy check in every language, and rendering in one (core:testing).
+    testImplementation(projects.core.testing)
 }

@@ -12,13 +12,16 @@ android {
 dependencies {
     implementation(projects.core.ui)
     implementation(projects.core.data)
+    // The bleeding counts on each method's card.
+    implementation(projects.core.domain)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     // The state tests derive her overview from a synthetic log with the real calculator, and the
     // ViewModel tests run the real repositories on an in-memory database and a DataStore file.
-    testImplementation(projects.core.domain)
     testImplementation(libs.androidx.room.runtime)
     testImplementation(libs.androidx.datastore.preferences)
     testImplementation(libs.kotlinx.coroutines.test)
+    // The copy check in every language, and rendering in one (core:testing).
+    testImplementation(projects.core.testing)
 }
