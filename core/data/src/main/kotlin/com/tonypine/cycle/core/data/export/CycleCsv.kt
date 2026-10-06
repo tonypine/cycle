@@ -84,8 +84,11 @@ sealed interface ImportProblem {
     /** The method on [line] stops before it starts. */
     data class StopsBeforeStarts(val line: Int) : ImportProblem
 
-    /** The method on [line] overlaps another one, earlier in the file or already on the phone. */
+    /** The method on [line] overlaps one already on the phone. */
     data class OverlappingMethod(val line: Int) : ImportProblem
+
+    /** The method on [line] overlaps the one on [earlier], the earliest row of the file it overlaps. */
+    data class OverlappingRows(val earlier: Int, val line: Int) : ImportProblem
 }
 
 /** What reading an export gives: its days, or the first problem found. */
@@ -229,8 +232,8 @@ internal object CycleCsv {
                 is StretchRow.Stretch -> row.stretch
                 is StretchRow.Problem -> return CsvRead.Refused(row.problem)
             }
-            if (stretches.any { it.stretch.overlaps(stretch) }) {
-                return CsvRead.Refused(ImportProblem.OverlappingMethod(record.line))
+            stretches.firstOrNull { it.stretch.overlaps(stretch) }?.let { earlier ->
+                return CsvRead.Refused(ImportProblem.OverlappingRows(earlier.line, record.line))
             }
             stretches += ImportedStretch(record.line, stretch)
         }

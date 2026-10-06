@@ -181,7 +181,20 @@ class SettingsViewModelTest {
 
         viewModel.onImport { ByteArrayInputStream(export) }
 
-        assertEquals(DataDialog.NothingToImport, viewModel.awaitDialog())
+        assertEquals(DataDialog.NothingToImport(), viewModel.awaitDialog())
+    }
+
+    @Test
+    fun `a file whose days and methods are all on the phone says so`() = runTest {
+        val viewModel = settingsViewModel()
+        logTwoDays()
+        contraception.start(ContraceptionMethod.IMPLANT, null, LocalDate.of(2026, 11, 9), today = today)
+        val export = ByteArrayOutputStream().also { YourDataRepository(database, settings).export(it) }.toByteArray()
+
+        viewModel.onImport { ByteArrayInputStream(export) }
+
+        assertEquals(DataDialog.NothingToImport(hasMethods = true), viewModel.awaitDialog())
+        assertEquals(1, contraception.observeStretches().first().size)
     }
 
     @Test
@@ -216,7 +229,10 @@ class SettingsViewModelTest {
         contraception.delete(contraception.observeStretches().first().single().id)
 
         viewModel.onImport { ByteArrayInputStream(export) }
-        assertEquals(DataDialog.ConfirmImport(newDays = 0, newStretches = 1), viewModel.awaitDialog())
+        assertEquals(
+            DataDialog.ConfirmImport(newDays = 0, newStretches = 1, hasMethods = true),
+            viewModel.awaitDialog()
+        )
 
         viewModel.onConfirmImport()
 

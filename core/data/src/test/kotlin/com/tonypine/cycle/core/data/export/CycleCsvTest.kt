@@ -297,20 +297,73 @@ class CycleCsvTest {
     }
 
     @Test
-    fun `stretches that overlap each other refuse the file at the later line`() {
+    fun `rows that overlap each other refuse the file naming both lines`() {
         refused(
-            ImportProblem.OverlappingMethod(4),
+            ImportProblem.OverlappingRows(3, 4),
             header,
             stretchHeader,
             "implant,2027-01-01,2027-03-01,",
             "patch,2027-03-01,,monthly"
         )
         refused(
-            ImportProblem.OverlappingMethod(4),
+            ImportProblem.OverlappingRows(3, 4),
             header,
             stretchHeader,
             "implant,,2027-03-01,",
             "injection,,2026-01-01,"
+        )
+    }
+
+    @Test
+    fun `identical rows refuse the file naming both lines`() {
+        refused(
+            ImportProblem.OverlappingRows(3, 4),
+            header,
+            stretchHeader,
+            "implant,2026-11-09,2027-11-03,",
+            "implant,2026-11-09,2027-11-03,"
+        )
+        refused(ImportProblem.OverlappingRows(3, 4), header, stretchHeader, "copper_iud,,,", "copper_iud,,,")
+    }
+
+    @Test
+    fun `an overlap names the first line reading down that overlaps, and the earliest row it overlaps`() {
+        refused(
+            ImportProblem.OverlappingRows(3, 5),
+            header,
+            stretchHeader,
+            "implant,2027-01-01,2027-02-01,",
+            "copper_iud,2027-03-01,2027-04-01,",
+            "injection,2027-01-15,2027-03-15,",
+            "hormonal_iud,2027-03-20,,"
+        )
+        refused(
+            ImportProblem.OverlappingRows(4, 5),
+            header,
+            stretchHeader,
+            "copper_iud,2027-03-01,2027-04-01,",
+            "implant,2027-01-01,2027-02-01,",
+            "injection,2027-01-15,2027-01-20,"
+        )
+    }
+
+    @Test
+    fun `an overlap is found top to bottom with the file's other problems`() {
+        refused(
+            ImportProblem.OverlappingRows(3, 4),
+            header,
+            stretchHeader,
+            "implant,2027-01-01,,",
+            "copper_iud,2027-02-01,,",
+            "implant,soon,,"
+        )
+        refused(
+            ImportProblem.BadDate(4, "soon"),
+            header,
+            stretchHeader,
+            "implant,2027-01-01,,",
+            "implant,soon,,",
+            "copper_iud,2027-02-01,,"
         )
     }
 }

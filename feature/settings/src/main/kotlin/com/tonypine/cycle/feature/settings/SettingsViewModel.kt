@@ -113,11 +113,18 @@ class SettingsViewModel(
                 read is ImportRead.Refused -> show(DataDialog.ImportRefused(read.problem))
 
                 read is ImportRead.Ready && read.newDays == 0 && read.newStretches == 0 && !read.restoresLengths ->
-                    show(DataDialog.NothingToImport)
+                    show(DataDialog.NothingToImport(read.hasStretches))
 
                 read is ImportRead.Ready -> {
                     pending = read
-                    show(DataDialog.ConfirmImport(read.newDays, read.newStretches, read.restoresLengths))
+                    show(
+                        DataDialog.ConfirmImport(
+                            read.newDays,
+                            read.newStretches,
+                            read.restoresLengths,
+                            read.hasStretches
+                        )
+                    )
                 }
             }
         }
@@ -226,14 +233,19 @@ data class SettingsUiState(
 sealed interface DataDialog {
     /**
      * "Import N days?", with [newDays] the days of the file not on the phone yet. With none, "Import
-     * N methods?" for its [newStretches] of contraception, or "Import your usual lengths?" when it
-     * brings only its usual lengths, which [restoresLengths] says it would restore.
+     * N methods?" for its [newStretches] of contraception not on the phone yet, or "Import your usual
+     * lengths?" when it brings only its usual lengths, which [restoresLengths] says it would restore.
+     * [hasMethods] says the file has contraception, new or not.
      */
-    data class ConfirmImport(val newDays: Int, val newStretches: Int = 0, val restoresLengths: Boolean = false) :
-        DataDialog
+    data class ConfirmImport(
+        val newDays: Int,
+        val newStretches: Int = 0,
+        val restoresLengths: Boolean = false,
+        val hasMethods: Boolean = false
+    ) : DataDialog
 
-    /** Every day in the file is on the phone already. */
-    data object NothingToImport : DataDialog
+    /** Everything in the file is on the phone already; [hasMethods] says it has contraception. */
+    data class NothingToImport(val hasMethods: Boolean = false) : DataDialog
 
     /** The file can't be imported, because of [problem]. */
     data class ImportRefused(val problem: ImportProblem) : DataDialog
