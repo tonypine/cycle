@@ -48,13 +48,8 @@ sealed interface CalendarUiState {
             val hint = when (contraception.estimates) {
                 EstimateKind.PERIOD -> CalendarHint.Periods
 
-                EstimateKind.NEXT_BLEED -> if (contraception.nextBleed !=
-                    null
-                ) {
-                    CalendarHint.Bleeds
-                } else {
-                    CalendarHint.FirstBleed
-                }
+                EstimateKind.NEXT_BLEED ->
+                    if (contraception.nextBleed != null) CalendarHint.Bleeds else CalendarHint.FirstBleed
 
                 EstimateKind.NONE -> current?.let { CalendarHint.NoEstimate(it.method) } ?: CalendarHint.AfterInjection
             }
