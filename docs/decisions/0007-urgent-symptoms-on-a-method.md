@@ -1,6 +1,6 @@
 # 0007: Urgent symptoms on a contraceptive method
 
-**Status:** proposed, 2026-10-05; accepted once Tony approves MOT-66
+**Status:** accepted, 2026-10-05
 
 ## Context
 
