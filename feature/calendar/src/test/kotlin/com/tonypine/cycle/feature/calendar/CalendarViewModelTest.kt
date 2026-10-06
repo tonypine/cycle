@@ -2,6 +2,7 @@ package com.tonypine.cycle.feature.calendar
 
 import android.content.Context
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.lifecycle.viewModelScope
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -23,7 +24,9 @@ import java.time.LocalDate
 import java.time.YearMonth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -95,7 +98,10 @@ class CalendarViewModelTest {
     @Test
     fun `logging a past day saves its flow, and changing it takes it back off the period`() = calendar { viewModel, _ ->
         viewModel.onDayClick(day("2027-03-10"))
-        assertEquals(DayLogEntry(day("2027-03-10"), fillDays = 5), viewModel.awaitState().selectedLog)
+        assertEquals(
+            DayLogEntry(day("2027-03-10"), fillDays = 5),
+            viewModel.awaitState { it.selected != null }.selectedLog
+        )
 
         viewModel.onLogDay(day("2027-03-10"), FlowLevel.MEDIUM, DayFeelings(day("2027-03-10")))
         val logged = viewModel.awaitState { it.days.periods.isNotEmpty() }
@@ -115,7 +121,7 @@ class CalendarViewModelTest {
         viewModel.awaitState { it.days.periods.isNotEmpty() }
 
         viewModel.onDayClick(day("2027-02-04"))
-        assertEquals(5, viewModel.awaitState().selectedLog?.fillDays)
+        assertEquals(5, viewModel.awaitState { it.selected != null }.selectedLog?.fillDays)
         viewModel.onFillPeriod(day("2027-02-04"))
 
         val state = viewModel.awaitState { it.days.periods.size == 2 }
@@ -203,14 +209,14 @@ class CalendarViewModelTest {
     @Test
     fun `months move back and forth, to a month asked for, and back to today`() = calendar { viewModel, _ ->
         viewModel.onPreviousMonth()
-        assertEquals(YearMonth.of(2027, 2), viewModel.awaitState().month)
+        viewModel.awaitState { it.month == YearMonth.of(2027, 2) }
         viewModel.onNextMonth()
         viewModel.onNextMonth()
-        assertEquals(YearMonth.of(2027, 4), viewModel.awaitState().month)
+        viewModel.awaitState { it.month == YearMonth.of(2027, 4) }
         viewModel.showMonth(YearMonth.of(2026, 12))
-        assertEquals(YearMonth.of(2026, 12), viewModel.awaitState().month)
+        viewModel.awaitState { it.month == YearMonth.of(2026, 12) }
         viewModel.onGoToToday()
-        assertEquals(YearMonth.of(2027, 3), viewModel.awaitState().month)
+        viewModel.awaitState { it.month == YearMonth.of(2027, 3) }
     }
 
     /** Runs [test] with a ViewModel on the test database, its state collected as the screen would. */
@@ -220,9 +226,20 @@ class CalendarViewModelTest {
         )
         val viewModel = CalendarViewModel(CycleRepository(dayLogs, settings), dayLogs) { today }
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
-        test(viewModel, settings)
+        try {
+            test(viewModel, settings)
+        } finally {
+            // As if the screen were gone: nothing of the ViewModel may still reach Dispatchers.Main while
+            // tearDown resets it, or resetMain fails with "used concurrently".
+            viewModel.viewModelScope.coroutineContext.job.cancelAndJoin()
+        }
     }
 
+    /**
+     * The first state that [matches]. Room emits on its own threads, and the ViewModel runs there on
+     * the unconfined Main, so a state can still be on its way after a call returns: wait for what the
+     * call changes, not just any state.
+     */
     private suspend fun CalendarViewModel.awaitState(
         matches: (CalendarUiState.Ready) -> Boolean = { true }
     ): CalendarUiState.Ready = uiState.first { it is CalendarUiState.Ready && matches(it) } as CalendarUiState.Ready
