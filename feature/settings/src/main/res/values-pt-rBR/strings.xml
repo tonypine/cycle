@@ -237,6 +237,7 @@
     <string name="refused_after_today">Esse dia é depois de hoje. Escolha hoje ou um dia anterior.</string>
     <string name="refused_before_current">Esse dia é antes de %2$s, quando você começou a usar %1$s. Escolha um dia posterior, ou mude primeiro as datas em que você usa %1$s.</string>
     <string name="refused_covers_whole">Isso cobriria todo o tempo em que você usou %1$s. Apague primeiro as datas em que você usou %1$s, ou escolha um dia posterior.</string>
+    <string name="refused_covers_whole_earlier">Isso cobriria todo o tempo em que você usou %1$s. Apague primeiro as datas em que você usou %1$s, ou escolha um dia anterior.</string>
     <string name="refused_stop_before_start">Esse dia é antes do início. Escolha um dia posterior.</string>
     <string name="refused_stop_too_late">Escolha um dia até %1$s.</string>
     <string name="refused_gone">Estas datas foram apagadas.</string>
