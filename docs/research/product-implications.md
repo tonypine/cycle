@@ -150,8 +150,9 @@ From [`contraception.md`](contraception.md):
 - **"Bleeding" on progestogen-only methods** (pill, implant, injection, hormonal IUD) and for
   unscheduled bleeding on a combined method. These are the accurate words, not euphemisms.
 - **No cycle language where there is no cycle**: no "cycle day", phases or "late" on the implant,
-  injection, progestogen-only pill or hormonal IUD. Describe bleeding over the last 90 days in plain
-  counts. Whether a hormonal IUD user with regular bleeds later gets a next-bleed estimate is
+  either injection, progestogen-only pill or hormonal IUD. Describe bleeding over the last 90 days
+  in plain counts. Whether a hormonal IUD user with regular bleeds, or a monthly combined injection
+  user whose bleeds follow her injections, later gets a next-bleed estimate is
   [MOT-50](https://linear.app/tonypine/issue/MOT-50)'s call.
 - **Never advise on her method**: no "consider switching", "you may want to stop", "you are
   protected" or missed-pill guidance. Questions about her method go to her pharmacist, nurse or

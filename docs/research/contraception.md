@@ -493,8 +493,9 @@ she knows from her clinic. Fertile window and ovulation estimates mean nothing.
 
 **Stopping.** Slower than the pill, much faster than DMPA. Users become pregnant on average about
 5 months after the last injection, about one month later than after most other methods, and the
-WHO says not being pregnant even 12 months after stopping is no cause for worry. Her earlier bleeding pattern generally returns a few months
-after the last injection, and she may ovulate before her first bleed
+WHO says not being pregnant even 12 months after stopping is no cause for worry.
+Her earlier bleeding pattern generally returns a few months after the last injection, and she may
+ovulate before her first bleed
 ([WHO FP Handbook, ch. 5, Q10–11](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf)).
 In small studies, 52% ovulated in the first month after three months of Lunelle and 71% by the
 second, 60% by the third month after two years of use, and in another study 11 of 14 women
@@ -516,7 +517,8 @@ studies: 87% after the pill, 85% after an IUD, 78% after an injection and 75% af
 without one outlying study), 83% overall
 ([Girum 2018](https://pmc.ncbi.nlm.nih.gov/articles/PMC6055351/)). The authors found no significant
 difference between hormonal methods and IUDs at a year. The difference is in how soon: weeks for
-most methods, months for the injection.
+most methods, months for the injections (about 10 months on average after DMPA, about 5 after the
+monthly combined injection).
 
 ## Worth mentioning to a doctor, on a method
 
