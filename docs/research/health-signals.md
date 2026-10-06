@@ -56,8 +56,10 @@ spotting, and suggests perimenopause can be a cause from 40 on
   these cards need their own calm treatment. Do not repeat a dismissed signal until the pattern
   changes.
 - **Her choice.** A setting turns these cards off entirely.
-- **No emergencies.** The app is not a triage tool and should not pretend to be one. If a ticket adds
-  wording about urgent symptoms, it should come from a clinical source and be reviewed.
+- **No emergencies.** The app is not a triage tool and should not pretend to be one: no card or
+  alert ever says a symptom she logged is urgent. Wording about urgent symptoms comes from a clinical
+  source and is reviewed; the only wording so far is the fixed "When to get help" text on some
+  contraceptive methods ([`0006`](../decisions/0006-urgent-symptoms-on-a-method.md)).
 - **The useful output is a summary.** A screen or file she can show a doctor: cycle lengths, period
   lengths, flow, pain and the symptoms she chose to share, over a chosen range. That shortens the
   "how long has this been going on?" part of an appointment, and for PMDD it is the two-cycle diary
