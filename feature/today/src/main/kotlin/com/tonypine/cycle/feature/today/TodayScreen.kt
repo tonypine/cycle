@@ -54,6 +54,7 @@ import com.tonypine.cycle.core.ui.DayLogSheet
 import com.tonypine.cycle.core.ui.calmLine
 import com.tonypine.cycle.core.ui.daySummary
 import com.tonypine.cycle.core.ui.formatDate
+import com.tonypine.cycle.core.ui.formatDateStartingLine
 import com.tonypine.cycle.core.ui.methodInSentence
 import com.tonypine.cycle.core.ui.methodShortName
 import com.tonypine.cycle.core.ui.summaryLine
@@ -205,7 +206,7 @@ private fun Header(state: TodayUiState.Tracking, modifier: Modifier) {
     val typography = CycleTheme.typography
     Column(modifier, verticalArrangement = Arrangement.spacedBy(CycleTheme.spacing.extraSmall)) {
         BasicText(
-            text = formatDate(state.today, DAY_AND_DATE),
+            text = formatDateStartingLine(state.today, DAY_AND_DATE),
             style = typography.label.copy(color = colors.onSurfaceVariant)
         )
         BasicText(

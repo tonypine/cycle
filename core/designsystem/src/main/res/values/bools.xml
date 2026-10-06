@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Whether Cycle's text hyphenates long words in this language (CycleTheme). On where a language's
+         long compounds would otherwise break between any two letters on a narrow line, as German's
+         "Periodenlänge" does at 200% font size; off where wrapping between words is enough. -->
+    <bool name="cycle_hyphenates">false</bool>
+</resources>

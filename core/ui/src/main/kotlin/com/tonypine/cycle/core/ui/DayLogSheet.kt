@@ -120,7 +120,7 @@ fun DayLogSheet(
     val scope = rememberCoroutineScope()
     var confirmClear by rememberSaveable { mutableStateOf(false) }
     val date = entry.date
-    CycleBottomSheet(sheet, title = formatDate(date, DAY_AND_DATE), onDismiss = { confirmClear = false }) {
+    CycleBottomSheet(sheet, title = formatDateStartingLine(date, DAY_AND_DATE), onDismiss = { confirmClear = false }) {
         var flow by rememberSaveable(date) { mutableStateOf(entry.flow) }
         var feelings by rememberSaveable(date) { mutableStateOf(entry.feelings) }
         val note = rememberSaveable(date, saver = TextFieldState.Saver) { TextFieldState(entry.feelings.note) }
