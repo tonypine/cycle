@@ -36,7 +36,6 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -53,7 +52,6 @@ import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.toPath
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 import kotlin.math.roundToInt
 
 /** Where a day sits in the cycle. Today, selection and disabled are separate, and combine with every state. */
@@ -279,11 +277,8 @@ private fun CycleDayState.numberColor(colors: CycleColors): Color = when (this) 
 }
 
 @Composable
-internal fun locale(): Locale = LocalConfiguration.current.locales[0]
-
-@Composable
 private fun dayNumber(date: LocalDate): String {
-    val locale = locale()
+    val locale = cycleLocale()
     return remember(date, locale) { String.format(locale, "%d", date.dayOfMonth) }
 }
 
@@ -293,7 +288,7 @@ private fun dayNumber(date: LocalDate): String {
  */
 @Composable
 private fun dayDescription(date: LocalDate, state: CycleDayState, isToday: Boolean, words: BleedingWords): String {
-    val locale = locale()
+    val locale = cycleLocale()
     val dayMonth = remember(date, locale) {
         DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "dMMMM"), locale).format(date)
     }

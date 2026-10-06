@@ -29,20 +29,26 @@ import org.gradle.work.DisableCachingByDefault
  * Registers the resolution once per project and returns the step that points one test task at it.
  */
 internal fun Project.gradleResolvedRobolectricRuntime(): (Test) -> Unit {
-    val androidAll = configurations.detachedConfiguration(
-        dependencies.create(libs.library("robolectric-android-all-instrumented").get())
-    ).apply { isTransitive = false }
+    // The SDK in robolectric.properties, and Android 10 for the tests that pin `sdk = [29]`. One
+    // configuration each: in one, Gradle would keep only the newer version of the same module.
+    val androidAll = listOf("robolectric-android-all-instrumented", "robolectric-android-all-instrumented-sdk29")
+        .map { alias ->
+            configurations.detachedConfiguration(dependencies.create(libs.library(alias).get()))
+                .apply { isTransitive = false }
+        }
 
     val writeDeps = tasks.register<WriteRobolectricDepsTask>("writeRobolectricDeps") {
         description = "Maps the android-all jars Gradle resolved for Robolectric to their files."
-        jarsByCoordinates.set(
-            androidAll.incoming.artifacts.resolvedArtifacts.map { artifacts ->
-                artifacts.associate { artifact ->
-                    val id = artifact.id.componentIdentifier as ModuleComponentIdentifier
-                    "${id.group}:${id.module}:${id.version}" to artifact.file.absolutePath
+        androidAll.forEach { configuration ->
+            jarsByCoordinates.putAll(
+                configuration.incoming.artifacts.resolvedArtifacts.map { artifacts ->
+                    artifacts.associate { artifact ->
+                        val id = artifact.id.componentIdentifier as ModuleComponentIdentifier
+                        "${id.group}:${id.module}:${id.version}" to artifact.file.absolutePath
+                    }
                 }
-            }
-        )
+            )
+        }
         propertiesFile.set(layout.buildDirectory.file("robolectric/robolectric-deps.properties"))
     }
 

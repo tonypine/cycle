@@ -21,6 +21,8 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension) {
         lint.abortOnError = true
         lint.warningsAsErrors = false
         lint.checkReleaseBuilds = true
+        // Every string in every language Cycle has, never a silent fallback to English (0008-languages.md).
+        lint.error += "MissingTranslation"
     }
 
     extensions.configure<KotlinAndroidProjectExtension> {

@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
@@ -42,6 +41,7 @@ import com.tonypine.cycle.core.designsystem.LoadingState
 import com.tonypine.cycle.core.designsystem.TextButton
 import com.tonypine.cycle.core.designsystem.TonalButton
 import com.tonypine.cycle.core.designsystem.WeekRow
+import com.tonypine.cycle.core.designsystem.cycleLocale
 import com.tonypine.cycle.core.designsystem.rememberCycleBottomSheetState
 import com.tonypine.cycle.core.model.BleedBasis
 import com.tonypine.cycle.core.model.DayFeelings
@@ -581,7 +581,7 @@ private fun basisLine(next: NextPeriod): String {
  */
 @Composable
 private fun dateRange(from: LocalDate, to: LocalDate): String {
-    val locale = LocalConfiguration.current.locales[0]
+    val locale = cycleLocale()
     val dayFirst = remember(locale) { DateFormat.getBestDateTimePattern(locale, DAY_AND_MONTH).startsWith("d") }
     val sameMonth = from.month == to.month && from.year == to.year
     return stringResource(

@@ -53,7 +53,9 @@ sealed interface ImportRead {
 class YourDataRepository(
     private val database: CycleDatabase,
     private val settings: SettingsRepository,
-    private val io: CoroutineDispatcher = Dispatchers.IO
+    private val io: CoroutineDispatcher = Dispatchers.IO,
+    // Android 13 and later keep her language in their own settings too (LanguageRepository.forget).
+    private val forgetLanguage: () -> Unit = {}
 ) {
     private val dayLogDao = database.dayLogDao()
     private val feelingsDao = database.feelingsDao()
@@ -128,12 +130,13 @@ class YourDataRepository(
     }
 
     /**
-     * "Delete everything": every logged day and her contraception, then every setting. The settings go last: clearing
-     * them is what brings back the welcome, which then finds no log.
+     * "Delete everything": every logged day and her contraception, then every setting, her language included. The
+     * settings go last: clearing them is what brings back the welcome, which then finds no log.
      */
     suspend fun deleteEverything() {
         withContext(io) { database.clearAllTables() }
         settings.clear()
+        forgetLanguage()
     }
 
     private suspend fun allDays(): List<LoggedDay> {

@@ -454,8 +454,8 @@ week in a `WeekRow`.
 `stateOf` gives each day's `CycleDayState`, `today` gets the ring, `selected` the frame. A day where
 `isEnabled` returns false keeps its full colour and ignores taps (`DayCell` with `onClick = null`), so
 pass `{ !it.isAfter(today) }` to keep a predicted period readable while only past days can be
-logged. The week starts on the locale's first day (`WeekFields.of(locale)`): Monday in the UK, Sunday
-in the US, and the columns run right to left in right-to-left layouts. Each cell is keyed by its date,
+logged. The week starts on the phone's first day (`firstDayOfWeek()`), whatever Cycle's language:
+Monday in the UK, Sunday in the US, and the columns run right to left in right-to-left layouts. Each cell is keyed by its date,
 so moving to another month never replays the logging morph. `wordsOf` gives each day's
 `BleedingWords`, so a month spanning the start of a method reads "period" before it and "bleeding"
 after.
@@ -945,3 +945,33 @@ A whole new token set (motion, for example) gets its own `Immutable` class, a `L
 Feature code uses design system components and tokens only. It never styles Foundation code ad hoc
 (`Modifier.background(Color(...))`, `16.dp` padding, a hand-made `TextStyle`). If a screen needs
 something the design system lacks, add the token or component here first.
+
+## Strings and languages
+
+Cycle speaks every language in `Language.Supported` (English only for now; Brazilian Portuguese,
+Spanish and German come with MOT-93), as
+[`0008-languages.md`](../decisions/0008-languages.md) decides. Every word a screen shows or TalkBack
+reads is a string resource in its module's `res/values/strings.xml`, never a literal in code.
+
+- **Every new user-visible string goes into every language in the same PR**: into `values` (English)
+  and each `values-xx` folder (`values-pt-rBR`, `values-es`, `values-de`). Android Lint's
+  `MissingTranslation` is an error, so a missing one fails the build. A translation not written by a
+  native speaker is marked as a draft at the top of its file, and the PR lists the new strings for a
+  native speaker to read (0008's "Review of translations").
+- **The copy rules hold in each language.** The words the app never says, per language, are in
+  `NeverSaid` in `core:testing` (`core/testing/src/main/kotlin/.../CopyRules.kt`), copied from 0008's
+  "Copy checks in every language", with the glossary and typography rules beside them in 0008. Each
+  module's `*StringsTest` runs `assertNeverSaid` over its strings and plurals in every language. A
+  module's own words (`also`) need a list in every language it checks, or the check fails. A list
+  changes only with 0008.
+- **Text that is not language**, such as the app's name, is `translatable="false"`.
+- **Dates and numbers** are formatted in `cycleLocale()`, the language of the strings Android picked,
+  never in `LocalConfiguration.current.locales[0]` (`LocaleReadersTest` fails on it). The first day
+  of the week is `firstDayOfWeek()`, from the phone. A date is formatted whole, with
+  `DateFormat.getBestDateTimePattern`, never assembled from pieces, and placeholders are numbered
+  (`%1$s`) so each language orders them its own way.
+- **Screenshots in another language**: `@Config(qualifiers = "+de")` on a test, or `renderIn(language)`
+  from `core:testing` before `setContent`.
+- **A new language** is added to `Language.Supported`, `localeFilters` (`CycleLanguages.kt` in
+  `build-logic`), `app`'s `res/xml/locales_config.xml`, every module's strings and `NeverSaid`, in one
+  PR; `LanguagesTest` in `app` fails until all of them name it.

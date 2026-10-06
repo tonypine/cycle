@@ -1,10 +1,11 @@
 # 0008: Languages: which ones, how Cycle applies them, and the copy rules in each
 
-**Status:** proposed, 2026-10-06. Tony approves it before
+**Status:** accepted, 2026-10-06. Tony approved it with
+[MOT-91](https://linear.app/tonypine/issue/MOT-91) before
 [MOT-92](https://linear.app/tonypine/issue/MOT-92) (applying and storing the language),
 [MOT-93](https://linear.app/tonypine/issue/MOT-93) (the translations) and
-[MOT-94](https://linear.app/tonypine/issue/MOT-94) (the Language page) start; until then they follow
-it as written.
+[MOT-94](https://linear.app/tonypine/issue/MOT-94) (the Language page). Her four questions below stay
+open; the build follows each "Until she answers".
 
 ## Context
 
@@ -240,14 +241,15 @@ case, as each `*StringsTest` does today for English.
 | Language | Every module | History, also |
 | -- | -- | -- |
 | English | safe, fertile, you should feel, pregnan | normal, regular |
-| Português (Brasil) | seguro, segura, fértil, fertil, grávid, gravidez, engravid, deveria se sentir, deve se sentir | normal, regular |
+| Português (Brasil) | seguro, segura, fértil, fertil, férteis, grávid, gravidez, engravid, deveria se sentir, deve se sentir | normal, regular |
 | Español | seguro, segura, fértil, fertil, embaraz, deberías sentir, debes sentir | normal, regular |
 | Deutsch | sichere, fruchtbar, schwanger, solltest dich, fühlen solltest | normal, regelmäßig |
 
 - Each list covers the English list's meaning: the "safe day" wording, fertility, pregnancy, telling
   her how to feel, and, in History, judging a cycle. Stems catch the other forms ("fertil" catches
   "fertilidade", "embaraz" catches "embarazo", "normal" catches "anormal" and "normalmente",
-  "regelmäßig" catches "unregelmäßig").
+  "regelmäßig" catches "unregelmäßig"). A plural no stem catches is listed too: "férteis", as in
+  "dias férteis" (added by MOT-92, whose check found the gap).
 - German has "sichere", the form in "sichere Tage", rather than "sicher": "Sicherung" (backup) must
   stay usable. Portuguese and Spanish copy finds other words for "sure" ("Tem certeza?", "¿Quieres…?").
 - Where a word is caught on purpose, the copy changes, not the list: "usually" is "costuma",

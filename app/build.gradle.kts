@@ -36,4 +36,6 @@ dependencies {
     // The lock tests run the real settings on a DataStore file of their own.
     testImplementation(libs.androidx.datastore.preferences)
     testImplementation(libs.kotlinx.coroutines.test)
+    // The copy check in every language, and rendering in one (core:testing).
+    testImplementation(projects.core.testing)
 }

@@ -19,4 +19,6 @@ dependencies {
     testImplementation(libs.androidx.room.runtime)
     testImplementation(libs.androidx.datastore.preferences)
     testImplementation(libs.kotlinx.coroutines.test)
+    // The copy check in every language, and rendering in one (core:testing).
+    testImplementation(projects.core.testing)
 }

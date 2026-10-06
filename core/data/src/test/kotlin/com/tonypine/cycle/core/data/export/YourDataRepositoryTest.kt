@@ -4,12 +4,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.tonypine.cycle.core.data.FakePhoneLanguages
 import com.tonypine.cycle.core.data.database.CycleDatabase
 import com.tonypine.cycle.core.data.database.toEntity
 import com.tonypine.cycle.core.data.day
 import com.tonypine.cycle.core.data.inMemoryDatabase
 import com.tonypine.cycle.core.data.repository.ContraceptionRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
+import com.tonypine.cycle.core.data.settings.LanguageRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
 import com.tonypine.cycle.core.model.BodySymptom
 import com.tonypine.cycle.core.model.Breaks
@@ -20,6 +22,7 @@ import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.EnergyLevel
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.Language
 import com.tonypine.cycle.core.model.LogCategory
 import com.tonypine.cycle.core.model.Mood
 import com.tonypine.cycle.core.model.Pain
@@ -60,7 +63,9 @@ class YourDataRepositoryTest {
     private class Phone(
         val repository: YourDataRepository,
         val settings: SettingsRepository,
-        val preferences: DataStore<Preferences>
+        val preferences: DataStore<Preferences>,
+        val language: LanguageRepository,
+        val android: FakePhoneLanguages
     )
 
     private fun TestScope.phone(): Phone {
@@ -68,7 +73,15 @@ class YourDataRepositoryTest {
             File(folder.root, "settings.preferences_pb")
         }
         val settings = SettingsRepository(preferences)
-        return Phone(YourDataRepository(database, settings), settings, preferences)
+        val android = FakePhoneLanguages()
+        val language = LanguageRepository(settings, android, File(folder.root, "language_handed_over"))
+        return Phone(
+            YourDataRepository(database, settings, forgetLanguage = language::forget),
+            settings,
+            preferences,
+            language,
+            android
+        )
     }
 
     /** Two synthetic cycles: every category, period markers, spotting and a note that needs quoting. */
@@ -452,6 +465,7 @@ class YourDataRepositoryTest {
         phone.settings.dismiss(CyclePrompt.MissedPeriod(day("2027-02-02"), cycleDay = 60))
         phone.settings.setCategoryShown(LogCategory.SEX, shown = false)
         phone.settings.setLastExported(day("2027-03-20"))
+        phone.language.setLanguage(Language("de"))
 
         phone.repository.deleteEverything()
 
@@ -467,5 +481,19 @@ class YourDataRepositoryTest {
         assertTrue(phone.preferences.data.first().asMap().isEmpty())
         assertFalse(phone.settings.welcomeDone.first())
         assertEquals(null, phone.settings.lastExported.first())
+        // On Android 13 and later, Android's per-app page goes back to System default too.
+        assertEquals(null, phone.language.language.first())
+        assertEquals(null, phone.android.appLanguage)
+    }
+
+    @Test
+    fun `her language never goes into the export`() = runTest {
+        val phone = phone()
+        phone.settings.saveSetup(cycleLength = 30, periodLength = 4)
+        val withoutLanguage = phone.repository.exportBytes()
+
+        phone.language.setLanguage(Language("de"))
+
+        assertEquals(withoutLanguage.decodeToString(), phone.repository.exportBytes().decodeToString())
     }
 }
