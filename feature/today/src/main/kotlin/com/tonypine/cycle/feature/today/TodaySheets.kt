@@ -21,15 +21,23 @@ import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.FilledButton
 import com.tonypine.cycle.core.designsystem.MonthCalendar
 import com.tonypine.cycle.core.designsystem.WeekRow
+import com.tonypine.cycle.core.model.BleedingWord
+import com.tonypine.cycle.core.model.ContraceptionMethod
 import com.tonypine.cycle.core.model.EstimateBasis
 import com.tonypine.cycle.core.ui.formatDate
+import com.tonypine.cycle.core.ui.methodInFull
+import com.tonypine.cycle.core.ui.methodInSentence
+import com.tonypine.cycle.core.ui.words
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.temporal.WeekFields
 import java.util.Locale
 import kotlinx.coroutines.launch
 
-/** "How is this estimated?": the date and the range of [next], in plain words. */
+/**
+ * "How is this estimated?": the date and the range of [next], in plain words. After stopping a method,
+ * counted from the day she stopped it, with a range that stays wide for a few cycles.
+ */
 @Composable
 internal fun EstimateSheet(sheet: CycleBottomSheetState, next: NextPeriod) {
     val scope = rememberCoroutineScope()
@@ -40,7 +48,24 @@ internal fun EstimateSheet(sheet: CycleBottomSheetState, next: NextPeriod) {
             is EstimateBasis.Logged -> pluralStringResource(R.plurals.estimate_cycle_logged, basis.count, basis.count)
         }
         val lastStart = formatDate(next.lastStart)
-        if (next.daysLate > 0) {
+        val stopped = next.stoppedMethod
+        if (stopped != null && next.daysLate == 0) {
+            val expected = formatDate(next.expectedStart)
+            SheetText(
+                stringResource(
+                    R.string.estimate_date_stopped,
+                    expected,
+                    lastStart,
+                    next.cycleLength,
+                    methodInSentence(stopped),
+                    cycle
+                )
+            )
+            SheetText(
+                stringResource(R.string.estimate_range, formatDate(next.earliestStart), formatDate(next.latestStart)) +
+                    " " + stringResource(R.string.estimate_range_settling)
+            )
+        } else if (next.daysLate > 0) {
             val due = formatDate(next.expectedStart.minusDays(next.daysLate.toLong()))
             SheetText(stringResource(R.string.estimate_date_late, due, lastStart, next.cycleLength, cycle))
             SheetText(pluralStringResource(R.plurals.estimate_late, next.daysLate, next.daysLate))
@@ -50,10 +75,10 @@ internal fun EstimateSheet(sheet: CycleBottomSheetState, next: NextPeriod) {
         } else {
             val expected = formatDate(next.expectedStart)
             SheetText(stringResource(R.string.estimate_date, expected, lastStart, next.cycleLength, cycle))
-            val spread = if (next.basis is EstimateBasis.Logged) {
-                R.string.estimate_range_logged
-            } else {
-                R.string.estimate_range_typical
+            val spread = when {
+                next.settlingAfter != null -> R.string.estimate_range_settling
+                next.basis is EstimateBasis.Logged -> R.string.estimate_range_logged
+                else -> R.string.estimate_range_typical
             }
             SheetText(
                 stringResource(R.string.estimate_range, formatDate(next.earliestStart), formatDate(next.latestStart)) +
@@ -61,6 +86,54 @@ internal fun EstimateSheet(sheet: CycleBottomSheetState, next: NextPeriod) {
             )
         }
         SheetText(stringResource(R.string.estimate_closing))
+        FilledButton(
+            text = stringResource(R.string.estimate_done),
+            onClick = { scope.launch { sheet.hide() } },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+/**
+ * "How is this estimated?" for the next bleed on a combined [method] with a break every month: a bleed
+ * set by the method, not a period, 28 days after the last one, give or take 2.
+ */
+@Composable
+internal fun NextBleedSheet(sheet: CycleBottomSheetState, method: ContraceptionMethod) {
+    val scope = rememberCoroutineScope()
+    CycleBottomSheet(sheet, title = stringResource(R.string.estimate_sheet_title)) {
+        val name = breakName(method)
+        SheetText(stringResource(R.string.bleed_sheet_why, methodInFull(method), name, methodInSentence(method)))
+        SheetText(stringResource(R.string.bleed_sheet_when, name))
+        SheetText(stringResource(R.string.bleed_sheet_between))
+        SheetText(stringResource(R.string.bleed_sheet_closing))
+        FilledButton(
+            text = stringResource(R.string.estimate_done),
+            onClick = { scope.launch { sheet.hide() } },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+/**
+ * "What changes on the implant?": what [method] does to bleeding, what Cycle does about it, and where
+ * to go if it bothers her.
+ */
+@Composable
+internal fun MethodSheet(sheet: CycleBottomSheetState, method: ContraceptionMethod) {
+    val scope = rememberCoroutineScope()
+    CycleBottomSheet(sheet, title = methodSheetTitle(method)) {
+        SheetText(
+            when (method) {
+                ContraceptionMethod.PROGESTOGEN_PILL -> stringResource(R.string.method_sheet_mini_pill)
+                ContraceptionMethod.IMPLANT -> stringResource(R.string.method_sheet_implant)
+                ContraceptionMethod.HORMONAL_IUD -> stringResource(R.string.method_sheet_hormonal_iud)
+                ContraceptionMethod.INJECTION -> stringResource(R.string.method_sheet_injection)
+                else -> stringResource(R.string.method_sheet_combined, methodInSentence(method))
+            }
+        )
+        SheetText(stringResource(R.string.method_sheet_what_cycle_does))
+        SheetText(stringResource(R.string.method_sheet_help))
         FilledButton(
             text = stringResource(R.string.estimate_done),
             onClick = { scope.launch { sheet.hide() } },
@@ -113,12 +186,16 @@ internal fun LogPeriodSheet(
     }
 }
 
-/** "When was the last day?": the weeks of her period so far, with only its days to pick. */
+/**
+ * "When was the last day?": the weeks of her period (or bleeding, in [words]) so far, with only its
+ * days to pick.
+ */
 @Composable
 internal fun LastDaySheet(
     sheet: CycleBottomSheetState,
     today: LocalDate,
     stillGoing: StillGoing,
+    words: BleedingWord,
     onEndedOn: (lastDay: LocalDate) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -127,7 +204,7 @@ internal fun LastDaySheet(
         var lastDay by rememberSaveable { mutableStateOf<LocalDate?>(null) }
         val days = stillGoing.days
         val weeks = remember(days, locale) { weeksOf(days, locale) }
-        SheetText(stringResource(R.string.today_last_day_body))
+        SheetText(stringResource(words.lastDayBody()))
         weeks.forEach { week ->
             WeekRow(
                 weekOf = week,
@@ -136,7 +213,8 @@ internal fun LastDaySheet(
                 today = today,
                 modifier = Modifier.calendarMargins(),
                 selected = lastDay,
-                isEnabled = { it in days }
+                isEnabled = { it in days },
+                wordsOf = { words.words }
             )
         }
         FilledButton(

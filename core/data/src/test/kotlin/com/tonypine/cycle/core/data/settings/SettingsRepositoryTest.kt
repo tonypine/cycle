@@ -6,6 +6,7 @@ import com.tonypine.cycle.core.data.settingsRepository
 import com.tonypine.cycle.core.model.CyclePrompt
 import com.tonypine.cycle.core.model.CycleSettings
 import com.tonypine.cycle.core.model.LogCategory
+import java.time.LocalDate
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -82,6 +83,16 @@ class SettingsRepositoryTest {
         val stored = settings.settings.first()
         assertEquals(setOf(day("2027-03-01")), stored.dismissedStillGoing)
         assertEquals(setOf(day("2027-01-04"), day("2027-03-01")), stored.dismissedMissedPeriod)
+    }
+
+    @Test
+    fun `remembers the copper IUDs whose heavier-periods card she dismissed, by fitting date`() = runTest {
+        val settings = settingsRepository(folder.root, backgroundScope)
+        assertEquals(emptySet<LocalDate>(), settings.settings.first().dismissedCopperIudNote)
+
+        settings.dismissCopperIudNote(day("2027-06-15"))
+
+        assertEquals(setOf(day("2027-06-15")), settings.settings.first().dismissedCopperIudNote)
     }
 
     @Test

@@ -1,6 +1,12 @@
 package com.tonypine.cycle.feature.today
 
+import com.tonypine.cycle.core.model.BleedBasis
+import com.tonypine.cycle.core.model.BleedingSummary
+import com.tonypine.cycle.core.model.BleedingWord
 import com.tonypine.cycle.core.model.BodySymptom
+import com.tonypine.cycle.core.model.Breaks
+import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.CyclePrompt
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.EnergyLevel
@@ -149,6 +155,139 @@ internal object TodaySamples {
         )
     )
 
+    private val implant = ContraceptionStretch(ContraceptionMethod.IMPLANT, LocalDate.parse("2026-11-09"))
+
+    /** C1: on the implant since November, bleeding logged on 5 days in the last 90. */
+    val onImplant = TodayUiState.Tracking(
+        today = today,
+        display = TodayDisplay.Method(ContraceptionMethod.IMPLANT),
+        phase = TodayPhase.NoEstimate,
+        days = CalendarDays(
+            periods = listOf(period("2027-03-02", "2027-03-06", stretch = implant)),
+            predicted = emptyList(),
+            stretches = listOf(implant)
+        ),
+        todayLog = DayLogEntry(date = today),
+        outlook = TodayOutlook.Bleeding(
+            BleedingSummary(
+                from = today.minusDays(89),
+                to = today,
+                sinceStart = false,
+                days = 5,
+                episodes = 1,
+                longest = 5
+            )
+        ),
+        words = BleedingWord.BLEEDING,
+        method = TodayMethod(ContraceptionMethod.IMPLANT, breaks = null, firstMonths = false)
+    )
+
+    /** C2: one tap on "Bleeding started" on the implant. */
+    val implantBleedingStarted = onImplant.copy(
+        phase = TodayPhase.PeriodStartedToday,
+        days = onImplant.days.copy(
+            periods =
+                onImplant.days.periods + period("2027-03-20", "2027-03-20", open = true, implant)
+        ),
+        todayLog = DayLogEntry(date = today, canClear = true, isPeriodDay = true),
+        outlook = TodayOutlook.Bleeding(
+            (onImplant.outlook as TodayOutlook.Bleeding).summary.copy(days = 6, episodes = 2)
+        )
+    )
+
+    private val pill = ContraceptionStretch(
+        ContraceptionMethod.COMBINED_PILL,
+        LocalDate.parse("2027-03-06"),
+        breaks = Breaks.MONTHLY
+    )
+
+    /** B6: the pill started two weeks ago; the first bleed is expected in the first break. */
+    val pillFirstBreak = TodayUiState.Tracking(
+        today = today,
+        display = TodayDisplay.Method(ContraceptionMethod.COMBINED_PILL),
+        phase = TodayPhase.BetweenPeriods(daysUntil = 7),
+        days = CalendarDays(
+            periods = listOf(period("2027-02-20", "2027-02-24")),
+            predicted = listOf(day("2027-03-27")..day("2027-04-02")),
+            stretches = listOf(pill)
+        ),
+        todayLog = DayLogEntry(date = today),
+        outlook = NextBleed(
+            method = ContraceptionMethod.COMBINED_PILL,
+            expectedStart = day("2027-03-27"),
+            earliestStart = day("2027-03-27"),
+            latestStart = day("2027-04-02"),
+            basis = BleedBasis.START_DATE,
+            missedBreak = false
+        ),
+        words = BleedingWord.BLEED,
+        method = TodayMethod(ContraceptionMethod.COMBINED_PILL, Breaks.MONTHLY, firstMonths = true)
+    )
+
+    /** Later on the pill: the next bleed from the last one that counted. */
+    val pillNextBleed = pillFirstBreak.copy(
+        phase = TodayPhase.BetweenPeriods(daysUntil = 6),
+        days = pillFirstBreak.days.copy(
+            periods = listOf(period("2027-02-28", "2027-03-03", stretch = pill)),
+            predicted = listOf(day("2027-03-26")..day("2027-03-29"))
+        ),
+        outlook = NextBleed(
+            method = ContraceptionMethod.COMBINED_PILL,
+            expectedStart = day("2027-03-26"),
+            earliestStart = day("2027-03-24"),
+            latestStart = day("2027-03-28"),
+            basis = BleedBasis.LAST_BLEED,
+            missedBreak = false
+        ),
+        method = TodayMethod(ContraceptionMethod.COMBINED_PILL, Breaks.MONTHLY, firstMonths = false)
+    )
+
+    /** D5: the implant came out 12 days ago; the next period from her usual cycle, ±7 days. */
+    val stoppedImplant = TodayUiState.Tracking(
+        today = today,
+        display = TodayDisplay.DaysSince(days = 12, method = ContraceptionMethod.IMPLANT),
+        phase = TodayPhase.BetweenPeriods(daysUntil = 17),
+        days = CalendarDays(
+            periods = listOf(period("2027-02-26", "2027-03-01", stretch = implant)),
+            predicted = listOf(day("2027-04-06")..day("2027-04-10")),
+            stretches = listOf(implant.copy(stopped = day("2027-03-08")))
+        ),
+        todayLog = DayLogEntry(date = today),
+        outlook = NextPeriod(
+            expectedStart = day("2027-04-06"),
+            earliestStart = day("2027-03-30"),
+            latestStart = day("2027-04-13"),
+            lastStart = day("2027-03-08"),
+            cycleLength = 29,
+            daysLate = 0,
+            basis = EstimateBasis.Logged(6),
+            stoppedMethod = ContraceptionMethod.IMPLANT,
+            settlingAfter = ContraceptionMethod.IMPLANT
+        )
+    )
+
+    /** After the injection: no estimate until her first period. */
+    val stoppedInjection = stoppedImplant.copy(
+        display = TodayDisplay.DaysSince(days = 12, method = ContraceptionMethod.INJECTION),
+        phase = TodayPhase.NoEstimate,
+        days = stoppedImplant.days.copy(predicted = emptyList()),
+        outlook = TodayOutlook.AfterInjection
+    )
+
+    /** F5: a copper IUD fitted a week ago keeps the estimates, with its heavier-periods card. */
+    val copperIud = tracking(
+        cycleDay = 9,
+        phase = TodayPhase.BetweenPeriods(daysUntil = 20),
+        periods = listOf(period("2027-03-12", "2027-03-16")),
+        next = next(
+            "2027-04-09",
+            "2027-04-06",
+            "2027-04-12",
+            lastStart = "2027-03-12",
+            basis = EstimateBasis.Logged(6)
+        )
+    ).copy(copperIudNote = day("2027-03-13"))
+
     /** Every state, by name, in the order the screenshots list them. */
     val all: Map<String, TodayUiState> = linkedMapOf(
         "empty" to empty,
@@ -160,7 +299,14 @@ internal object TodaySamples {
         "late" to late,
         "still_going" to stillGoing,
         "missed_period" to missedPeriod,
-        "logged_today" to loggedToday
+        "logged_today" to loggedToday,
+        "on_implant" to onImplant,
+        "implant_bleeding_started" to implantBleedingStarted,
+        "pill_first_break" to pillFirstBreak,
+        "pill_next_bleed" to pillNextBleed,
+        "stopped_implant" to stoppedImplant,
+        "stopped_injection" to stoppedInjection,
+        "copper_iud" to copperIud
     )
 
     private fun tracking(
@@ -182,7 +328,7 @@ internal object TodaySamples {
         )
         return TodayUiState.Tracking(
             today = today,
-            cycleDay = cycleDay,
+            display = TodayDisplay.CycleDay(cycleDay),
             phase = phase,
             days = days,
             todayLog = DayLogEntry(
@@ -191,14 +337,16 @@ internal object TodaySamples {
                 canClear = days.isPeriodDay(today) || todayFlow != null,
                 isPeriodDay = days.isPeriodDay(today)
             ),
-            nextPeriod = next,
+            outlook = next,
             stillGoing = stillGoing,
             missedPeriod = missedPeriod
         )
     }
 
-    private fun period(start: String, end: String, open: Boolean = false) =
-        Period(LocalDate.parse(start), LocalDate.parse(end), isOpen = open)
+    private fun day(iso: String) = LocalDate.parse(iso)
+
+    private fun period(start: String, end: String, open: Boolean = false, stretch: ContraceptionStretch? = null) =
+        Period(LocalDate.parse(start), LocalDate.parse(end), isOpen = open, stretch = stretch)
 
     private fun next(
         expected: String,

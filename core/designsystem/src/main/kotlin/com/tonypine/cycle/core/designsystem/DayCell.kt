@@ -90,7 +90,7 @@ enum class CycleDayState {
  *
  * The cell is at least 48dp square and grows with large text, so its shape always holds the number.
  * It is a `Role.Button` that exposes [selected], and reads its date and state to TalkBack
- * ("20 March, today, period").
+ * ("20 March, today, period"), a period day in [words]: "14 October, bleeding" on a method.
  */
 @Composable
 fun DayCell(
@@ -101,6 +101,7 @@ fun DayCell(
     isToday: Boolean = false,
     selected: Boolean = false,
     enabled: Boolean = true,
+    words: BleedingWords = BleedingWords.Period,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val colors = CycleTheme.colors
@@ -110,7 +111,7 @@ fun DayCell(
         end = CyclePolygons.squircle,
         atEnd = state == CycleDayState.Period
     )
-    val description = dayDescription(date, state, isToday)
+    val description = dayDescription(date, state, isToday, words)
     Box(
         modifier = modifier
             .then(
@@ -286,9 +287,12 @@ private fun dayNumber(date: LocalDate): String {
     return remember(date, locale) { String.format(locale, "%d", date.dayOfMonth) }
 }
 
-/** The date in the locale's day-and-month form ("20 March", "March 20"), then today and the state. */
+/**
+ * The date in the locale's day-and-month form ("20 March", "March 20"), then today and the state, a
+ * period day in [words].
+ */
 @Composable
-private fun dayDescription(date: LocalDate, state: CycleDayState, isToday: Boolean): String {
+private fun dayDescription(date: LocalDate, state: CycleDayState, isToday: Boolean, words: BleedingWords): String {
     val locale = locale()
     val dayMonth = remember(date, locale) {
         DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "dMMMM"), locale).format(date)
@@ -296,9 +300,25 @@ private fun dayDescription(date: LocalDate, state: CycleDayState, isToday: Boole
     val today = if (isToday) stringResource(R.string.day_cell_today) else null
     val stateLabel = when (state) {
         CycleDayState.Plain -> null
-        CycleDayState.Period -> stringResource(R.string.day_cell_period)
-        CycleDayState.PredictedPeriod -> stringResource(R.string.day_cell_predicted_period)
+
+        CycleDayState.Period -> stringResource(
+            when (words) {
+                BleedingWords.Period -> R.string.day_cell_period
+                BleedingWords.Bleed -> R.string.day_cell_bleed
+                BleedingWords.Bleeding -> R.string.day_cell_bleeding
+            }
+        )
+
+        CycleDayState.PredictedPeriod -> stringResource(
+            when (words) {
+                BleedingWords.Period -> R.string.day_cell_predicted_period
+                BleedingWords.Bleed -> R.string.day_cell_expected_bleed
+                BleedingWords.Bleeding -> R.string.day_cell_expected_bleeding
+            }
+        )
+
         CycleDayState.Fertile -> stringResource(R.string.day_cell_fertile)
+
         CycleDayState.Ovulation -> stringResource(R.string.day_cell_ovulation)
     }
     return listOfNotNull(dayMonth, today, stateLabel).joinToString(", ")

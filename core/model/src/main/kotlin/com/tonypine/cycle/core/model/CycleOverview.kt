@@ -39,11 +39,17 @@ data class CycleOverview(
      * What her bleeding on [date] is called: the word of the hormonal method its bleeding belongs to,
      * or of the method on that day, else "period". A day before she started a method keeps "period".
      */
-    fun bleedingWord(date: LocalDate): BleedingWord {
-        val stretch = periods.lastOrNull { date in it.start..it.end }?.stretch
-            ?: contraception.stretches.firstOrNull { it.method.isHormonal && date in it }
-        return stretch?.behaviour?.word ?: BleedingWord.PERIOD
-    }
+    fun bleedingWord(date: LocalDate): BleedingWord = bleedingWord(date, periods, contraception.stretches)
+}
+
+/**
+ * What her bleeding on [date] is called, from her [periods] and the [stretches] she recorded: the word
+ * of the hormonal method its bleeding belongs to, or of the method on that day, else "period".
+ */
+fun bleedingWord(date: LocalDate, periods: List<Period>, stretches: List<ContraceptionStretch>): BleedingWord {
+    val stretch = periods.lastOrNull { date in it.start..it.end }?.stretch
+        ?: stretches.firstOrNull { it.method.isHormonal && date in it }
+    return stretch?.behaviour?.word ?: BleedingWord.PERIOD
 }
 
 /**

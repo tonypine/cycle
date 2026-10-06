@@ -21,9 +21,21 @@ class CalendarStringsTest {
         val offending = strings.filter { text -> ForbiddenWords.any { text.contains(it, ignoreCase = true) } }
         assertEquals(emptyList<String>(), offending)
         assertTrue(resources.getString(R.string.calendar_hint).contains("estimates"))
+        assertTrue(resources.getString(R.string.calendar_hint_bleeds).contains("estimates"))
     }
 
     private companion object {
-        val ForbiddenWords = listOf("safe", "fertile", "you should feel", "pregnan")
+        // On a method too: never a safe or protected day, ovulation or advice on the method.
+        val ForbiddenWords = listOf(
+            "safe",
+            "fertile",
+            "you should feel",
+            "pregnan",
+            "ovulat",
+            "protected",
+            "should",
+            "consider",
+            "switch"
+        )
     }
 }

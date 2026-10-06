@@ -11,7 +11,11 @@ import com.tonypine.cycle.core.data.repository.ContraceptionRepository
 import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
+import com.tonypine.cycle.core.designsystem.BleedingWords
 import com.tonypine.cycle.core.designsystem.CycleDayState
+import com.tonypine.cycle.core.designsystem.CycleLegendEntry
+import com.tonypine.cycle.core.model.Breaks
+import com.tonypine.cycle.core.model.ContraceptionMethod
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
@@ -95,6 +99,62 @@ class CalendarViewModelTest {
             assertEquals(it, CycleDayState.PredictedPeriod, state.days.stateOf(day(it)))
         }
         assertEquals(CycleDayState.Plain, state.days.stateOf(day("2027-06-18")))
+    }
+
+    @Test
+    fun `on the implant nothing is predicted after its start, and the logged days still show`() =
+        calendar { viewModel, _ ->
+            logPeriod(day("2027-01-29"), day("2027-02-02"))
+            logPeriod(day("2027-02-26"), day("2027-03-02"))
+            contraception.start(ContraceptionMethod.IMPLANT, breaks = null, started = day("2027-03-04"), today = today)
+            logPeriod(day("2027-03-10"), day("2027-03-11"))
+
+            val state = viewModel.awaitState { it.hint is CalendarHint.NoEstimate && it.days.periods.size == 3 }
+            assertEquals(CalendarHint.NoEstimate(ContraceptionMethod.IMPLANT), state.hint)
+            (1L..90L).forEach { assertEquals(CycleDayState.Plain, state.days.stateOf(today.plusDays(it))) }
+            assertEquals(CycleDayState.Period, state.days.stateOf(day("2027-03-01")))
+            assertEquals(CycleDayState.Period, state.days.stateOf(day("2027-03-10")))
+            assertEquals(BleedingWords.Period, state.days.wordsOf(day("2027-03-01")))
+            assertEquals(BleedingWords.Bleeding, state.days.wordsOf(day("2027-03-10")))
+            // The legend: no predicted period, and both words the month shows.
+            assertEquals(listOf(CycleLegendEntry.Period, CycleLegendEntry.Today), state.legend.entries)
+            assertEquals(listOf(BleedingWords.Period, BleedingWords.Bleeding), state.legend.words)
+        }
+
+    @Test
+    fun `on the pill with monthly breaks the expected bleeds show in its words`() = calendar { viewModel, _ ->
+        logPeriod(day("2027-02-20"), day("2027-02-24"))
+        contraception.start(
+            ContraceptionMethod.COMBINED_PILL,
+            Breaks.MONTHLY,
+            started = day("2027-03-06"),
+            today = today
+        )
+
+        val state = viewModel.awaitState { it.hint == CalendarHint.Bleeds }
+        // The first break, whole: 27 March to 2 April; then a pack later.
+        listOf("2027-03-27", "2027-04-02", "2027-04-24").forEach {
+            assertEquals(it, CycleDayState.PredictedPeriod, state.days.stateOf(day(it)))
+        }
+        assertEquals(CycleDayState.Plain, state.days.stateOf(day("2027-03-26")))
+        assertEquals(BleedingWords.Bleed, state.days.wordsOf(day("2027-03-27")))
+        assertEquals(
+            listOf(CycleLegendEntry.Period, CycleLegendEntry.PredictedPeriod, CycleLegendEntry.Today),
+            state.legend.entries
+        )
+        assertEquals(listOf(BleedingWords.Bleed), state.legend.words)
+        assertEquals(BleedingWords.Bleed, state.legend.predictedWords)
+    }
+
+    @Test
+    fun `after the injection nothing is predicted until her first period`() = calendar { viewModel, _ ->
+        logPeriod(day("2026-10-08"), day("2026-10-12"))
+        contraception.start(ContraceptionMethod.INJECTION, breaks = null, started = day("2026-11-09"), today = today)
+        val injection = contraception.observeStretches().first().single()
+        contraception.stop(injection.id, lastDay = day("2026-12-05"), today = today)
+
+        val state = viewModel.awaitState { it.hint == CalendarHint.AfterInjection }
+        (1L..90L).forEach { assertEquals(CycleDayState.Plain, state.days.stateOf(today.plusDays(it))) }
     }
 
     @Test
