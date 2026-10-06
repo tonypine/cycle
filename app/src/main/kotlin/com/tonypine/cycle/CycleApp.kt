@@ -96,7 +96,9 @@ fun CycleApp(
     modifier: Modifier = Modifier,
     today: () -> LocalDate = LocalDate::now
 ) {
-    val onboarding = viewModel { OnboardingViewModel(data.settingsRepository, data.dayLogRepository, today) }
+    val onboarding = viewModel {
+        OnboardingViewModel(data.settingsRepository, data.dayLogRepository, data.contraceptionRepository, today)
+    }
     val showWelcome by onboarding.showWelcome.collectAsStateWithLifecycle()
     Box(modifier.fillMaxSize().background(CycleTheme.colors.surface)) {
         when (showWelcome) {
@@ -187,7 +189,11 @@ private fun CycleTabs(
                 composable(HISTORY_LIST_ROUTE) {
                     HistoryRoute(
                         viewModel { HistoryViewModel(data.cycleRepository, today) },
-                        onCycleClick = { start -> navController.navigate("$HISTORY_CYCLE_PREFIX$start") }
+                        onCycleClick = { start -> navController.navigate("$HISTORY_CYCLE_PREFIX$start") },
+                        onSeeInCalendar = { month ->
+                            calendarMonth = month
+                            navController.navigateToTab(TopLevelDestination.Calendar)
+                        }
                     )
                 }
                 composable(HISTORY_CYCLE_ROUTE) { entry ->

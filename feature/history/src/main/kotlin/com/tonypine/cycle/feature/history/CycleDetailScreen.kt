@@ -180,7 +180,10 @@ private fun Detail(
     )
 }
 
-/** "28 days, February 2 to March 1", read by TalkBack as one item. */
+/**
+ * "28 days, February 2 to March 1", read by TalkBack as one item, with the method that cut it short
+ * when one did.
+ */
 @Composable
 private fun Summary(state: CycleDetailUiState.Detail, modifier: Modifier) {
     val colors = CycleTheme.colors
@@ -205,6 +208,13 @@ private fun Summary(state: CycleDetailUiState.Detail, modifier: Modifier) {
                 },
                 style = typography.body.copy(color = colors.onSurface)
             )
+            cycle.cutShortBy?.let { method ->
+                BasicText(
+                    text = stringResource(R.string.cycle_cut_short, cutShort(method)),
+                    modifier = Modifier.padding(top = CycleTheme.spacing.small),
+                    style = typography.bodySmall.copy(color = colors.onSurfaceVariant)
+                )
+            }
         }
     }
 }

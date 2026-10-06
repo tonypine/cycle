@@ -50,7 +50,7 @@ class HistoryScreenshotTest(private val name: String, private val appearance: Ap
     companion object {
         private val screens: Map<String, @Composable () -> Unit> =
             HistorySamples.all.entries.associate { (name, state) ->
-                "history_$name" to @Composable { HistoryScreen(state, onCycleClick = {}) }
+                "history_$name" to @Composable { HistoryScreen(state, onCycleClick = {}, onSeeInCalendar = {}) }
             } + HistorySamples.allDetails.entries.associate { (name, state) ->
                 "cycle_$name" to @Composable {
                     CycleDetailScreen(state, onBack = {}, onSeeInCalendar = {}, onEditPeriod = {}, onDeletePeriod = {})
@@ -74,7 +74,7 @@ class HistoryScreenshotTest(private val name: String, private val appearance: Ap
         fun cases(): List<Array<Any>> = screens.keys.flatMap { name ->
             listOf(Appearance.Light, Appearance.Dark).map { arrayOf<Any>(name, it) }
         } +
-            listOf("history_cycles", "cycle_past", "edit_period_refused").map {
+            listOf("history_cycles", "history_on_implant", "cycle_past", "edit_period_refused").map {
                 arrayOf<Any>(it, Appearance.FontScale200)
             }
     }
