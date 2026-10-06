@@ -1,6 +1,7 @@
 # 0006: Contraception: what Cycle records, says and estimates on each method
 
-**Status:** accepted, 2026-10-05.
+**Status:** accepted, 2026-10-05. Amended 2026-10-06 for the monthly combined injection
+([MOT-85](https://linear.app/tonypine/issue/MOT-85)).
 [MOT-51](https://linear.app/tonypine/issue/MOT-51) stores the stretches and computes the estimates;
 the screens follow this record and [`contraception.md`](../design/contraception.md).
 
@@ -30,7 +31,7 @@ behaviour from it.
 | -- | -- | -- | -- | -- | -- |
 | **Own cycle** | None; copper IUD | Period | As in `0003` | As in `0003` | Yes |
 | **Scheduled bleed** | Combined pill, patch or ring, with a break every month | Bleed | In the break, from the pack (below) | No; "Day N of your bleed" while bleeding | No |
-| **No estimate** | Progestogen-only pill, implant, hormonal IUD, injection; combined pill, patch or ring with a break every few packs or no breaks | Bleeding | None | No; "Day N of bleeding" while bleeding | No |
+| **No estimate** | Progestogen-only pill, implant, hormonal IUD, injection, monthly combined injection; combined pill, patch or ring with a break every few packs or no breaks | Bleeding | None | No; "Day N of bleeding" while bleeding | No |
 
 Fertile window and ovulation estimates never show on a hormonal method, even after they exist for
 natural cycles. On a copper IUD they follow her answer to the first open question in
@@ -48,6 +49,7 @@ natural cycles. On a copper IUD they follow her answer to the first open questio
 | Implant | Date fitted | "Implant"; the calm line; Last 90 days card | Bleeding; nothing expected | As above |
 | Hormonal IUD | Date fitted | "Hormonal IUD"; the calm line; Last 90 days card, with the first-months line for 6 months | Bleeding; nothing expected | As above |
 | Injection | Date of the first injection | "Injection"; the calm line; Last 90 days card | Bleeding; nothing expected | As above |
+| Monthly combined injection | Date of the first injection | "Monthly injection"; the calm line; Last 90 days card | Bleeding; nothing expected | As above |
 
 "The calm line" is the one sentence per method in [`contraception.md`](../design/contraception.md#the-calm-line-per-method)
 that says what Cycle stops estimating and why, such as "Bleeding on the implant can come at any time,
@@ -57,6 +59,16 @@ a no-estimate method it is also Today's line under the method's name while she i
 The hormonal IUD gets no next-bleed estimate, not even later when her own bleeds look regular: the
 research leaves it open, and offering it would need a rule for when bleeding counts as regular and a
 second mode to switch to. Worth revisiting if she has a hormonal IUD and asks.
+
+The monthly combined injection gets no next-bleed estimate either, for the same reasons and one
+more. Its bleed follows the injection, not a cycle, but the sources put it anywhere from 14 to 25
+days after each injection, the injection itself can come 7 days early or late, and about a third of
+users bleed irregularly ([`contraception.md`](../research/contraception.md#monthly-combined-injection)).
+An estimate would have to count from each injection, so she would have to log every one, which no
+other method asks; and "once her own bleeds follow her injections" needs a rule like the hormonal
+IUD's "regular", and a second mode. So it is a no-estimate method: everything she logs on it is
+"bleeding", since Cycle does not know which bleed followed an injection. Worth revisiting if she
+uses it and asks.
 
 ### Words
 
@@ -86,16 +98,16 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
 | Column | Type | Meaning |
 | -- | -- | -- |
 | `id` | integer, primary key | |
-| `method` | text | `combined_pill`, `patch`, `ring`, `progestogen_pill`, `implant`, `hormonal_iud`, `copper_iud`, `injection`, written by an explicit converter as in `0003`. |
+| `method` | text | `combined_pill`, `patch`, `ring`, `progestogen_pill`, `implant`, `hormonal_iud`, `copper_iud`, `injection`, `combined_injection`, written by an explicit converter as in `0003`. |
 | `started` | ISO date, nullable | First day on the method. Null only when she skipped "since when" in setup: the stretch then covers every day before `stopped`. |
-| `stopped` | ISO date, nullable | Last day on the method, included. Null while she is still on it. Only the injection's can be after today (below). |
+| `stopped` | ISO date, nullable | Last day on the method, included. Null while she is still on it. Only an injection's can be after today (below). |
 | `breaks` | text, nullable | Combined pill, patch and ring only: `monthly`, `every_few_packs` or `none`. |
 
 - **The current stretch.** At most one stretch covers today: the one with no stop date, or with a
   stop date today or later. That stretch is her method "Now" in Settings, on Today and everywhere
   else, until its stop date has passed. One exception: once she marks a method as stopped with
   today's date, Settings shows "None" straight away, and starting a method treats it as stopped.
-  Today is still its last day for the estimates. The injection, whose stop date runs ahead, stays
+  Today is still its last day for the estimates. Either injection, whose stop date runs ahead, stays
   "Now" until that date has passed.
 - **No overlaps.** Starting or changing a method ends the current stretch the day before the new one
   starts, moving its stop date earlier if it has one. A new start can only be today or earlier, so
@@ -148,6 +160,11 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
   the day before the new start: last injection 3 August, stop date 2 November, implant fitted 31
   August, so the injection now ends on 30 August. She can edit the end, to any day up to 13 weeks
   after today, for an 8-week injection.
+- **Monthly combined injection.** The same, with 4 weeks, its interval
+  ([`contraception.md`](../research/contraception.md#monthly-combined-injection)): last injection 3
+  August, stop date 31 August. She can edit the end to any day up to 4 weeks after today. The bleed
+  two to three weeks after her last injection is still a withdrawal bleed, and falls inside those 4
+  weeks, so it stays "bleeding" and never counts as her first period after stopping.
 
 ### Leaving her estimates
 
@@ -224,7 +241,7 @@ in plain counts, never with the clinical labels:
 
 The stretch ends on the stop date and the next day is "none", except for a combined method's
 withdrawal bleed (below). Everything below starts the day after the stop date, never while it is
-still ahead (the injection's weeks, above):
+still ahead (an injection's weeks, above):
 
 - **Today** shows the days since the stop date ("12 days", "since your implant came out") instead of
   a cycle day, until her first period after stopping, and "My period started" as its button.
@@ -249,6 +266,11 @@ still ahead (the injection's weeks, above):
   months, up to a year, to come back ([`contraception.md`](../research/contraception.md#injection)).
   Today says so: "Periods can take several months to come back after the injection. Cycle will
   estimate again once you log one."
+- **After the monthly combined injection**, the same: ovulation can take up to 112 days to return,
+  and on average pregnancy comes about 5 months after the last injection
+  ([`contraception.md`](../research/contraception.md#monthly-combined-injection)), so an estimate
+  from her usual cycle would often be wrong by more than its 7 days. Today: "Periods can take a few
+  months to come back after the monthly injection. Cycle will estimate again once you log one."
 
 ### Setup and Settings
 
@@ -262,7 +284,9 @@ still ahead (the injection's weeks, above):
   "When to get help" under the current method and above the earlier stretches: fixed text with the
   signs clinics give every user of the method, in the words of
   [`0007`](0007-urgent-symptoms-on-a-method.md). It follows the method in force, never what she
-  logs, and appears nowhere else. Its layout is in the design doc.
+  logs, and appears nowhere else. Its layout is in the design doc. The monthly combined injection
+  has none for now: it has an oestrogen like the combined pill, but `0007` covers only the methods
+  whose urgent signs it found a source for, and adding one needs a source and a change to `0007`.
 
 ### Privacy
 
@@ -301,9 +325,9 @@ The method is health data and stays on the phone with the rest:
 
 All new numbers live in `CycleRules` with their source in a comment, as in `0003`: the 28-day pack,
 21 days between scheduled bleeds, ±2 days around the next bleed, 7 days for the withdrawal bleed
-after stopping, ±7 days and three cycles after stopping, 13 weeks after the last injection, 90 days
-for the bleeding summary, 3 months (6 on a hormonal IUD) for the first-months line, and 6 months for
-the copper IUD note.
+after stopping, ±7 days and three cycles after stopping, 13 weeks after the last injection, 4 weeks
+after the last monthly combined injection, 90 days for the bleeding summary, 3 months (6 on a
+hormonal IUD) for the first-months line, and 6 months for the copper IUD note.
 
 ## Options considered
 
@@ -313,10 +337,18 @@ the copper IUD note.
 - **A list of every method, including the injection and the patch.** Chosen over only the implant and
   the pill she asked about: the research covers them, the extra rows cost nothing, and a later switch
   needs no new screen. The diaphragm and condoms have no row: they leave her cycle as it is, which
-  is "None". The monthly combined injection has no row yet either: it stops ovulation like the other
-  hormonal methods, but it is sold mainly outside the UK and US, and whether her list needs it is
-  still hers to answer ([`product-implications.md`](../research/product-implications.md), open
+  is "None". The monthly combined injection, sold mainly outside the UK and US, was added once she
+  said she might use it ([`product-implications.md`](../research/product-implications.md), open
   question 2).
+- **A next-bleed estimate on the monthly combined injection**, from her injection dates once her
+  bleeds follow them. The bleed does follow the injection, but 14 to 25 days after it, and it would
+  need every injection logged and a rule for when her bleeds follow them (above). Left out until she
+  asks.
+- **Counting the next bleed on the monthly combined injection from her logged bleeds**, as on the
+  pill after its first break. Without her injection dates, a range wide enough to hold an injection
+  7 days late and a bleed 14 to 25 days after it says little more than "about a month".
+- **Calling the bleed after each monthly injection a bleed**, as the research does. Cycle would need
+  her injection dates to tell that bleed from the rest; "bleeding" is accurate for both.
 - **Storing the method in DataStore with the settings.** Easy for the current method, but History
   needs the dates of every past method, and `0003` already says life stages are date ranges in their
   own table.
@@ -369,6 +401,8 @@ the copper IUD note.
   `CycleIcons.Medication` for the Settings row.
 - Health signals, when they arrive, follow the per-method table in
   [`contraception.md`](../research/contraception.md#worth-mentioning-to-a-doctor-on-a-method), using
-  the stretches' start and stop dates.
+  the stretches' start and stop dates. On the monthly combined injection, the signal for bleeding
+  outside the bleed after each injection needs her injection dates, which Cycle does not ask for;
+  it waits until Cycle does.
 - Reminders (a pill or injection reminder) are not part of this record. If she asks for one, it
   needs its own ticket and its own discreet wording.

@@ -46,7 +46,7 @@ Refined against MOT-49. "Hormonal method" means everything except the copper IUD
 6. **Copper IUD.** Predictions continue as before. For the first six months Cycle mentions that
    periods can be heavier or longer at first, until I tap Got it.
 7. **Stopping.** I mark the end date. Estimates restart from my usual lengths with a wider range
-   (±7 days for three cycles), and Cycle says cycles can take a few months to settle. After the
+   (±7 days for three cycles), and Cycle says cycles can take a few months to settle. After either
    injection, it waits for my first period before estimating, and says why.
 8. **History keeps its meaning.** Time on a hormonal method stays in History as one card, marked,
    and is left out of my typical cycle. On a method without an estimate I see the days of bleeding
@@ -59,6 +59,11 @@ Refined against MOT-49. "Hormonal method" means everything except the copper IUD
     lists the signs clinics tell everyone on it to get help for, and what to do. It is the same for
     everyone on the method, it is there whenever I look, and it says Cycle does not check my log for
     them ([When to get help](#when-to-get-help)).
+12. **Monthly combined injection.** If I get an injection every 4 weeks, I can choose it apart from
+    the 8- or 13-week injection. Cycle calls everything I log bleeding, shows my last 90 days and
+    doesn't estimate my next bleed, because it doesn't know when I have my injections. When I mark
+    it stopped with the date of my last injection, Cycle counts 4 more weeks, then waits for my
+    first period before estimating ([MOT-85](https://linear.app/tonypine/issue/MOT-85)).
 
 ## The words
 
@@ -93,12 +98,18 @@ Setup and Settings show the same list, one `RadioRow` each, nothing chosen at fi
 | Hormonal IUD | Hormonal coil or IUS, such as Mirena |
 | Copper IUD | Copper coil, with no hormones |
 | Injection | Such as Depo-Provera |
+| Monthly combined injection | Two hormones, every 4 weeks, such as Cyclofem |
 
 Under the list in Settings, after choosing a pill: "Not sure which pill you take? The leaflet in the
 pack says."
 
 Short names, for Today's display and History's card label: Pill, Mini pill, Patch, Ring, Implant,
-Hormonal IUD, Copper IUD, Injection.
+Hormonal IUD, Copper IUD, Injection, Monthly injection. In a sentence: "monthly injection" ("Move
+the end of your monthly injection?"); in full: "monthly combined injection".
+
+"Two hormones" and "every 4 weeks" keep it apart from the progestogen-only injection: Mesigyna has
+the same progestogen as Noristerat, and the list must not let one pass for the other
+([research](../research/contraception.md#monthly-combined-injection)).
 
 ### Since when
 
@@ -111,6 +122,7 @@ Hormonal IUD, Copper IUD, Injection.
 | Implant | When was your implant fitted? | When was your implant taken out? |
 | Hormonal IUD, Copper IUD | When was your IUD fitted? | When was your IUD taken out? |
 | Injection | When was your first injection? | When was your last injection? (body: "Cycle counts 13 weeks from it.") |
+| Monthly combined injection | When was your first monthly injection? | When was your last injection? (body: "Cycle counts 4 weeks from it.") |
 
 Body: "Roughly is fine." A `MonthCalendar` with days up to today; days before the method's start are
 not tappable when stopping.
@@ -149,6 +161,7 @@ Settings, and Today's line under the method's name on a method without an estima
 | Implant | Bleeding on the implant can come at any time, so Cycle doesn't estimate it. |
 | Hormonal IUD | Bleeding with a hormonal IUD doesn't follow a cycle you can count on, so Cycle doesn't estimate it. |
 | Injection | Bleeding on the injection doesn't follow a cycle, so Cycle doesn't estimate it. |
+| Monthly combined injection | Bleeding on the monthly injection follows your injections, not a cycle, and it varies, so Cycle doesn't estimate it. |
 
 ### The first-months line
 
@@ -163,6 +176,7 @@ a hormonal IUD. Expected changes read as expected, not as a warning.
 | Implant | In the first months on the implant, bleeding is often irregular or long. |
 | Hormonal IUD | In the first months with a hormonal IUD, bleeding is often frequent or long. It usually gets lighter over the first year. |
 | Injection | In the first months on the injection, bleeding is often irregular or long. It usually lessens with time. |
+| Monthly combined injection | In the first months on the monthly injection, bleeding is often irregular or long. It usually settles. |
 
 ### What changes (Today's sheet)
 
@@ -175,6 +189,17 @@ about it, and where to go if it bothers her. The implant's:
 >
 > So Cycle doesn't estimate when you'll bleed, count cycle days or say anything is late. It shows the
 > days you log, and how much you bled in the last 90 days.
+>
+> If the bleeding becomes a problem for you, a GP or sexual health clinic can help.
+
+The monthly combined injection's, titled "Bleeding on the monthly injection":
+
+> Most people bleed once between injections, about two to three weeks after each one. Bleeding can
+> also come at other times, last longer, or not come at all, most often in the first months.
+>
+> Cycle doesn't know when you have your injections, so it doesn't estimate when you'll bleed, count
+> cycle days or say anything is late. It shows the days you log, and how much you bled in the last
+> 90 days.
 >
 > If the bleeding becomes a problem for you, a GP or sexual health clinic can help.
 
@@ -200,7 +225,7 @@ every user of the method, and nothing she logs shows it, hides it or changes it.
 
 | | |
 | -- | -- |
-| Methods | Combined pill (with any breaks), patch and ring; copper IUD and hormonal IUD. None for the progestogen-only pill, the implant, the injection or no method. |
+| Methods | Combined pill (with any breaks), patch and ring; copper IUD and hormonal IUD. None for the progestogen-only pill, the implant, the injection or no method. None for the monthly combined injection either, until `0007` has a source for its signs and adds it ([`0006`](../decisions/0006-contraception.md#setup-and-settings)). |
 | Where | Settings › Your cycle › Contraception, under the Now card, whose calm line says what the method does to bleeding, and above "Your methods". Shown in full for as long as the method is in force, also with "Start not known". Once she marks it as stopped, or changes to a method without it, the section goes. |
 | Never | On Today or its sheets, in setup, on a method's edit page, in History, a notification or a widget. |
 | Look | A section title "When to get help", like "Now" and "Your methods" (Settings' `SectionTitle`, a heading). Under it one `Card`: the intro line in `bodySmall` `onSurfaceVariant`; each action line in `titleSmall` `onSurface`, a heading; the signs in `body` `onSurface`, one per line, each after a bullet TalkBack skips; the last line in `bodySmall` `onSurfaceVariant`. No icon, no error colours, no button: nothing on it can be tapped or dismissed. |
@@ -292,6 +317,12 @@ Today is Thursday 14 October 2027. Implant since 9 November 2026.
 When she has no natural cycles at all (on a method since before she installed Cycle), the typical
 cycle card is left out and History starts with the method's card.
 
+On the monthly combined injection, Today looks like C1 with display "Monthly injection", its calm
+line ("Bleeding on the monthly injection follows your injections, not a cycle, and it varies, so
+Cycle doesn't estimate it."), and "What changes on the monthly injection?"; the calendar's hint is
+"Cycle doesn't estimate bleeding on the monthly injection. Tap any day up to today to log or change
+it."; History's card is **MONTHLY INJECTION**, with its last 90 days.
+
 The rest of History's copy for a method ([MOT-55](https://linear.app/tonypine/issue/MOT-55)):
 
 - A combined pill, patch or ring with a break every month counts its bleeds instead of the 90 days:
@@ -303,8 +334,8 @@ The rest of History's copy for a method ([MOT-55](https://linear.app/tonypine/is
   logged: "… you logged no bleeding or spotting."
 - The cycle a method cut short says how: "cut short when you started the pill" (the mini pill, the
   patch, the ring), "when the implant was fitted", "when the IUD was fitted", "when you had your
-  first injection". Its detail adds "Cut short when the implant was fitted. Not part of your typical
-  cycle." under its dates.
+  first injection" (either injection). Its detail adds "Cut short when the implant was fitted. Not
+  part of your typical cycle." under its dates.
 - "See it in the calendar" opens the month of the method's last day so far: this month while she is
   on it, else the month it stopped.
 
@@ -378,6 +409,20 @@ to 2 Nov 2027". Today shows "12 days", "since you stopped the injection" (on 14 
 next period: "Periods can take several months to come back after the injection. Cycle will estimate
 again once you log one."
 
+**After the monthly combined injection.** The same, with 4 weeks. Monthly injection since 9 November
+2026, last injection on 3 August 2027; she marks it as stopped on 10 August with that date ("When
+was your last injection?", "Cycle counts 4 weeks from it."):
+
+- Until 31 August, Contraception's "Now" card stays "Monthly combined injection", "Since 9 November
+  2026", the calm line, then "Cycle counts it until 31 August 2027, 4 weeks after your last
+  injection." Its edit page reads First injection · 9 November 2026; Counted until · 31 August
+  2027 (any day up to 4 weeks from today); Delete these dates. Today, the calendar and History are
+  unchanged; a bleed she logs on 19 August is "bleeding", part of the time on it.
+- From 1 September, Contraception shows "None" and "Monthly injection · 9 Nov 2026 to 31 Aug 2027"
+  under "Your methods". On 12 September Today shows "12 days", "since you stopped the monthly
+  injection", and no next period: "Periods can take a few months to come back after the monthly
+  injection. Cycle will estimate again once you log one."
+
 ### E. Switching from the pill to a hormonal IUD, then correcting the start date
 
 Today is Friday 17 September 2027. Pill since 3 May. The IUD was fitted on 6 September; she first
@@ -433,7 +478,7 @@ which the build adds first with their catalog entries, previews and tests
 | `CycleAlertDialog`, `CycleDestructiveDialog` | E7; deleting dates | Exist |
 | Settings' `SettingsRow` (feature code, a `ClickableCard`) | B1, D2, E4, E5 | Exists in `feature:settings` |
 | Settings' `SectionTitle` (feature code, a heading) | Contraception's "Now", "When to get help" and "Your methods" | Exists in `feature:settings` |
-| **`RadioRow`** | The method list (A4, B3, E2, F2) and breaks (B5) | Added ([MOT-52](https://linear.app/tonypine/issue/MOT-52)), with `RadioGroup`; the method and breaks lists are `MethodList` and `BreaksList` in `core:ui`. A single-choice row like `SwitchRow`: title in `titleSmall`, an optional one-line body in `bodySmall`, a radio at the end; `accentContainer` when selected; 48dp at least; `Role.RadioButton` in a `selectableGroup`, read as "Implant, A rod in the arm, such as Nexplanon, radio button, selected, 6 of 9". `ButtonGroup` does not fit: nine options with a line each. |
+| **`RadioRow`** | The method list (A4, B3, E2, F2) and breaks (B5) | Added ([MOT-52](https://linear.app/tonypine/issue/MOT-52)), with `RadioGroup`; the method and breaks lists are `MethodList` and `BreaksList` in `core:ui`. A single-choice row like `SwitchRow`: title in `titleSmall`, an optional one-line body in `bodySmall`, a radio at the end; `accentContainer` when selected; 48dp at least; `Role.RadioButton` in a `selectableGroup`, read as "Implant, A rod in the arm, such as Nexplanon, radio button, selected, 6 of 10". `ButtonGroup` does not fit: ten options with a line each. |
 | **`BleedingWords`** | Calendar legend, day cells, week row | Added ([MOT-54](https://linear.app/tonypine/issue/MOT-54)). An enum, `Period` (default), `Bleed`, `Bleeding`, passed to `DayCell`, `MonthCalendar`, `WeekRow` and `CycleLegend`. It changes the legend labels ("Bleed", "Expected bleed", "Bleeding") and TalkBack ("14 October, bleeding"); the shapes and colours stay. A calendar spanning a method's start takes the word per day; its legend names the logged days and the predicted ones each in their own words. |
 | **`CycleIcons.Medication`** | The Contraception row in Settings | Added ([MOT-52](https://linear.app/tonypine/issue/MOT-52)). Material Symbols Rounded "medication", weight 600, like the others. The journeys page draws a stand-in capsule. |
 

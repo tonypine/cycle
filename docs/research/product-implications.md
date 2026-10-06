@@ -66,14 +66,14 @@ health signals need several cycles, a doctor summary needs the signals' data.
   ([MOT-48](https://linear.app/tonypine/issue/MOT-48)), so this can come before the rest of this
   step. Her method and the dates she started and stopped it, then per method: what to estimate
   (the next bleed follows the pack on a combined pill, patch or ring; nothing on the implant,
-  injection, progestogen-only pill or hormonal IUD, nor by default on the monthly combined
-  injection), what to hide (fertile window and ovulation on every hormonal method), the words
-  ("period", "bleed" or "bleeding"), a 90-day bleeding summary on progestogen-only methods and the
-  monthly combined injection, and the signals that fit the method
-  ([`contraception.md`](contraception.md)). Designed in
+  either injection, progestogen-only pill or hormonal IUD), what to hide (fertile window and
+  ovulation on every hormonal method), the words ("period", "bleed" or "bleeding"), a 90-day
+  bleeding summary on progestogen-only methods and the monthly combined injection, and the signals
+  that fit the method ([`contraception.md`](contraception.md)). Designed in
   [`docs/design/contraception.md`](../design/contraception.md) and decided in
   [`0006`](../decisions/0006-contraception.md) ([MOT-50](https://linear.app/tonypine/issue/MOT-50)),
-  whose method list has no monthly combined injection yet (open question 2 below).
+  whose method list includes the monthly combined injection since she said she might use it (open
+  question 2 below).
 - **Other life-stage modes**: pregnant (predictions paused), after birth or breastfeeding
   (predictions paused until three regular cycles), perimenopause (wider ranges, no fertility
   estimates by default).
@@ -151,17 +151,18 @@ Can move earlier if she wants them sooner; none depend on the steps above.
 From [`contraception.md`](contraception.md):
 
 - **"Period" only when she has her own cycle**: with no method or a copper IUD.
-- **"Bleed" for the scheduled bleed on a combined pill, patch or ring**, and for the bleed after
-  each monthly combined injection: it is a withdrawal bleed, not a period. "Bleed expected in your
-  pill break", not "period expected".
-- **"Bleeding" on progestogen-only methods** (pill, implant, injection, hormonal IUD) and for
-  unscheduled bleeding on a combined method. These are the accurate words, not euphemisms.
+- **"Bleed" for the scheduled bleed on a combined pill, patch or ring**: it is a withdrawal bleed,
+  not a period. "Bleed expected in your pill break", not "period expected".
+- **"Bleeding" on progestogen-only methods** (pill, implant, injection, hormonal IUD), for
+  unscheduled bleeding on a combined method, and for everything she logs on the monthly combined
+  injection: its bleed after each injection is a withdrawal bleed too, but Cycle does not know her
+  injection dates to tell it from the rest ([`0006`](../decisions/0006-contraception.md)). These are
+  the accurate words, not euphemisms.
 - **No cycle language where there is no cycle**: no "cycle day", phases or "late" on the implant,
   either injection, progestogen-only pill or hormonal IUD. Describe bleeding over the last 90 days
-  in plain counts. A hormonal IUD gets no next-bleed estimate, even once her bleeds look regular
-  ([`0006`](../decisions/0006-contraception.md)). Whether a monthly combined injection user whose
-  bleeds follow her injections gets one waits on whether her method list needs it (open question 2
-  below).
+  in plain counts. A hormonal IUD gets no next-bleed estimate, even once her bleeds look regular,
+  and neither does the monthly combined injection, even once her bleeds follow her injections
+  ([`0006`](../decisions/0006-contraception.md)).
 - **Never advise on her method**: no "consider switching", "you may want to stop", "you are
   protected" or missed-pill guidance. Questions about her method go to her pharmacist, nurse or
   doctor.
@@ -186,9 +187,11 @@ next planning ticket.
    [`contraception.md`](contraception.md); the stories and screens are in
    [`docs/design/contraception.md`](../design/contraception.md), and the decision, including a
    next-bleed estimate on the pill with a break every month and a 90-day summary on the others, is
-   [`0006`](../decisions/0006-contraception.md). Still open: a pill or injection reminder; if she
-   uses or might use a monthly combined injection (sold mainly outside the UK and US), whether the
-   method list needs it; and whether "When to get help" should name her country's emergency numbers
+   [`0006`](../decisions/0006-contraception.md). The monthly combined injection (sold mainly
+   outside the UK and US): answered "yes or maybe" (2026-10-06,
+   [MOT-85](https://linear.app/tonypine/issue/MOT-85)), so the method list has it, with no
+   next-bleed estimate ([`0006`](../decisions/0006-contraception.md)). Still open: a pill or
+   injection reminder; and whether "When to get help" should name her country's emergency numbers
    ([`0007`](../decisions/0007-urgent-symptoms-on-a-method.md)).
 3. **Does she have history in another app** she wants to bring over? Which app, and can it export?
 4. **What does she want to log** beyond her period? The list in
