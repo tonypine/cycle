@@ -5,7 +5,8 @@ She asked for Cycle to know whether she has an implant or takes the pill
 every journey screen by screen with its copy and where it lives in the app, then the components.
 The screens are drawn in [`journeys/contraception.html`](journeys/contraception.html) (open it in a
 browser; one row of phones per journey). The rules behind them, method by method, are
-[`0006-contraception.md`](../decisions/0006-contraception.md); the research is
+[`0006-contraception.md`](../decisions/0006-contraception.md), and the words of "When to get help" are
+[`0007`](../decisions/0007-urgent-symptoms-on-a-method.md); the research is
 [`docs/research/contraception.md`](../research/contraception.md)
 ([MOT-49](https://linear.app/tonypine/issue/MOT-49)).
 
@@ -16,7 +17,7 @@ Every date and number here is synthetic.
 | Place | What changes |
 | -- | -- |
 | Setup | A third, optional step after her usual lengths: the method, since when, and breaks on a combined method. |
-| Settings › Your cycle › Contraception | A new row and page: her method now, "Mark as stopped", "Change method", every earlier method with its dates, and an edit page for each. |
+| Settings › Your cycle › Contraception | A new row and page: her method now, "Mark as stopped", "Change method", every earlier method with its dates, and an edit page for each. On the combined pill, patch or ring or an IUD, "When to get help" under her method. |
 | Today | On a hormonal method, the method's name instead of "Day 19", a calm line, the next bleed (combined, a break every month) or the last 90 days (every other hormonal method). After stopping, the days since and a wider estimate. On a copper IUD, a card about heavier periods. |
 | Calendar | "Bleed" or "Bleeding" in the legend and for TalkBack; expected bleeds instead of predicted periods on a combined method with monthly breaks; nothing predicted on the others. |
 | History | The time on each hormonal method as one card, marked and left out of her typical cycle, with its last 90 days; the cycle a method cut short, marked. |
@@ -54,6 +55,10 @@ Refined against MOT-49. "Hormonal method" means everything except the copper IUD
    When a correction overlaps another method, Cycle offers to move that one's edge.
 10. **Private.** My method stays on the phone. It appears only in my export and Android's encrypted
     backup, never in a notification or widget.
+11. **Know when to get help.** On the combined pill, patch or ring, or with an IUD, my method's page
+    lists the signs clinics tell everyone on it to get help for, and what to do. It is the same for
+    everyone on the method, it is there whenever I look, and it says Cycle does not check my log for
+    them ([When to get help](#when-to-get-help)).
 
 ## The words
 
@@ -187,6 +192,31 @@ estimate sheet instead:
 >
 > These are estimates, not promises.
 
+## When to get help
+
+The fixed text decided in [`0007`](../decisions/0007-urgent-symptoms-on-a-method.md): the signs
+clinics give everyone on the method, under the action to take. It is reference text, the same for
+every user of the method, and nothing she logs shows it, hides it or changes it.
+
+| | |
+| -- | -- |
+| Methods | Combined pill (with any breaks), patch and ring; copper IUD and hormonal IUD. None for the progestogen-only pill, the implant, the injection or no method. |
+| Where | Settings › Your cycle › Contraception, under the Now card, whose calm line says what the method does to bleeding, and above "Your methods". Shown in full for as long as the method is in force, also with "Start not known". Once she marks it as stopped, or changes to a method without it, the section goes. |
+| Never | On Today or its sheets, in setup, on a method's edit page, in History, a notification or a widget. |
+| Look | A section title "When to get help", like "Now" and "Your methods" (Settings' `SectionTitle`, a heading). Under it one `Card`: the intro line in `bodySmall` `onSurfaceVariant`; each action line in `titleSmall` `onSurface`, a heading; the signs in `body` `onSurface`, one per line, each after a bullet TalkBack skips; the last line in `bodySmall` `onSurfaceVariant`. No icon, no error colours, no button: nothing on it can be tapped or dismissed. |
+| TalkBack | In reading order: "When to get help, heading", the intro, then each action line with "heading" ("Get emergency help now if you have:, heading") followed by its signs one by one, then "Cycle does not check your log for these signs." |
+
+The words, line by line with their sources, are in
+[`0007`](../decisions/0007-urgent-symptoms-on-a-method.md), and change only there. Only the intro
+line differs between methods:
+
+| Method | Intro line | Then |
+| -- | -- | -- |
+| Combined pill | Clinics give these signs to everyone who uses the combined pill, patch or ring. | Emergency help now (2 signs), urgent advice today (1 sign) |
+| Patch | Clinics give these signs to everyone who uses the patch. | The same |
+| Vaginal ring | Clinics give these signs to everyone who uses the ring. | The same |
+| Copper IUD, hormonal IUD | Clinics give these signs to everyone who has an IUD. | Urgent advice today (5 signs) |
+
 ## Journeys
 
 Each step names its screen, where it lives, the copy on it, and the components. The letters and
@@ -269,7 +299,7 @@ Today is Monday 15 November 2027. The implant came out on 3 November.
 | Step | Screen | Where | Copy |
 | -- | -- | -- | -- |
 | D1 | Settings | Settings | Contraception · "Implant, since 9 Nov 2026" |
-| D2 | Contraception | Settings › Your cycle › Contraception | "Now": "Implant", "Since 9 November 2026", the calm line. **Mark as stopped** · Change method. "Your methods": Implant · Since 9 Nov 2026 › |
+| D2 | Contraception | Settings › Your cycle › Contraception | "Now": "Implant", "Since 9 November 2026", the calm line. **Mark as stopped** · Change method. No "When to get help" on the implant. "Your methods": Implant · Since 9 Nov 2026 › |
 | D3 | Stopped on | Settings › Contraception › Mark as stopped | "When was your implant taken out?" "Roughly is fine." Calendar, 3 November chosen. **Save** |
 | D4 | Contraception: none now | Settings › Your cycle › Contraception | "Now": "None", "Cycle estimates your periods from your own cycle." Add your method (a start inside the implant's dates: below). "Your methods": Implant · 9 Nov 2026 to 3 Nov 2027 › |
 | D5 | Today: fresh estimates | Today | "MONDAY 15 NOVEMBER", display "12 days", "since your implant came out". **My period started** · Log how you feel. "Next period": "Around 2 December", "Between 25 November and 9 December", "Estimated from your usual 29-day cycle. Cycles can take a few months to settle after the implant, so the range is wider." How is this estimated? |
@@ -335,10 +365,10 @@ enters 13 September by mistake.
 
 | Step | Screen | Where | Copy |
 | -- | -- | -- | -- |
-| E1 | Contraception: on the pill | Settings › Your cycle › Contraception | "Now": "Combined pill", "Since 3 May 2027 · a break every month", the calm line. Mark as stopped · **Change method** |
+| E1 | Contraception: on the pill | Settings › Your cycle › Contraception | "Now": "Combined pill", "Since 3 May 2027 · a break every month", the calm line. Mark as stopped · **Change method**. Then "When to get help" for the combined pill, in full ([When to get help](#when-to-get-help)). "Your methods" and the note follow, below the fold. |
 | E2 | Change method | Settings › Contraception › Change method | "Which method?" The list, Hormonal IUD chosen. **Next** |
 | E3 | Since when (wrong day) | Settings › Contraception › Change method | "When was your IUD fitted?" "Roughly is fine." 13 September chosen. **Save**. The pill now ends on 12 September. A day on or before 3 May is refused: "That's before you started the pill on 3 May. Pick a later day, or change the pill's dates first." |
-| E4 | Contraception: switched | Settings › Your cycle › Contraception | "Now": "Hormonal IUD", "Since 13 September 2027", its calm line. "Your methods": Hormonal IUD · Since 13 Sep 2027 ›, Combined pill · 3 May to 12 Sep 2027 › |
+| E4 | Contraception: switched | Settings › Your cycle › Contraception | "Now": "Hormonal IUD", "Since 13 September 2027", its calm line. Then "When to get help" for an IUD, as in F4; the phone shows the page scrolled to its end. "Your methods": Hormonal IUD · Since 13 Sep 2027 ›, Combined pill · 3 May to 12 Sep 2027 › |
 | E5 | Edit its dates | Settings › Contraception › Hormonal IUD | Top bar "Hormonal IUD". Rows: Fitted · 13 September 2027; Taken out · Still in; Delete these dates · "Cycle forgets this method for these dates. What you logged stays." (Combined methods add Breaks · Every month.) |
 | E6 | Correct the start | Settings › Contraception › Hormonal IUD › Fitted | Sheet "When was your IUD fitted?", 6 September chosen. **Save** |
 | E7 | Overlap | Same, dialog | "Move the end of your pill?" "Your combined pill would end on 5 September instead of 12 September, so the two don't overlap. Cycle works out its estimates again." Cancel · **Move it** |
@@ -358,7 +388,7 @@ Today is Tuesday 22 June 2027. Her last period started on 14 June; the IUD was f
 | F1 | Contraception | Settings › Your cycle › Contraception | "None". **Add your method**. With an earlier method under "Your methods", a start inside its dates offers to move its end, and one on or before its start, or one that would cover a later method whole, is refused ([Since when](#since-when), journey D). |
 | F2 | Choose copper IUD | Settings › Contraception › Add | The list, Copper IUD chosen. **Next** |
 | F3 | Since when | Settings › Contraception › Add | "When was your IUD fitted?" 15 June chosen, during her period. **Save** |
-| F4 | Contraception: copper IUD | Settings › Your cycle › Contraception | "Copper IUD", "Since 15 June 2027", "Your cycle stays your own, so Cycle keeps estimating your periods. They can be heavier or longer at first." |
+| F4 | Contraception: copper IUD | Settings › Your cycle › Contraception | "Copper IUD", "Since 15 June 2027", "Your cycle stays your own, so Cycle keeps estimating your periods. They can be heavier or longer at first." Mark as stopped · Change method. Then "When to get help" for an IUD, in full ([When to get help](#when-to-get-help)). |
 | F5 | Today still predicting | Today | "TUESDAY 22 JUNE", "Day 9", "Your next period is expected in about 20 days". Card "Periods can be heavier at first": "With a copper IUD, periods are often heavier, longer or more painful for the first 3 to 6 months. Cycle keeps estimating them as before." Got it. My period started · Log how you feel. "Next period": "Around 12 July", "Between 9 and 15 July", "Estimated from your last 6 cycles". |
 | F6 | Calendar: periods predicted | Calendar | Unchanged: predicted period 12 to 16 July, legend Period, Predicted period, Today. |
 
@@ -377,11 +407,12 @@ which the build adds first with their catalog entries, previews and tests
 | `EmptyState` | A1 | Exists |
 | `MonthCalendar`, `WeekRow`, `CycleLegend`, `DayCell` | A2, A5, B4, B7, C4, D3, E3, E6, F3, F6; the week on Today | Exist; gain `BleedingWords` |
 | `UsualLengthSliders` (`core:ui`, two `SliderField`s) | A3 | Exists |
-| `Card`, `ClickableCard` | Today's cards, History, Contraception's Now card | Exist |
+| `Card`, `ClickableCard` | Today's cards, History, Contraception's Now card and When to get help | Exist |
 | `FilledButton`, `TonalButton`, `TextButton` | Throughout | Exist |
 | `CycleBottomSheet` | C3 and the estimate sheet, E6 | Exists |
 | `CycleAlertDialog`, `CycleDestructiveDialog` | E7; deleting dates | Exist |
 | Settings' `SettingsRow` (feature code, a `ClickableCard`) | B1, D2, E4, E5 | Exists in `feature:settings` |
+| Settings' `SectionTitle` (feature code, a heading) | Contraception's "Now", "When to get help" and "Your methods" | Exists in `feature:settings` |
 | **`RadioRow`** | The method list (A4, B3, E2, F2) and breaks (B5) | **To add.** A single-choice row like `SwitchRow`: title in `titleSmall`, an optional one-line body in `bodySmall`, a radio at the end; `accentContainer` when selected; 48dp at least; `Role.RadioButton` in a `selectableGroup`, read as "Implant, A rod in the arm, such as Nexplanon, radio button, selected, 6 of 9". `ButtonGroup` does not fit: nine options with a line each. |
 | **`BleedingWords`** | Calendar legend, day cells, week row | **To add.** An enum, `Period` (default), `Bleed`, `Bleeding`, passed to `DayCell`, `MonthCalendar`, `WeekRow` and `CycleLegend`. It changes the legend labels ("Bleed", "Expected bleed", "Bleeding") and TalkBack ("14 October, bleeding"); the shapes and colours stay. A calendar spanning a method's start takes the word per day. |
 | **`CycleIcons.Medication`** | The Contraception row in Settings | **To add.** Material Symbols Rounded "medication", weight 600, like the others. The journeys page draws a stand-in capsule. |
@@ -402,3 +433,6 @@ Against [`product-implications.md`](../research/product-implications.md#copy-rul
 - No cycle language without a cycle: no cycle day ("Day 19"), "late" or "Missed a period?" on a
   method without an estimate.
 - The method never appears in a notification, widget or the recent-apps preview.
+- The only words about urgent symptoms are "When to get help", in the words of
+  [`0007`](../decisions/0007-urgent-symptoms-on-a-method.md): no condition names, no phone numbers,
+  no step about the method, and never set off by what she logs.

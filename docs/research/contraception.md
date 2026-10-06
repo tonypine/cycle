@@ -614,7 +614,8 @@ protected are questions for her pharmacist or clinic, not for Cycle.
 - **Health signals change with the method**, as listed above. The thresholds and the method they
   apply to belong in one place in code with their sources, like the others.
 - **Urgent symptoms are reference text, not alerts.** The method screen of the combined pill, patch,
-  ring and both IUDs ends with "When to get help", the same for every user of the method and never
-  set off by her log ([`0007`](../decisions/0007-urgent-symptoms-on-a-method.md)).
+  ring and both IUDs shows "When to get help" below what the method does to bleeding, the same for
+  every user of the method and never set off by her log
+  ([`0007`](../decisions/0007-urgent-symptoms-on-a-method.md)).
 - **Synthetic data only.** Every example here uses made-up dates and numbers, like the rest of the
   repo.
