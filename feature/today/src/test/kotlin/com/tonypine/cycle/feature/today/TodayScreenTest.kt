@@ -31,7 +31,9 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import com.github.takahirom.roborazzi.captureScreenRoboImage
 import com.tonypine.cycle.core.model.BleedingWord
+import com.tonypine.cycle.core.model.ContraceptionMethod
 import com.tonypine.cycle.core.model.DayFeelings
+import com.tonypine.cycle.core.model.EstimateBasis
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.model.LogCategory
 import java.time.LocalDate
@@ -341,6 +343,29 @@ class TodayScreenTest {
         composeRule.onNodeWithText("29 days after you stopped the implant on March 8", substring = true).assertExists()
         composeRule.waitForIdle()
         captureScreenRoboImage("src/test/screenshots/today_sheet_estimate_stopped.png")
+    }
+
+    @Test
+    fun `after her first period since stopping each basis ends its sentence before the settling line`() {
+        val settling = (TodaySamples.midCycle.outlook as NextPeriod).copy(settlingAfter = ContraceptionMethod.IMPLANT)
+        val bases = mapOf(
+            EstimateBasis.Setup to "Estimated from the lengths you gave.",
+            EstimateBasis.Typical to "Estimated from a typical 28-day cycle.",
+            EstimateBasis.Logged(1) to "Estimated from your last cycle.",
+            EstimateBasis.Logged(2) to "Estimated from your last 2 cycles."
+        )
+        bases.forEach { (basis, line) ->
+            show(TodaySamples.midCycle.copy(outlook = settling.copy(basis = basis)))
+
+            composeRule
+                .onNode(hasText("Around March 30", substring = true))
+                .assert(
+                    hasText(
+                        "$line Cycles can take a few months to settle after the implant, so the range is wider.",
+                        substring = true
+                    )
+                )
+        }
     }
 
     @Test

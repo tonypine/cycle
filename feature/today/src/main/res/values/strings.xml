@@ -163,7 +163,9 @@
     <string name="today_since_implant">since your implant came out</string>
     <string name="today_since_iud">since your IUD came out</string>
     <string name="today_since_injection">since you stopped the injection</string>
-    <string name="today_basis_usual">Estimated from your usual %1$d-day cycle.</string>
+    <string name="today_basis_usual">Estimated from your usual %1$d-day cycle</string>
+    <!-- A basis line above, then the settling sentence below. -->
+    <string name="today_basis_then_settling">%1$s. %2$s</string>
     <string name="today_basis_settling">Cycles can take a few months to settle after the %1$s, so the range is wider.</string>
     <string name="today_after_injection">Periods can take several months to come back after the injection. Cycle will estimate again once you log one.</string>
 

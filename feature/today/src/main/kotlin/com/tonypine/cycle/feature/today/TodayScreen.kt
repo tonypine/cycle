@@ -568,7 +568,11 @@ private fun basisLine(next: NextPeriod): String {
         }
     }
     val settling = next.settlingAfter ?: return basis
-    return basis + " " + stringResource(R.string.today_basis_settling, methodInSentence(settling))
+    return stringResource(
+        R.string.today_basis_then_settling,
+        basis,
+        stringResource(R.string.today_basis_settling, methodInSentence(settling))
+    )
 }
 
 /**
