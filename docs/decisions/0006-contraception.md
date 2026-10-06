@@ -137,6 +137,20 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
   change would overlap a neighbour, a dialog offers to move the neighbour's edge ("Move the end of
   your pill?"); a change that would swallow a neighbour entirely is refused with the dates to use.
   A stopped date before the started date is refused.
+- **An edit that reaches more than one neighbour.** A start moved earlier can only cut short the
+  stretch it lands in, and covers every stretch after that one whole; a stop moved later works the
+  same way forwards. Any stretch covered whole refuses the change, with no move dialog, even when
+  the new date also lies inside another. The refusal names the neighbour next to the edge she moved
+  (just before for a start, just after for a stop): it is covered whole whenever any stretch is,
+  and a day past its start (or before its stop) is as far as the edge can go. Implant 9 November
+  2026 to 3 November 2027, ring 20 November 2027 to 10 January 2028, pill since 11 January 2028;
+  today is 15 February 2028. She moves the pill's start to 1 November 2027: "That would cover all
+  of your time on the ring. Delete the ring's dates first, or pick a later day." Any start up to 20
+  November is refused the same way; from 21 November to 10 January, the dialog offers to move the
+  ring's end. She moves the implant's stop to 15 January 2028: "That would cover all of your time
+  on the ring. Delete the ring's dates first, or pick an earlier day." Any stop from 10 January is
+  refused the same way; from 20 November to 9 January, the dialog offers "Move the start of your
+  ring?"; up to 19 November, nothing overlaps.
 - **Delete.** Deleting a stretch forgets the method for those dates. The days she logged stay and
   count as her own cycle again.
 - **None** is no row: Cycle is on "none" on any day outside every stretch.
@@ -275,7 +289,11 @@ The method is health data and stays on the phone with the rest:
   other problems: "Line 7 has a method whose dates overlap one already on this phone." This
   replaces the current "Line 7 has a method whose dates overlap another one, in the file or already
   on this phone.", now that rows overlapping each other have their own copy, below. A null start
-  overlaps every stretch that starts on or before its stop, as above.
+  overlaps every stretch that starts on or before its stop, as above. A row that reaches several
+  stretches on the phone, even covering some whole, is refused the same way, with the same one-line
+  problem and no move dialog, and nothing from the file is added: unlike an edit, which names the
+  stretch in the way, the problem names only the line, so it stays one sentence like the file's
+  others and she reads the dates to fix in "Your methods".
 - **A stretch already on the phone.** A row with the same method and start as a stretch on the
   phone is that stretch, as a line for a date she already logged is that day: import skips it and
   the phone's copy stays as it is, whatever the row says about its stop or breaks. A null start
