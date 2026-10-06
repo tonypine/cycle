@@ -176,6 +176,7 @@
     <string name="stretch_delete_from_to">Cycle forgets you used the %1$s from %2$s to %3$s. The days you logged stay, and count as your own cycle again.</string>
     <string name="stretch_delete_since">Cycle forgets you\'ve used the %1$s since %2$s. The days you logged stay, and count as your own cycle again.</string>
     <string name="stretch_delete_until">Cycle forgets you used the %1$s until %2$s. The days you logged stay, and count as your own cycle again.</string>
+    <string name="stretch_delete_on">Cycle forgets you used the %1$s on %2$s. The days you logged stay, and count as your own cycle again.</string>
     <string name="stretch_delete_ongoing">Cycle forgets you use the %1$s. The days you logged stay, and count as your own cycle again.</string>
     <string name="stretch_delete_confirm">Delete</string>
     <string name="stretch_delete_keep">Keep them</string>

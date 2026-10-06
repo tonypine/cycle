@@ -247,4 +247,32 @@ class ContraceptionScreenTest {
         composeRule.onNodeWithText("Delete").assertIsEnabled().performClick()
         assertEquals(listOf("delete"), calls)
     }
+
+    @Test
+    fun `a method fitted and taken out on one day lists that day once`() {
+        showPage(current = null, iud.copy(stopped = iud.started))
+
+        assertEquals("Hormonal IUD, 13 Sept 2027", spokenButtons().last())
+    }
+
+    @Test
+    fun `deleting a method fitted and taken out on one day names that day once`() {
+        composeRule.setContent {
+            Themed {
+                StretchScreen(
+                    StretchUiState.Ready(iud.copy(stopped = iud.started), today, today),
+                    onEdit = {},
+                    onDelete = {},
+                    onBack = {},
+                    onMove = {},
+                    onDismissDialog = {}
+                )
+            }
+        }
+        composeRule.onNodeWithText("Delete these dates").performClick()
+        composeRule.onNodeWithText(
+            "Cycle forgets you used the hormonal IUD on 13 September 2027. " +
+                "The days you logged stay, and count as your own cycle again."
+        ).assertExists()
+    }
 }

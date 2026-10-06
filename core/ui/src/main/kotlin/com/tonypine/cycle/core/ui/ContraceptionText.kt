@@ -253,8 +253,8 @@ private fun breaksLine(method: ContraceptionMethod, breaks: Breaks): Int = when 
 
 /**
  * A stretch's dates, short: "Since 13 Sep 2027" while she is on it, "3 May to 12 Sep 2027" (the year
- * once when both share it) once it has a stop date, and with no start date "Start not known", or
- * "Until 3 Nov 2027" once it has stopped.
+ * once when both share it, or "6 Oct 2026" alone when it starts and stops that day) once it has a
+ * stop date, and with no start date "Start not known", or "Until 3 Nov 2027" once it has stopped.
  */
 @Composable
 fun stretchDates(stretch: ContraceptionStretch): String {
@@ -267,6 +267,8 @@ fun stretchDates(stretch: ContraceptionStretch): String {
                 ?: stringResource(R.string.stretch_start_not_known)
 
         started == null -> stringResource(R.string.stretch_until, formatDate(stopped, DAY_SHORT_MONTH_AND_YEAR))
+
+        started == stopped -> formatDate(started, DAY_SHORT_MONTH_AND_YEAR)
 
         else -> stringResource(
             R.string.stretch_from_to,

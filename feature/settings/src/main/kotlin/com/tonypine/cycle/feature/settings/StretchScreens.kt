@@ -389,8 +389,8 @@ private fun refusalSentence(reason: StretchRefusal): String = when (reason) {
 
 /**
  * "Cycle forgets you used the combined pill from 3 May to 5 September 2027…", or with no stop date
- * "since 9 November 2026", with no start date "until 3 November 2027", and with neither "you use the
- * implant".
+ * "since 9 November 2026", with no start date "until 3 November 2027", on one day "on 6 October
+ * 2026", and with neither "you use the implant".
  */
 @Composable
 private fun deleteText(stretch: ContraceptionStretch): String {
@@ -404,6 +404,8 @@ private fun deleteText(stretch: ContraceptionStretch): String {
                 ?: stringResource(R.string.stretch_delete_ongoing, name)
 
         started == null -> stringResource(R.string.stretch_delete_until, name, formatDate(stopped, DAY_MONTH_AND_YEAR))
+
+        started == stopped -> stringResource(R.string.stretch_delete_on, name, formatDate(started, DAY_MONTH_AND_YEAR))
 
         else -> stringResource(
             R.string.stretch_delete_from_to,
