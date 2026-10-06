@@ -84,6 +84,11 @@ class TodayViewModel(
         (uiState.value as? TodayUiState.Tracking)?.missedPeriod?.let { settings.dismiss(it.prompt) }
     }
 
+    /** "Got it" on the copper IUD's heavier-periods card: it goes for this IUD. */
+    fun onDismissCopperIudNote() = write {
+        (uiState.value as? TodayUiState.Tracking)?.copperIudNote?.let { settings.dismissCopperIudNote(it) }
+    }
+
     /** "Still going": not asked again for this period. */
     fun onStillGoing() = write { stillGoing()?.let { settings.dismiss(it.prompt) } }
 

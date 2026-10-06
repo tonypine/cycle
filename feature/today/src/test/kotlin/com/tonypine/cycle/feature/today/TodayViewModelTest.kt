@@ -12,6 +12,10 @@ import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
 import com.tonypine.cycle.core.designsystem.CycleDayState
+import com.tonypine.cycle.core.model.BleedBasis
+import com.tonypine.cycle.core.model.BleedingWord
+import com.tonypine.cycle.core.model.Breaks
+import com.tonypine.cycle.core.model.ContraceptionMethod
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.EnergyLevel
@@ -135,8 +139,8 @@ class TodayViewModelTest {
         assertEquals(CycleDayState.Period, started.dayState(today))
         assertTrue(started.onPeriod)
         // The estimate follows at once: her first full cycle, 24 days.
-        assertEquals(EstimateBasis.Logged(1), started.nextPeriod.basis)
-        assertEquals(day("2027-04-13"), started.nextPeriod.expectedStart)
+        assertEquals(EstimateBasis.Logged(1), started.nextPeriod?.basis)
+        assertEquals(day("2027-04-13"), started.nextPeriod?.expectedStart)
 
         viewModel.onUndoPeriodStarted()
         assertEquals(before, viewModel.awaitState<TodayUiState.Tracking> { it.phase == TodayPhase.Due })
@@ -177,9 +181,9 @@ class TodayViewModelTest {
         val state = viewModel.awaitState<TodayUiState.Tracking>()
         assertEquals(31, state.cycleDay)
         assertEquals(TodayPhase.Late(daysLate = 2), state.phase)
-        assertEquals(today, state.nextPeriod.expectedStart)
-        assertEquals(today, state.nextPeriod.earliestStart)
-        assertEquals(28, state.nextPeriod.cycleLength)
+        assertEquals(today, state.nextPeriod?.expectedStart)
+        assertEquals(today, state.nextPeriod?.earliestStart)
+        assertEquals(28, state.nextPeriod?.cycleLength)
         assertEquals(CycleDayState.PredictedPeriod, state.dayState(today))
     }
 
@@ -327,7 +331,7 @@ class TodayViewModelTest {
         assertEquals(23, state.cycleDay)
         assertEquals(Period(day("2027-02-26"), day("2027-03-02")), state.periods.last())
         // One cycle of 28 days, from 29 January to 25 February.
-        assertEquals(day("2027-03-26"), state.nextPeriod.expectedStart)
+        assertEquals(day("2027-03-26"), state.nextPeriod?.expectedStart)
     }
 
     @Test
@@ -344,6 +348,229 @@ class TodayViewModelTest {
                 it.cycleDay == 20
             }.phase
         )
+    }
+
+    @Test
+    fun `on the implant Today shows the method, its bleeding and nothing expected`() = today { viewModel, _ ->
+        logPeriod(day("2027-01-01"), day("2027-01-05"))
+        logPeriod(day("2027-01-29"), day("2027-02-02"))
+        contraception.start(ContraceptionMethod.IMPLANT, breaks = null, started = day("2027-02-10"), today = today)
+        logPeriod(day("2027-03-02"), day("2027-03-06"))
+
+        val state = viewModel.awaitState<TodayUiState.Tracking> {
+            (it.outlook as? TodayOutlook.Bleeding)?.summary?.days == 5
+        }
+        assertEquals(TodayDisplay.Method(ContraceptionMethod.IMPLANT), state.display)
+        assertNull(state.cycleDay)
+        assertEquals(TodayPhase.NoEstimate, state.phase)
+        assertEquals(BleedingWord.BLEEDING, state.words)
+        assertNull(state.nextPeriod)
+        assertNull(state.missedPeriod)
+        val summary = (state.outlook as TodayOutlook.Bleeding).summary
+        assertEquals(5, summary.days)
+        assertEquals(1, summary.episodes)
+        assertEquals(TodayMethod(ContraceptionMethod.IMPLANT, breaks = null, firstMonths = true), state.method)
+        // Nothing predicted after the implant's start; the days she logged still show.
+        (0L..60L).forEach { assertEquals(CycleDayState.Plain, state.dayState(today.plusDays(it))) }
+        assertEquals(CycleDayState.Period, state.dayState(day("2027-03-02")))
+
+        // C2: one tap logs the bleeding as before.
+        viewModel.onPeriodStarted()
+        val started = viewModel.awaitState<TodayUiState.Tracking> { it.phase == TodayPhase.PeriodStartedToday }
+        assertEquals(BleedingWord.BLEEDING, started.words)
+        assertEquals(CycleDayState.Period, started.dayState(today))
+        assertEquals(2, (started.outlook as TodayOutlook.Bleeding).summary.episodes)
+    }
+
+    @Test
+    fun `on the implant with nothing logged Today is not empty`() = today { viewModel, _ ->
+        contraception.start(ContraceptionMethod.IMPLANT, breaks = null, started = null, today = today)
+
+        val state = viewModel.awaitState<TodayUiState.Tracking>()
+        assertEquals(TodayDisplay.Method(ContraceptionMethod.IMPLANT), state.display)
+        assertEquals(0, (state.outlook as TodayOutlook.Bleeding).summary.days)
+        // An unknown start has no first months.
+        assertEquals(false, state.method?.firstMonths)
+    }
+
+    @Test
+    fun `after the implant comes out Today counts the days since and estimates with a wider range`() =
+        today { viewModel, _ ->
+            logPeriod(day("2026-09-10"), day("2026-09-14"))
+            logPeriod(day("2026-10-08"), day("2026-10-12"))
+            contraception.start(ContraceptionMethod.IMPLANT, breaks = null, started = day("2026-11-09"), today = today)
+            val implant = contraception.observeStretches().first().single()
+            contraception.stop(implant.id, lastDay = day("2027-03-08"), today = today)
+
+            val state = viewModel.awaitState<TodayUiState.Tracking> { it.display is TodayDisplay.DaysSince }
+            assertEquals(TodayDisplay.DaysSince(days = 12, method = ContraceptionMethod.IMPLANT), state.display)
+            assertEquals(BleedingWord.PERIOD, state.words)
+            val next = state.nextPeriod!!
+            // Her usual 28 days from the day it came out, give or take 7.
+            assertEquals(day("2027-04-05"), next.expectedStart)
+            assertEquals(day("2027-03-29"), next.earliestStart)
+            assertEquals(day("2027-04-12"), next.latestStart)
+            assertEquals(day("2027-03-08"), next.lastStart)
+            assertEquals(ContraceptionMethod.IMPLANT, next.stoppedMethod)
+            assertEquals(ContraceptionMethod.IMPLANT, next.settlingAfter)
+            assertNull(state.missedPeriod)
+
+            // Her first period after it is day 1 again, still with the wider range.
+            viewModel.onPeriodStarted()
+            val first = viewModel.awaitState<TodayUiState.Tracking> { it.cycleDay == 1 }
+            assertNull(first.nextPeriod?.stoppedMethod)
+            assertEquals(ContraceptionMethod.IMPLANT, first.nextPeriod?.settlingAfter)
+        }
+
+    @Test
+    fun `after the injection Today waits for her first period`() = today { viewModel, _ ->
+        logPeriod(day("2026-10-08"), day("2026-10-12"))
+        contraception.start(ContraceptionMethod.INJECTION, breaks = null, started = day("2026-11-09"), today = today)
+        val injection = contraception.observeStretches().first().single()
+        // Last injection on 5 December: counted until 6 March, 13 weeks later.
+        contraception.stop(injection.id, lastDay = day("2026-12-05"), today = today)
+
+        val state = viewModel.awaitState<TodayUiState.Tracking> { it.display is TodayDisplay.DaysSince }
+        assertEquals(TodayDisplay.DaysSince(days = 14, method = ContraceptionMethod.INJECTION), state.display)
+        assertEquals(TodayOutlook.AfterInjection, state.outlook)
+        assertEquals(TodayPhase.NoEstimate, state.phase)
+        (0L..60L).forEach { assertEquals(CycleDayState.Plain, state.dayState(today.plusDays(it))) }
+    }
+
+    @Test
+    fun `on the pill with monthly breaks the first bleed is expected in the first break`() = today { viewModel, _ ->
+        logPeriod(day("2027-02-20"), day("2027-02-24"))
+        contraception.start(
+            ContraceptionMethod.COMBINED_PILL,
+            Breaks.MONTHLY,
+            started = day("2027-03-06"),
+            today = today
+        )
+
+        val state = viewModel.awaitState<TodayUiState.Tracking> { it.display is TodayDisplay.Method }
+        assertEquals(TodayDisplay.Method(ContraceptionMethod.COMBINED_PILL), state.display)
+        assertEquals(BleedingWord.BLEED, state.words)
+        val next = state.outlook as NextBleed
+        assertEquals(BleedBasis.START_DATE, next.basis)
+        assertEquals(day("2027-03-27"), next.earliestStart)
+        assertEquals(day("2027-04-02"), next.latestStart)
+        assertEquals(TodayPhase.BetweenPeriods(daysUntil = 7), state.phase)
+        assertEquals(true, state.method?.firstMonths)
+        assertEquals(CycleDayState.PredictedPeriod, state.dayState(day("2027-04-02")))
+
+        // Bleeding between breaks shows, but does not move the estimate.
+        viewModel.onPeriodStarted()
+        val bleeding = viewModel.awaitState<TodayUiState.Tracking> { it.phase == TodayPhase.PeriodStartedToday }
+        assertEquals(BleedingWord.BLEED, bleeding.words)
+        assertEquals(day("2027-03-27"), (bleeding.outlook as NextBleed).earliestStart)
+    }
+
+    @Test
+    fun `on the pill the next bleed follows the last one that counted`() = today { viewModel, _ ->
+        contraception.start(
+            ContraceptionMethod.COMBINED_PILL,
+            Breaks.MONTHLY,
+            started = day("2027-01-02"),
+            today = today
+        )
+        // Each in its break: days 26 to 29 of the first pack, then 28 days later.
+        logPeriod(day("2027-01-27"), day("2027-01-30"))
+        logPeriod(day("2027-02-24"), day("2027-02-27"))
+
+        // With only the first bleed, the second break would have passed with none: wait for both.
+        val state = viewModel.awaitState<TodayUiState.Tracking> {
+            (it.outlook as? NextBleed)?.let { next -> next.expectedStart == day("2027-03-24") && !next.missedBreak } ==
+                true
+        }
+        val next = state.outlook as NextBleed
+        assertEquals(BleedBasis.LAST_BLEED, next.basis)
+        assertEquals(day("2027-03-22"), next.earliestStart)
+        assertEquals(day("2027-03-26"), next.latestStart)
+        assertEquals(false, next.missedBreak)
+        assertEquals(TodayPhase.BetweenPeriods(daysUntil = 4), state.phase)
+    }
+
+    @Test
+    fun `a break that passes with no bleed is said calmly, and the next is expected a pack later`() =
+        today { viewModel, _ ->
+            contraception.start(
+                ContraceptionMethod.COMBINED_PILL,
+                Breaks.MONTHLY,
+                started = day("2027-02-01"),
+                today = today
+            )
+
+            val state = viewModel.awaitState<TodayUiState.Tracking> { (it.outlook as? NextBleed)?.missedBreak == true }
+            val next = state.outlook as NextBleed
+            assertEquals(day("2027-03-22"), next.earliestStart)
+            assertEquals(TodayPhase.BetweenPeriods(daysUntil = 2), state.phase)
+        }
+
+    @Test
+    fun `on the pill with no start date and no bleed logged, Today waits for her first bleed`() =
+        today { viewModel, _ ->
+            contraception.start(ContraceptionMethod.COMBINED_PILL, Breaks.MONTHLY, started = null, today = today)
+
+            val state = viewModel.awaitState<TodayUiState.Tracking> { it.outlook == TodayOutlook.FirstBleedToLog }
+            assertEquals(TodayDisplay.Method(ContraceptionMethod.COMBINED_PILL), state.display)
+            assertEquals(TodayPhase.NoEstimate, state.phase)
+            assertEquals(BleedingWord.BLEED, state.words)
+            assertNull(state.nextPeriod)
+            // An unknown start has no first months.
+            assertEquals(
+                TodayMethod(ContraceptionMethod.COMBINED_PILL, Breaks.MONTHLY, firstMonths = false),
+                state.method
+            )
+            (0L..60L).forEach { assertEquals(CycleDayState.Plain, state.dayState(today.plusDays(it))) }
+        }
+
+    @Test
+    fun `on a copper IUD the estimate stays, with the heavier-periods card until Got it`() =
+        today { viewModel, settings ->
+            logPeriod(day("2027-02-12"), day("2027-02-16"))
+            logPeriod(day("2027-03-12"), day("2027-03-16"))
+            contraception.start(
+                ContraceptionMethod.COPPER_IUD,
+                breaks = null,
+                started = day("2027-03-13"),
+                today = today
+            )
+
+            val state = viewModel.awaitState<TodayUiState.Tracking> { it.copperIudNote != null }
+            assertEquals(TodayDisplay.CycleDay(9), state.display)
+            assertEquals(BleedingWord.PERIOD, state.words)
+            assertNull(state.method)
+            assertEquals(day("2027-04-09"), state.nextPeriod?.expectedStart)
+            assertEquals(day("2027-03-13"), state.copperIudNote)
+
+            viewModel.onDismissCopperIudNote()
+            viewModel.awaitState<TodayUiState.Tracking> { it.copperIudNote == null }
+            assertEquals(setOf(day("2027-03-13")), settings.settings.first().dismissedCopperIudNote)
+        }
+
+    @Test
+    fun `in the days after the pill stops a bleed is still its bleed`() = today { viewModel, _ ->
+        logPeriod(day("2026-12-01"), day("2026-12-05"))
+        contraception.start(
+            ContraceptionMethod.COMBINED_PILL,
+            Breaks.MONTHLY,
+            started = day("2027-01-02"),
+            today = today
+        )
+        val pill = contraception.observeStretches().first().single()
+        contraception.stop(pill.id, lastDay = day("2027-03-16"), today = today)
+
+        val state = viewModel.awaitState<TodayUiState.Tracking> { it.display is TodayDisplay.DaysSince }
+        assertEquals(TodayDisplay.DaysSince(days = 4, method = ContraceptionMethod.COMBINED_PILL), state.display)
+        // "Bleed started", not "My period started", for 7 days after the last pill.
+        assertEquals(BleedingWord.BLEED, state.words)
+
+        viewModel.onPeriodStarted()
+        val bleed = viewModel.awaitState<TodayUiState.Tracking> { it.phase == TodayPhase.PeriodStartedToday }
+        assertEquals(BleedingWord.BLEED, bleed.words)
+        // Not her first period: still days since, and the estimate still counts from the stop date.
+        assertEquals(TodayDisplay.DaysSince(days = 4, method = ContraceptionMethod.COMBINED_PILL), bleed.display)
+        assertEquals(day("2027-03-16"), bleed.nextPeriod?.lastStart)
     }
 
     /** Runs [test] with a ViewModel on the test database, its state collected as the screen would. */

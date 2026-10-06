@@ -72,7 +72,9 @@ class SettingsViewModelTest {
             PreferenceDataStoreFactory.create(scope = backgroundScope) { File(folder.root, "test.preferences_pb") }
         )
         val viewModel =
-            SettingsViewModel(settings, YourDataRepository(database, settings), deviceLock, clock = { today })
+            SettingsViewModel(settings, YourDataRepository(database, settings), deviceLock, contraception, clock = {
+                today
+            })
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
         return viewModel
     }
@@ -238,6 +240,19 @@ class SettingsViewModelTest {
         assertEquals(1, state?.importedMethods)
         assertEquals(null, state?.importedDays)
         assertEquals(listOf(implant), contraception.observeStretches().first().map { it.copy(id = 0) })
+    }
+
+    @Test
+    fun `the contraception row shows her method, and none once she marks it as stopped today`() = runTest {
+        val viewModel = settingsViewModel()
+        contraception.start(ContraceptionMethod.HORMONAL_IUD, null, today, today)
+
+        val iud = viewModel.uiState.first { it?.contraception != null }!!.contraception!!
+        assertEquals(ContraceptionMethod.HORMONAL_IUD, iud.method)
+        contraception.stop(iud.id, today, today)
+
+        assertEquals(today, contraception.observeStretches().first().single().stopped)
+        assertEquals(null, viewModel.uiState.first { it?.contraception?.id != iud.id }!!.contraception)
     }
 
     @Test

@@ -69,7 +69,10 @@ class MainActivityTest {
         composeRule.onNodeWithText("Get started").performClick()
         composeRule.onNode(hasContentDescription("today", substring = true) and hasClickAction()).performClick()
         composeRule.onNodeWithText("Next").performScrollTo().performClick()
-        composeRule.onNodeWithText("Done").performScrollTo().performClick()
+        waitForText("How long do they usually last?")
+        composeRule.onNodeWithText("Next").performScrollTo().performClick()
+        waitForText("Are you using contraception?")
+        composeRule.onNodeWithText("Skip").performScrollTo().performClick()
 
         waitForText("Day 1")
         composeRule.onAllNodes(isTab).assertCountEquals(4)

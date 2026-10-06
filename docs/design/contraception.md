@@ -292,6 +292,22 @@ Today is Thursday 14 October 2027. Implant since 9 November 2026.
 When she has no natural cycles at all (on a method since before she installed Cycle), the typical
 cycle card is left out and History starts with the method's card.
 
+The rest of History's copy for a method ([MOT-55](https://linear.app/tonypine/issue/MOT-55)):
+
+- A combined pill, patch or ring with a break every month counts its bleeds instead of the 90 days:
+  "You logged 6 bleeds on it." ("You logged no bleeds on it."), the withdrawal bleed after it
+  stopped included.
+- A method younger than 90 days counts since its start, as on Today: "Since September 6: you logged
+  bleeding or spotting on 4 days, in 2 episodes. The longest lasted 3 days."
+  Once stopped, one shorter than 90 days counts all of it: "In that time you logged …". With nothing
+  logged: "… you logged no bleeding or spotting."
+- The cycle a method cut short says how: "cut short when you started the pill" (the mini pill, the
+  patch, the ring), "when the implant was fitted", "when the IUD was fitted", "when you had your
+  first injection". Its detail adds "Cut short when the implant was fitted. Not part of your typical
+  cycle." under its dates.
+- "See it in the calendar" opens the month of the method's last day so far: this month while she is
+  on it, else the month it stopped.
+
 ### D. Implant removed
 
 Today is Monday 15 November 2027. The implant came out on 3 November.
@@ -304,6 +320,10 @@ Today is Monday 15 November 2027. The implant came out on 3 November.
 | D4 | Contraception: none now | Settings › Your cycle › Contraception | "Now": "None", "Cycle estimates your periods from your own cycle." Add your method (a start inside the implant's dates: below). "Your methods": Implant · 9 Nov 2026 to 3 Nov 2027 › |
 | D5 | Today: fresh estimates | Today | "MONDAY 15 NOVEMBER", display "12 days", "since your implant came out". **My period started** · Log how you feel. "Next period": "Around 2 December", "Between 25 November and 9 December", "Estimated from your usual 29-day cycle. Cycles can take a few months to settle after the implant, so the range is wider." How is this estimated? |
 | D6 | History | History | The implant's card now reads "9 Nov 2026 to 3 Nov 2027", "Not part of your typical cycle.", "In its last 90 days you logged bleeding or spotting on 10 days, in 3 episodes. The longest lasted 5 days." |
+
+The stop date is her last day on the implant. Had she marked it stopped with today's date, Settings
+would show "None" at once, but Today would keep the implant's words until tomorrow, and D5's
+estimates would start then.
 
 Once she logs her first period after it, Today is "Day 1" again, with the ±7-day range until she has
 logged three cycles. "Missed a period?" is not asked before that first period. Other methods:
@@ -413,9 +433,9 @@ which the build adds first with their catalog entries, previews and tests
 | `CycleAlertDialog`, `CycleDestructiveDialog` | E7; deleting dates | Exist |
 | Settings' `SettingsRow` (feature code, a `ClickableCard`) | B1, D2, E4, E5 | Exists in `feature:settings` |
 | Settings' `SectionTitle` (feature code, a heading) | Contraception's "Now", "When to get help" and "Your methods" | Exists in `feature:settings` |
-| **`RadioRow`** | The method list (A4, B3, E2, F2) and breaks (B5) | **To add.** A single-choice row like `SwitchRow`: title in `titleSmall`, an optional one-line body in `bodySmall`, a radio at the end; `accentContainer` when selected; 48dp at least; `Role.RadioButton` in a `selectableGroup`, read as "Implant, A rod in the arm, such as Nexplanon, radio button, selected, 6 of 9". `ButtonGroup` does not fit: nine options with a line each. |
-| **`BleedingWords`** | Calendar legend, day cells, week row | **To add.** An enum, `Period` (default), `Bleed`, `Bleeding`, passed to `DayCell`, `MonthCalendar`, `WeekRow` and `CycleLegend`. It changes the legend labels ("Bleed", "Expected bleed", "Bleeding") and TalkBack ("14 October, bleeding"); the shapes and colours stay. A calendar spanning a method's start takes the word per day. |
-| **`CycleIcons.Medication`** | The Contraception row in Settings | **To add.** Material Symbols Rounded "medication", weight 600, like the others. The journeys page draws a stand-in capsule. |
+| **`RadioRow`** | The method list (A4, B3, E2, F2) and breaks (B5) | Added ([MOT-52](https://linear.app/tonypine/issue/MOT-52)), with `RadioGroup`; the method and breaks lists are `MethodList` and `BreaksList` in `core:ui`. A single-choice row like `SwitchRow`: title in `titleSmall`, an optional one-line body in `bodySmall`, a radio at the end; `accentContainer` when selected; 48dp at least; `Role.RadioButton` in a `selectableGroup`, read as "Implant, A rod in the arm, such as Nexplanon, radio button, selected, 6 of 9". `ButtonGroup` does not fit: nine options with a line each. |
+| **`BleedingWords`** | Calendar legend, day cells, week row | Added ([MOT-54](https://linear.app/tonypine/issue/MOT-54)). An enum, `Period` (default), `Bleed`, `Bleeding`, passed to `DayCell`, `MonthCalendar`, `WeekRow` and `CycleLegend`. It changes the legend labels ("Bleed", "Expected bleed", "Bleeding") and TalkBack ("14 October, bleeding"); the shapes and colours stay. A calendar spanning a method's start takes the word per day; its legend names the logged days and the predicted ones each in their own words. |
+| **`CycleIcons.Medication`** | The Contraception row in Settings | Added ([MOT-52](https://linear.app/tonypine/issue/MOT-52)). Material Symbols Rounded "medication", weight 600, like the others. The journeys page draws a stand-in capsule. |
 
 ## Copy checks
 

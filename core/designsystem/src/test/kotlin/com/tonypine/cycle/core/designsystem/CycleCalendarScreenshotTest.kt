@@ -12,7 +12,8 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * A sample week of day cells and the cycle phase legend, in full and without fertility, in light, dark, 200% font scale and
+ * A sample week of day cells and the cycle phase legend, in full, without fertility and in a method's
+ * words, in light, dark, 200% font scale and
  * right-to-left, with the accessibility checks. The screen is 480dp wide and xhdpi: wide enough for a
  * week of cells inside the 16dp margins even at 200%, where each cell grows to 58dp, and dense enough that the legend's 14sp labels render
  * as on a real device (at mdpi their one-pixel strokes blur, and the contrast check underestimates them).
@@ -33,6 +34,32 @@ class CycleCalendarScreenshotTest(private val case: MatrixCase) {
     @Test
     fun legendWithoutFertility() = matrix.capture("legend_without_fertility", case) {
         CycleLegend(entries = CycleLegendEntry.WithoutFertility)
+    }
+
+    @Test
+    fun legendBleed() = matrix.capture("legend_bleed", case) {
+        CycleLegend(
+            entries = CycleLegendEntry.WithoutFertility,
+            words = listOf(BleedingWords.Bleed),
+            predictedWords = BleedingWords.Bleed
+        )
+    }
+
+    @Test
+    fun legendPeriodThenExpectedBleed() = matrix.capture("legend_period_then_expected_bleed", case) {
+        CycleLegend(
+            entries = CycleLegendEntry.WithoutFertility,
+            words = listOf(BleedingWords.Period),
+            predictedWords = BleedingWords.Bleed
+        )
+    }
+
+    @Test
+    fun legendPeriodThenBleeding() = matrix.capture("legend_period_then_bleeding", case) {
+        CycleLegend(
+            entries = listOf(CycleLegendEntry.Period, CycleLegendEntry.Today),
+            words = listOf(BleedingWords.Period, BleedingWords.Bleeding)
+        )
     }
 
     companion object {

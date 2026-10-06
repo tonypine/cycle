@@ -15,9 +15,10 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * Every History and cycle detail state in light and dark, and the list and a detail at 200% font
- * scale. Each records `src/test/screenshots/history_<state>_<appearance>.png` or
- * `cycle_<state>_<appearance>.png`. The data is synthetic ([HistorySamples]).
+ * Every History, cycle detail and period editor state in light and dark, and the list, a detail and
+ * the editor at 200% font scale. Each records `src/test/screenshots/history_<state>_<appearance>.png`,
+ * `cycle_<state>_<appearance>.png` or `edit_period_<state>_<appearance>.png`. The data is synthetic
+ * ([HistorySamples]).
  */
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -49,15 +50,32 @@ class HistoryScreenshotTest(private val name: String, private val appearance: Ap
     companion object {
         private val screens: Map<String, @Composable () -> Unit> =
             HistorySamples.all.entries.associate { (name, state) ->
-                "history_$name" to @Composable { HistoryScreen(state, onCycleClick = {}) }
+                "history_$name" to @Composable { HistoryScreen(state, onCycleClick = {}, onSeeInCalendar = {}) }
             } + HistorySamples.allDetails.entries.associate { (name, state) ->
-                "cycle_$name" to @Composable { CycleDetailScreen(state, onBack = {}, onSeeInCalendar = {}) }
+                "cycle_$name" to @Composable {
+                    CycleDetailScreen(state, onBack = {}, onSeeInCalendar = {}, onEditPeriod = {}, onDeletePeriod = {})
+                }
+            } + HistorySamples.allEdits.entries.associate { (name, state) ->
+                "edit_period_$name" to @Composable {
+                    EditPeriodScreen(
+                        state,
+                        onBack = {},
+                        onChoose = {},
+                        onPick = {},
+                        onMonthChange = {},
+                        onStillGoingChange = {},
+                        onSave = {}
+                    )
+                }
             }
 
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "{0}_{1}")
         fun cases(): List<Array<Any>> = screens.keys.flatMap { name ->
             listOf(Appearance.Light, Appearance.Dark).map { arrayOf<Any>(name, it) }
-        } + listOf("history_cycles", "cycle_past").map { arrayOf<Any>(it, Appearance.FontScale200) }
+        } +
+            listOf("history_cycles", "history_on_implant", "cycle_past", "edit_period_refused").map {
+                arrayOf<Any>(it, Appearance.FontScale200)
+            }
     }
 }
