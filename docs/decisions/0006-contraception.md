@@ -72,6 +72,9 @@ uses it and asks.
 
 ### Words
 
+- "Combined method" in this record means the combined pill, patch or ring. The monthly combined
+  injection is not one: it has no breaks and no 7-day withdrawal bleed after its stop date, since
+  its last withdrawal bleed falls inside its 4 weeks ([Stored](#stored-dated-stretches)).
 - "Period" with no method or a copper IUD; "bleed" for the scheduled bleed on a combined method with
   a break every month; "bleeding" everywhere else ([`product-implications.md`](../research/product-implications.md#on-contraception)).
 - Every place that says "period" takes the word of the method on that day: Today's buttons ("Bleed

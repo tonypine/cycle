@@ -111,6 +111,10 @@ the end of your monthly injection?"); in full: "monthly combined injection".
 the same progestogen as Noristerat, and the list must not let one pass for the other
 ([research](../research/contraception.md#monthly-combined-injection)).
 
+"Combined method" in this doc means the combined pill, patch or ring, as in `0006`. The monthly
+combined injection is not one: it has no breaks page and no 7 days of withdrawal bleed after its
+stop date.
+
 ### Since when
 
 | Method | Title (Setup and Settings) | When she stops |
