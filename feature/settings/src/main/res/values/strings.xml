@@ -125,4 +125,80 @@
 
     <!-- Open-source notices: the bundled fonts and icons, and their licences. -->
     <string name="notices_title">Open-source notices</string>
+
+    <!-- Contraception: docs/design/contraception.md, journeys B, D and E. The method's own words
+         (names, since when, breaks, the calm line) are in core:ui, shared with setup. -->
+    <string name="contraception_title">Contraception</string>
+    <string name="contraception_none">None</string>
+    <string name="contraception_row_since">%1$s, since %2$s</string>
+    <string name="contraception_row_start_not_known">%1$s, start not known</string>
+    <string name="contraception_now">Now</string>
+    <string name="contraception_your_methods">Your methods</string>
+    <string name="contraception_since">Since %1$s</string>
+    <string name="contraception_start_not_known">Start not known</string>
+    <string name="contraception_with_breaks">%1$s · %2$s</string>
+    <string name="contraception_breaks_monthly">a break every month</string>
+    <string name="contraception_breaks_every_few_packs">a break every few packs</string>
+    <string name="contraception_breaks_none">no breaks</string>
+    <string name="contraception_counts_until">Cycle counts it until %1$s.</string>
+    <string name="contraception_counts_until_injection">Cycle counts it until %1$s, 13 weeks after your last injection.</string>
+    <string name="contraception_add">Add your method</string>
+    <string name="contraception_change">Change method</string>
+    <string name="contraception_stop">Mark as stopped</string>
+    <string name="contraception_note">Cycle isn\'t a contraceptive and doesn\'t advise on methods. Questions about yours are for your pharmacist, nurse or doctor. Your method stays on this phone.</string>
+
+    <!-- Add your method, or change it: which method, since when, breaks. -->
+    <string name="add_method_which">Which method?</string>
+    <string name="add_method_which_body">Some methods change bleeding, so Cycle changes what it estimates.</string>
+    <string name="add_method_next">Next</string>
+    <string name="add_method_save">Save</string>
+    <string name="add_method_done">Done</string>
+
+    <!-- Mark as stopped. -->
+    <string name="stop_method_save">Save</string>
+
+    <!-- A method's page: its dates, its breaks, and deleting them. -->
+    <string name="stretch_started">Started</string>
+    <string name="stretch_fitted">Fitted</string>
+    <string name="stretch_first_injection">First injection</string>
+    <string name="stretch_stopped">Stopped</string>
+    <string name="stretch_taken_out">Taken out</string>
+    <string name="stretch_counted_until">Counted until</string>
+    <string name="stretch_not_known">Not known</string>
+    <string name="stretch_still_in">Still in</string>
+    <string name="stretch_still_on_it">Still on it</string>
+    <string name="stretch_counted_until_body">Any day up to 13 weeks from today.</string>
+    <string name="stretch_breaks">Breaks</string>
+    <string name="stretch_delete">Delete these dates</string>
+    <string name="stretch_delete_body">Cycle forgets this method for these dates. What you logged stays.</string>
+    <string name="stretch_save">Save</string>
+    <string name="stretch_delete_title">Delete these dates?</string>
+    <string name="stretch_delete_from_to">Cycle forgets you used the %1$s from %2$s to %3$s. The days you logged stay, and count as your own cycle again.</string>
+    <string name="stretch_delete_since">Cycle forgets you\'ve used the %1$s since %2$s. The days you logged stay, and count as your own cycle again.</string>
+    <string name="stretch_delete_until">Cycle forgets you used the %1$s until %2$s. The days you logged stay, and count as your own cycle again.</string>
+    <string name="stretch_delete_ongoing">Cycle forgets you use the %1$s. The days you logged stay, and count as your own cycle again.</string>
+    <string name="stretch_delete_confirm">Delete</string>
+    <string name="stretch_delete_keep">Keep them</string>
+
+    <!-- When new dates overlap another method's. -->
+    <string name="move_end_title">Move the end of your %1$s?</string>
+    <string name="move_end_text">Your %1$s would end on %2$s instead of %3$s, so the two don\'t overlap. Cycle works out its estimates again.</string>
+    <string name="move_start_title">Move the start of your %1$s?</string>
+    <string name="move_start_text">Your %1$s would start on %2$s instead of %3$s, so the two don\'t overlap. Cycle works out its estimates again.</string>
+    <string name="move_several_title">Move your other methods\' dates?</string>
+    <string name="move_end_line">Your %1$s would end on %2$s instead of %3$s.</string>
+    <string name="move_start_line">Your %1$s would start on %2$s instead of %3$s.</string>
+    <string name="move_several_end">That way none of them overlap. Cycle works out its estimates again.</string>
+    <string name="move_confirm">Move it</string>
+    <string name="move_cancel">Cancel</string>
+
+    <!-- When the dates can't be saved. -->
+    <string name="refused_title">Pick another day</string>
+    <string name="refused_ok">OK</string>
+    <string name="refused_after_today">That\'s after today. Pick today or an earlier day.</string>
+    <string name="refused_before_current">That\'s before you started the %1$s on %2$s. Pick a later day, or change the %1$s\'s dates first.</string>
+    <string name="refused_covers_whole">That would cover all of your time on the %1$s. Delete the %1$s\'s dates first, or pick a later day.</string>
+    <string name="refused_stop_before_start">That\'s before it started. Pick a later day.</string>
+    <string name="refused_stop_too_late">Pick a day up to %1$s.</string>
+    <string name="refused_gone">These dates have been deleted.</string>
 </resources>

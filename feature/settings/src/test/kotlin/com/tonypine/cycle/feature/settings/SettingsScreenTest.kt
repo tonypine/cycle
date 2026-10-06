@@ -28,6 +28,8 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
 import com.tonypine.cycle.core.data.export.ImportProblem
+import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -56,6 +58,7 @@ class SettingsScreenTest {
                 versionName = "1.4.27",
                 onUsualLengths = { calls += "usual lengths" },
                 onWhatToLog = { calls += "what to log" },
+                onContraception = { calls += "contraception" },
                 onAppLockChange = { on -> calls += "lock $on" },
                 onDismissLockNote = { calls += "dismiss lock note" },
                 onExport = { calls += "export" },
@@ -85,11 +88,24 @@ class SettingsScreenTest {
         }
         row("Usual cycle and period").assert(hasText("28-day cycle, 5-day period")).performClick()
         row("What to log").performClick()
+        row("Contraception").assert(hasText("None")).performClick()
         row("Export my data").assert(hasText("Save a file with every day you logged")).performClick()
         row("Import from a file").performClick()
         row("Open-source notices").performClick()
 
-        assertEquals(listOf("usual lengths", "what to log", "export", "import", "notices"), calls)
+        assertEquals(listOf("usual lengths", "what to log", "contraception", "export", "import", "notices"), calls)
+    }
+
+    @Test
+    fun `contraception reads her method today and since when`() {
+        state = state.copy(
+            contraception = ContraceptionStretch(ContraceptionMethod.IMPLANT, LocalDate.of(2026, 11, 9), id = 1)
+        )
+        show()
+
+        row("Contraception").assert(hasText("Implant, since 9 Nov 2026"))
+        state = state.copy(contraception = ContraceptionStretch(ContraceptionMethod.IMPLANT, started = null, id = 1))
+        row("Contraception").assert(hasText("Implant, start not known"))
     }
 
     @Test

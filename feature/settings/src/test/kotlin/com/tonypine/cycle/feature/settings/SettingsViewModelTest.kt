@@ -72,7 +72,9 @@ class SettingsViewModelTest {
             PreferenceDataStoreFactory.create(scope = backgroundScope) { File(folder.root, "test.preferences_pb") }
         )
         val viewModel =
-            SettingsViewModel(settings, YourDataRepository(database, settings), deviceLock, clock = { today })
+            SettingsViewModel(settings, YourDataRepository(database, settings), deviceLock, contraception, clock = {
+                today
+            })
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
         return viewModel
     }

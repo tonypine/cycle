@@ -5,7 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.tonypine.cycle.core.data.export.ImportProblem
 import com.tonypine.cycle.core.data.export.ImportRead
 import com.tonypine.cycle.core.data.export.YourDataRepository
+import com.tonypine.cycle.core.data.repository.ContraceptionRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
+import com.tonypine.cycle.core.domain.ContraceptionEdits
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.ui.DeviceLock
 import java.io.IOException
 import java.io.InputStream
@@ -23,18 +26,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * The Settings tab: her usual lengths, and "Your data": "Lock Cycle", export to a file she picks,
- * import from one, and "Delete everything". The welcome's "Restore from a Cycle export" uses its import too.
+ * The Settings tab: her usual lengths, her contraception, and "Your data": "Lock Cycle", export to
+ * a file she picks, import from one, and "Delete everything". The welcome's "Restore from a Cycle export" uses its import too.
  * Files are opened by the screen, from what Android's save screen or file picker returns, and only
  * read or written here.
  *
  * @param deviceLock the phone's lock, which "Lock Cycle" asks for before it turns on or off.
+ * @param contraception her methods, for the method in force today on the Contraception row.
  * @param clock her day, from the phone's clock in its current zone.
  */
 class SettingsViewModel(
     private val settings: SettingsRepository,
     private val yourData: YourDataRepository,
     private val deviceLock: DeviceLock,
+    contraception: ContraceptionRepository,
     private val clock: () -> LocalDate = LocalDate::now,
     private val io: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
@@ -53,12 +58,13 @@ class SettingsViewModel(
             settings.lastExported,
             settings.appLock,
             settings.appLockTurnedOff,
-            visit
-        ) { settings, lastExported, appLock, appLockTurnedOff, visit ->
+            combine(visit, contraception.observeStretches(), ::Pair)
+        ) { settings, lastExported, appLock, appLockTurnedOff, (visit, stretches) ->
             SettingsUiState(
                 usualCycleLength = settings.usualCycleLength,
                 usualPeriodLength = settings.usualPeriodLength,
                 lastExported = lastExported,
+                contraception = ContraceptionEdits.current(stretches, clock()),
                 appLock = appLock,
                 appLockTurnedOff = appLockTurnedOff,
                 importedDays = visit.importedDays,
@@ -195,6 +201,7 @@ class SettingsViewModel(
  * The Settings tab.
  *
  * @property lastExported the day of her last export, or null if she never exported.
+ * @property contraception the method in force today, or null on none.
  * @property appLock whether "Lock Cycle" is on.
  * @property appLockTurnedOff whether Cycle turned its lock off because the phone has no screen lock
  *   any more, until she dismisses the note that says so.
@@ -207,6 +214,7 @@ data class SettingsUiState(
     val usualCycleLength: Int,
     val usualPeriodLength: Int,
     val lastExported: LocalDate?,
+    val contraception: ContraceptionStretch? = null,
     val appLock: Boolean = false,
     val appLockTurnedOff: Boolean = false,
     val importedDays: Int? = null,

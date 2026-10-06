@@ -183,7 +183,7 @@ internal fun problemSentence(problem: ImportProblem): String = when (problem) {
 
 /** [value], or the last non-null value it had, so a closing dialog keeps its text while it animates out. */
 @Composable
-private fun <T : Any> rememberLast(value: T?): T? {
+internal fun <T : Any> rememberLast(value: T?): T? {
     val last = remember { LastValue<T>() }
     if (value != null) last.value = value
     return last.value

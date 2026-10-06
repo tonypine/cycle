@@ -93,6 +93,7 @@ private fun Settings(state: SettingsUiState) = SettingsScreen(
     versionName = "1.4.27",
     onUsualLengths = {},
     onWhatToLog = {},
+    onContraception = {},
     onAppLockChange = {},
     onDismissLockNote = {},
     onExport = {},
