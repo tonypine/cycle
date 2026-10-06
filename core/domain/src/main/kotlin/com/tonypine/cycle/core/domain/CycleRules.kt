@@ -2,7 +2,8 @@ package com.tonypine.cycle.core.domain
 
 /**
  * Every number the cycle logic uses, in one place, each with where it comes from. The reasoning is
- * in `docs/decisions/0003-cycle-estimates.md`; the sources in `docs/research/`.
+ * in `docs/decisions/0003-cycle-estimates.md` and, on contraception, `0006-contraception.md`; the
+ * sources in `docs/research/`.
  */
 object CycleRules {
     /**
@@ -72,4 +73,59 @@ object CycleRules {
      * percent, so the day it is asked on is exact integer arithmetic.
      */
     const val MISSED_PERIOD_PERCENT = 180
+
+    /**
+     * A pack, patch cycle or ring cycle of a combined method, its break or dummy pills at its end:
+     * 21/7, 24/4 and 26/2 packs all last 28 days (NHS, `contraception.md`, "Combined pill").
+     */
+    const val PACK_DAYS = 28
+
+    /**
+     * A bleed on a combined method counts toward the next estimate only this many days after the
+     * start date or the last bleed that counted: the active pills before the break (21/7 pack,
+     * `contraception.md`). An earlier one is bleeding between breaks.
+     */
+    const val DAYS_BEFORE_BREAK = 21
+
+    /** The next bleed after one that counted is expected within ± this many days (`0006`). */
+    const val BLEED_SPREAD_DAYS = 2
+
+    /**
+     * Bleeding that starts within this many days after a combined method stops is its withdrawal
+     * bleed, not a period: the length of a pill break (FSRH CHC 2019, `contraception.md`).
+     */
+    const val WITHDRAWAL_BLEED_DAYS = 7
+
+    /**
+     * After stopping a hormonal method, the next period's range is at least ± this many days, wider
+     * than the little-data rule: the first cycles after a method vary more (NHS, "1 to 3 months",
+     * `contraception.md`, "Patch and ring" and "Stopping a method").
+     */
+    const val SETTLING_SPREAD_DAYS = 7
+
+    /** The wider range after stopping lasts until she has logged this many complete cycles since (`0006`). */
+    const val SETTLING_CYCLES = 3
+
+    /** An injection counts this many weeks after the last one: the DMPA interval (`contraception.md`, "Injection"). */
+    const val INJECTION_WEEKS = 13L
+
+    /**
+     * Bleeding on a no-estimate method is described over this many days: the WHO's reference period
+     * (`contraception.md`, "Describing bleeding that does not follow a cycle").
+     */
+    const val BLEEDING_SUMMARY_DAYS = 90
+
+    /**
+     * The first months on a hormonal method, when bleeding is often unsettled (FSRH, "The first
+     * three months are different", `contraception.md`), and the longer ones on a hormonal IUD, whose
+     * bleeding takes longer to settle (`contraception.md`, "Hormonal IUD").
+     */
+    const val FIRST_MONTHS = 3L
+    const val HORMONAL_IUD_FIRST_MONTHS = 6L
+
+    /**
+     * How long after a copper IUD is fitted Cycle says periods can be heavier at first: "especially
+     * in the first three to six months" (WHO FP Handbook, `contraception.md`, "Copper IUD").
+     */
+    const val COPPER_IUD_NOTE_MONTHS = 6L
 }

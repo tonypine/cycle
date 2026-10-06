@@ -1,5 +1,8 @@
 package com.tonypine.cycle.core.domain
 
+import com.tonypine.cycle.core.model.Breaks
+import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.CycleSettings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
@@ -26,3 +29,18 @@ val notSetUp = CycleSettings(usualCycleLength = 28, usualPeriodLength = 5, setup
 
 fun setUp(cycleLength: Int = 28, periodLength: Int = 5) =
     CycleSettings(usualCycleLength = cycleLength, usualPeriodLength = periodLength, setupDone = true)
+
+/** A stretch on [method] from [started] to [stopped] (ISO dates, null for none); combined ones take [breaks]. */
+fun stretch(
+    method: ContraceptionMethod,
+    started: String?,
+    stopped: String? = null,
+    breaks: Breaks? = Breaks.MONTHLY,
+    id: Long = 0
+) = ContraceptionStretch(
+    method = method,
+    started = started?.let(::day),
+    stopped = stopped?.let(::day),
+    breaks = breaks.takeIf { method.isCombined },
+    id = id
+)
