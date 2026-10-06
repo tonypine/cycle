@@ -32,10 +32,14 @@ sealed interface ImportRead {
     /**
      * The file can be imported: [newDays] of its days are not on the phone yet, [restoresLengths]
      * says whether its usual lengths would be restored, on a phone where she has not done setup, and
-     * [newStretches] of contraception would be added.
+     * [newStretches] of its contraception are not on the phone yet and would be added.
      */
     data class Ready(val file: ImportFile, val newDays: Int, val restoresLengths: Boolean, val newStretches: Int = 0) :
-        ImportRead
+        ImportRead {
+        /** The file has contraception, new to the phone or not. */
+        val hasStretches: Boolean
+            get() = file.stretches.isNotEmpty()
+    }
 
     /** The file cannot be imported, because of [problem]. */
     data class Refused(val problem: ImportProblem) : ImportRead
@@ -71,7 +75,8 @@ class YourDataRepository(
 
     /**
      * Reads and checks the export in [input], and closes it. Nothing is written: [import] does that
-     * once she confirms.
+     * once she confirms. A stretch of the file already on the phone is skipped; any other that
+     * overlaps one on the phone refuses the file (`docs/decisions/0006-contraception.md`, Privacy).
      */
     suspend fun read(input: InputStream): ImportRead {
         val text = when (val decoded = withContext(io) { decode(input) }) {
@@ -83,14 +88,15 @@ class YourDataRepository(
 
             is CsvRead.Days -> {
                 val (onPhone, stretchesOnPhone) = database.withTransaction { loggedDates() to stretches() }
-                read.stretches.firstOrNull { imported -> stretchesOnPhone.any { it.overlaps(imported.stretch) } }?.let {
-                    return ImportRead.Refused(ImportProblem.OverlappingMethod(it.line))
-                }
+                val newStretches = read.stretches.filterNot { it.stretch.isIn(stretchesOnPhone) }
+                newStretches.filter { imported -> stretchesOnPhone.any { it.overlaps(imported.stretch) } }
+                    .minByOrNull { it.line }
+                    ?.let { return ImportRead.Refused(ImportProblem.OverlappingMethod(it.line)) }
                 ImportRead.Ready(
                     ImportFile(read.days, read.usualLengths, read.stretches),
                     newDays = read.days.count { it.date !in onPhone },
                     restoresLengths = read.usualLengths != null && !settings.settings.first().setupDone,
-                    newStretches = read.stretches.size
+                    newStretches = newStretches.size
                 )
             }
         }
@@ -98,8 +104,8 @@ class YourDataRepository(
 
     /**
      * Adds the days of [file] that are not on the phone yet, and its stretches of contraception that
-     * overlap none on the phone, in one transaction, and returns how many days. A day she already
-     * logged on the phone stays as it is, whatever the file says about it. The file's usual lengths
+     * overlap none on the phone, in one transaction, and returns how many days. A day or a stretch
+     * already on the phone stays as it is, whatever the file says about it. The file's usual lengths
      * are restored only on a phone where she has not done setup, such as after "Delete everything":
      * lengths she gave on the phone win too.
      */
@@ -139,6 +145,13 @@ class YourDataRepository(
     }
 
     private suspend fun stretches(): List<ContraceptionStretch> = contraceptionDao.getAll().map { it.toModel() }
+
+    /**
+     * This stretch is one of [onPhone]: the same method and start, as a line for a date is that day,
+     * whatever its stop or breaks. A null start matches a null start.
+     */
+    private fun ContraceptionStretch.isIn(onPhone: List<ContraceptionStretch>): Boolean =
+        onPhone.any { it.method == method && it.started == started }
 
     private suspend fun loggedDates() = dayLogDao.getAll().mapTo(mutableSetOf()) { it.date } +
         feelingsDao.getAll().map { it.date }

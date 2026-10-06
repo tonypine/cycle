@@ -213,6 +213,16 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun `a picked file with methods says the days and methods on the phone stay`() {
+        state = state.copy(dialog = DataDialog.ConfirmImport(newDays = 3, newStretches = 0, hasMethods = true))
+        show()
+
+        composeRule.onNode(hasText("Import 3 days?") and isHeading()).assertIsDisplayed()
+        composeRule.onNodeWithText("Days and methods already on this phone stay as they are.").assertIsDisplayed()
+        composeRule.onNodeWithText("Days already logged on this phone stay as they are.").assertDoesNotExist()
+    }
+
+    @Test
     fun `a picked file with only the usual lengths asks to import them`() {
         state = state.copy(dialog = DataDialog.ConfirmImport(newDays = 0, restoresLengths = true))
         show()
@@ -226,14 +236,22 @@ class SettingsScreenTest {
 
     @Test
     fun `a picked file with only methods asks to import them, whatever its lengths do`() {
-        state = state.copy(dialog = DataDialog.ConfirmImport(newDays = 0, newStretches = 1))
+        state = state.copy(dialog = DataDialog.ConfirmImport(newDays = 0, newStretches = 1, hasMethods = true))
         show()
 
         composeRule.onNode(hasText("Import 1 method?") and isHeading()).assertIsDisplayed()
         composeRule.onNodeWithText("only contraception methods and their dates", substring = true).assertIsDisplayed()
         composeRule.onNodeWithText("usual lengths", substring = true).assertDoesNotExist()
 
-        state = state.copy(dialog = DataDialog.ConfirmImport(newDays = 0, newStretches = 2, restoresLengths = true))
+        state =
+            state.copy(
+                dialog = DataDialog.ConfirmImport(
+                    newDays = 0,
+                    newStretches = 2,
+                    restoresLengths = true,
+                    hasMethods = true
+                )
+            )
         composeRule.onNode(hasText("Import 2 methods?") and isHeading()).assertIsDisplayed()
         composeRule.onNodeWithText("only contraception methods and your usual", substring = true).assertIsDisplayed()
     }
@@ -264,7 +282,9 @@ class SettingsScreenTest {
                 "Line 14 is a second line for usual_period_length.",
             ImportProblem.WrongValueCount(15, found = 3, expected = 2) to "Line 15 has 3 values instead of 2.",
             ImportProblem.OneUsualLength to
-                "This file gives only one of usual_cycle_length and usual_period_length. A Cycle export has both or neither."
+                "This file gives only one of usual_cycle_length and usual_period_length. A Cycle export has both or neither.",
+            ImportProblem.OverlappingRows(6, 7) to "Lines 6 and 7 have methods whose dates overlap.",
+            ImportProblem.OverlappingMethod(8) to "Line 8 has a method whose dates overlap one already on this phone."
         )
         state = state.copy(dialog = DataDialog.ImportRefused(ImportProblem.Empty))
         show()
@@ -280,9 +300,16 @@ class SettingsScreenTest {
 
     @Test
     fun `nothing new and a failed export each say so`() {
-        state = state.copy(dialog = DataDialog.NothingToImport)
+        state = state.copy(dialog = DataDialog.NothingToImport())
         show()
+        composeRule.onNode(hasText("Nothing new to import") and isHeading()).assertIsDisplayed()
         composeRule.onNodeWithText("Every day in this file is already on this phone.").assertIsDisplayed()
+
+        state = state.copy(dialog = DataDialog.NothingToImport(hasMethods = true))
+        composeRule.onNode(hasText("Nothing new to import") and isHeading()).assertIsDisplayed()
+        composeRule.onNodeWithText("Everything in this file is already on this phone.").assertIsDisplayed()
+        composeRule.onNodeWithText("OK").performClick()
+        assertEquals(listOf("dismiss"), calls)
 
         state = state.copy(dialog = DataDialog.ExportFailed)
         composeRule.onNodeWithText("Cycle couldn't write to that file", substring = true).assertIsDisplayed()
