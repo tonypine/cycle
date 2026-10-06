@@ -175,5 +175,11 @@ class CalendarDaysTest {
             CalendarLegend(listOf(CycleLegendEntry.Period), listOf(BleedingWords.Bleeding), BleedingWords.Bleeding),
             days.legend(april, today = day("2027-03-20"))
         )
+        // A month before the fitting with nothing logged shows the word of its own days, not today's.
+        val january = (1..31).map { day("2027-01-%02d".format(it)) }
+        assertEquals(
+            CalendarLegend(listOf(CycleLegendEntry.Period), listOf(BleedingWords.Period), BleedingWords.Period),
+            days.legend(january, today = day("2027-03-20"))
+        )
     }
 }
