@@ -31,6 +31,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import com.github.takahirom.roborazzi.captureScreenRoboImage
 import com.tonypine.cycle.core.model.BleedingWord
+import com.tonypine.cycle.core.model.Breaks
 import com.tonypine.cycle.core.model.ContraceptionMethod
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.EstimateBasis
@@ -304,6 +305,25 @@ class TodayScreenTest {
     }
 
     @Test
+    fun `on the pill with no start date and no bleed logged Today says the estimate comes with her first bleed`() {
+        show(
+            TodaySamples.pillFirstBreak.copy(
+                phase = TodayPhase.NoEstimate,
+                days = TodaySamples.pillFirstBreak.days.copy(periods = emptyList(), predicted = emptyList()),
+                outlook = TodayOutlook.FirstBleedToLog,
+                method = TodayMethod(ContraceptionMethod.COMBINED_PILL, Breaks.MONTHLY, firstMonths = false)
+            )
+        )
+
+        composeRule.onNodeWithText("Pill").assert(isHeading())
+        composeRule.onNodeWithText("Cycle will estimate your next bleed once you log one.").assertIsDisplayed()
+        listOf("Next bleed", "How is this estimated?").forEach {
+            composeRule.onNodeWithText(it, substring = true).assertDoesNotExist()
+        }
+        composeRule.onNodeWithText("Bleed started").assertIsDisplayed()
+    }
+
+    @Test
     fun `how the next bleed is estimated says it is set by the pill`() {
         show(TodaySamples.pillNextBleed)
         composeRule.onNode(
@@ -343,6 +363,36 @@ class TodayScreenTest {
         composeRule.onNodeWithText("29 days after you stopped the implant on March 8", substring = true).assertExists()
         composeRule.waitForIdle()
         captureScreenRoboImage("src/test/screenshots/today_sheet_estimate_stopped.png")
+    }
+
+    @Test
+    fun `late for her first period after the implant the estimate sheet still counts from the day it came out`() {
+        // The implant came out on February 15; her period was due 29 days later, on March 16.
+        show(
+            TodaySamples.stoppedImplant.copy(
+                display = TodayDisplay.DaysSince(days = 33, method = ContraceptionMethod.IMPLANT),
+                phase = TodayPhase.Late(daysLate = 4),
+                outlook = (TodaySamples.stoppedImplant.outlook as NextPeriod).copy(
+                    expectedStart = LocalDate.of(2027, 3, 20),
+                    earliestStart = LocalDate.of(2027, 3, 20),
+                    latestStart = LocalDate.of(2027, 3, 23),
+                    lastStart = LocalDate.of(2027, 2, 15),
+                    daysLate = 4
+                )
+            )
+        )
+        composeRule.onNodeWithText("How is this estimated?").performScrollTo().performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText(
+            "Your period was expected around March 16, 29 days after you stopped the implant on February 15: " +
+                "the middle length of your last 6 cycles."
+        ).assertExists()
+        composeRule.onNodeWithText("It is 4 days later than that, so the estimate now starts today.").assertExists()
+        composeRule.onNodeWithText("It may start any day from today to March 23.").assertExists()
+        composeRule.onAllNodesWithText("first day of your last period", substring = true).assertCountEquals(0)
+        composeRule.waitForIdle()
+        captureScreenRoboImage("src/test/screenshots/today_sheet_estimate_stopped_late.png")
     }
 
     @Test
