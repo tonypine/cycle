@@ -487,10 +487,12 @@ after the injection, and a third of users bleed irregularly. The injection itsel
 the bleeding: the WHO and the label say to give it every 4 weeks whatever the bleeding does
 ([WHO FP Handbook, ch. 5, Q5](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf),
 [Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)). So no
-next bleed by default; whether to offer one, counted from her injection date once her own logged
-bleeds follow her injections, is a design question for
-[MOT-50](https://linear.app/tonypine/issue/MOT-50). The useful date is the next injection, which
-she knows from her clinic. Fertile window and ovulation estimates mean nothing.
+next bleed by default. [`0006`](../decisions/0006-contraception.md) has no row for this method yet:
+whether her method list needs it is open question 2 in
+[`product-implications.md`](product-implications.md), and whether to offer a next bleed, counted
+from her injection date once her own logged bleeds follow her injections, waits on her answer. The
+useful date is the next injection, which she knows from her clinic. Fertile window and ovulation
+estimates mean nothing.
 
 **Stopping.** Slower than the pill, much faster than DMPA. Users become pregnant on average about
 5 months after the last injection, about one month later than after most other methods, and the
@@ -506,10 +508,10 @@ women who stopped Cyclofem to conceive, more than half were pregnant at 6 months
 ([d'Arcangues and Snow, GFMER](https://www.gfmer.ch/Endo/Lectures_11/Arcangues.htm)). The bleed two
 to three weeks after the last injection is still a withdrawal bleed.
 
-**For Cycle.** No next-bleed estimate by default (MOT-50 decides whether to estimate one from the
-injection date); call the bleed after each injection a bleed, and anything else bleeding; hide the
-fertile window, ovulation and cycle day; show what she logged and a 90-day summary; count natural
-cycles from the first period after the next injection would have been due.
+**For Cycle.** No next-bleed estimate by default (whether to estimate one from the injection date
+waits on open question 2, as above); call the bleed after each injection a bleed, and anything else
+bleeding; hide the fertile window, ovulation and cycle day; show what she logged and a 90-day
+summary; count natural cycles from the first period after the next injection would have been due.
 
 ## Stopping a method, in numbers
 
@@ -589,7 +591,7 @@ protected are questions for her pharmacist or clinic, not for Cycle.
   | Hormonal IUD | Nothing, even once her own bleeds are regular ([`0006`](../decisions/0006-contraception.md)) | Next bleed, cycle day, fertile window, ovulation, phases | A 90-day summary |
   | Copper IUD | As without a method | As without a method | Periods, as without a method |
   | Injection (DMPA, NET-EN) | Nothing (a next-injection reminder only if she asks) | Next bleed, cycle day, fertile window, ovulation, phases | A 90-day summary |
-  | Monthly combined injection | Nothing by default; maybe the next bleed from her injection date once her own bleeds follow it (a design question for MOT-50); a next-injection reminder only if she asks | Next bleed (by default), cycle day, fertile window, ovulation, phases | What she logged and a 90-day summary |
+  | Monthly combined injection | Nothing by default; maybe the next bleed from her injection date once her own bleeds follow it (waits on open question 2 in [`product-implications.md`](product-implications.md); [`0006`](../decisions/0006-contraception.md) has no row for it yet); a next-injection reminder only if she asks | Next bleed (by default), cycle day, fertile window, ovulation, phases | What she logged and a 90-day summary |
 
 - **A 90-day summary instead of cycle lengths** on progestogen-only methods and the monthly
   combined injection: days of bleeding or spotting and the number of episodes in the last 90 days,
