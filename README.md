@@ -32,7 +32,7 @@ Every merge to `main` publishes a signed APK. The newest one is always at
 | `core:designsystem` | `CycleTheme`, the Zest tokens (colour, type, shape, spacing, elevation) and the components (buttons, icon buttons, chips) on Compose Foundation, no Material. See [`docs/design/design-system.md`](docs/design/design-system.md). |
 | `core:ui` | Shared app-level UI built on the design system: the day log sheet Today and the calendar both open, and the cycle state of each calendar day. |
 | `feature:calendar` | Calendar: her logged and estimated periods month by month, and the day log for any day up to today (log, fill in a forgotten period, clear a day). |
-| `feature:onboarding` | The first-run welcome and the optional two-step setup: her last period and her usual lengths. |
+| `feature:onboarding` | The first-run welcome and the optional three-step setup: her last period, her usual lengths and her contraception. |
 | `feature:today` | Today: her cycle day, this week, the next period estimate, the one-tap period buttons and the "missed a period?" question. |
 | `build-logic` | Gradle convention plugins shared by every module. |
 
