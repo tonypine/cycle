@@ -292,6 +292,22 @@ Today is Thursday 14 October 2027. Implant since 9 November 2026.
 When she has no natural cycles at all (on a method since before she installed Cycle), the typical
 cycle card is left out and History starts with the method's card.
 
+The rest of History's copy for a method ([MOT-55](https://linear.app/tonypine/issue/MOT-55)):
+
+- A combined pill, patch or ring with a break every month counts its bleeds instead of the 90 days:
+  "You logged 6 bleeds on it." ("You logged no bleeds on it."), the withdrawal bleed after it
+  stopped included.
+- A method younger than 90 days counts since its start, as on Today: "Since September 6: you logged
+  bleeding or spotting on 4 days, in 2 episodes. The longest lasted 3 days."
+  Once stopped, one shorter than 90 days counts all of it: "In that time you logged …". With nothing
+  logged: "… you logged no bleeding or spotting."
+- The cycle a method cut short says how: "cut short when you started the pill" (the mini pill, the
+  patch, the ring), "when the implant was fitted", "when the IUD was fitted", "when you had your
+  first injection". Its detail adds "Cut short when the implant was fitted. Not part of your typical
+  cycle." under its dates.
+- "See it in the calendar" opens the month of the method's last day so far: this month while she is
+  on it, else the month it stopped.
+
 ### D. Implant removed
 
 Today is Monday 15 November 2027. The implant came out on 3 November.

@@ -1,6 +1,8 @@
 package com.tonypine.cycle.feature.history
 
 import com.tonypine.cycle.core.model.BodySymptom
+import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.CycleSettings
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
@@ -14,7 +16,7 @@ import com.tonypine.cycle.core.model.SexualActivity
 import com.tonypine.cycle.core.model.SleepQuality
 import java.time.LocalDate
 
-// Synthetic logs only: made-up dates in 2027, never anyone's real cycle.
+// Synthetic logs only: made-up dates in 2026 and 2027, never anyone's real cycle.
 
 fun day(iso: String): LocalDate = LocalDate.parse(iso)
 
@@ -78,3 +80,33 @@ val syntheticFeelings: List<DayFeelings> = listOf(
 )
 
 val notSetUp = CycleSettings(usualCycleLength = 28, usualPeriodLength = 5, setupDone = false)
+
+/** The implant in journeys C and D of `docs/design/contraception.md`: fitted on 9 November 2026. */
+val syntheticImplant = ContraceptionStretch(ContraceptionMethod.IMPLANT, started = day("2026-11-09"), id = 1)
+
+/**
+ * The log behind [HistorySamples.onImplant] and [HistorySamples.implantRemoved]: six cycles of her own
+ * of 31, 27, 30, 28, 29 and 29 days from 17 April 2026, with periods of 5, 5, 4, 6, 5 and 5 days, then
+ * a 6-day period on 8 October that the implant cuts short. On the implant, bleeding in December, and
+ * from late July 2027: 6 days, a day and a day of spotting, 3 days, and 5 days from 14 October.
+ */
+val syntheticBeforeAndOnImplant: List<DayLog> =
+    bleed("2026-04-17", 5) +
+        bleed("2026-05-18", 5) +
+        bleed("2026-06-14", 4) +
+        bleed("2026-07-14", 6) +
+        bleed("2026-08-11", 5) +
+        bleed("2026-09-09", 5) +
+        listOf(
+            DayLog(day("2026-10-08"), FlowLevel.MEDIUM),
+            DayLog(day("2026-10-09"), FlowLevel.HEAVY),
+            DayLog(day("2026-10-10"), FlowLevel.MEDIUM),
+            DayLog(day("2026-10-11"), FlowLevel.MEDIUM),
+            DayLog(day("2026-10-12"), FlowLevel.LIGHT),
+            DayLog(day("2026-10-13"), FlowLevel.LIGHT)
+        ) +
+        bleed("2026-12-20", 5) +
+        bleed("2027-07-30", 6) +
+        listOf(DayLog(day("2027-09-01"), FlowLevel.MEDIUM), DayLog(day("2027-09-02"), FlowLevel.SPOTTING)) +
+        bleed("2027-10-02", 3) +
+        bleed("2027-10-14", 5)

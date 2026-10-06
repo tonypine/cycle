@@ -20,6 +20,11 @@
         <item quantity="one">From your last cycle</item>
         <item quantity="other">The middle length of your last %1$d cycles</item>
     </plurals>
+    <!-- The same, once some of her time was on a hormonal method: docs/design/contraception.md, C5. -->
+    <plurals name="history_typical_basis_left_out">
+        <item quantity="one">From your last cycle. Time on hormonal contraception is left out.</item>
+        <item quantity="other">The middle length of your last %1$d cycles. Time on hormonal contraception is left out.</item>
+    </plurals>
     <plurals name="history_days">
         <item quantity="one">%1$d day</item>
         <item quantity="other">%1$d days</item>
@@ -44,6 +49,61 @@
         <item quantity="other">Period: %1$d days so far</item>
     </plurals>
     <string name="history_open_cycle">see details</string>
+    <!-- A cycle that ended the day before she started a hormonal method. %2$s: how it was cut short,
+         below. -->
+    <plurals name="history_cut_short">
+        <item quantity="one">%1$d day, cut short %2$s. Not counted.</item>
+        <item quantity="other">%1$d days, cut short %2$s. Not counted.</item>
+    </plurals>
+    <string name="history_cut_short_combined_pill">when you started the pill</string>
+    <string name="history_cut_short_progestogen_pill">when you started the mini pill</string>
+    <string name="history_cut_short_patch">when you started the patch</string>
+    <string name="history_cut_short_ring">when you started the ring</string>
+    <string name="history_cut_short_implant">when the implant was fitted</string>
+    <string name="history_cut_short_iud">when the IUD was fitted</string>
+    <string name="history_cut_short_injection">when you had your first injection</string>
+
+    <!-- Her time on a hormonal method, one card: docs/design/contraception.md, C5 and D6. The label
+         is the method's short name. -->
+    <string name="history_method_combined_pill">Pill</string>
+    <string name="history_method_progestogen_pill">Mini pill</string>
+    <string name="history_method_patch">Patch</string>
+    <string name="history_method_ring">Ring</string>
+    <string name="history_method_implant">Implant</string>
+    <string name="history_method_hormonal_iud">Hormonal IUD</string>
+    <string name="history_method_copper_iud">Copper IUD</string>
+    <string name="history_method_injection">Injection</string>
+    <string name="history_method_left_out">Not part of your typical cycle.</string>
+    <!-- On a method with no estimate, her bleeding over its last 90 days, in plain counts. %1$s: the
+         days, "12 days"; %2$s: the episodes, "4 episodes". While she is on it, "Last 90 days", or
+         "Since September 6" while it is younger; once stopped, its last 90 days, or all of it when
+         it lasted less. -->
+    <string name="history_bleeding_last_90">Last 90 days: you logged bleeding or spotting on %1$s, in %2$s.</string>
+    <string name="history_bleeding_since">Since %3$s: you logged bleeding or spotting on %1$s, in %2$s.</string>
+    <string name="history_bleeding_stopped_last_90">In its last 90 days you logged bleeding or spotting on %1$s, in %2$s.</string>
+    <string name="history_bleeding_stopped_all">In that time you logged bleeding or spotting on %1$s, in %2$s.</string>
+    <string name="history_bleeding_none_last_90">Last 90 days: you logged no bleeding or spotting.</string>
+    <string name="history_bleeding_none_since">Since %1$s: you logged no bleeding or spotting.</string>
+    <string name="history_bleeding_none_stopped_last_90">In its last 90 days you logged no bleeding or spotting.</string>
+    <string name="history_bleeding_none_stopped_all">In that time you logged no bleeding or spotting.</string>
+    <plurals name="history_bleeding_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="history_bleeding_episodes">
+        <item quantity="one">%1$d episode</item>
+        <item quantity="other">%1$d episodes</item>
+    </plurals>
+    <plurals name="history_bleeding_longest">
+        <item quantity="one">The longest lasted %1$d day.</item>
+        <item quantity="other">The longest lasted %1$d days.</item>
+    </plurals>
+    <!-- On a combined method with a break every month, the bleeds she logged on it. -->
+    <plurals name="history_bleeds">
+        <item quantity="one">You logged %1$d bleed on it.</item>
+        <item quantity="other">You logged %1$d bleeds on it.</item>
+    </plurals>
+    <string name="history_bleeds_none">You logged no bleeds on it.</string>
 
     <!-- One cycle's details. -->
     <string name="cycle_title">Cycle</string>
@@ -71,6 +131,9 @@
     <string name="cycle_notes">Notes</string>
     <string name="cycle_note_day">Day %1$d</string>
     <string name="cycle_see_in_calendar">See it in the calendar</string>
+    <!-- Under the dates of a cycle cut short by a hormonal method. %1$s: how, "when the implant was
+         fitted". -->
+    <string name="cycle_cut_short">Cut short %1$s. Not part of your typical cycle.</string>
     <string name="cycle_missing_title">This cycle has changed</string>
     <string name="cycle_missing_body">Its period was edited, so the cycle now starts on another day. Go back to see your cycles.</string>
 

@@ -11,6 +11,7 @@ import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
 import com.tonypine.cycle.core.model.BodySymptom
+import com.tonypine.cycle.core.model.ContraceptionMethod
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.model.LogCategory
 import com.tonypine.cycle.core.model.Period
@@ -88,6 +89,32 @@ class HistoryViewModelTest {
         assertEquals(8, edited.cycles[1].length)
         assertEquals(day("2027-09-09"), edited.cycles[1].end)
     }
+
+    @Test
+    fun `setting the implant marks its time and leaves it out, and deleting its dates brings it all back`() =
+        history { cycles ->
+            clock = day("2027-10-14")
+            syntheticBeforeAndOnImplant.forEach { dayLogs.save(it) }
+            val viewModel = HistoryViewModel(cycles) { clock }.also { follow(it.uiState) }
+            val before = viewModel.uiState.first { it is HistoryUiState.Cycles } as HistoryUiState.Cycles
+            assertFalse(before.leftOut)
+
+            // Settings › Contraception: the implant, fitted on 9 November 2026.
+            contraception.start(ContraceptionMethod.IMPLANT, breaks = null, started = day("2026-11-09"), today = clock)
+            val marked = viewModel.uiState.first { (it as? HistoryUiState.Cycles)?.leftOut == true }
+            val id = contraception.observeStretches().first().single().id
+            val implant = HistorySamples.onImplant.entries.first() as MethodSummary
+            assertEquals(
+                HistorySamples.onImplant.copy(
+                    entries = listOf(implant.copy(stretch = implant.stretch.copy(id = id))) +
+                        HistorySamples.onImplant.entries.drop(1)
+                ),
+                marked
+            )
+
+            contraception.delete(id)
+            assertEquals(before, viewModel.uiState.first { (it as? HistoryUiState.Cycles)?.leftOut == false })
+        }
 
     @Test
     fun `the detail follows an edit to its period, and goes missing when its start moves`() = history { cycles ->

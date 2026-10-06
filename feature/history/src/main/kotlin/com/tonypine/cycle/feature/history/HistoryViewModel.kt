@@ -18,8 +18,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
- * History's state. It follows her log, so an edit anywhere in the app, on Today or in the calendar,
- * recomputes every cycle at once.
+ * History's state. It follows her log and her contraception, so an edit anywhere in the app, on
+ * Today, in the calendar or to a method's dates in Settings, recomputes every cycle at once.
  *
  * @param today her day, from the phone's clock in its current zone. Read again by [refreshDay].
  */
@@ -29,8 +29,8 @@ class HistoryViewModel(private val cycles: CycleRepository, private val today: (
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<HistoryUiState> = day
-        .flatMapLatest { day -> cycles.observeOverview(day) }
-        .map(HistoryUiState::from)
+        .flatMapLatest { day -> cycles.observeLog(day) }
+        .map { HistoryUiState.from(it.overview, it.logs) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), HistoryUiState.Loading)
 
     /** Reads the day again, such as when she comes back to the app after midnight. */
@@ -118,8 +118,7 @@ class EditPeriodViewModel(
      * when they are refused, the editor says why and nothing changes.
      */
     fun save(onSaved: (LocalDate) -> Unit) {
-        val editing = uiState.value as? EditPeriodUiState.Editing ?: return
-        val picked = editing.draft
+        val picked = editing()?.draft ?: return
         viewModelScope.launch {
             when (val change = dayLogs.editPeriod(start, picked.start, picked.end, today())) {
                 PeriodChange.Saved -> onSaved(picked.start)
@@ -129,8 +128,16 @@ class EditPeriodViewModel(
     }
 
     private fun update(change: (EditPeriodUiState.Editing) -> PeriodDraft) {
-        val editing = uiState.value as? EditPeriodUiState.Editing ?: return
-        draft.value = change(editing)
+        draft.value = change(editing() ?: return)
+    }
+
+    /**
+     * The editor with her latest [draft]. [uiState] can lag behind it while a write elsewhere is
+     * read back, so a tap or "Save" never builds on the state from before her last tap.
+     */
+    private fun editing(): EditPeriodUiState.Editing? {
+        val editing = uiState.value as? EditPeriodUiState.Editing ?: return null
+        return editing.copy(draft = draft.value ?: editing.draft)
     }
 }
 
