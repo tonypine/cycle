@@ -227,6 +227,19 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun `the contraception row shows her method, and none once she marks it as stopped today`() = runTest {
+        val viewModel = settingsViewModel()
+        contraception.start(ContraceptionMethod.HORMONAL_IUD, null, today, today)
+
+        val iud = viewModel.uiState.first { it?.contraception != null }!!.contraception!!
+        assertEquals(ContraceptionMethod.HORMONAL_IUD, iud.method)
+        contraception.stop(iud.id, today, today)
+
+        assertEquals(today, contraception.observeStretches().first().single().stopped)
+        assertEquals(null, viewModel.uiState.first { it?.contraception?.id != iud.id }!!.contraception)
+    }
+
+    @Test
     fun `a malformed or unreadable file is refused with its problem`() = runTest {
         val viewModel = settingsViewModel()
 

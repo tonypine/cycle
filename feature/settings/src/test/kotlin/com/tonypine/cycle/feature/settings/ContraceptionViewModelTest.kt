@@ -311,6 +311,17 @@ class ContraceptionViewModelTest {
         assertEquals(LocalDate.of(2027, 11, 3), stored().single().stopped)
         assertNull(page().await().current)
 
+        // An IUD fitted and taken out today: none from now on.
+        database.clearAllTables()
+        contraception.start(ContraceptionMethod.HORMONAL_IUD, null, today, today)
+        val iud = stretch(stored().single().id)
+        iud.ready()
+        iud.onStop(today)
+
+        iud.await { it == StretchUiState.Closed }
+        assertEquals(today, stored().single().stopped)
+        assertEquals(ContraceptionUiState(today, current = null, stretches = stored()), page().await())
+
         // After the injection: the last one on 3 August, marked on 20 August.
         today = LocalDate.of(2027, 8, 20)
         database.clearAllTables()

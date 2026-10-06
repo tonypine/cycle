@@ -125,19 +125,22 @@ class ContraceptionJourneyTest {
         composeRule.onNodeWithContentDescription("Back").performClick()
         row("Combined pill", "26 Apr to 16 Sept 2027")
 
-        // 5. The IUD stopped today: it is still her method today, and both stay listed.
+        // 5. The IUD stopped today: none now, both stay listed, and the Settings row reads None.
         button("Mark as stopped").performClick()
         waitForText("When was your IUD taken out?")
         composeRule.onNodeWithContentDescription("17 September, today").performClick()
         button("Save").performClick()
-        waitForText("Cycle counts it until 17 September 2027.")
+        waitForText("Add your method")
         assertEquals(today, stretches().last().stopped)
         assertEquals(0, composeRule.onAllNodesWithText("Mark as stopped").fetchSemanticsNodes().size)
-        row("Hormonal IUD", "17 Sept to 17 Sept 2027")
+        composeRule.onNodeWithText("Cycle estimates your periods from your own cycle.").assertExists()
+        row("Hormonal IUD", "17 Sept 2027")
         row("Combined pill", "26 Apr to 16 Sept 2027")
+        composeRule.onNodeWithContentDescription("Back").performClick()
+        row("Contraception", "None").performClick()
 
         // 6. Delete the IUD's dates: the pill stays.
-        row("Hormonal IUD", "17 Sept to 17 Sept 2027").performClick()
+        row("Hormonal IUD", "17 Sept 2027").performClick()
         row("Delete these dates").performClick()
         composeRule.onNode(hasText("Delete") and hasAnyAncestor(isDialog())).performClick()
         waitForStretches(1)

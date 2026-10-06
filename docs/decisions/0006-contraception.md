@@ -93,7 +93,10 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
 
 - **The current stretch.** At most one stretch covers today: the one with no stop date, or with a
   stop date today or later. That stretch is her method "Now" in Settings, on Today and everywhere
-  else, until its stop date has passed.
+  else, until its stop date has passed. One exception: once she marks a method as stopped with
+  today's date, Settings shows "None" straight away, and starting a method treats it as stopped.
+  Today is still its last day for the estimates. The injection, whose stop date runs ahead, stays
+  "Now" until that date has passed.
 - **No overlaps.** Starting or changing a method ends the current stretch the day before the new one
   starts, moving its stop date earlier if it has one. A new start can only be today or earlier, so
   it always falls before the current stretch ends. A new start on or before the current stretch's

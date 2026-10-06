@@ -26,9 +26,13 @@ sealed interface StretchPlan {
  * than any date and no stop later than any.
  */
 object ContraceptionEdits {
-    /** The stretch in force on [today]: the one that covers it. At most one does. */
+    /**
+     * Her method now, on [today]: the stretch that covers it, unless she marked it as stopped today.
+     * Today is still that stretch's last day, but she is on none from the moment she says so. The
+     * injection stays her method until the date Cycle counts it until has passed. At most one is.
+     */
     fun current(stretches: List<ContraceptionStretch>, today: LocalDate): ContraceptionStretch? =
-        stretches.lastOrNull { today in it }
+        stretches.lastOrNull { today in it && !(it.stopped == today && it.method != ContraceptionMethod.INJECTION) }
 
     /**
      * The stop date of [method] when the last day she gives is [lastDay]: that day, or for the
