@@ -94,9 +94,11 @@ unless a migration changes them.
     keeps the same days.
   - The calendar draws a day logged with no period flow and no marker (none or spotting) as plain,
     even inside a period, so a cleared middle day shows as cleared while the period stays one.
-- Life stages (pregnancy, after birth, hormonal contraception) and cycles to exclude are not modelled
-  yet. When they are, they are date ranges in their own table, and `CycleCalculator` leaves the
-  cycles inside them out of the last six. Contraception is decided in
-  [`0006`](0006-contraception.md): one row per stretch on a method, which cycles leave the estimates,
-  and what each method shows instead.
+- Life stages are date ranges in their own table, and `CycleCalculator` leaves the cycles inside them
+  out of the last six. Hormonal contraception is the first, decided in [`0006`](0006-contraception.md):
+  the `contraception` table holds one row per stretch on a method, written through
+  `ContraceptionRepository`, and `CycleCalculator.overview` takes the stretches with the log, so
+  editing or deleting a stretch recomputes every cycle after it like editing a day. The overview
+  carries the method in force, which estimate applies and what each method shows instead. Pregnancy,
+  after birth and other cycles to exclude are not modelled yet.
 - Fertile window and ovulation estimates are not part of this record.

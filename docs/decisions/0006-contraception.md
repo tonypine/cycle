@@ -1,8 +1,8 @@
 # 0006: Contraception: what Cycle records, says and estimates on each method
 
 **Status:** accepted, 2026-10-05.
-Designed only: the build tickets (MOT-51 to MOT-55) were canceled, so a later build follows this
-record and [`contraception.md`](../design/contraception.md).
+[MOT-51](https://linear.app/tonypine/issue/MOT-51) stores the stretches and computes the estimates;
+the screens follow this record and [`contraception.md`](../design/contraception.md).
 
 ## Context
 
