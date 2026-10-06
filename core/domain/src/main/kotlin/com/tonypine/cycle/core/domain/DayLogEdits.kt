@@ -3,7 +3,17 @@ package com.tonypine.cycle.core.domain
 import com.tonypine.cycle.core.domain.CycleRules.MAX_GAP_DAYS
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
+import com.tonypine.cycle.core.model.Period
+import com.tonypine.cycle.core.model.PeriodRefusal
 import java.time.LocalDate
+
+/** What saving a period's new dates would write, or why it cannot be saved. */
+sealed interface PeriodPlan {
+    /** [writes] replace what is stored for their days; an empty log removes the day. */
+    data class Ready(val writes: List<DayLog>) : PeriodPlan
+
+    data class Refused(val reason: PeriodRefusal) : PeriodPlan
+}
 
 /**
  * The edits the day log sheet makes to any day up to today, as the days to write: each returned log
@@ -102,6 +112,93 @@ object DayLogEdits {
             }
         }
     }
+
+    /**
+     * "Edit period dates" in History: the period that starts on [start] runs from [newStart] to
+     * [newEnd], or from [newStart] and is still going when [newEnd] is null. Its first day is marked
+     * started and, unless it is still going, its last day ended; a stray marker between them goes, so
+     * nothing splits it or ends it early. The days it no longer covers lose their period flow and
+     * markers, while none, spotting and how she felt stay. When the period before it would run on
+     * into the days this one leaves, its last day is marked ended, so every other period keeps its
+     * days.
+     *
+     * Refused when no period starts on [start] any more, when a day is after [today] or the last
+     * comes before the first, and when the new days reach another period or come within
+     * [MAX_GAP_DAYS] of it, which would join the two: still going with a later period does.
+     */
+    fun editPeriod(
+        logs: List<DayLog>,
+        start: LocalDate,
+        newStart: LocalDate,
+        newEnd: LocalDate?,
+        today: LocalDate
+    ): PeriodPlan {
+        val periods = CycleCalculator.periods(logs, today)
+        val period = periods.firstOrNull { it.start == start } ?: return PeriodPlan.Refused(PeriodRefusal.Gone)
+        val end = newEnd ?: today
+        if (newStart > today || end > today) return PeriodPlan.Refused(PeriodRefusal.AfterToday)
+        if (end < newStart) return PeriodPlan.Refused(PeriodRefusal.EndBeforeStart)
+        val reach = MAX_GAP_DAYS + 1L
+        periods.firstOrNull {
+            it != period && it.start <= end.plusDays(reach) && it.end >= newStart.minusDays(reach)
+        }?.let { return PeriodPlan.Refused(PeriodRefusal.TooClose(it)) }
+
+        val days = logs.associateBy { it.date }
+        val writes = logs.filter { it.date in period.start..period.end && it.date !in newStart..end }
+            .associate { it.date to it.withoutBleeding() }
+            .toMutableMap()
+        // Inside the new days only the first is started and only the last ended. Still going, a later
+        // "ended" on its own would close it, so every one up to today goes.
+        logs.filter { it.date in newStart..end }.forEach { log ->
+            writes[log.date] = log.copy(
+                periodStarted = log.periodStarted && log.date == newStart,
+                periodEnded = log.periodEnded && log.date == newEnd
+            )
+        }
+        writes[newStart] = (writes[newStart] ?: DayLog(newStart)).copy(periodStarted = true)
+        if (newEnd != null) writes[newEnd] = (writes[newEnd] ?: DayLog(newEnd)).copy(periodEnded = true)
+        val changed = writes.values.filter { it != (days[it.date] ?: DayLog(it.date)) }
+        return PeriodPlan.Ready(keepBefore(logs, changed, periods, period, today).sortedBy { it.date })
+    }
+
+    /**
+     * "Delete this period" in History: every day of the period that starts on [start] loses its
+     * period flow and markers, so the cycle it began joins the one before. None, spotting and how she
+     * felt stay. When the period before it would run on into the days this one leaves, its last day
+     * is marked ended, so every other period keeps its days. Nothing, when no period starts on
+     * [start].
+     */
+    fun deletePeriod(logs: List<DayLog>, start: LocalDate, today: LocalDate): List<DayLog> {
+        val periods = CycleCalculator.periods(logs, today)
+        val period = periods.firstOrNull { it.start == start } ?: return emptyList()
+        val cleared = logs.filter { it.date in period.start..period.end && it != it.withoutBleeding() }
+            .map { it.withoutBleeding() }
+        return keepBefore(logs, cleared, periods, period, today).sortedBy { it.date }
+    }
+
+    /**
+     * [writes], and the last day of the period before [period] marked ended when [writes] would
+     * change that period: one she marked started and never ended, or a lone "ended" after [period]
+     * that was ignored, would take in the days [period] gives up.
+     */
+    private fun keepBefore(
+        logs: List<DayLog>,
+        writes: List<DayLog>,
+        periods: List<Period>,
+        period: Period,
+        today: LocalDate
+    ): List<DayLog> {
+        val before = periods.getOrNull(periods.indexOf(period) - 1) ?: return writes
+        val written = writes.associateBy { it.date }
+        val after = (logs.filterNot { it.date in written } + writes).filterNot { it.isEmpty }
+        if (CycleCalculator.periods(after, today).any { it == before }) return writes
+        val last = written[before.end] ?: logs.firstOrNull { it.date == before.end } ?: DayLog(before.end)
+        return writes.filterNot { it.date == before.end } + last.copy(periodEnded = true)
+    }
+
+    /** The day with no period flow and no marker: none and spotting stay. */
+    private fun DayLog.withoutBleeding(): DayLog =
+        copy(flow = flow?.takeUnless { it.isPeriodFlow }, periodStarted = false, periodEnded = false)
 
     /** [clear] on [date] would change her log. */
     fun canClear(logs: List<DayLog>, date: LocalDate, today: LocalDate): Boolean {

@@ -6,6 +6,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasScrollAction
@@ -41,10 +42,33 @@ class HistoryScreenTest {
         composeRule.waitForIdle()
     }
 
+    private fun showEditor(state: EditPeriodUiState) {
+        composeRule.setContent {
+            Themed {
+                EditPeriodScreen(
+                    state,
+                    onBack = { calls += "back" },
+                    onChoose = { calls += "choose $it" },
+                    onPick = { calls += "pick $it" },
+                    onMonthChange = { calls += "month $it" },
+                    onStillGoingChange = { calls += "still going $it" },
+                    onSave = { calls += "save" }
+                )
+            }
+        }
+        composeRule.waitForIdle()
+    }
+
     private fun showDetail(state: CycleDetailUiState) {
         composeRule.setContent {
             Themed {
-                CycleDetailScreen(state, onBack = { calls += "back" }, onSeeInCalendar = { calls += "calendar $it" })
+                CycleDetailScreen(
+                    state,
+                    onBack = { calls += "back" },
+                    onSeeInCalendar = { calls += "calendar $it" },
+                    onEditPeriod = { calls += "edit $it" },
+                    onDeletePeriod = { calls += "delete" }
+                )
             }
         }
         composeRule.waitForIdle()
@@ -165,6 +189,65 @@ class HistoryScreenTest {
         showDetail(HistorySamples.currentCycle)
         composeRule.onNodeWithText("Current cycle").assertIsDisplayed()
         composeRule.onNode(hasText("Day 9 so far") and hasText("Since September 2")).assertIsDisplayed()
+    }
+
+    @Test
+    fun `edit period dates opens the editor for the cycle's period`() {
+        showDetail(HistorySamples.pastCycle)
+        composeRule.onNodeWithText("Edit period dates").performScrollTo().assert(isButton).performClick()
+
+        assertEquals(listOf("edit 2027-08-05"), calls)
+    }
+
+    @Test
+    fun `delete this period asks first, and keep it changes nothing`() {
+        showDetail(HistorySamples.pastCycle)
+        composeRule.onNodeWithText("Delete this period").performScrollTo().assert(isButton).performClick()
+        composeRule.onNodeWithText("Delete this period?").assertIsDisplayed()
+        composeRule.onNodeWithText("Cycle forgets your period of August 5 to August 10", substring = true)
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Keep it").performClick()
+        composeRule.waitForIdle()
+        assertEquals(emptyList<String>(), calls)
+
+        composeRule.onNodeWithText("Delete this period").performScrollTo().performClick()
+        composeRule.onNodeWithText("Delete").performClick()
+        assertEquals(listOf("delete"), calls)
+    }
+
+    @Test
+    fun `the editor shows the picked days, and each tap goes to its action`() {
+        showEditor(HistorySamples.editPast)
+
+        composeRule.onNode(hasText("August 5 to August 8") and hasText("Period: 4 days")).assertIsDisplayed()
+        composeRule.onNodeWithText("Tap the day it ended.").assertIsDisplayed()
+        composeRule.onAllNodesWithText("Still going").assertCountEquals(0)
+        composeRule.onNodeWithText("First day").performClick()
+        composeRule.onNodeWithContentDescription("August 20", substring = true).performClick()
+        composeRule.onNodeWithContentDescription("Previous month").performClick()
+        composeRule.onNodeWithText("Save").performScrollTo().performClick()
+        composeRule.onNodeWithContentDescription("Back").performClick()
+
+        assertEquals(listOf("choose First", "pick 2027-08-20", "month 2027-07", "save", "back"), calls)
+    }
+
+    @Test
+    fun `the current period can be still going, and Save waits for a change`() {
+        val current = HistorySamples.editCurrent
+        showEditor(current.copy(draft = PeriodDraft.of(current.period)))
+
+        composeRule.onNodeWithText("Save").performScrollTo().assertIsNotEnabled()
+        composeRule.onNodeWithText("Still going").performClick()
+
+        assertEquals(listOf("still going true"), calls)
+    }
+
+    @Test
+    fun `a refused save says why`() {
+        showEditor(HistorySamples.editRefused)
+        composeRule.onNodeWithText("That runs into your period of July 9 to July 13", substring = true)
+            .performScrollTo()
+            .assertIsDisplayed()
     }
 
     @Test

@@ -5,10 +5,12 @@ import com.tonypine.cycle.core.data.database.CycleDatabase
 import com.tonypine.cycle.core.data.database.toEntity
 import com.tonypine.cycle.core.data.database.toModel
 import com.tonypine.cycle.core.domain.DayLogEdits
+import com.tonypine.cycle.core.domain.PeriodPlan
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.model.LogCategory
+import com.tonypine.cycle.core.model.PeriodChange
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -94,6 +96,33 @@ class DayLogRepository(private val database: CycleDatabase) {
         edit { logs -> DayLogEdits.clear(logs, date, today) }
         feelingsDao.save(feelingsDao.get(date).without(LogCategory.entries.toSet() - hidden))
     }
+
+    /**
+     * "Edit period dates" on the period that starts on [start], by [DayLogEdits.editPeriod]: it runs
+     * from [newStart] to [newEnd], or is still going when [newEnd] is null. One write, so no screen
+     * sees the period half moved; nothing is written when it is refused.
+     */
+    suspend fun editPeriod(start: LocalDate, newStart: LocalDate, newEnd: LocalDate?, today: LocalDate): PeriodChange {
+        var change: PeriodChange = PeriodChange.Saved
+        edit { logs ->
+            when (val plan = DayLogEdits.editPeriod(logs, start, newStart, newEnd, today)) {
+                is PeriodPlan.Ready -> plan.writes
+
+                is PeriodPlan.Refused -> {
+                    change = PeriodChange.Refused(plan.reason)
+                    emptyList()
+                }
+            }
+        }
+        return change
+    }
+
+    /**
+     * "Delete this period" on the period that starts on [start], by [DayLogEdits.deletePeriod]: its
+     * days lose their period flow and markers, in one write. How she felt those days stays.
+     */
+    suspend fun deletePeriod(start: LocalDate, today: LocalDate) =
+        edit { logs -> DayLogEdits.deletePeriod(logs, start, today) }
 
     private suspend fun edit(edit: (List<DayLog>) -> List<DayLog>) {
         dao.edit { stored ->

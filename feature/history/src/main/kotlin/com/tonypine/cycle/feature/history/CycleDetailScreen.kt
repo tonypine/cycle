@@ -16,6 +16,9 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
@@ -30,12 +33,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tonypine.cycle.core.designsystem.AppBarAction
 import com.tonypine.cycle.core.designsystem.Card
 import com.tonypine.cycle.core.designsystem.CycleDayState
+import com.tonypine.cycle.core.designsystem.CycleDestructiveDialog
 import com.tonypine.cycle.core.designsystem.CycleIcons
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.DayCell
 import com.tonypine.cycle.core.designsystem.EmptyState
 import com.tonypine.cycle.core.designsystem.EmptyStateIcon
 import com.tonypine.cycle.core.designsystem.LoadingState
+import com.tonypine.cycle.core.designsystem.OutlinedButton
+import com.tonypine.cycle.core.designsystem.TextButton
 import com.tonypine.cycle.core.designsystem.TonalButton
 import com.tonypine.cycle.core.designsystem.TopAppBar
 import com.tonypine.cycle.core.model.FlowLevel
@@ -43,14 +49,20 @@ import com.tonypine.cycle.core.model.Pain
 import com.tonypine.cycle.core.ui.label
 import com.tonypine.cycle.core.ui.painSummary
 import com.tonypine.cycle.core.ui.summaryLabel
+import java.time.LocalDate
 import java.time.YearMonth
 
-/** A cycle's details, wired to its [viewModel]. The day is read again whenever the screen resumes. */
+/**
+ * A cycle's details, wired to its [viewModel]. The day is read again whenever the screen resumes.
+ * [onEditPeriod] opens the editor for the period that starts on the given day; once its period is
+ * deleted, [onBack] leaves the detail.
+ */
 @Composable
 fun CycleDetailRoute(
     viewModel: CycleDetailViewModel,
     onBack: () -> Unit,
     onSeeInCalendar: (YearMonth) -> Unit,
+    onEditPeriod: (start: LocalDate) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -58,19 +70,29 @@ fun CycleDetailRoute(
         viewModel.refreshDay()
         onPauseOrDispose {}
     }
-    CycleDetailScreen(state, onBack, onSeeInCalendar, modifier)
+    CycleDetailScreen(
+        state = state,
+        onBack = onBack,
+        onSeeInCalendar = onSeeInCalendar,
+        onEditPeriod = onEditPeriod,
+        onDeletePeriod = { viewModel.deletePeriod(onDeleted = onBack) },
+        modifier = modifier
+    )
 }
 
 /**
  * One cycle: its length and dates, its period's dates and the flow of each period day, how she felt
- * and her notes, and a button that opens the calendar on the month it started in. Scrolls when the
- * text is large.
+ * and her notes, a button that opens the calendar on the month it started in, and the two ways to
+ * fix its period: "Edit period dates" ([onEditPeriod]) and "Delete this period", which asks first
+ * and calls [onDeletePeriod] once she confirms. Scrolls when the text is large.
  */
 @Composable
 fun CycleDetailScreen(
     state: CycleDetailUiState,
     onBack: () -> Unit,
     onSeeInCalendar: (YearMonth) -> Unit,
+    onEditPeriod: (start: LocalDate) -> Unit,
+    onDeletePeriod: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isCurrent = (state as? CycleDetailUiState.Detail)?.cycle?.isCurrent == true
@@ -92,14 +114,21 @@ fun CycleDetailScreen(
                 illustration = { EmptyStateIcon(CycleIcons.History) }
             )
 
-            is CycleDetailUiState.Detail -> Detail(state, onSeeInCalendar, content)
+            is CycleDetailUiState.Detail -> Detail(state, onSeeInCalendar, onEditPeriod, onDeletePeriod, content)
         }
     }
 }
 
 @Composable
-private fun Detail(state: CycleDetailUiState.Detail, onSeeInCalendar: (YearMonth) -> Unit, modifier: Modifier) {
+private fun Detail(
+    state: CycleDetailUiState.Detail,
+    onSeeInCalendar: (YearMonth) -> Unit,
+    onEditPeriod: (start: LocalDate) -> Unit,
+    onDeletePeriod: () -> Unit,
+    modifier: Modifier
+) {
     val spacing = CycleTheme.spacing
+    var confirmDelete by rememberSaveable { mutableStateOf(false) }
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -116,7 +145,39 @@ private fun Detail(state: CycleDetailUiState.Detail, onSeeInCalendar: (YearMonth
             modifier = Modifier.fillMaxWidth(),
             icon = CycleIcons.Calendar
         )
+        OutlinedButton(
+            text = stringResource(R.string.period_edit),
+            onClick = { onEditPeriod(state.cycle.start) },
+            modifier = Modifier.fillMaxWidth(),
+            icon = CycleIcons.Edit
+        )
+        TextButton(
+            text = stringResource(R.string.period_delete),
+            onClick = { confirmDelete = true },
+            modifier = Modifier.fillMaxWidth(),
+            icon = CycleIcons.Delete
+        )
     }
+    val period = state.cycle.period
+    CycleDestructiveDialog(
+        visible = confirmDelete,
+        onDismissRequest = { confirmDelete = false },
+        title = stringResource(R.string.period_delete_title),
+        text = stringResource(
+            R.string.period_delete_text,
+            stringResource(
+                R.string.history_dates,
+                formatDate(period.start, state.today),
+                formatDate(period.end, state.today)
+            )
+        ),
+        confirmText = stringResource(R.string.period_delete_confirm),
+        onConfirm = {
+            confirmDelete = false
+            onDeletePeriod()
+        },
+        dismissText = stringResource(R.string.period_delete_keep)
+    )
 }
 
 /** "28 days, February 2 to March 1", read by TalkBack as one item. */
@@ -289,11 +350,17 @@ private val FlowLevel?.label: Int
 @Preview
 @Composable
 private fun CycleDetailPreview() {
-    CycleTheme { CycleDetailScreen(HistorySamples.pastCycle, onBack = {}, onSeeInCalendar = {}) }
+    CycleTheme {
+        CycleDetailScreen(HistorySamples.pastCycle, onBack = {
+        }, onSeeInCalendar = {}, onEditPeriod = {}, onDeletePeriod = {})
+    }
 }
 
 @Preview
 @Composable
 private fun CycleDetailDarkPreview() {
-    CycleTheme(darkTheme = true) { CycleDetailScreen(HistorySamples.currentCycle, onBack = {}, onSeeInCalendar = {}) }
+    CycleTheme(darkTheme = true) {
+        CycleDetailScreen(HistorySamples.currentCycle, onBack = {
+        }, onSeeInCalendar = {}, onEditPeriod = {}, onDeletePeriod = {})
+    }
 }

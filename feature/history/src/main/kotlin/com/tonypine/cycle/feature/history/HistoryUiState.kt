@@ -215,7 +215,7 @@ internal fun dayRuns(days: List<Int>): List<IntRange> {
 data class FlowDay(val date: LocalDate, val flow: FlowLevel?)
 
 /** Her cycles, oldest first, each with its period: the overview has one period per cycle. */
-private fun cycleSummaries(overview: CycleOverview): List<CycleSummary> =
+internal fun cycleSummaries(overview: CycleOverview): List<CycleSummary> =
     overview.cycles.zip(overview.periods) { cycle, period ->
         CycleSummary(cycle.start, cycle.end, cycle.length ?: cycle.dayOf(overview.today), period)
     }

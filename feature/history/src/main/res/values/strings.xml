@@ -73,4 +73,29 @@
     <string name="cycle_see_in_calendar">See it in the calendar</string>
     <string name="cycle_missing_title">This cycle has changed</string>
     <string name="cycle_missing_body">Its period was edited, so the cycle now starts on another day. Go back to see your cycles.</string>
+
+    <!-- Fixing a cycle's period: its cycles are worked out from its periods, so a cycle is edited
+         or deleted through the period it starts with. -->
+    <string name="period_edit">Edit period dates</string>
+    <string name="period_delete">Delete this period</string>
+    <string name="period_delete_title">Delete this period?</string>
+    <!-- %1$s: the period's dates, "August 5 to August 10". -->
+    <string name="period_delete_text">Cycle forgets your period of %1$s and works out your cycles again. How you felt and your notes stay.</string>
+    <string name="period_delete_confirm">Delete</string>
+    <string name="period_delete_keep">Keep it</string>
+    <string name="period_edit_title">Period dates</string>
+    <!-- Names the choice of first or last day for TalkBack, which reads it after each option. -->
+    <string name="period_edit_picking">Day to change</string>
+    <string name="period_edit_first_day">First day</string>
+    <string name="period_edit_last_day">Last day</string>
+    <string name="period_edit_pick_first">Tap the day it started.</string>
+    <string name="period_edit_pick_last">Tap the day it ended.</string>
+    <string name="period_edit_still_going">Still going</string>
+    <string name="period_edit_still_going_body">It has not ended yet.</string>
+    <string name="period_edit_save">Save</string>
+    <!-- Why the new days cannot be saved. %1$s: the other period's dates, "March 3 to March 7". -->
+    <string name="period_edit_too_close">That runs into your period of %1$s. Leave at least two days between them, or delete that period first.</string>
+    <string name="period_edit_after_today">Pick days up to today.</string>
+    <string name="period_edit_end_before_start">The last day can’t come before the first.</string>
+    <string name="period_edit_gone">This period has changed since you opened it. Go back to see it.</string>
 </resources>
