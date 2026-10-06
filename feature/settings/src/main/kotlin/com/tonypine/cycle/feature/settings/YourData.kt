@@ -162,6 +162,12 @@ internal fun problemSentence(problem: ImportProblem): String = when (problem) {
         stringResource(R.string.import_problem_repeated_setting, problem.line, problem.setting)
 
     ImportProblem.OneUsualLength -> stringResource(R.string.import_problem_one_usual_length)
+
+    is ImportProblem.MissingBreaks -> stringResource(R.string.import_problem_missing_breaks, problem.line)
+
+    is ImportProblem.StopsBeforeStarts -> stringResource(R.string.import_problem_stops_before_starts, problem.line)
+
+    is ImportProblem.OverlappingMethod -> stringResource(R.string.import_problem_overlapping_method, problem.line)
 }
 
 /** [value], or the last non-null value it had, so a closing dialog keeps its text while it animates out. */

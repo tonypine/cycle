@@ -8,6 +8,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.tonypine.cycle.core.data.day
 import com.tonypine.cycle.core.model.BodySymptom
+import com.tonypine.cycle.core.model.Breaks
+import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.EnergyLevel
@@ -91,6 +94,12 @@ class CycleDatabaseMigrationTest {
                     if (version >= 2) listOf(SEEDED_FEELINGS) else emptyList(),
                     database.feelingsDao().getAll()
                 )
+                // Versions before 3 had no contraception: it starts empty. From 3 on, it is kept.
+                assertEquals(
+                    "from version $version",
+                    if (version >= 3) listOf(SEEDED_STRETCH) else emptyList(),
+                    database.contraceptionDao().getAll().map { it.toModel() }
+                )
             } finally {
                 database.close()
             }
@@ -117,6 +126,22 @@ class CycleDatabaseMigrationTest {
     }
 
     @Test
+    fun `after version 2 migrates, her contraception is stored and read back`() = runTest {
+        helper.createDatabase(CycleDatabase.FILE_NAME, 2).use { it.seed(2) }
+        helper.runMigrationsAndValidate(CycleDatabase.FILE_NAME, 3, true, CycleMigrations.MIGRATION_2_3).close()
+
+        val database = CycleDatabase.build(context)
+        try {
+            database.contraceptionDao().upsert(SEEDED_STRETCH.copy(id = 0).toEntity())
+
+            assertEquals(listOf(SEEDED_STRETCH), database.contraceptionDao().getAll().map { it.toModel() })
+            assertEquals(listOf(SEEDED_FEELINGS), database.feelingsDao().getAll())
+        } finally {
+            database.close()
+        }
+    }
+
+    @Test
     fun `the database opens without migrations at the current version`() = runTest {
         val database = CycleDatabase.build(context)
         try {
@@ -135,7 +160,17 @@ class CycleDatabaseMigrationTest {
          */
         val RELEASED_SCHEMAS = mapOf(
             1 to "e7993613216ac3cdda24866e10380e6a",
-            2 to "3b95ef39f3fdb5ebdf56e043a67fdf99"
+            2 to "3b95ef39f3fdb5ebdf56e043a67fdf99",
+            3 to "5fbc0e8838ec8208402068ba4d12476c"
+        )
+
+        /** What [seed] stores of her contraception, from version 3 on. */
+        val SEEDED_STRETCH = ContraceptionStretch(
+            ContraceptionMethod.COMBINED_PILL,
+            started = day("2027-01-04"),
+            stopped = day("2027-02-28"),
+            breaks = Breaks.MONTHLY,
+            id = 1
         )
 
         /** What [seed] logs about how she felt, from version 2 on. */
@@ -153,7 +188,7 @@ class CycleDatabaseMigrationTest {
 
     /** Synthetic rows in the shape of schema [version]'s tables. */
     private fun SupportSQLiteDatabase.seed(version: Int) {
-        check(version in 1..2) { "Add the shape of the tables at version $version" }
+        check(version in 1..3) { "Add the shape of the tables at version $version" }
         execSQL(
             "INSERT INTO day_log (date, flow, period_started, period_ended) VALUES " +
                 "('2027-03-02', 'medium', 1, 0), ('2027-03-03', 'spotting', 0, 0), ('2027-03-06', NULL, 0, 1)"
@@ -166,6 +201,12 @@ class CycleDatabaseMigrationTest {
             execSQL("INSERT INTO sleep (date, quality) VALUES ('2027-03-02', 'badly')")
             execSQL("INSERT INTO sex (date, protection) VALUES ('2027-03-02', 'unprotected')")
             execSQL("INSERT INTO note (date, text) VALUES ('2027-03-02', 'Synthetic note')")
+        }
+        if (version >= 3) {
+            execSQL(
+                "INSERT INTO contraception (id, method, started, stopped, breaks) VALUES " +
+                    "(1, 'combined_pill', '2027-01-04', '2027-02-28', 'monthly')"
+            )
         }
     }
 }

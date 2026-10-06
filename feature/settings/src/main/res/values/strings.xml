@@ -85,6 +85,9 @@
     <string name="import_problem_bad_length">Line %1$d has “%2$s” as %3$s. Cycle takes a number of days from %4$d to %5$d.</string>
     <string name="import_problem_repeated_setting">Line %1$d is a second line for %2$s.</string>
     <string name="import_problem_one_usual_length">This file gives only one of usual_cycle_length and usual_period_length. A Cycle export has both or neither.</string>
+    <string name="import_problem_missing_breaks">Line %1$d has a combined pill, patch or ring without its breaks.</string>
+    <string name="import_problem_stops_before_starts">Line %1$d has a method that stops before it starts.</string>
+    <string name="import_problem_overlapping_method">Line %1$d has a method whose dates overlap another one, in the file or already on this phone.</string>
 
     <!-- Export. -->
     <string name="export_failed_title">Couldn\'t save your data</string>

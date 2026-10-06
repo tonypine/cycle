@@ -4,10 +4,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.tonypine.cycle.core.data.day
 import com.tonypine.cycle.core.data.inMemoryDatabase
 import com.tonypine.cycle.core.data.settingsRepository
+import com.tonypine.cycle.core.model.ContraceptionMethod
 import com.tonypine.cycle.core.model.CyclePrompt
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.EstimateBasis
+import com.tonypine.cycle.core.model.EstimateKind
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.model.LogCategory
 import com.tonypine.cycle.core.model.Period
@@ -31,6 +33,7 @@ class CycleRepositoryTest {
 
     private val database = inMemoryDatabase()
     private val dayLogs = DayLogRepository(database)
+    private val contraception = ContraceptionRepository(database)
 
     @After
     fun closeDatabase() = database.close()
@@ -41,7 +44,7 @@ class CycleRepositoryTest {
     @Test
     fun `the overview recomputes every cycle after a past day is edited`() = runTest {
         val settings = settingsRepository(folder.root, backgroundScope)
-        val cycles = CycleRepository(dayLogs, settings)
+        val cycles = CycleRepository(dayLogs, settings, contraception)
         listOf("2027-01-05", "2027-02-02", "2027-03-02").forEach { logPeriod(day(it)) }
         val today = day("2027-03-10")
 
@@ -57,9 +60,39 @@ class CycleRepositoryTest {
     }
 
     @Test
+    fun `editing or deleting a stretch of contraception recomputes everything after it`() = runTest {
+        val cycles = CycleRepository(dayLogs, settingsRepository(folder.root, backgroundScope), contraception)
+        listOf("2027-01-05", "2027-02-02", "2027-03-02", "2027-03-30").forEach { logPeriod(day(it)) }
+        val today = day("2027-04-10")
+        contraception.start(ContraceptionMethod.IMPLANT, null, day("2027-03-10"), today)
+        val implant = contraception.observeStretches().first().single()
+
+        val onImplant = cycles.observeOverview(today).first()
+        assertEquals(listOf(28, 28, 8), onImplant.cycles.map { it.length })
+        assertEquals(implant, onImplant.contraception.current)
+        assertEquals(null, onImplant.estimate)
+
+        contraception.edit(implant.copy(started = day("2027-02-20")), today)
+        val startedEarlier = cycles.observeOverview(today).first()
+        assertEquals(listOf(28, 18), startedEarlier.cycles.map { it.length })
+        assertEquals(
+            listOf(null, null, implant.copy(started = day("2027-02-20")), implant.copy(started = day("2027-02-20"))),
+            startedEarlier.periods.map {
+                it.stretch
+            }
+        )
+
+        contraception.delete(implant.id)
+        val deleted = cycles.observeOverview(today).first()
+        assertEquals(listOf(28, 28, 28, null), deleted.cycles.map { it.length })
+        assertEquals(EstimateKind.PERIOD, deleted.contraception.estimates)
+        assertEquals(day("2027-04-27"), deleted.estimate?.next?.expectedStart)
+    }
+
+    @Test
     fun `the overview follows her settings and dismissed prompts`() = runTest {
         val settings = settingsRepository(folder.root, backgroundScope)
-        val cycles = CycleRepository(dayLogs, settings)
+        val cycles = CycleRepository(dayLogs, settings, contraception)
         dayLogs.setPeriodStarted(day("2027-03-01"), started = true)
         val today = day("2027-03-07")
 
@@ -79,7 +112,7 @@ class CycleRepositoryTest {
 
     @Test
     fun `a day's log and the overview come from the same read`() = runTest {
-        val cycles = CycleRepository(dayLogs, settingsRepository(folder.root, backgroundScope))
+        val cycles = CycleRepository(dayLogs, settingsRepository(folder.root, backgroundScope), contraception)
         val today = day("2027-03-10")
         dayLogs.setPeriodStarted(today, started = true)
 
@@ -96,7 +129,7 @@ class CycleRepositoryTest {
 
     @Test
     fun `every logged day and the overview come from the same read`() = runTest {
-        val cycles = CycleRepository(dayLogs, settingsRepository(folder.root, backgroundScope))
+        val cycles = CycleRepository(dayLogs, settingsRepository(folder.root, backgroundScope), contraception)
         val today = day("2027-03-10")
         logPeriod(day("2027-03-02"), days = 2)
 
@@ -116,7 +149,7 @@ class CycleRepositoryTest {
 
     @Test
     fun `the log comes with the overview and says what the day sheet offers`() = runTest {
-        val cycles = CycleRepository(dayLogs, settingsRepository(folder.root, backgroundScope))
+        val cycles = CycleRepository(dayLogs, settingsRepository(folder.root, backgroundScope), contraception)
         val today = day("2027-03-20")
         logPeriod(day("2027-02-02"))
         logPeriod(day("2027-03-02"))
@@ -136,7 +169,7 @@ class CycleRepositoryTest {
     @Test
     fun `the log carries how she felt and what she hid, and a day she can see something on can be cleared`() = runTest {
         val settings = settingsRepository(folder.root, backgroundScope)
-        val cycles = CycleRepository(dayLogs, settings)
+        val cycles = CycleRepository(dayLogs, settings, contraception)
         val sex = DayFeelings(day("2027-03-05"), sex = SexualActivity.PROTECTED)
         dayLogs.logDay(day("2027-03-05"), null, sex)
         val today = day("2027-03-10")

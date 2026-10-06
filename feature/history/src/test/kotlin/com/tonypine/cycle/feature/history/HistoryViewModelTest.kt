@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.tonypine.cycle.core.data.database.CycleDatabase
+import com.tonypine.cycle.core.data.repository.ContraceptionRepository
 import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
@@ -48,6 +49,7 @@ class HistoryViewModelTest {
         .allowMainThreadQueries()
         .build()
     private val dayLogs = DayLogRepository(database)
+    private val contraception = ContraceptionRepository(database)
     private lateinit var settings: SettingsRepository
 
     @Before
@@ -143,7 +145,7 @@ class HistoryViewModelTest {
         settings = SettingsRepository(
             PreferenceDataStoreFactory.create(scope = backgroundScope) { File(folder.root, "test.preferences_pb") }
         )
-        test(CycleRepository(dayLogs, settings))
+        test(CycleRepository(dayLogs, settings, contraception))
     }
 
     /** Logs [syntheticHistory] and how she felt, [syntheticFeelings], as the day log sheet does. */

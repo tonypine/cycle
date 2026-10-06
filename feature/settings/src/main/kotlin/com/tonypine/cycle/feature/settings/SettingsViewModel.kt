@@ -106,7 +106,7 @@ class SettingsViewModel(
             when {
                 read is ImportRead.Refused -> show(DataDialog.ImportRefused(read.problem))
 
-                read is ImportRead.Ready && read.newDays == 0 && !read.restoresLengths ->
+                read is ImportRead.Ready && read.newDays == 0 && read.newStretches == 0 && !read.restoresLengths ->
                     show(DataDialog.NothingToImport)
 
                 read is ImportRead.Ready -> {

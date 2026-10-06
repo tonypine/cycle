@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.tonypine.cycle.core.data.database.CycleDatabase
 import com.tonypine.cycle.core.data.export.YourDataRepository
+import com.tonypine.cycle.core.data.repository.ContraceptionRepository
 import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
@@ -26,7 +27,11 @@ class CycleData(context: Context) {
 
     val dayLogRepository: DayLogRepository by lazy { DayLogRepository(database) }
 
-    val cycleRepository: CycleRepository by lazy { CycleRepository(dayLogRepository, settingsRepository) }
+    val contraceptionRepository: ContraceptionRepository by lazy { ContraceptionRepository(database) }
+
+    val cycleRepository: CycleRepository by lazy {
+        CycleRepository(dayLogRepository, settingsRepository, contraceptionRepository)
+    }
 
     val yourDataRepository: YourDataRepository by lazy { YourDataRepository(database, settingsRepository) }
 
