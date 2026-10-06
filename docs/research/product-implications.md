@@ -126,7 +126,8 @@ Can move earlier if she wants them sooner; none depend on the steps above.
 | Contraception | None set | She sets her method and its start date; nothing is assumed. |
 | Health signal cards | On, dismissible, switchable off; to confirm with her | Useful and calm when worded as in [`health-signals.md`](health-signals.md). |
 | Notifications | All off | She opts in to each. |
-| Temperature unit, first day of the week, date format | From the phone's locale | No setting needed until she asks. |
+| Temperature unit, first day of the week | From the phone's locale | No setting needed until she asks. |
+| Language, and with it dates and month names | The phone's, until she picks one of Cycle's four in Settings | Her phone already says which language she reads ([`0008`](../decisions/0008-languages.md)). |
 
 ## Copy rules
 
@@ -140,6 +141,10 @@ Can move earlier if she wants them sooner; none depend on the steps above.
 - **Never**: "safe day", "low chance", "you can't get pregnant", "you should feel".
 - **TalkBack reads the same words**, including "estimated" ("18 March, estimated ovulation").
 - **Discreet surfaces** (notifications, widget) use neutral text by default: "Reminder from Cycle".
+- **In every language.** These rules hold in Brazilian Portuguese, Spanish and German as in
+  English. Each language's own list of words the app never says, its glossary and how it words an
+  estimate are in [`0008`](../decisions/0008-languages.md#copy-rules-in-every-language), with
+  [its copy checks](../decisions/0008-languages.md#copy-checks-in-every-language).
 
 ### On contraception
 
