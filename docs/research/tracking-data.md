@@ -35,7 +35,7 @@ she asks for, each one optional and hideable.
 | Ovulation test | Negative, high, positive, inconclusive | Health Connect's `OvulationTestRecord` results. |
 | Pregnancy test | Negative, positive | Only if she wants it; a positive one can offer the pregnancy mode. |
 | Medication | Free text or a short list she builds | |
-| Contraception | A setting, not a daily log: the method (combined pill, patch, ring, progestogen-only pill by kind, implant, hormonal IUD, copper IUD, injection), the date she started and stopped it, and for combined methods optionally the regimen and the current pack's start date | Changes the words for what she logs, which estimates appear, and which health signals apply; hormonal methods switch fertility estimates off ([`contraception.md`](contraception.md)). |
+| Contraception | A setting, not a daily log: the method (combined pill, patch, ring, progestogen-only pill by kind, implant, hormonal IUD, copper IUD, progestogen-only injection (DMPA, NET-EN), monthly combined injection), the date she started and stopped it, and for combined methods optionally the regimen and the current pack's start date, or the date of her last monthly injection | Changes the words for what she logs, which estimates appear, and which health signals apply; hormonal methods switch fertility estimates off ([`contraception.md`](contraception.md)). |
 | Notes | Free text per day | Everything else. |
 
 ## For the premenstrual diary

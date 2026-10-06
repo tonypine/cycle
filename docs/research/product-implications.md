@@ -66,9 +66,10 @@ health signals need several cycles, a doctor summary needs the signals' data.
   ([MOT-48](https://linear.app/tonypine/issue/MOT-48)), so this can come before the rest of this
   step. Her method and the dates she started and stopped it, then per method: what to estimate
   (the next bleed follows the pack on a combined pill, patch or ring; nothing on the implant,
-  injection or progestogen-only pill, nor by default on the hormonal IUD), what to hide (fertile
-  window and ovulation on every hormonal method), the words ("period", "bleed" or "bleeding"), a
-  90-day bleeding summary on progestogen-only methods, and the signals that fit the method
+  injection or progestogen-only pill, nor by default on the hormonal IUD or the monthly combined
+  injection), what to hide (fertile window and ovulation on every hormonal method), the words
+  ("period", "bleed" or "bleeding"), a 90-day bleeding summary on progestogen-only methods and the
+  monthly combined injection, and the signals that fit the method
   ([`contraception.md`](contraception.md)). The design is
   [MOT-50](https://linear.app/tonypine/issue/MOT-50).
 - **Other life-stage modes**: pregnant (predictions paused), after birth or breastfeeding
@@ -143,13 +144,15 @@ Can move earlier if she wants them sooner; none depend on the steps above.
 From [`contraception.md`](contraception.md):
 
 - **"Period" only when she has her own cycle**: with no method or a copper IUD.
-- **"Bleed" for the scheduled bleed on a combined pill, patch or ring**: it is a withdrawal bleed,
-  not a period. "Bleed expected in your pill break", not "period expected".
+- **"Bleed" for the scheduled bleed on a combined pill, patch or ring**, and for the bleed after
+  each monthly combined injection: it is a withdrawal bleed, not a period. "Bleed expected in your
+  pill break", not "period expected".
 - **"Bleeding" on progestogen-only methods** (pill, implant, injection, hormonal IUD) and for
   unscheduled bleeding on a combined method. These are the accurate words, not euphemisms.
 - **No cycle language where there is no cycle**: no "cycle day", phases or "late" on the implant,
-  injection, progestogen-only pill or hormonal IUD. Describe bleeding over the last 90 days in plain
-  counts. Whether a hormonal IUD user with regular bleeds later gets a next-bleed estimate is
+  either injection, progestogen-only pill or hormonal IUD. Describe bleeding over the last 90 days
+  in plain counts. Whether a hormonal IUD user with regular bleeds, or a monthly combined injection
+  user whose bleeds follow her injections, later gets a next-bleed estimate is
   [MOT-50](https://linear.app/tonypine/issue/MOT-50)'s call.
 - **Never advise on her method**: no "consider switching", "you may want to stop", "you are
   protected" or missed-pill guidance. Questions about her method go to her pharmacist, nurse or
@@ -170,7 +173,9 @@ next planning ticket.
    implant or takes the pill ([MOT-48](https://linear.app/tonypine/issue/MOT-48)). The research is
    in [`contraception.md`](contraception.md); the screens and the decision come from
    [MOT-50](https://linear.app/tonypine/issue/MOT-50). Still hers to answer there: whether she wants
-   a next-bleed estimate on the pill, a 90-day summary, and a pill or injection reminder.
+   a next-bleed estimate on the pill, a 90-day summary, and a pill or injection reminder; and, if
+   she uses or might use a monthly combined injection (sold mainly outside the UK and US), whether
+   the method list needs it.
 3. **Does she have history in another app** she wants to bring over? Which app, and can it export?
 4. **What does she want to log** beyond her period? The list in
    [`tracking-data.md`](tracking-data.md) is a menu, not a requirement.
