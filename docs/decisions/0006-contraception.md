@@ -267,9 +267,26 @@ The method is health data and stays on the phone with the rest:
 
 - It travels only in her export and in Android's encrypted backup (the Room database,
   [`0004`](0004-backup-encryption.md)). The export gains a third section after the settings, with
-  the columns `method,started,stopped,breaks`, and import adds the stretches that do not overlap
-  ones already on the phone, refusing the file with a line number otherwise, like its other
-  problems. A null start overlaps every stretch that starts on or before its stop, as above.
+  the columns `method,started,stopped,breaks`, and import adds the stretches that are new to the
+  phone and overlap none already on it, refusing the file with a line number otherwise, like its
+  other problems. A null start overlaps every stretch that starts on or before its stop, as above.
+- **A stretch already on the phone.** A row with the same method and start as a stretch on the
+  phone is that stretch, as a line for a date she already logged is that day: import skips it and
+  the phone's copy stays as it is, whatever the row says about its stop or breaks. A null start
+  matches a null start. A skipped row is not checked against the phone's other stretches. So
+  re-importing her own export adds nothing: with the implant from 9 November 2026 to 3 November 2027
+  on the phone, the file's `implant,2026-11-09,2027-11-03,` is skipped, and so is
+  `implant,2026-11-09,,` from an export made before she marked it stopped. The confirm dialog
+  counts only the new methods, and on a file with methods its line reads "Days and methods already
+  on this phone stay as they are." When nothing in the file is new: "Nothing new to import"
+  "Everything in this file is already on this phone." **OK**. A file with no methods keeps the
+  current copy.
+- **Rows that overlap each other.** Two rows in the file whose dates overlap, identical rows
+  included, refuse the file: Cycle never writes them, as it never writes two lines for one date. The
+  problem names the first line, reading down, that overlaps an earlier row, and the earliest row it
+  overlaps: "Lines 6 and 7 have methods whose dates overlap." The file is checked on its own first,
+  top to bottom with its other problems, and only then against the phone, so it is refused even
+  when one of the two rows is already on the phone.
 - Never in a notification, a widget or any text outside the app. "Delete everything" deletes it.
 
 ### Thresholds
@@ -299,6 +316,14 @@ the copper IUD note.
   reaches back over several methods, but one tap on "Move it" would forget whole stretches she
   logged. Deleting dates keeps its own page and its own question; the refusal names the stretch to
   delete or the day to pick after.
+- **Refusing an imported row that is already on the phone.** Simpler, but re-importing her own
+  export would refuse the whole file over the stretches it holds, while its days are skipped
+  quietly.
+- **Skipping only a row identical in every column.** An export made before she marked a method
+  stopped, or changed its breaks, would then be refused. As with days, the phone's copy is the one
+  she changed last, and the method and start are enough to tell it is the same stretch.
+- **Keeping one of two overlapping rows in a file.** Cycle would have to guess which one she meant;
+  naming both lines lets her fix the file.
 - **Asking for the start date of her current pack** to place the break exactly. More precise, but one
   more date to keep right, and wrong as soon as she starts a pack a day late. Her logged bleeds
   follow the pack anyway, so the estimate anchors on them after the first break.
