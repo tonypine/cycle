@@ -8,8 +8,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.tonypine.cycle.core.data.database.CycleDatabase
 import com.tonypine.cycle.core.data.export.ImportProblem
 import com.tonypine.cycle.core.data.export.YourDataRepository
+import com.tonypine.cycle.core.data.repository.ContraceptionRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
+import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.FlowLevel
 import java.io.ByteArrayInputStream
@@ -50,6 +53,7 @@ class SettingsViewModelTest {
         .allowMainThreadQueries()
         .build()
     private val dayLogs = DayLogRepository(database)
+    private val contraception = ContraceptionRepository(database)
     private val today = LocalDate.of(2027, 3, 20)
     private lateinit var settings: SettingsRepository
     private val deviceLock = FakeDeviceLock()
@@ -188,7 +192,7 @@ class SettingsViewModelTest {
         settings.welcomeDone.first { !it }
 
         viewModel.onImport { ByteArrayInputStream(export) }
-        assertEquals(DataDialog.ConfirmImport(newDays = 0), viewModel.awaitDialog())
+        assertEquals(DataDialog.ConfirmImport(newDays = 0, restoresLengths = true), viewModel.awaitDialog())
 
         var restored = false
         viewModel.onConfirmImport(onImported = { restored = true })
@@ -197,6 +201,27 @@ class SettingsViewModelTest {
         assertEquals(SettingsUiState(31, 6, lastExported = null), state)
         assertTrue(settings.settings.first().setupDone)
         assertTrue(restored)
+    }
+
+    @Test
+    fun `a file with only a method not on the phone asks to import it, then adds it and says so`() = runTest {
+        val viewModel = settingsViewModel()
+        settings.saveSetup(cycleLength = 31, periodLength = 6)
+        logTwoDays()
+        val implant = ContraceptionStretch(ContraceptionMethod.IMPLANT, LocalDate.of(2026, 11, 9))
+        contraception.start(implant.method, null, implant.started, today = today)
+        val export = ByteArrayOutputStream().also { YourDataRepository(database, settings).export(it) }.toByteArray()
+        contraception.delete(contraception.observeStretches().first().single().id)
+
+        viewModel.onImport { ByteArrayInputStream(export) }
+        assertEquals(DataDialog.ConfirmImport(newDays = 0, newStretches = 1), viewModel.awaitDialog())
+
+        viewModel.onConfirmImport()
+
+        val state = viewModel.uiState.first { it?.importedMethods != null }
+        assertEquals(1, state?.importedMethods)
+        assertEquals(null, state?.importedDays)
+        assertEquals(listOf(implant), contraception.observeStretches().first().map { it.copy(id = 0) })
     }
 
     @Test
