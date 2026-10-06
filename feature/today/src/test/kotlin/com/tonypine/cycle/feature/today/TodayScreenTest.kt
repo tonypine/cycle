@@ -30,6 +30,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import com.github.takahirom.roborazzi.captureScreenRoboImage
+import com.tonypine.cycle.core.model.BleedingWord
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.model.LogCategory
@@ -67,7 +68,8 @@ class TodayScreenTest {
         onStillGoing = { calls += "still going" },
         onEndedOn = { calls += "ended on $it" },
         onAddPastPeriod = { calls += "add past period $it" },
-        onNoMissedPeriod = { calls += "no missed period" }
+        onNoMissedPeriod = { calls += "no missed period" },
+        onDismissCopperIudNote = { calls += "copper IUD got it" }
     )
 
     private var state by mutableStateOf<TodayUiState>(TodayUiState.Loading)
@@ -235,6 +237,134 @@ class TodayScreenTest {
     }
 
     @Test
+    fun `on the implant Today names the method, says why nothing is estimated and counts her bleeding`() {
+        show(TodaySamples.onImplant)
+
+        composeRule.onNodeWithText("Implant").assert(isHeading())
+        composeRule.onNodeWithText("Bleeding on the implant can come at any time, so Cycle doesn't estimate it.")
+            .assertIsDisplayed()
+        composeRule
+            .onNode(hasText("Last 90 days", substring = true))
+            .assert(
+                hasText(
+                    "You logged bleeding or spotting on 5 days, in 1 episode. The longest lasted 5 days.",
+                    substring = true
+                )
+            )
+        listOf("Day ", "Next period", "Predicted", "later than expected", "Missed a period?").forEach {
+            composeRule.onNodeWithText(it, substring = true).assertDoesNotExist()
+        }
+        composeRule.onNodeWithText("Bleeding started").performClick()
+        assertEquals(listOf("started"), calls)
+    }
+
+    @Test
+    fun `one tap on the implant says bleeding, and the week reads it to TalkBack`() {
+        show(TodaySamples.implantBleedingStarted)
+
+        // C2: the line under "Implant" and the Undo card.
+        composeRule.onAllNodesWithText("Bleeding started today").assertCountEquals(2)
+        composeRule.onNodeWithText("Bleeding stopped").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("March 20, today, bleeding").assertExists()
+    }
+
+    @Test
+    fun `what changes on the implant explains its bleeding and where to get help`() {
+        show(TodaySamples.onImplant)
+        composeRule.onNodeWithText("What changes on the implant?").performScrollTo().performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText("Bleeding on the implant").assertExists()
+        composeRule.onNodeWithText("The implant changes bleeding for most people.", substring = true).assertExists()
+        composeRule.onNodeWithText("a GP or sexual health clinic can help", substring = true).assertExists()
+        composeRule.onNodeWithText("Got it").assertIsDisplayed()
+        composeRule.waitForIdle()
+        captureScreenRoboImage("src/test/screenshots/today_sheet_method.png")
+    }
+
+    @Test
+    fun `on the pill the first bleed is a range in the first break`() {
+        show(TodaySamples.pillFirstBreak)
+
+        composeRule.onNodeWithText("Pill").assert(isHeading())
+        composeRule.onNodeWithText("Your first bleed is expected in about 7 days").assertIsDisplayed()
+        composeRule
+            .onNode(hasText("Next bleed", substring = true))
+            .assert(hasText("March 27 to April 2", substring = true))
+            .assert(hasText("In your first pill break. Estimated from the day you started the pill.", substring = true))
+            .assert(
+                hasText(
+                    "Bleeding between breaks is common in the first three months, and usually settles.",
+                    substring = true
+                )
+            )
+        composeRule.onNodeWithText("Bleed started").assertIsDisplayed()
+    }
+
+    @Test
+    fun `how the next bleed is estimated says it is set by the pill`() {
+        show(TodaySamples.pillNextBleed)
+        composeRule.onNode(
+            hasText("Around March 26", substring = true)
+        ).assert(hasText("Between March 24 and March 28", substring = true))
+        composeRule.onNodeWithText("How is this estimated?").performScrollTo().performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText(
+            "On the combined pill, the bleed in your break comes because you stop the hormones for a few days. " +
+                "It's a bleed set by the pill, not a period."
+        ).assertExists()
+        composeRule.onNodeWithText("These are estimates, not promises.").assertExists()
+        composeRule.waitForIdle()
+        captureScreenRoboImage("src/test/screenshots/today_sheet_next_bleed.png")
+    }
+
+    @Test
+    fun `after the implant Today counts the days since and says why the range is wider`() {
+        show(TodaySamples.stoppedImplant)
+
+        composeRule.onNodeWithText("12 days").assert(isHeading())
+        composeRule.onNodeWithText("since your implant came out").assertIsDisplayed()
+        composeRule
+            .onNode(hasText("Around April 6", substring = true))
+            .assert(hasText("Between March 30 and April 13", substring = true))
+            .assert(
+                hasText(
+                    "Estimated from your usual 29-day cycle. Cycles can take a few months to settle after the " +
+                        "implant, so the range is wider.",
+                    substring = true
+                )
+            )
+        composeRule.onNodeWithText("My period started").assertIsDisplayed()
+        composeRule.onNodeWithText("How is this estimated?").performScrollTo().performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithText("29 days after you stopped the implant on March 8", substring = true).assertExists()
+        composeRule.waitForIdle()
+        captureScreenRoboImage("src/test/screenshots/today_sheet_estimate_stopped.png")
+    }
+
+    @Test
+    fun `after the injection Today says periods can take months to come back`() {
+        show(TodaySamples.stoppedInjection)
+
+        composeRule.onNodeWithText("since you stopped the injection").assertIsDisplayed()
+        composeRule.onNodeWithText(
+            "Periods can take several months to come back after the injection. Cycle will estimate again once you log one."
+        ).assertExists()
+        composeRule.onNodeWithText("Around", substring = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun `on a copper IUD the heavier-periods card goes with Got it`() {
+        show(TodaySamples.copperIud)
+
+        composeRule.onNodeWithText("Day 9").assert(isHeading())
+        composeRule.onNodeWithText("Periods can be heavier at first").assertIsDisplayed()
+        composeRule.onNodeWithText("Got it").performClick()
+        assertEquals(listOf("copper IUD got it"), calls)
+    }
+
+    @Test
     fun `the empty state logs a period from the day she picks`() {
         show(TodaySamples.empty)
         composeRule.onNodeWithText("No periods logged yet", substring = true).assertIsDisplayed()
@@ -282,8 +412,7 @@ class TodayScreenTest {
     fun `at 200 percent the screen scrolls and no text clips`() {
         TodaySamples.all.values.forEach { state ->
             show(state, fontScale = 2f)
-            val last = if (state is TodayUiState.Empty) "Log a period" else "How is this estimated?"
-            composeRule.onNodeWithText(last).performScrollTo().assertIsDisplayed()
+            composeRule.onNodeWithText(buttonLabels(state).last()).performScrollTo().assertIsDisplayed()
             composeRule.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsActions.GetTextLayoutResult))
                 .fetchSemanticsNodes()
                 .forEach { node ->
@@ -308,17 +437,27 @@ class TodayScreenTest {
         is TodayUiState.Empty -> listOf("Log a period")
 
         is TodayUiState.Tracking -> buildList {
+            val (started, ended) = when (state.words) {
+                BleedingWord.PERIOD -> "My period started" to "My period ended"
+                BleedingWord.BLEED -> "Bleed started" to "Bleed ended"
+                BleedingWord.BLEEDING -> "Bleeding started" to "Bleeding stopped"
+            }
             when (state.phase) {
                 is TodayPhase.PeriodEndedToday -> add("Undo")
-                TodayPhase.PeriodStartedToday -> addAll(listOf("Undo", "My period ended"))
-                is TodayPhase.OnPeriod -> add("My period ended")
-                else -> add("My period started")
+                TodayPhase.PeriodStartedToday -> addAll(listOf("Undo", ended))
+                is TodayPhase.OnPeriod -> add(ended)
+                else -> add(started)
             }
             if (state.stillGoing != null) addAll(listOf("Still going", "It ended earlier"))
             if (state.missedPeriod != null) addAll(listOf("Add a past period", "No, I didn't miss one"))
+            if (state.copperIudNote != null) add("Got it")
             add(if (state.onPeriod) "Log flow and how you feel" else "Log how you feel")
             if (state.todayLog.isLogged) add("Edit")
-            add("How is this estimated?")
+            when (state.outlook) {
+                is NextPeriod, is NextBleed -> add("How is this estimated?")
+                is TodayOutlook.Bleeding -> add("What changes on the implant?")
+                TodayOutlook.AfterInjection, TodayOutlook.FirstBleedToLog -> Unit
+            }
         }
     }
 }

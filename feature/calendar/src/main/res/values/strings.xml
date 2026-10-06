@@ -5,4 +5,16 @@
     <string name="calendar_title">Calendar</string>
     <string name="calendar_go_to_today">Go to today</string>
     <string name="calendar_hint">Predicted periods are estimates. Tap any day up to today to log or change it.</string>
+
+    <!-- On a method (docs/design/contraception.md, B7 and C4): what is estimated, or why nothing is. -->
+    <string name="calendar_hint_bleeds">Expected bleeds are estimates. Tap any day up to today to log or change it.</string>
+    <string name="calendar_hint_first_bleed">Cycle will estimate your next bleed once you log one. Tap any day up to today to log or change it.</string>
+    <string name="calendar_hint_after_injection">Cycle will estimate your periods again once you log one. Tap any day up to today to log or change it.</string>
+    <string name="calendar_hint_none_pill">Cycle doesn\'t estimate bleeding on the pill. Tap any day up to today to log or change it.</string>
+    <string name="calendar_hint_none_mini_pill">Cycle doesn\'t estimate bleeding on the mini pill. Tap any day up to today to log or change it.</string>
+    <string name="calendar_hint_none_patch">Cycle doesn\'t estimate bleeding on the patch. Tap any day up to today to log or change it.</string>
+    <string name="calendar_hint_none_ring">Cycle doesn\'t estimate bleeding on the ring. Tap any day up to today to log or change it.</string>
+    <string name="calendar_hint_none_implant">Cycle doesn\'t estimate bleeding on the implant. Tap any day up to today to log or change it.</string>
+    <string name="calendar_hint_none_hormonal_iud">Cycle doesn\'t estimate bleeding with a hormonal IUD. Tap any day up to today to log or change it.</string>
+    <string name="calendar_hint_none_injection">Cycle doesn\'t estimate bleeding on the injection. Tap any day up to today to log or change it.</string>
 </resources>

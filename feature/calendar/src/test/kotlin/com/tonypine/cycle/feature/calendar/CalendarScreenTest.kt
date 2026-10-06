@@ -92,6 +92,30 @@ class CalendarScreenTest {
     }
 
     @Test
+    fun `on the implant the legend and TalkBack say bleeding, and nothing reads as predicted`() {
+        show(CalendarSamples.implantMarch)
+
+        listOf("Period", "Bleeding", "Today").forEach { composeRule.onNodeWithText(it).assertIsDisplayed() }
+        composeRule.onNodeWithText("Predicted period").assertDoesNotExist()
+        composeRule.onNodeWithContentDescription("March 1, period").assertExists()
+        composeRule.onNodeWithContentDescription("March 10, bleeding").assertExists()
+        composeRule.onNodeWithText(
+            "Cycle doesn't estimate bleeding on the implant. Tap any day up to today to log or change it."
+        ).assertIsDisplayed()
+    }
+
+    @Test
+    fun `on the pill the legend says bleed and expected bleed`() {
+        show(CalendarSamples.pillMarch)
+
+        listOf("Bleed", "Expected bleed", "Today").forEach { composeRule.onNodeWithText(it).assertIsDisplayed() }
+        composeRule.onNodeWithText("Predicted period").assertDoesNotExist()
+        composeRule.onNodeWithContentDescription("March 27, expected bleed").assertExists()
+        composeRule.onNodeWithText("Expected bleeds are estimates. Tap any day up to today to log or change it.")
+            .assertIsDisplayed()
+    }
+
+    @Test
     fun `the top bar goes to today and the header moves between months`() {
         show(CalendarSamples.april)
 

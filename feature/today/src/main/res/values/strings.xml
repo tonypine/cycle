@@ -103,4 +103,149 @@
         <item quantity="other">Pick the first day of your last period. Cycle counts it as %1$d days long.</item>
     </plurals>
     <string name="log_period_confirm">Log it</string>
+
+    <!-- On a method: docs/design/contraception.md and docs/decisions/0006-contraception.md. "Bleed"
+         for the scheduled bleed on a combined method with a break every month, "bleeding" on every
+         other hormonal method. No cycle day, "late" or "Missed a period?" where there is no cycle. -->
+    <plurals name="today_context_bleed_between_first">
+        <item quantity="one">Your first bleed is expected in about %1$d day</item>
+        <item quantity="other">Your first bleed is expected in about %1$d days</item>
+    </plurals>
+    <plurals name="today_context_bleed_between">
+        <item quantity="one">Your next bleed is expected in about %1$d day</item>
+        <item quantity="other">Your next bleed is expected in about %1$d days</item>
+    </plurals>
+    <string name="today_context_bleed_due">Your bleed could start any day now</string>
+    <string name="today_context_bleed_started">Your bleed started today</string>
+    <string name="today_context_bleeding_started">Bleeding started today</string>
+    <string name="today_context_on_bleed">Day %1$d of your bleed</string>
+    <string name="today_context_on_bleeding">Day %1$d of bleeding</string>
+    <plurals name="today_context_bleed_ended">
+        <item quantity="one">Your bleed lasted %1$d day</item>
+        <item quantity="other">Your bleed lasted %1$d days</item>
+    </plurals>
+    <plurals name="today_context_bleeding_ended">
+        <item quantity="one">Bleeding lasted %1$d day</item>
+        <item quantity="other">Bleeding lasted %1$d days</item>
+    </plurals>
+    <string name="today_context_first_bleed_to_log">Cycle will estimate your next bleed once you log one.</string>
+
+    <string name="today_bleed_started">Bleed started</string>
+    <string name="today_bleed_ended">Bleed ended</string>
+    <string name="today_bleeding_started">Bleeding started</string>
+    <string name="today_bleeding_stopped">Bleeding stopped</string>
+    <string name="today_bleed_started_card">Bleed started today</string>
+    <string name="today_bleed_ended_card">Bleed ended today</string>
+    <string name="today_bleeding_started_card">Bleeding started today</string>
+    <string name="today_bleeding_stopped_card">Bleeding stopped today</string>
+
+    <string name="today_still_bleeding_title">Still bleeding?</string>
+    <plurals name="today_still_going_bleed_body">
+        <item quantity="one">Your bleed has lasted %1$d day so far.</item>
+        <item quantity="other">Your bleed has lasted %1$d days so far.</item>
+    </plurals>
+    <plurals name="today_still_going_bleeding_body">
+        <item quantity="one">You have been bleeding for %1$d day so far.</item>
+        <item quantity="other">You have been bleeding for %1$d days so far.</item>
+    </plurals>
+    <string name="today_last_day_bleed_body">Pick the last day of your bleed.</string>
+    <string name="today_last_day_bleeding_body">Pick the last day of bleeding.</string>
+
+    <!-- After stopping a method, until her first period: the days since, in place of a cycle day. -->
+    <plurals name="today_days_since">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <string name="today_since_pill">since you stopped the pill</string>
+    <string name="today_since_mini_pill">since you stopped the mini pill</string>
+    <string name="today_since_patch">since you stopped the patch</string>
+    <string name="today_since_ring">since you stopped the ring</string>
+    <string name="today_since_implant">since your implant came out</string>
+    <string name="today_since_iud">since your IUD came out</string>
+    <string name="today_since_injection">since you stopped the injection</string>
+    <string name="today_basis_usual">Estimated from your usual %1$d-day cycle.</string>
+    <string name="today_basis_settling">Cycles can take a few months to settle after the %1$s, so the range is wider.</string>
+    <string name="today_after_injection">Periods can take several months to come back after the injection. Cycle will estimate again once you log one.</string>
+
+    <!-- The next bleed, on a combined method with a break every month. -->
+    <string name="today_next_bleed">Next bleed</string>
+    <string name="today_next_bleed_range">%1$s to %2$s</string>
+    <string name="today_bleed_basis_start_pill">In your first pill break. Estimated from the day you started the pill.</string>
+    <string name="today_bleed_basis_start_patch">In your first patch-free week. Estimated from the day you started the patch.</string>
+    <string name="today_bleed_basis_start_ring">In your first ring-free week. Estimated from the day you started the ring.</string>
+    <string name="today_bleed_basis_start_later_pill">In your pill break. Estimated from the day you started the pill.</string>
+    <string name="today_bleed_basis_start_later_patch">In your patch-free week. Estimated from the day you started the patch.</string>
+    <string name="today_bleed_basis_start_later_ring">In your ring-free week. Estimated from the day you started the ring.</string>
+    <string name="today_bleed_basis_last_pill">In your pill break. Estimated from your last bleed on the pill.</string>
+    <string name="today_bleed_basis_last_patch">In your patch-free week. Estimated from your last bleed on the patch.</string>
+    <string name="today_bleed_basis_last_ring">In your ring-free week. Estimated from your last bleed on the ring.</string>
+    <string name="today_missed_break_title">No bleed logged this break</string>
+    <string name="today_missed_break_body">Some breaks pass without one. The next is expected in your next break.</string>
+
+    <!-- The bleeding card, on a method with no estimate: plain counts, never clinical labels. -->
+    <string name="today_bleeding_last_90_days">Last 90 days</string>
+    <string name="today_bleeding_since">Since %1$s</string>
+    <plurals name="today_bleeding_days">
+        <item quantity="one">You logged bleeding or spotting on %1$d day, in %2$s.</item>
+        <item quantity="other">You logged bleeding or spotting on %1$d days, in %2$s.</item>
+    </plurals>
+    <plurals name="today_bleeding_episodes">
+        <item quantity="one">%1$d episode</item>
+        <item quantity="other">%1$d episodes</item>
+    </plurals>
+    <plurals name="today_bleeding_longest">
+        <item quantity="one">The longest lasted %1$d day.</item>
+        <item quantity="other">The longest lasted %1$d days.</item>
+    </plurals>
+    <string name="today_bleeding_none">You logged no bleeding or spotting.</string>
+
+    <!-- The first-months line, under the bleeding or next bleed card: expected, not a warning. -->
+    <string name="today_first_months_combined_monthly">Bleeding between breaks is common in the first three months, and usually settles.</string>
+    <string name="today_first_months_combined">Bleeding between breaks is common in the first months, and usually settles.</string>
+    <string name="today_first_months_mini_pill">Bleeding on the mini pill often changes in the first months.</string>
+    <string name="today_first_months_implant">In the first months on the implant, bleeding is often irregular or long.</string>
+    <string name="today_first_months_hormonal_iud">In the first months with a hormonal IUD, bleeding is often frequent or long. It usually gets lighter over the first year.</string>
+    <string name="today_first_months_injection">In the first months on the injection, bleeding is often irregular or long. It usually lessens with time.</string>
+
+    <!-- The copper IUD, for six months after fitting, until she taps Got it. -->
+    <string name="today_copper_iud_title">Periods can be heavier at first</string>
+    <string name="today_copper_iud_body">With a copper IUD, periods are often heavier, longer or more painful for the first 3 to 6 months. Cycle keeps estimating them as before.</string>
+    <string name="today_got_it">Got it</string>
+
+    <!-- What changes: the sheet on a method with no estimate. What the method does to bleeding, what
+         Cycle does about it, and where to go if it bothers her. -->
+    <string name="method_sheet_button_pill">What changes on the pill?</string>
+    <string name="method_sheet_button_mini_pill">What changes on the mini pill?</string>
+    <string name="method_sheet_button_patch">What changes on the patch?</string>
+    <string name="method_sheet_button_ring">What changes on the ring?</string>
+    <string name="method_sheet_button_implant">What changes on the implant?</string>
+    <string name="method_sheet_button_hormonal_iud">What changes with a hormonal IUD?</string>
+    <string name="method_sheet_button_injection">What changes on the injection?</string>
+    <string name="method_sheet_title_pill">Bleeding on the pill</string>
+    <string name="method_sheet_title_mini_pill">Bleeding on the mini pill</string>
+    <string name="method_sheet_title_patch">Bleeding on the patch</string>
+    <string name="method_sheet_title_ring">Bleeding on the ring</string>
+    <string name="method_sheet_title_implant">Bleeding on the implant</string>
+    <string name="method_sheet_title_hormonal_iud">Bleeding with a hormonal IUD</string>
+    <string name="method_sheet_title_injection">Bleeding on the injection</string>
+    <string name="method_sheet_combined">On the %1$s, a bleed usually comes in a break. With breaks only every few packs, or none, bleeding can still come at other times, and it often settles with time.</string>
+    <string name="method_sheet_mini_pill">The mini pill changes bleeding for many people. It can be irregular, come and go, or stop, and it may not settle with time.</string>
+    <string name="method_sheet_implant">The implant changes bleeding for most people. It can be lighter, longer, come and go, or stop, and the pattern can change at any time.</string>
+    <string name="method_sheet_hormonal_iud">A hormonal IUD changes bleeding for most people. It is often frequent or long in the first months, then usually gets lighter, and for some it stops.</string>
+    <string name="method_sheet_injection">The injection changes bleeding for most people. It is often irregular or long at first, and usually lessens the longer you use it. For many, it stops.</string>
+    <string name="method_sheet_what_cycle_does">So Cycle doesn\'t estimate when you\'ll bleed, count cycle days or say anything is late. It shows the days you log, and how much you bled in the last 90 days.</string>
+    <string name="method_sheet_help">If the bleeding becomes a problem for you, a GP or sexual health clinic can help.</string>
+
+    <!-- How is this estimated, for the next bleed. -->
+    <string name="bleed_sheet_why">On the %1$s, the bleed in your %2$s comes because you stop the hormones for a few days. It\'s a bleed set by the %3$s, not a period.</string>
+    <string name="bleed_sheet_when">Cycle expects it 28 days after your last one started, give or take 2 days. Before you\'ve logged one, it expects it in your first %1$s, 22 to 28 days after you started.</string>
+    <string name="bleed_sheet_between">Bleeding between breaks is common in the first months. It shows on your calendar but doesn\'t move this estimate.</string>
+    <string name="bleed_sheet_closing">These are estimates, not promises.</string>
+    <string name="bleed_break_pill">break</string>
+    <string name="bleed_break_patch">patch-free week</string>
+    <string name="bleed_break_ring">ring-free week</string>
+
+    <!-- How is this estimated, after stopping a method. -->
+    <string name="estimate_date_stopped">Your next period is expected around %1$s, %3$d days after you stopped the %4$s on %2$s: %5$s.</string>
+    <string name="estimate_range_settling">The first cycles after stopping a method can vary more, so the range stays at least 7 days either side until you have logged three cycles.</string>
 </resources>
