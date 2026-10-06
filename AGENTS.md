@@ -40,6 +40,14 @@ hard-coded colours, sizes and text styles. If a screen needs something the desig
 the token or component there first, with its catalog entry, previews and tests. How to do that is in
 `docs/design/design-system.md`.
 
+Cycle speaks several languages (`docs/decisions/0008-languages.md`). Every new user-visible string
+goes into every supported language in the same PR: `values/strings.xml` and each `values-xx` folder,
+or Lint's `MissingTranslation` fails the build. The words the app never says, per language, live in
+`NeverSaid` in `core:testing`, from 0008; each module's `*StringsTest` checks its strings in every
+language with `assertNeverSaid`. Dates and numbers use `cycleLocale()`, never
+`Configuration.locales[0]`. The details are under "Strings and languages" in
+`docs/design/design-system.md`.
+
 ## Commits and branches
 
 - Commits: `type: message`, e.g. `feat: log period start date`. Types: `feat`, `fix`, `refactor`,
@@ -75,19 +83,22 @@ screenshots change with it. The map follows the `projects.*` dependencies in eac
   catalog renders every component and `app` renders the theme.
 - `:core:ui`: also `:feature:calendar`, `:feature:history`, `:feature:onboarding`,
   `:feature:settings`, `:feature:today` and `:app`.
-- `:core:model`: also `:core:domain`, `:core:data`, `:core:ui`, `:feature:calendar`,
-  `:feature:history`, `:feature:onboarding`, `:feature:settings`, `:feature:today` and `:app`.
+- `:core:model`: also `:core:domain`, `:core:data`, `:core:testing`, `:core:ui`, `:feature:calendar`,
+  `:feature:history`, `:feature:onboarding`, `:feature:settings`, `:feature:today` and `:app`; through
+  `:core:testing`, `:core:designsystem`'s tests too.
 - `:core:domain`: also `:core:data`, `:core:ui`, `:feature:calendar`, `:feature:history`,
   `:feature:onboarding`, `:feature:settings`, `:feature:today` and `:app`.
 - `:core:data`: also `:feature:calendar`, `:feature:history`, `:feature:onboarding`,
   `:feature:settings`, `:feature:today` and `:app`.
+- `:core:testing` (test helpers only): also `:core:designsystem`, `:core:ui`, `:feature:calendar`,
+  `:feature:history`, `:feature:onboarding`, `:feature:settings`, `:feature:today` and `:app`.
 - `:feature:calendar`, `:feature:history`, `:feature:onboarding`, `:feature:settings`,
   `:feature:today`: also `:app`.
 - `:app-catalog`, `:app`: nothing depends on them.
 
 `verifyRoborazziDebug` runs a module's unit tests and verifies its screenshots. `:core:model`,
-`:core:domain` and `:core:data` have no screenshots: their check is `testDebugUnitTest` (in the two
-pure Kotlin modules it runs `test`). Each takes seconds:
+`:core:domain`, `:core:data` and `:core:testing` have no screenshots: their check is
+`testDebugUnitTest` (in the two pure Kotlin modules it runs `test`). Each takes seconds:
 
 ```sh
 ./gradlew ktlintCheck
