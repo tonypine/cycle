@@ -1,6 +1,9 @@
 package com.tonypine.cycle.feature.history
 
+import com.tonypine.cycle.core.model.BleedingSummary
 import com.tonypine.cycle.core.model.BodySymptom
+import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.EnergyLevel
 import com.tonypine.cycle.core.model.FlowLevel
 import com.tonypine.cycle.core.model.LengthSummary
@@ -15,9 +18,10 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 /**
- * One synthetic History per state, for previews and screenshots. Made-up dates in 2027, never anyone's
- * real cycle: six cycles of 29, 26, 31, 28, 27 and 28 days, with periods of 5, 4, 6, 5, 5, 6 and 4
- * days. `HistoryUiStateTest` checks the same states come out of a real log.
+ * One synthetic History per state, for previews and screenshots. Made-up dates in 2026 and 2027, never
+ * anyone's real cycle: six cycles of 29, 26, 31, 28, 27 and 28 days, with periods of 5, 4, 6, 5, 5, 6
+ * and 4 days, and on the implant, journeys C and D of `docs/design/contraception.md`.
+ * `HistoryUiStateTest` checks the same states come out of a real log.
  */
 internal object HistorySamples {
     val today: LocalDate = LocalDate.of(2027, 9, 10)
@@ -38,6 +42,19 @@ internal object HistorySamples {
         cycle("2027-03-17", length = 29, periodLength = 5)
     )
 
+    private val implant = ContraceptionStretch(ContraceptionMethod.IMPLANT, started = day("2026-11-09"), id = 1)
+
+    /** The cycle the implant cut short, then her six cycles before it, newest first. */
+    private val beforeImplant = listOf(
+        cycle("2026-10-08", length = 32, periodLength = 6).copy(cutShortBy = ContraceptionMethod.IMPLANT),
+        cycle("2026-09-09", length = 29, periodLength = 5),
+        cycle("2026-08-11", length = 29, periodLength = 5),
+        cycle("2026-07-14", length = 28, periodLength = 6),
+        cycle("2026-06-14", length = 30, periodLength = 4),
+        cycle("2026-05-18", length = 27, periodLength = 5),
+        cycle("2026-04-17", length = 31, periodLength = 5)
+    )
+
     val loading = HistoryUiState.Loading
 
     val empty = HistoryUiState.Empty(hasPeriod = false)
@@ -49,7 +66,86 @@ internal object HistorySamples {
         today = today,
         typicalCycle = LengthSummary(median = 28, shortest = 26, longest = 31, count = 6),
         typicalPeriod = LengthSummary(median = 5, shortest = 4, longest = 6, count = 6),
-        cycles = listOf(current) + past
+        entries = listOf(current) + past
+    )
+
+    /**
+     * Journey C5 (`docs/design/contraception.md`): on 14 October 2027, on the implant since 9
+     * November 2026. Six cycles of her own before it, of 31, 27, 30, 28, 29 and 29 days, then the
+     * cycle the implant cut short, and 12 days of bleeding or spotting in the last 90 days.
+     */
+    val onImplant = HistoryUiState.Cycles(
+        today = day("2027-10-14"),
+        typicalCycle = LengthSummary(median = 29, shortest = 27, longest = 31, count = 6),
+        typicalPeriod = LengthSummary(median = 5, shortest = 4, longest = 6, count = 6),
+        entries = listOf(
+            MethodSummary(
+                stretch = implant,
+                isCurrent = true,
+                lastDay = day("2027-10-14"),
+                bleeding = MethodBleeding.Days(
+                    BleedingSummary(
+                        from = day("2027-07-17"),
+                        to = day("2027-10-14"),
+                        sinceStart = false,
+                        days = 12,
+                        episodes = 4,
+                        longest = 6
+                    )
+                )
+            )
+        ) + beforeImplant,
+        leftOut = true
+    )
+
+    /** Journey D6: on 15 November 2027, the implant out since 3 November, with its last 90 days. */
+    val implantRemoved = onImplant.copy(
+        today = day("2027-11-15"),
+        entries = listOf(
+            MethodSummary(
+                stretch = implant.copy(stopped = day("2027-11-03")),
+                isCurrent = false,
+                lastDay = day("2027-11-03"),
+                bleeding = MethodBleeding.Days(
+                    BleedingSummary(
+                        from = day("2027-08-06"),
+                        to = day("2027-11-03"),
+                        sinceStart = false,
+                        days = 10,
+                        episodes = 3,
+                        longest = 5
+                    )
+                )
+            )
+        ) + beforeImplant
+    )
+
+    /**
+     * On the implant since before she installed Cycle, start not known, with no cycle of her own:
+     * no typical cycle, the method's card alone.
+     */
+    val methodOnly = HistoryUiState.Cycles(
+        today = day("2027-10-14"),
+        typicalCycle = null,
+        typicalPeriod = null,
+        entries = listOf(
+            MethodSummary(
+                stretch = implant.copy(started = null),
+                isCurrent = true,
+                lastDay = day("2027-10-14"),
+                bleeding = MethodBleeding.Days(
+                    BleedingSummary(
+                        from = day("2027-07-17"),
+                        to = day("2027-10-14"),
+                        sinceStart = false,
+                        days = 5,
+                        episodes = 1,
+                        longest = 5
+                    )
+                )
+            )
+        ),
+        leftOut = true
     )
 
     /**
@@ -92,6 +188,21 @@ internal object HistorySamples {
         today = today,
         cycle = current,
         flow = flow("2027-09-02", FlowLevel.MEDIUM, FlowLevel.HEAVY, FlowLevel.MEDIUM, FlowLevel.LIGHT)
+    )
+
+    /** The cycle the implant cut short, in [onImplant]: 8 October to 8 November 2026. */
+    val cutShortCycle = CycleDetailUiState.Detail(
+        today = day("2027-10-14"),
+        cycle = beforeImplant.first(),
+        flow = flow(
+            "2026-10-08",
+            FlowLevel.MEDIUM,
+            FlowLevel.HEAVY,
+            FlowLevel.MEDIUM,
+            FlowLevel.MEDIUM,
+            FlowLevel.LIGHT,
+            FlowLevel.LIGHT
+        )
     )
 
     val missing = CycleDetailUiState.Missing
@@ -137,13 +248,17 @@ internal object HistorySamples {
         "loading" to loading,
         "empty" to empty,
         "first_cycle" to firstCycle,
-        "cycles" to cycles
+        "cycles" to cycles,
+        "on_implant" to onImplant,
+        "implant_removed" to implantRemoved,
+        "method_only" to methodOnly
     )
 
     /** Every detail state by name, for the screenshot tests. */
     val allDetails: Map<String, CycleDetailUiState> = mapOf(
         "past" to pastCycle,
         "current" to currentCycle,
+        "cut_short" to cutShortCycle,
         "missing" to missing
     )
 

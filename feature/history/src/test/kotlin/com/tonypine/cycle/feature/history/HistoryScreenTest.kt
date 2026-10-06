@@ -19,6 +19,11 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
+import com.tonypine.cycle.core.model.BleedingSummary
+import com.tonypine.cycle.core.model.Breaks
+import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionStretch
+import java.time.LocalDate
 import java.time.YearMonth
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -38,7 +43,14 @@ class HistoryScreenTest {
     private val isButton = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button)
 
     private fun showHistory(state: HistoryUiState) {
-        composeRule.setContent { Themed { HistoryScreen(state, onCycleClick = { calls += "cycle $it" }) } }
+        composeRule.setContent {
+            Themed {
+                HistoryScreen(state, onCycleClick = { calls += "cycle $it" }, onSeeInCalendar = {
+                    calls +=
+                        "calendar $it"
+                })
+            }
+        }
         composeRule.waitForIdle()
     }
 
@@ -124,12 +136,133 @@ class HistoryScreenTest {
     }
 
     @Test
+    fun `on a method, the typical cycle says time on it is left out`() {
+        showHistory(HistorySamples.onImplant)
+
+        composeRule.onNodeWithText(
+            "The middle length of your last 6 cycles. Time on hormonal contraception is left out."
+        ).assertIsDisplayed()
+    }
+
+    @Test
+    fun `TalkBack reads the method's card as one item, the method first, then its calendar button`() {
+        showHistory(HistorySamples.onImplant)
+
+        val card = hasText("Implant") and hasText("Since Nov 9, 2026") and
+            hasText("Not part of your typical cycle.") and
+            hasText(
+                "Last 90 days: you logged bleeding or spotting on 12 days, in 4 episodes. The longest lasted 6 days."
+            )
+        composeRule.onNode(card).assertIsDisplayed().assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Role))
+        composeRule.onNodeWithText("See it in the calendar").assert(isButton).performClick()
+
+        assertEquals(listOf("calendar 2027-10"), calls)
+    }
+
+    @Test
+    fun `TalkBack reads the method that cut a cycle short with the cycle, as one button`() {
+        showHistory(HistorySamples.onImplant)
+        val card = hasText("Oct 8, 2026 to Nov 8, 2026") and
+            hasText("32 days, cut short when the implant was fitted. Not counted.")
+        composeRule.onNode(hasScrollAction()).performScrollToNode(card)
+
+        composeRule.onNode(card).assert(isButton).performClick()
+
+        assertEquals(listOf("cycle 2026-10-08"), calls)
+    }
+
+    @Test
+    fun `once the method stopped, its card reads its dates and its last 90 days`() {
+        showHistory(HistorySamples.implantRemoved)
+
+        composeRule.onNode(
+            hasText("Nov 9, 2026 to Nov 3, 2027") and hasText(
+                "In its last 90 days you logged bleeding or spotting on 10 days, in 3 episodes. " +
+                    "The longest lasted 5 days."
+            )
+        ).assertIsDisplayed()
+        composeRule.onNodeWithText("See it in the calendar").performClick()
+
+        assertEquals(listOf("calendar 2027-11"), calls)
+    }
+
+    @Test
+    fun `with no cycle of her own, History starts with the method's card`() {
+        showHistory(HistorySamples.methodOnly)
+
+        composeRule.onAllNodesWithText("Your typical cycle").assertCountEquals(0)
+        composeRule.onNodeWithText("Cycles").assert(isHeading())
+        composeRule.onNode(hasText("Implant") and hasText("Start not known")).assertIsDisplayed()
+    }
+
+    @Test
+    fun `each method's card counts what fits it`() {
+        val today = LocalDate.of(2027, 10, 10)
+        val pill = ContraceptionStretch(
+            ContraceptionMethod.COMBINED_PILL,
+            started = LocalDate.of(2027, 6, 1),
+            stopped = LocalDate.of(2027, 8, 31),
+            breaks = Breaks.MONTHLY,
+            id = 1
+        )
+        val ring = pill.copy(method = ContraceptionMethod.RING, id = 2)
+        val injection = ContraceptionStretch(ContraceptionMethod.INJECTION, started = LocalDate.of(2027, 9, 6), id = 3)
+        val iud = ContraceptionStretch(
+            ContraceptionMethod.HORMONAL_IUD,
+            started = LocalDate.of(2027, 1, 4),
+            stopped = LocalDate.of(2027, 2, 20),
+            id = 4
+        )
+        fun summary(from: LocalDate, to: LocalDate, days: Int) = MethodBleeding.Days(
+            BleedingSummary(from, to, sinceStart = true, days = days, episodes = days.coerceAtMost(1), longest = days)
+        )
+        showHistory(
+            HistoryUiState.Cycles(
+                today = today,
+                typicalCycle = null,
+                typicalPeriod = null,
+                entries = listOf(
+                    MethodSummary(injection, isCurrent = true, today, summary(injection.started!!, today, days = 0)),
+                    MethodSummary(pill, isCurrent = false, pill.stopKey, MethodBleeding.Bleeds(3)),
+                    MethodSummary(ring, isCurrent = false, ring.stopKey, MethodBleeding.Bleeds(0)),
+                    MethodSummary(iud, isCurrent = false, iud.stopKey, summary(iud.startKey, iud.stopKey, days = 4))
+                ),
+                leftOut = true
+            )
+        )
+        val list = composeRule.onNode(hasScrollAction())
+
+        listOf(
+            hasText("Injection") and hasText("Since September 6: you logged no bleeding or spotting."),
+            hasText("Pill") and hasText("You logged 3 bleeds on it."),
+            hasText("Ring") and hasText("You logged no bleeds on it."),
+            hasText("Hormonal IUD") and
+                hasText(
+                    "In that time you logged bleeding or spotting on 4 days, in 1 episode. The longest lasted 4 days."
+                )
+        ).forEach { card ->
+            list.performScrollToNode(card)
+            composeRule.onNode(card).assertIsDisplayed()
+        }
+    }
+
+    @Test
     fun `a cycle card opens that cycle`() {
         showHistory(HistorySamples.cycles)
         composeRule.onNodeWithText("Aug 5 to Sep 1", substring = true).performClick()
         composeRule.onNodeWithText("Since Sep 2", substring = true).performClick()
 
         assertEquals(listOf("cycle 2027-08-05", "cycle 2027-09-02"), calls)
+    }
+
+    @Test
+    fun `the detail of a cycle cut short names the method with its length and dates`() {
+        showDetail(HistorySamples.cutShortCycle)
+
+        composeRule.onNode(
+            hasText("32 days") and hasText("October 8, 2026 to November 8, 2026") and
+                hasText("Cut short when the implant was fitted. Not part of your typical cycle.")
+        ).assertIsDisplayed()
     }
 
     @Test

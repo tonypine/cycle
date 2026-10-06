@@ -18,8 +18,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
- * History's state. It follows her log, so an edit anywhere in the app, on Today or in the calendar,
- * recomputes every cycle at once.
+ * History's state. It follows her log and her contraception, so an edit anywhere in the app, on
+ * Today, in the calendar or to a method's dates in Settings, recomputes every cycle at once.
  *
  * @param today her day, from the phone's clock in its current zone. Read again by [refreshDay].
  */
@@ -29,8 +29,8 @@ class HistoryViewModel(private val cycles: CycleRepository, private val today: (
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<HistoryUiState> = day
-        .flatMapLatest { day -> cycles.observeOverview(day) }
-        .map(HistoryUiState::from)
+        .flatMapLatest { day -> cycles.observeLog(day) }
+        .map { HistoryUiState.from(it.overview, it.logs) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), HistoryUiState.Loading)
 
     /** Reads the day again, such as when she comes back to the app after midnight. */
