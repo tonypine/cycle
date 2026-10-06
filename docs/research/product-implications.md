@@ -161,7 +161,7 @@ From [`contraception.md`](contraception.md):
   common, and the copy says so calmly rather than flagging it.
 - **Urgent symptoms are fixed text, never alerts**: the combined pill, patch, ring and both IUDs
   get a "When to get help" section in the words of
-  [`0006`](../decisions/0006-urgent-symptoms-on-a-method.md), with no phone numbers and nothing set
+  [`0007`](../decisions/0007-urgent-symptoms-on-a-method.md), with no phone numbers and nothing set
   off by what she logs.
 
 ## Open questions for her
@@ -180,7 +180,7 @@ next planning ticket.
    a next-bleed estimate on the pill, a 90-day summary, and a pill or injection reminder; if she
    uses or might use a monthly combined injection (sold mainly outside the UK and US), whether the
    method list needs it; and whether "When to get help" should name her country's emergency numbers
-   ([`0006`](../decisions/0006-urgent-symptoms-on-a-method.md)).
+   ([`0007`](../decisions/0007-urgent-symptoms-on-a-method.md)).
 3. **Does she have history in another app** she wants to bring over? Which app, and can it export?
 4. **What does she want to log** beyond her period? The list in
    [`tracking-data.md`](tracking-data.md) is a menu, not a requirement.

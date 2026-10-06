@@ -558,7 +558,7 @@ pain low in the tummy ([FSRH CHC 2019, Box 4](https://www.cosrh.org/Common/Uploa
 not a triage tool ([`health-signals.md`](health-signals.md)) and never raises them from what she
 logs. On the combined pill, patch and ring and on both IUDs, the method screen shows them as fixed
 "When to get help" text, in the wording decided in
-[`0006`](../decisions/0006-urgent-symptoms-on-a-method.md). Missed-pill rules and whether she is
+[`0007`](../decisions/0007-urgent-symptoms-on-a-method.md). Missed-pill rules and whether she is
 protected are questions for her pharmacist or clinic, not for Cycle.
 
 ## What this means for Cycle
@@ -614,6 +614,6 @@ protected are questions for her pharmacist or clinic, not for Cycle.
   apply to belong in one place in code with their sources, like the others.
 - **Urgent symptoms are reference text, not alerts.** The method screen of the combined pill, patch,
   ring and both IUDs ends with "When to get help", the same for every user of the method and never
-  set off by her log ([`0006`](../decisions/0006-urgent-symptoms-on-a-method.md)).
+  set off by her log ([`0007`](../decisions/0007-urgent-symptoms-on-a-method.md)).
 - **Synthetic data only.** Every example here uses made-up dates and numbers, like the rest of the
   repo.

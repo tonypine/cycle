@@ -59,7 +59,7 @@ spotting, and suggests perimenopause can be a cause from 40 on
 - **No emergencies.** The app is not a triage tool and should not pretend to be one: no card or
   alert ever says a symptom she logged is urgent. Wording about urgent symptoms comes from a clinical
   source and is reviewed; the only wording so far is the fixed "When to get help" text on some
-  contraceptive methods ([`0006`](../decisions/0006-urgent-symptoms-on-a-method.md)).
+  contraceptive methods ([`0007`](../decisions/0007-urgent-symptoms-on-a-method.md)).
 - **The useful output is a summary.** A screen or file she can show a doctor: cycle lengths, period
   lengths, flow, pain and the symptoms she chose to share, over a chosen range. That shortens the
   "how long has this been going on?" part of an appointment, and for PMDD it is the two-cycle diary
