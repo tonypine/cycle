@@ -76,7 +76,10 @@ private fun phoneLocales(context: Context): List<Locale> = if (Build.VERSION.SDK
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private object SystemLocales {
     // With a per-app language, the process's configuration starts with it; this is the phone's own list.
-    fun of(context: Context): List<Locale> = context.getSystemService(LocaleManager::class.java).systemLocales.toList()
+    // A context without the service, such as a preview's, falls back to the system's resources.
+    fun of(context: Context): List<Locale> =
+        context.getSystemService(LocaleManager::class.java)?.systemLocales?.toList()
+            ?: Resources.getSystem().configuration.locales.toList()
 }
 
 private fun LocaleList.toList(): List<Locale> = List(size()) { get(it) }

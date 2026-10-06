@@ -47,18 +47,20 @@ class AndroidPhoneLanguages(context: Context) : PhoneLanguages {
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private object PerAppLanguage {
     // The phone's own languages: with a per-app language set, the app's configuration starts with it.
-    fun systemLocales(context: Context): List<Locale> = localeManager(context).systemLocales.toList()
+    // A context without the service falls back to the system's resources.
+    fun systemLocales(context: Context): List<Locale> =
+        localeManager(context)?.systemLocales?.toList() ?: Resources.getSystem().configuration.locales.toList()
 
     // One language, as Android's page and Cycle set it.
     fun get(context: Context): Language? =
-        localeManager(context).applicationLocales.toList().firstOrNull()?.let { Language(it.toLanguageTag()) }
+        localeManager(context)?.applicationLocales?.toList()?.firstOrNull()?.let { Language(it.toLanguageTag()) }
 
     fun set(context: Context, language: Language?) {
-        localeManager(context).applicationLocales =
+        localeManager(context)?.applicationLocales =
             if (language == null) LocaleList.getEmptyLocaleList() else LocaleList.forLanguageTags(language.tag)
     }
 
-    private fun localeManager(context: Context) = context.getSystemService(LocaleManager::class.java)
+    private fun localeManager(context: Context): LocaleManager? = context.getSystemService(LocaleManager::class.java)
 }
 
 private fun LocaleList.toList(): List<Locale> = List(size()) { get(it) }

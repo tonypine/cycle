@@ -2,6 +2,7 @@ package com.tonypine.cycle.core.data.settings
 
 import android.app.LocaleManager
 import android.content.Context
+import android.content.ContextWrapper
 import android.os.LocaleList
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -67,5 +68,23 @@ class AndroidPhoneLanguagesTest {
         phone.appLanguage = Language("de")
 
         assertEquals(null, phone.appLanguage)
+    }
+
+    @Test
+    @Config(qualifiers = "fr-rFR")
+    fun `without a LocaleManager, the phone's languages are the system's and there is no per-app setting`() {
+        val phone = AndroidPhoneLanguages(NoLocaleManager(context))
+        assertEquals(listOf(Locale.FRANCE), phone.locales)
+
+        phone.appLanguage = Language("de")
+
+        assertEquals(null, phone.appLanguage)
+    }
+
+    private class NoLocaleManager(base: Context) : ContextWrapper(base) {
+        override fun getApplicationContext(): Context = this
+
+        override fun getSystemService(name: String): Any? =
+            if (name == Context.LOCALE_SERVICE) null else super.getSystemService(name)
     }
 }

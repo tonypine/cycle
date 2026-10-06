@@ -1,6 +1,10 @@
 package com.tonypine.cycle.core.designsystem
 
+import android.content.Context
+import android.content.ContextWrapper
 import android.text.format.DateFormat
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.time.DayOfWeek
@@ -109,5 +113,28 @@ class CycleLocaleTest {
             assertEquals(Locale.forLanguageTag("en-DE"), locale)
             assertEquals(DayOfWeek.MONDAY, firstDay)
         }
+    }
+
+    @Test
+    @Config(qualifiers = "de-rDE")
+    fun `a context without a LocaleManager, as in a preview, falls back to the system's languages`() {
+        lateinit var locale: Locale
+        lateinit var firstDay: DayOfWeek
+        compose.setContent {
+            CompositionLocalProvider(LocalContext provides NoLocaleManager(LocalContext.current)) {
+                locale = cycleLocale()
+                firstDay = firstDayOfWeek()
+            }
+        }
+
+        compose.runOnIdle {
+            assertEquals(Locale.forLanguageTag("en-DE"), locale)
+            assertEquals(DayOfWeek.MONDAY, firstDay)
+        }
+    }
+
+    private class NoLocaleManager(base: Context) : ContextWrapper(base) {
+        override fun getSystemService(name: String): Any? =
+            if (name == Context.LOCALE_SERVICE) null else super.getSystemService(name)
     }
 }
