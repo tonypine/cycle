@@ -27,7 +27,7 @@ needs help.
 
 | Area | Decision |
 | -- | -- |
-| Where | The method screen designed in [MOT-50](https://linear.app/tonypine/issue/MOT-50), below what the method does to bleeding. Shown in full, not folded away, for as long as the method is set. |
+| Where | The method screen designed in [MOT-50](https://linear.app/tonypine/issue/MOT-50) (Settings › Your cycle › Contraception), below what the method does to bleeding: under the Now card and its calm line, above her earlier methods ([design](../design/contraception.md#when-to-get-help)). Shown in full, not folded away, for as long as the method is set. |
 | Which methods | Combined pill, patch and ring; copper IUD and hormonal IUD. No section for the progestogen-only pill, implant or injection, and none without a method: the research found no urgent-symptom list for them, and adding one needs a source and a change to this record. |
 | What it is | Reference text: one optional intro line, then the signs under the action to take, in the words below. Every user of the method sees the same text. |
 | What it never is | Not a notification, a signal card, a banner, a pop-up or a step in setting the method. Never shown because of something she logged, and never hidden because of it. No symptom checker and no questions. |

@@ -255,6 +255,11 @@ still ahead (the injection's weeks, above):
 - **Settings › Your cycle › Contraception** shows the current method with its calm line, "Mark as
   stopped" and "Change method", the earlier stretches, and each stretch's edit page (dates, breaks,
   delete). The flows and copy are in the design doc.
+- **When to get help.** On the combined pill, patch or ring, or either IUD, the same page shows
+  "When to get help" under the current method and above the earlier stretches: fixed text with the
+  signs clinics give every user of the method, in the words of
+  [`0007`](0007-urgent-symptoms-on-a-method.md). It follows the method in force, never what she
+  logs, and appears nowhere else. Its layout is in the design doc.
 
 ### Privacy
 
