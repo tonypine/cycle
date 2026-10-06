@@ -118,8 +118,7 @@ class EditPeriodViewModel(
      * when they are refused, the editor says why and nothing changes.
      */
     fun save(onSaved: (LocalDate) -> Unit) {
-        val editing = uiState.value as? EditPeriodUiState.Editing ?: return
-        val picked = editing.draft
+        val picked = editing()?.draft ?: return
         viewModelScope.launch {
             when (val change = dayLogs.editPeriod(start, picked.start, picked.end, today())) {
                 PeriodChange.Saved -> onSaved(picked.start)
@@ -129,8 +128,16 @@ class EditPeriodViewModel(
     }
 
     private fun update(change: (EditPeriodUiState.Editing) -> PeriodDraft) {
-        val editing = uiState.value as? EditPeriodUiState.Editing ?: return
-        draft.value = change(editing)
+        draft.value = change(editing() ?: return)
+    }
+
+    /**
+     * The editor with her latest [draft]. [uiState] can lag behind it while a write elsewhere is
+     * read back, so a tap or "Save" never builds on the state from before her last tap.
+     */
+    private fun editing(): EditPeriodUiState.Editing? {
+        val editing = uiState.value as? EditPeriodUiState.Editing ?: return null
+        return editing.copy(draft = draft.value ?: editing.draft)
     }
 }
 
