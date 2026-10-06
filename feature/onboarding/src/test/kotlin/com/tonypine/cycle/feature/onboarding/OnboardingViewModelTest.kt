@@ -10,9 +10,13 @@ import com.tonypine.cycle.core.data.repository.ContraceptionRepository
 import com.tonypine.cycle.core.data.repository.CycleRepository
 import com.tonypine.cycle.core.data.repository.DayLogRepository
 import com.tonypine.cycle.core.data.settings.SettingsRepository
+import com.tonypine.cycle.core.model.Breaks
+import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.CycleSettings
 import com.tonypine.cycle.core.model.DayLog
 import com.tonypine.cycle.core.model.EstimateBasis
+import com.tonypine.cycle.core.model.EstimateKind
 import com.tonypine.cycle.core.model.EstimatedPeriod
 import com.tonypine.cycle.core.model.Period
 import java.io.File
@@ -28,6 +32,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -112,6 +117,53 @@ class OnboardingViewModelTest {
     }
 
     @Test
+    fun `an implant with no start date takes away the period estimate from the first day`() = onboarding {
+            viewModel,
+            settings
+        ->
+        viewModel.awaitWelcome(shown = true)
+        viewModel.onDone(
+            day("2027-03-02"),
+            cycleLength = 28,
+            periodLength = 5,
+            contraception = ContraceptionStretch(ContraceptionMethod.IMPLANT, started = null)
+        )
+
+        viewModel.awaitWelcome(shown = false)
+        assertEquals(
+            listOf(ContraceptionStretch(ContraceptionMethod.IMPLANT, started = null, id = 1)),
+            contraception.observeStretches().first()
+        )
+        val overview = CycleRepository(dayLogs, settings, contraception).observeOverview(today).first()
+        assertEquals(ContraceptionMethod.IMPLANT, overview.contraception.current?.method)
+        assertEquals(EstimateKind.NONE, overview.contraception.estimates)
+        assertNull(overview.estimate)
+        // The period she gave is bleeding on the implant, not a cycle.
+        assertNull(overview.cycleDay)
+    }
+
+    @Test
+    fun `a method with its start date and breaks is saved as she gave it`() = onboarding { viewModel, _ ->
+        viewModel.awaitWelcome(shown = true)
+        val pill = ContraceptionStretch(ContraceptionMethod.COMBINED_PILL, day("2026-11-09"), breaks = Breaks.MONTHLY)
+        viewModel.onDone(lastPeriodStart = null, cycleLength = 28, periodLength = 5, contraception = pill)
+
+        viewModel.awaitWelcome(shown = false)
+        assertEquals(listOf(pill.copy(id = 1)), contraception.observeStretches().first())
+    }
+
+    @Test
+    fun `setup with no method, as after Skip or None, stores no method`() = onboarding { viewModel, settings ->
+        viewModel.awaitWelcome(shown = true)
+        viewModel.onDone(day("2027-03-02"), cycleLength = 28, periodLength = 5, contraception = null)
+
+        viewModel.awaitWelcome(shown = false)
+        assertEquals(emptyList<ContraceptionStretch>(), contraception.observeStretches().first())
+        val overview = CycleRepository(dayLogs, settings, contraception).observeOverview(today).first()
+        assertEquals(day("2027-03-30"), overview.estimate?.next?.expectedStart)
+    }
+
+    @Test
     fun `I don't remember saves the lengths and logs no period`() = onboarding { viewModel, settings ->
         viewModel.awaitWelcome(shown = true)
         viewModel.onDone(lastPeriodStart = null, cycleLength = 30, periodLength = 6)
@@ -129,6 +181,7 @@ class OnboardingViewModelTest {
         viewModel.awaitWelcome(shown = false)
         assertEquals(CycleSettings(28, 5, setupDone = false), settings.settings.first())
         assertEquals(emptyList<DayLog>(), dayLogs.observeDayLogs().first())
+        assertEquals(emptyList<ContraceptionStretch>(), contraception.observeStretches().first())
     }
 
     @Test
@@ -155,7 +208,7 @@ class OnboardingViewModelTest {
             viewModel,
             settings
         ->
-        // She went through both steps but never tapped Done: her answers stay on screen only.
+        // She went through every step but never tapped Done: her answers stay on screen only.
         viewModel.awaitWelcome(shown = true)
 
         nextLaunch().awaitWelcome(shown = true)
@@ -218,7 +271,7 @@ class OnboardingViewModelTest {
 
     /** A new ViewModel on the same storage, as when she opens the app again. */
     private fun nextLaunch(): OnboardingViewModel {
-        val viewModel = OnboardingViewModel(settings, dayLogs) { today }
+        val viewModel = OnboardingViewModel(settings, dayLogs, contraception) { today }
         scope.backgroundScope.launch(UnconfinedTestDispatcher(scope.testScheduler)) { viewModel.showWelcome.collect {} }
         return viewModel
     }
