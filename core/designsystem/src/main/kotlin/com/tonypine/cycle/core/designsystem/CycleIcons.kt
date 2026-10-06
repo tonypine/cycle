@@ -81,7 +81,10 @@ enum class CycleIcons(@param:DrawableRes val drawable: Int, val symbol: String) 
     Info(R.drawable.ic_symbol_info, "info"),
 
     /** The app lock. */
-    Lock(R.drawable.ic_symbol_lock, "lock")
+    Lock(R.drawable.ic_symbol_lock, "lock"),
+
+    /** Contraception. */
+    Medication(R.drawable.ic_symbol_medication, "medication")
 }
 
 /**

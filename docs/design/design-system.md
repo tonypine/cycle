@@ -290,6 +290,40 @@ icon and switch draw at the disabled alphas, the state stays visible and taps ar
 Don't use a switch for choosing between options (use a `ButtonGroup`), for picking several items
 such as symptoms (use `FilterChip`s), or for an action that happens once (use a button).
 
+## Radio row
+
+`RadioRow.kt`. One choice of several, each with a line under it, such as her contraception method or
+whether she takes breaks between packs.
+
+```kotlin
+RadioGroup(
+    options = methods,
+    selected = method,
+    onSelect = { method = it },
+    title = { methodTitle(it) },
+    body = { methodLine(it) }
+)
+RadioRow(title = "Implant", selected = true, onClick = {}, body = "A rod in the arm, such as Nexplanon")
+```
+
+- `RadioGroup(options, selected, onSelect, title, modifier, body = { null }, enabled = true)` is the
+  one to reach for: a `RadioRow` per option, `spacing.small` apart, with nothing selected while
+  `selected` is null. The rows are one `selectableGroup` and a collection, so TalkBack reads each
+  row's place in it: "Implant, A rod in the arm, such as Nexplanon, radio button, selected, 6 of 9".
+- `RadioRow(title, selected, onClick, modifier, body = null, enabled = true, interactionSource)` is
+  one row: a full-width row on `surfaceContainer` with 24dp corners (`shapes.large`), the `title` in
+  `titleSmall` `onSurface`, an optional one-line `body` in `bodySmall` `onSurfaceVariant`, and the
+  radio at the end. The whole row is the target (`selectable`, `Role.RadioButton`), at least 56dp
+  tall. Pressed, focused and hovered come from `cycleIndication` in the row's shape.
+
+Selected, the row is `accentContainer` with `onAccentContainer` text and the radio is a 10dp `accent`
+dot in a 20dp `accent` ring; otherwise the radio is a 2dp `outline` ring, so the dot says the state
+without colour. The colours change on the default effects spring and jump under reduce motion.
+Disabled, the text and radio draw at the disabled alphas and taps are ignored.
+
+Don't use a radio row for two to five short options side by side (use a `ButtonGroup`), for a
+setting that is on or off (use a `SwitchRow`), or for picking several items (use `FilterChip`s).
+
 ## Slider
 
 `Slider.kt`. A whole number picked along a track, such as her usual cycle length in days. Built on
