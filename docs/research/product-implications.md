@@ -162,6 +162,10 @@ From [`contraception.md`](contraception.md):
   doctor.
 - **Expected changes read as expected**: in the first months on a method, unpredictable bleeding is
   common, and the copy says so calmly rather than flagging it.
+- **Urgent symptoms are fixed text, never alerts**: the combined pill, patch, ring and both IUDs
+  get a "When to get help" section in the words of
+  [`0007`](../decisions/0007-urgent-symptoms-on-a-method.md), with no phone numbers and nothing set
+  off by what she logs.
 
 ## Open questions for her
 
@@ -177,9 +181,10 @@ next planning ticket.
    [`contraception.md`](contraception.md); the stories and screens are in
    [`docs/design/contraception.md`](../design/contraception.md), and the decision, including a
    next-bleed estimate on the pill with a break every month and a 90-day summary on the others, is
-   [`0006`](../decisions/0006-contraception.md). Still open: a pill or injection reminder and, if
-   she uses or might use a monthly combined injection (sold mainly outside the UK and US), whether
-   the method list needs it.
+   [`0006`](../decisions/0006-contraception.md). Still open: a pill or injection reminder; if she
+   uses or might use a monthly combined injection (sold mainly outside the UK and US), whether the
+   method list needs it; and whether "When to get help" should name her country's emergency numbers
+   ([`0007`](../decisions/0007-urgent-symptoms-on-a-method.md)).
 3. **Does she have history in another app** she wants to bring over? Which app, and can it export?
 4. **What does she want to log** beyond her period? The list in
    [`tracking-data.md`](tracking-data.md) is a menu, not a requirement.

@@ -552,12 +552,14 @@ signs of heavy bleeding (soaking through in an hour or two, large clots) apply a
 | No period a year after the last injection | Injection (DMPA, NET-EN) | "Your last injection was on 10 January last year and you have not logged a period since. A gap this long is worth mentioning to a doctor or nurse." | [FSRH injectable 2014, 11.1](https://www.cosrh.org/Common/Uploaded%20files/documents/progestogen-only-injectable-december-2014-amended-11july2023.pdf), [NHS](https://www.nhs.uk/contraception/methods-of-contraception/contraceptive-injection/what-is-it/) |
 | Bleeding that bothers her | Every method | Not a signal card. Where the app explains what a method does to bleeding, the NHS's own words fit: if the bleeding becomes a problem for her, a GP or sexual health clinic can help. | [NHS, implant](https://www.nhs.uk/contraception/methods-of-contraception/contraceptive-implant/side-effects-and-risks/) |
 
-Not for the app: urgent symptoms the sources list, such as calf pain, chest pain or sudden severe
+Not signal cards: urgent symptoms the sources list, such as calf pain, chest pain or sudden severe
 pain low in the tummy ([FSRH CHC 2019, Box 4](https://www.cosrh.org/Common/Uploaded%20files/documents/fsrh-guideline-combined-hormonal-contraception-october-2023.pdf),
 [NHS](https://www.nhs.uk/contraception/methods-of-contraception/iud-coil/side-effects/)). Cycle is
-not a triage tool ([`health-signals.md`](health-signals.md)); wording about urgent symptoms needs
-its own ticket and review. Missed-pill rules and whether she is protected are questions for her
-pharmacist or clinic, not for Cycle.
+not a triage tool ([`health-signals.md`](health-signals.md)) and never raises them from what she
+logs. On the combined pill, patch and ring and on both IUDs, the method screen shows them as fixed
+"When to get help" text, in the wording decided in
+[`0007`](../decisions/0007-urgent-symptoms-on-a-method.md). Missed-pill rules and whether she is
+protected are questions for her pharmacist or clinic, not for Cycle.
 
 ## What this means for Cycle
 
@@ -610,5 +612,8 @@ pharmacist or clinic, not for Cycle.
   days instead of 7; the other natural-cycle signals apply from the start.
 - **Health signals change with the method**, as listed above. The thresholds and the method they
   apply to belong in one place in code with their sources, like the others.
+- **Urgent symptoms are reference text, not alerts.** The method screen of the combined pill, patch,
+  ring and both IUDs ends with "When to get help", the same for every user of the method and never
+  set off by her log ([`0007`](../decisions/0007-urgent-symptoms-on-a-method.md)).
 - **Synthetic data only.** Every example here uses made-up dates and numbers, like the rest of the
   repo.
