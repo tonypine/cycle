@@ -60,10 +60,10 @@ fun ContraceptionRoute(
  * Her contraception: "Now", a card with her method today, since when (with its breaks on a combined
  * method) and its calm line, then "Mark as stopped" and "Change method", or on none "Add your method".
  * A method whose stop date is still ahead, such as the injection's 13 weeks, says until when Cycle
- * counts it and has no "Mark as stopped". Then "Your methods", every stretch, the latest first, each a
- * row with the method and its dates that opens its page, and a note that Cycle doesn't advise on
- * methods. Section titles are headings, and each row is one button for TalkBack. Scrolls when the
- * text is large.
+ * counts it and has no "Mark as stopped". On the combined pill, patch or ring, or an IUD, "When to get
+ * help" follows, in full. Then "Your methods", every stretch, the latest first, each a row with the
+ * method and its dates that opens its page, and a note that Cycle doesn't advise on methods. Section
+ * titles are headings, and each row is one button for TalkBack. Scrolls when the text is large.
  */
 @Composable
 fun ContraceptionScreen(
@@ -108,8 +108,7 @@ fun ContraceptionScreen(
                     )
                 }
             }
-            // "When to get help" goes here, under what the method does to bleeding (MOT-75).
-
+            getHelp(current?.method)?.let { WhenToGetHelp(it) }
             if (state.stretches.isNotEmpty()) {
                 SectionTitle(stringResource(R.string.contraception_your_methods))
                 state.stretches.forEach { stretch ->
