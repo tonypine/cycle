@@ -274,8 +274,11 @@ the copper IUD note.
   research's table with no more settings for her.
 - **A list of every method, including the injection and the patch.** Chosen over only the implant and
   the pill she asked about: the research covers them, the extra rows cost nothing, and a later switch
-  needs no new screen. Monthly combined injections, the diaphragm and condoms have no row: they leave
-  her cycle as it is, which is "None".
+  needs no new screen. The diaphragm and condoms have no row: they leave her cycle as it is, which
+  is "None". The monthly combined injection has no row yet either: it stops ovulation like the other
+  hormonal methods, but it is sold mainly outside the UK and US, and whether her list needs it is
+  still hers to answer ([`product-implications.md`](../research/product-implications.md), open
+  question 2).
 - **Storing the method in DataStore with the settings.** Easy for the current method, but History
   needs the dates of every past method, and `0003` already says life stages are date ranges in their
   own table.
