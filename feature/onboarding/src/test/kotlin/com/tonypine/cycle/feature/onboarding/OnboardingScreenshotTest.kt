@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.Density
 import com.github.takahirom.roborazzi.captureRoboImage
 import java.time.LocalDate
@@ -13,12 +15,15 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
  * The welcome and both setup steps in light, dark and at 200% font scale, plus step 2 at the ends
- * of its ranges. Each records `src/test/screenshots/onboarding_<screen>_<appearance>.png`. Synthetic dates.
+ * of its ranges. Each records `src/test/screenshots/onboarding_<screen>_<appearance>.png`. Step 2 is
+ * also recorded on a phone on its side, at the top and scrolled to Done, which fails if it stops
+ * scrolling. Synthetic dates.
  */
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -29,6 +34,7 @@ class OnboardingScreenshotTest(private val name: String, private val appearance:
 
     @Test
     fun onboarding() {
+        if (appearance == Appearance.Landscape) RuntimeEnvironment.setQualifiers(LANDSCAPE)
         composeRule.setContent {
             val density = LocalDensity.current
             val fontScale = if (appearance == Appearance.FontScale200) 2f else 1f
@@ -36,16 +42,24 @@ class OnboardingScreenshotTest(private val name: String, private val appearance:
                 Themed(darkTheme = appearance == Appearance.Dark) { Screens.getValue(name)() }
             }
         }
-        composeRule.onRoot().captureRoboImage("src/test/screenshots/onboarding_${name}_${appearance.fileName}.png")
+        val path = "src/test/screenshots/onboarding_${name}_${appearance.fileName}.png"
+        composeRule.onRoot().captureRoboImage(path)
+        if (appearance == Appearance.Landscape) {
+            composeRule.onNodeWithText("Done").performScrollTo()
+            composeRule.onRoot().captureRoboImage(path.replace(".png", "_scrolled.png"))
+        }
     }
 
     enum class Appearance(val fileName: String) {
         Light("light"),
         Dark("dark"),
-        FontScale200("font_scale_200")
+        FontScale200("font_scale_200"),
+        Landscape("landscape")
     }
 
     companion object {
+        private const val LANDSCAPE = "+w800dp-h360dp-land"
+
         private val Today = LocalDate.of(2027, 3, 20)
 
         private val Screens: Map<String, @Composable () -> Unit> = mapOf(
@@ -82,6 +96,7 @@ class OnboardingScreenshotTest(private val name: String, private val appearance:
         @ParameterizedRobolectricTestRunner.Parameters(name = "{0}_{1}")
         fun cases(): List<Array<Any>> = Screens.keys.flatMap { name ->
             listOf(Appearance.Light, Appearance.Dark).map { arrayOf<Any>(name, it) }
-        } + listOf("welcome", "last_period", "usual_lengths").map { arrayOf<Any>(it, Appearance.FontScale200) }
+        } + listOf("welcome", "last_period", "usual_lengths").map { arrayOf<Any>(it, Appearance.FontScale200) } +
+            listOf(arrayOf<Any>("usual_lengths", Appearance.Landscape))
     }
 }
