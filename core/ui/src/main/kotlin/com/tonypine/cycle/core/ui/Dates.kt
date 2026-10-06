@@ -12,6 +12,8 @@ import java.util.Locale
 const val DAY_AND_MONTH = "dMMMM"
 const val DAY_AND_DATE = "EEEEdMMMM"
 const val DAY_MONTH_AND_YEAR = "dMMMMy"
+const val DAY_AND_SHORT_MONTH = "dMMM"
+const val DAY_SHORT_MONTH_AND_YEAR = "dMMMy"
 
 fun dateFormatter(locale: Locale, skeleton: String): DateTimeFormatter =
     DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, skeleton), locale)

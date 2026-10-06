@@ -252,7 +252,23 @@ class ContraceptionEditsTest {
 
         assertEquals(injection, ContraceptionEdits.current(listOf(injection), day("2027-11-02")))
         assertEquals(null, ContraceptionEdits.current(listOf(injection), day("2027-11-03")))
+        assertEquals(pill, ContraceptionEdits.current(listOf(pill), day("2027-09-17")))
         assertEquals(day("2027-11-02"), ContraceptionEdits.stopDate(ContraceptionMethod.INJECTION, day("2027-08-03")))
         assertEquals(day("2027-08-03"), ContraceptionEdits.stopDate(ContraceptionMethod.IMPLANT, day("2027-08-03")))
+    }
+
+    @Test
+    fun `a method she marked as stopped today is no longer current, and a start today asks to move its end`() {
+        val iud = stretch(ContraceptionMethod.HORMONAL_IUD, "2027-09-13", "2027-09-17", id = 2)
+        val moved = iud.copy(stopped = day("2027-09-16"))
+
+        assertEquals(null, ContraceptionEdits.current(listOf(iud), day("2027-09-17")))
+        assertEquals(
+            StretchPlan.Ready(
+                listOf(moved, stretch(ContraceptionMethod.IMPLANT, "2027-09-17")),
+                listOf(StretchMove(iud, moved))
+            ),
+            start(listOf(iud), "2027-09-17", "2027-09-17", method = ContraceptionMethod.IMPLANT)
+        )
     }
 }

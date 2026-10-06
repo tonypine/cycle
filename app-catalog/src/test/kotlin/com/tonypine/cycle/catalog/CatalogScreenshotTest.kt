@@ -70,6 +70,7 @@ class CatalogScreenshotTest(private val page: Page, private val variant: Variant
             "Chips" to (1040 to 1900),
             "Button groups" to (1160 to 1700),
             "Switches" to (1240 to 2200),
+            "Radio rows" to (1100 to 2000),
             "Sliders" to (1700 to 2760),
             "Text field" to (1280 to 2240),
             "Dialogs" to (560 to 940),

@@ -48,6 +48,9 @@ val CatalogSections: List<CatalogSection> = listOf(
     CatalogSection("Switches", "The switch and the switch row: toggle a few, and every state.") {
         SwitchesSection()
     },
+    CatalogSection("Radio rows", "The radio row and the radio group: choose one, and every state.") {
+        RadioRowsSection()
+    },
     CatalogSection("Sliders", "The slider and the slider field: set a length, and every state.") {
         SlidersSection()
     },
