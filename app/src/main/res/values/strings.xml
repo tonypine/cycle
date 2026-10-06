@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Cycle</string>
+    <!-- The app's name, the same in every language (docs/decisions/0008-languages.md). -->
+    <string name="app_name" translatable="false">Cycle</string>
 
     <!-- The navigation bar's tabs: one short word each. -->
     <string name="tab_today">Today</string>

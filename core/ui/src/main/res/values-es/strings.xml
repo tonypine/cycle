@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <!-- The day log sheet, for any day up to today: flow, then how she feels. -->
+    <string name="day_log_flow">Flujo</string>
+    <string name="day_log_flow_none">Ninguno</string>
+    <string name="day_log_flow_spotting">Manchado</string>
+    <string name="day_log_flow_light">Ligero</string>
+    <string name="day_log_flow_medium">Medio</string>
+    <string name="day_log_flow_heavy">Abundante</string>
+    <plurals name="day_log_fill">
+        <item quantity="one">El periodo empezó este día: completar %1$d día</item>
+        <item quantity="many">El periodo empezó este día: completar %1$d días</item>
+        <item quantity="other">El periodo empezó este día: completar %1$d días</item>
+    </plurals>
+    <string name="day_log_clear">Borrar este día</string>
+
+    <!-- How she feels. Moods are nouns, so they fit anyone. -->
+    <string name="day_log_pain">Dolor</string>
+    <string name="day_log_pain_where">¿Dónde?</string>
+    <string name="day_log_body">Cuerpo</string>
+    <string name="day_log_mood">Ánimo</string>
+    <string name="day_log_energy">Energía</string>
+    <string name="day_log_sleep">Sueño</string>
+    <string name="day_log_sex">Sexo</string>
+    <string name="day_log_notes">Notas</string>
+    <string name="day_log_note_label">Tu nota</string>
+    <string name="day_log_note_placeholder">¿Algo más? Cuéntalo aquí.</string>
+    <string name="day_log_note_supporting">Solo en este teléfono.</string>
+
+    <string name="pain_none">Ninguno</string>
+    <string name="pain_mild">Leve</string>
+    <string name="pain_moderate">Moderado</string>
+    <string name="pain_severe">Fuerte</string>
+    <string name="pain_cramps">Cólicos</string>
+    <string name="pain_headache">Dolor de cabeza</string>
+    <string name="pain_lower_back">Zona lumbar</string>
+    <string name="pain_breasts">Pechos</string>
+    <string name="pain_ovulation">Dolor de ovulación</string>
+    <string name="pain_during_sex">Durante el sexo</string>
+
+    <string name="body_bloating">Hinchazón</string>
+    <string name="body_tender_breasts">Pechos sensibles</string>
+    <string name="body_acne">Acné</string>
+    <string name="body_cravings">Antojos</string>
+    <string name="body_nausea">Náuseas</string>
+    <string name="body_tired">Cansancio</string>
+    <string name="body_hot_flushes">Sofocos</string>
+    <string name="body_night_sweats">Sudores nocturnos</string>
+
+    <string name="mood_calm">Calma</string>
+    <string name="mood_happy">Alegría</string>
+    <string name="mood_sensitive">Sensibilidad</string>
+    <string name="mood_sad">Tristeza</string>
+    <string name="mood_anxious">Ansiedad</string>
+    <string name="mood_irritable">Irritabilidad</string>
+    <string name="mood_angry">Rabia</string>
+    <string name="mood_low">Desánimo</string>
+    <string name="mood_mood_swings">Cambios de humor</string>
+
+    <string name="energy_low">Baja</string>
+    <string name="energy_normal">Normal</string>
+    <string name="energy_high">Alta</string>
+    <string name="sleep_well">Dormí bien</string>
+    <string name="sleep_badly">Dormí mal</string>
+    <string name="sex_protected">Con protección</string>
+    <string name="sex_unprotected">Sin protección</string>
+
+    <!-- A day in a few words, such as "Cólicos, dolor moderado · Hinchazón · Energía baja". -->
+    <string name="summary_separator">" · "</string>
+    <string name="summary_pain_where">%1$s, %2$s</string>
+    <string name="summary_pain_mild">dolor leve</string>
+    <string name="summary_pain_moderate">dolor moderado</string>
+    <string name="summary_pain_severe">dolor fuerte</string>
+    <string name="summary_pain_none">Sin dolor</string>
+    <string name="summary_pain_mild_only">Dolor leve</string>
+    <string name="summary_pain_moderate_only">Dolor moderado</string>
+    <string name="summary_pain_severe_only">Dolor fuerte</string>
+    <string name="summary_flow_none">Sin flujo</string>
+    <string name="summary_flow_spotting">Manchado</string>
+    <string name="summary_flow_light">Flujo ligero</string>
+    <string name="summary_flow_medium">Flujo medio</string>
+    <string name="summary_flow_heavy">Flujo abundante</string>
+    <string name="summary_energy_low">Energía baja</string>
+    <string name="summary_energy_normal">Energía normal</string>
+    <string name="summary_energy_high">Energía alta</string>
+    <string name="summary_sex_protected">Sexo con protección</string>
+    <string name="summary_sex_unprotected">Sexo sin protección</string>
+    <string name="day_log_dismiss">Ahora no</string>
+    <string name="day_log_save">Registrar</string>
+
+    <!-- Clearing a day. %1$s: the day, "20 de marzo". -->
+    <string name="day_log_clear_title">¿Borrar el %1$s?</string>
+    <string name="day_log_clear_period_body">El %1$s deja de contar como día de periodo y se borra lo que registraste ese día. Los demás días del periodo se quedan.</string>
+    <string name="day_log_clear_body">Se borra lo que registraste el %1$s.</string>
+    <string name="day_log_clear_confirm">Borrar</string>
+    <string name="day_log_clear_keep">Conservar</string>
+
+    <!-- Her usual lengths, at setup and in Settings. -->
+    <string name="usual_cycle_length">Duración del ciclo</string>
+    <string name="usual_cycle_length_supporting">Del primer día de un periodo al primer día del siguiente. A menudo, entre 21 y 35 días.</string>
+    <string name="usual_cycle_length_shorter">Ciclo un día más corto</string>
+    <string name="usual_cycle_length_longer">Ciclo un día más largo</string>
+    <string name="usual_period_length">Duración del periodo</string>
+    <string name="usual_period_length_supporting">Los días en que sangras. A menudo, entre 2 y 7 días.</string>
+    <string name="usual_period_length_shorter">Periodo un día más corto</string>
+    <string name="usual_period_length_longer">Periodo un día más largo</string>
+    <plurals name="usual_length_days">
+        <item quantity="one">%1$d día</item>
+        <item quantity="many">%1$d días</item>
+        <item quantity="other">%1$d días</item>
+    </plurals>
+
+    <!-- Contraception, shared by setup and Settings. -->
+    <string name="method_none">Ninguno</string>
+    <string name="method_none_line">O un método de barrera, como el condón</string>
+    <string name="method_combined_pill">Píldora combinada</string>
+    <string name="method_combined_pill_line">Dos hormonas, a menudo con una pausa</string>
+    <string name="method_progestogen_pill">Píldora solo de progestágeno</string>
+    <string name="method_progestogen_pill_line">También llamada minipíldora</string>
+    <string name="method_patch">Parche</string>
+    <string name="method_patch_line">Un parche nuevo cada semana</string>
+    <string name="method_ring">Anillo vaginal</string>
+    <string name="method_ring_line">Se deja puesto tres semanas seguidas</string>
+    <string name="method_implant">Implante</string>
+    <string name="method_implant_line">Una varilla en el brazo, como Implanon o Nexplanon</string>
+    <string name="method_hormonal_iud">DIU hormonal</string>
+    <string name="method_hormonal_iud_line">También llamado SIU, como Mirena</string>
+    <string name="method_copper_iud">DIU de cobre</string>
+    <string name="method_copper_iud_line">DIU sin hormonas</string>
+    <string name="method_injection">Inyección</string>
+    <string name="method_injection_line">Como Depo-Provera</string>
+    <string name="method_which_pill">¿No sabes qué píldora tomas? Lo dice el prospecto.</string>
+
+    <!-- Short names, for Today's display and History's card: "Implante". -->
+    <string name="method_short_combined_pill">Píldora</string>
+    <string name="method_short_progestogen_pill">Minipíldora</string>
+    <string name="method_short_patch">Parche</string>
+    <string name="method_short_ring">Anillo</string>
+    <string name="method_short_implant">Implante</string>
+    <string name="method_short_hormonal_iud">DIU hormonal</string>
+    <string name="method_short_copper_iud">DIU de cobre</string>
+    <string name="method_short_injection">Inyección</string>
+
+    <!-- In a sentence, short, with its article: "la píldora", "el implante". Every sentence that takes
+         one puts it where the article needs no contraction (never after "de" or "a"), and never first,
+         where it would need a capital. -->
+    <string name="method_sentence_combined_pill">la píldora</string>
+    <string name="method_sentence_progestogen_pill">la minipíldora</string>
+    <string name="method_sentence_patch">el parche</string>
+    <string name="method_sentence_ring">el anillo</string>
+    <string name="method_sentence_implant">el implante</string>
+    <string name="method_sentence_hormonal_iud">el DIU hormonal</string>
+    <string name="method_sentence_copper_iud">el DIU de cobre</string>
+    <string name="method_sentence_injection">la inyección</string>
+
+    <!-- In a sentence, in full, with its article, under the same rules: "la píldora combinada". -->
+    <string name="method_full_combined_pill">la píldora combinada</string>
+    <string name="method_full_progestogen_pill">la píldora solo de progestágeno</string>
+    <string name="method_full_patch">el parche</string>
+    <string name="method_full_ring">el anillo vaginal</string>
+    <string name="method_full_implant">el implante</string>
+    <string name="method_full_hormonal_iud">el DIU hormonal</string>
+    <string name="method_full_copper_iud">el DIU de cobre</string>
+    <string name="method_full_injection">la inyección</string>
+
+    <!-- Since when, and when she stops. -->
+    <string name="method_since_body">Basta con una fecha aproximada.</string>
+    <string name="method_since_combined_pill">¿Cuándo empezaste a tomar la píldora?</string>
+    <string name="method_since_progestogen_pill">¿Cuándo empezaste a tomar la minipíldora?</string>
+    <string name="method_since_patch">¿Cuándo empezaste a usar el parche?</string>
+    <string name="method_since_ring">¿Cuándo empezaste a usar el anillo?</string>
+    <string name="method_since_implant">¿Cuándo te pusieron el implante?</string>
+    <string name="method_since_iud">¿Cuándo te pusieron el DIU?</string>
+    <string name="method_since_injection">¿Cuándo fue tu primera inyección?</string>
+    <string name="method_stop_pill">¿Cuándo tomaste tu última píldora?</string>
+    <string name="method_stop_patch">¿Cuándo te quitaste tu último parche?</string>
+    <string name="method_stop_ring">¿Cuándo te quitaste tu último anillo?</string>
+    <string name="method_stop_implant">¿Cuándo te quitaron el implante?</string>
+    <string name="method_stop_iud">¿Cuándo te quitaron el DIU?</string>
+    <string name="method_stop_injection">¿Cuándo fue tu última inyección?</string>
+    <string name="method_stop_injection_body">Cycle cuenta 13 semanas desde ella.</string>
+
+    <!-- A stretch's dates, in "Tus métodos" and History: "Del 3 may 2027 al 12 sept 2027". -->
+    <string name="stretch_since">Desde el %1$s</string>
+    <string name="stretch_from_to">Del %1$s al %2$s</string>
+    <string name="stretch_until">Hasta el %1$s</string>
+    <string name="stretch_start_not_known">Inicio desconocido</string>
+
+    <!-- Breaks, on a combined pill, patch or ring. -->
+    <string name="breaks_question_pill">¿Haces una pausa entre envases?</string>
+    <string name="breaks_question_patch">¿Tienes una semana sin parche?</string>
+    <string name="breaks_question_ring">¿Tienes una semana sin anillo?</string>
+    <string name="breaks_monthly">Cada mes</string>
+    <string name="breaks_monthly_pill_line">Una semana de descanso, o píldoras sin hormonas, en cada envase</string>
+    <string name="breaks_monthly_patch_line">Una semana sin parche después de tres parches</string>
+    <string name="breaks_monthly_ring_line">Una semana sin anillo después de tres semanas</string>
+    <string name="breaks_every_few_packs">Cada pocos envases</string>
+    <string name="breaks_every_few_packs_line">Dos o más envases seguidos, luego una pausa</string>
+    <string name="breaks_none">Sin pausas</string>
+    <string name="breaks_none_line">Un envase justo después de otro</string>
+
+    <!-- The calm line: what Cycle stops estimating on the method, and why. -->
+    <string name="calm_none">Cycle estima tus periodos a partir de tu propio ciclo.</string>
+    <string name="calm_copper_iud">Tu ciclo sigue siendo tuyo, así que Cycle sigue estimando tus periodos. Al principio pueden ser más abundantes o más largos.</string>
+    <string name="calm_pill_monthly">La píldora marca tus sangrados, así que Cycle espera uno en cada pausa y lo llama sangrado de la pausa, no periodo.</string>
+    <string name="calm_patch_monthly">El parche marca tus sangrados, así que Cycle espera uno en cada semana sin parche y lo llama sangrado de la pausa, no periodo.</string>
+    <string name="calm_ring_monthly">El anillo marca tus sangrados, así que Cycle espera uno en cada semana sin anillo y lo llama sangrado de la pausa, no periodo.</string>
+    <string name="calm_every_few_packs">Tú eliges cuándo llegan tus pausas, así que Cycle no estima tu próximo sangrado de la pausa.</string>
+    <string name="calm_no_breaks">Sin pausas no hay sangrado de la pausa que esperar, así que Cycle no estima ninguno.</string>
+    <string name="calm_progestogen_pill">Con la minipíldora, el sangrado no sigue un ciclo, así que Cycle no lo estima.</string>
+    <string name="calm_implant">Con el implante, el sangrado puede llegar en cualquier momento, así que Cycle no lo estima.</string>
+    <string name="calm_hormonal_iud">Con un DIU hormonal, el sangrado no sigue un ciclo con el que puedas contar, así que Cycle no lo estima.</string>
+    <string name="calm_injection">Con la inyección, el sangrado no sigue un ciclo, así que Cycle no lo estima.</string>
+</resources>

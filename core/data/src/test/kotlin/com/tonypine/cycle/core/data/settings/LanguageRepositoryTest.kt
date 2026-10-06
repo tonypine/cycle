@@ -60,10 +60,11 @@ class LanguageRepositoryTest {
     }
 
     @Test
-    fun `the phone's language is the first of hers that Cycle has, English until Cycle has more`() = runTest {
+    fun `the phone's language is the first of hers that Cycle has, English with none of them`() = runTest {
         val frenchThenSpanish = listOf(Locale.forLanguageTag("fr-FR"), Locale.forLanguageTag("es-ES"))
 
-        assertEquals(Language.English, languages(FakePhoneLanguages(frenchThenSpanish)).phoneLanguage())
+        assertEquals(Language("es"), languages(FakePhoneLanguages(frenchThenSpanish)).phoneLanguage())
+        assertEquals(Language.English, languages(FakePhoneLanguages(listOf(Locale.FRANCE))).phoneLanguage())
     }
 
     @Test

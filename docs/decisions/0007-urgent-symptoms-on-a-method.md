@@ -83,6 +83,79 @@ both the copper IUD and the hormonal IUD
 [hormonal](https://www.nhs.uk/contraception/methods-of-contraception/ius-hormonal-coil/side-effects-and-risks/)),
 in second person and without the medical words.
 
+### Translations
+
+The English above is the source. Each language follows it line by line
+([`0008`](0008-languages.md#copy-rules-in-every-language)): the same two actions, each sign with the
+same meaning in everyday words, the intro and the closing line, with no condition names, no phone
+numbers and no country's own service named. Each line has its back-translation into English beside
+it. They are drafts until a native speaker has read them (0008, "Review of translations"), and
+`WhenToGetHelpTest` pins each language as it pins the English. Changing a word in any language
+changes this record in the same PR.
+
+**Português (Brasil)**
+
+| Line | Translation | Back-translation |
+| -- | -- | -- |
+| Title | Quando procurar ajuda | When to look for help |
+| Intro, combined pill | As clínicas passam estes sinais a todas as pessoas que usam a pílula combinada, o adesivo ou o anel. | Clinics pass these signs on to everyone who uses the combined pill, the patch or the ring. |
+| Intro, patch | As clínicas passam estes sinais a todas as pessoas que usam o adesivo. | Clinics pass these signs on to everyone who uses the patch. |
+| Intro, ring | As clínicas passam estes sinais a todas as pessoas que usam o anel. | Clinics pass these signs on to everyone who uses the ring. |
+| Intro, IUD | As clínicas passam estes sinais a todas as pessoas que usam um DIU. | Clinics pass these signs on to everyone who uses an IUD. |
+| Emergency help | Procure atendimento de emergência agora se você tiver: | Seek emergency care now if you have: |
+| Chest | dor no peito, ou falta de ar, ou tosse com sangue | chest pain, or shortness of breath, or a cough with blood |
+| Weakness | fraqueza ou dormência repentina no rosto, em um braço ou em uma perna, ou dificuldade para falar | sudden weakness or numbness in the face, in an arm or in a leg, or difficulty speaking |
+| Urgent advice | Procure orientação médica urgente hoje se você tiver: | Seek urgent medical advice today if you have: |
+| Leg | dor, inchaço ou vermelhidão em uma perna, geralmente na panturrilha | pain, swelling or redness in one leg, usually in the calf |
+| Painkillers | dor no pé da barriga que não passa com analgésicos | pain low in the belly that painkillers do not take away |
+| Sudden pain | dor repentina no pé da barriga que piora ou não passa | sudden pain low in the belly that gets worse or does not go away |
+| Temperature | febre alta | a high fever |
+| Discharge | corrimento fora do comum ou com mau cheiro | unusual or bad-smelling discharge |
+| Bleeding | sangramento muito intenso | very heavy bleeding |
+| Closing | O Cycle não verifica seu registro em busca destes sinais. | Cycle does not check your log for these signs. |
+
+**Español**
+
+| Line | Translation | Back-translation |
+| -- | -- | -- |
+| Title | Cuándo buscar ayuda | When to seek help |
+| Intro, combined pill | Las clínicas dan estas señales a todas las personas que usan la píldora combinada, el parche o el anillo. | Clinics give these signs to everyone who uses the combined pill, the patch or the ring. |
+| Intro, patch | Las clínicas dan estas señales a todas las personas que usan el parche. | Clinics give these signs to everyone who uses the patch. |
+| Intro, ring | Las clínicas dan estas señales a todas las personas que usan el anillo. | Clinics give these signs to everyone who uses the ring. |
+| Intro, IUD | Las clínicas dan estas señales a todas las personas que llevan un DIU. | Clinics give these signs to everyone who has an IUD. |
+| Emergency help | Busca ayuda de emergencia ahora si tienes: | Get emergency help now if you have: |
+| Chest | dolor en el pecho, o te falta el aire, o toses sangre | pain in the chest, or you are short of breath, or you cough up blood |
+| Weakness | debilidad o entumecimiento repentinos en la cara, un brazo o una pierna, o dificultad para hablar | sudden weakness or numbness in the face, an arm or a leg, or difficulty speaking |
+| Urgent advice | Busca atención médica urgente hoy si tienes: | Get urgent medical attention today if you have: |
+| Leg | dolor, hinchazón o enrojecimiento en una pierna, sobre todo en la pantorrilla | pain, swelling or redness in one leg, mostly in the calf |
+| Painkillers | dolor en la parte baja de la barriga que no se calma con analgésicos | pain in the lower part of the belly that painkillers do not ease |
+| Sudden pain | dolor repentino en la parte baja de la barriga que empeora o no se va | sudden pain in the lower part of the belly that gets worse or does not go away |
+| Temperature | fiebre alta | a high fever |
+| Discharge | flujo vaginal raro o con mal olor | strange or bad-smelling vaginal discharge |
+| Bleeding | un sangrado muy abundante | very heavy bleeding |
+| Closing | Cycle no revisa tu registro en busca de estas señales. | Cycle does not check your log for these signs. |
+
+**Deutsch**
+
+| Line | Translation | Back-translation |
+| -- | -- | -- |
+| Title | Wann du Hilfe brauchst | When you need help |
+| Intro, combined pill | Praxen geben diese Anzeichen allen mit, die die Kombinationspille, das Pflaster oder den Ring verwenden. | Doctors' practices give these signs to everyone who uses the combined pill, the patch or the ring. |
+| Intro, patch | Praxen geben diese Anzeichen allen mit, die das Pflaster verwenden. | Doctors' practices give these signs to everyone who uses the patch. |
+| Intro, ring | Praxen geben diese Anzeichen allen mit, die den Ring verwenden. | Doctors' practices give these signs to everyone who uses the ring. |
+| Intro, IUD | Praxen geben diese Anzeichen allen mit, die eine Spirale haben. | Doctors' practices give these signs to everyone who has an IUD. |
+| Emergency help | Hol sofort Notfallhilfe, wenn du Folgendes hast: | Get emergency help at once if you have the following: |
+| Chest | Schmerzen in der Brust, Atemnot oder du hustest Blut | pain in the chest, shortness of breath, or you cough up blood |
+| Weakness | plötzliche Schwäche oder Taubheit im Gesicht, in einem Arm oder einem Bein, oder Schwierigkeiten beim Sprechen | sudden weakness or numbness in the face, in an arm or a leg, or difficulty speaking |
+| Urgent advice | Hol dir heute noch dringend ärztlichen Rat, wenn du Folgendes hast: | Get urgent medical advice today if you have the following: |
+| Leg | Schmerzen, Schwellung oder Rötung in einem Bein, meist in der Wade | pain, swelling or redness in one leg, mostly in the calf |
+| Painkillers | Schmerzen im Unterbauch, gegen die Schmerzmittel nicht helfen | pain in the lower belly that painkillers do not help |
+| Sudden pain | plötzliche Schmerzen im Unterbauch, die schlimmer werden oder nicht weggehen | sudden pain in the lower belly that gets worse or does not go away |
+| Temperature | hohes Fieber | a high fever |
+| Discharge | ungewöhnlichen oder übel riechenden Ausfluss | unusual or foul-smelling discharge |
+| Bleeding | sehr starke Blutungen | very heavy bleeding |
+| Closing | Cycle prüft deine Einträge nicht auf diese Anzeichen. | Cycle does not check your entries for these signs. |
+
 ### Left out on purpose
 
 - **"You think you might be pregnant" and "you cannot feel the threads"**, from the same NHS IUD

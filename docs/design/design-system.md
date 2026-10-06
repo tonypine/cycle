@@ -647,8 +647,9 @@ NavigationBar(destinations, selectedIndex = selected, onSelect = { selected = it
 - Each destination is a tab (`Role.Tab`, in a `selectableGroup`) at least 48dp tall, with its selected
   state and its position (`CollectionInfo` on the bar, `CollectionItemInfo` on each tab), so TalkBack
   reads "Calendar, selected, tab, 2 of 4". The icon is decoration.
-- At large font scales, labels that do not fit shrink together, never below their size at 100%, and
-  only then end in an ellipsis. Keep labels to one short word.
+- Labels that do not fit, a long word such as German's "Einstellungen" or any label at a large font
+  scale, shrink together, never below `NavigationBarLabelFloor` (11sp, a point under `labelSmall`) as
+  it reads at 100%, and only then end in an ellipsis. Keep labels to one short word.
 - Edge to edge: put it at the bottom of the screen. It pads itself by `WindowInsets.navigationBars`.
 - `interactionSources` takes one source per destination, for previews and tests to hold a pressed or
   focused state.
@@ -656,6 +657,8 @@ NavigationBar(destinations, selectedIndex = selected, onSelect = { selected = it
 The catalog's App bars page has a full-screen demo with both bars on an edge-to-edge screen, the
 system bars shaded. `AppBarSemanticsTest` checks the heading, tab roles, selected state, positions
 and TalkBack order, `NavigationBarMotionTest` measures the pill mid-spring and under reduce motion,
+`NavigationBarLabelTest` keeps English at 12sp and German whole on a phone 360dp wide (the catalog's
+"Long labels" entry),
 `AppBarInsetsTest` and the catalog's `AppBarsDemoScreenshotTest` dispatch system bar insets and check
 both bars stay clear of them.
 
@@ -948,9 +951,8 @@ something the design system lacks, add the token or component here first.
 
 ## Strings and languages
 
-Cycle speaks every language in `Language.Supported` (English only for now; Brazilian Portuguese,
-Spanish and German come with MOT-93), as
-[`0008-languages.md`](../decisions/0008-languages.md) decides. Every word a screen shows or TalkBack
+Cycle speaks every language in `Language.Supported`: English, Brazilian Portuguese, Spanish and
+German, as [`0008-languages.md`](../decisions/0008-languages.md) decides. Every word a screen shows or TalkBack
 reads is a string resource in its module's `res/values/strings.xml`, never a literal in code.
 
 - **Every new user-visible string goes into every language in the same PR**: into `values` (English)
@@ -970,6 +972,16 @@ reads is a string resource in its module's `res/values/strings.xml`, never a lit
   of the week is `firstDayOfWeek()`, from the phone. A date is formatted whole, with
   `DateFormat.getBestDateTimePattern`, never assembled from pieces, and placeholders are numbered
   (`%1$s`) so each language orders them its own way.
+- **A formatted date that starts a title or a line** goes through `startingLine` (or
+  `formatDateStartingLine` in `core:ui`), which capitalizes it by the language's rules: Portuguese and
+  Spanish write "março de 2027", a calendar title reads "Março de 2027".
+- **A word that slots into a sentence**, such as a method's name in "Move the end of your %1$s?",
+  carries what the sentence needs in each language: its article in Portuguese and Spanish ("a
+  pílula"), its article in the accusative in German ("den Ring"), and every sentence that takes it is
+  written so it needs no contraction or other case. The comment above those strings says which.
+- **Long words**: German hyphenates where a line breaks (`cycle_hyphenates` in its `values-de`, read
+  by `CycleTheme`), so a compound such as "Periodenlänge" breaks at a syllable at 200% font size.
+  The other languages wrap between words.
 - **Screenshots in another language**: `@Config(qualifiers = "+de")` on a test, or `renderIn(language)`
   from `core:testing` before `setContent`.
 - **A new language** is added to `Language.Supported`, `localeFilters` (`CycleLanguages.kt` in

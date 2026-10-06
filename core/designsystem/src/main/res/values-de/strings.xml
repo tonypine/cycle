@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <!-- The language of these strings, as a BCP 47 tag (cycleLocale). Not shown. -->
+    <string name="cycle_language_tag">de</string>
+
+    <string name="cycle_text_field_counter">%1$d von %2$d Zeichen</string>
+
+    <!-- Day cell content description parts, read by TalkBack after the date: "20. März, heute, Periode". -->
+    <string name="day_cell_today">heute</string>
+    <string name="day_cell_period">Periode</string>
+    <string name="day_cell_predicted_period">erwartete Periode</string>
+    <string name="day_cell_bleed">Abbruchblutung</string>
+    <string name="day_cell_expected_bleed">erwartete Abbruchblutung</string>
+    <string name="day_cell_bleeding">Blutung</string>
+    <string name="day_cell_expected_bleeding">erwartete Blutung</string>
+    <string name="day_cell_fertile">geschätztes fruchtbares Fenster</string>
+    <string name="day_cell_ovulation">geschätzter Eisprung</string>
+
+    <string name="calendar_previous_month">Vorheriger Monat</string>
+    <string name="calendar_next_month">Nächster Monat</string>
+
+    <string name="legend_period">Periode</string>
+    <string name="legend_predicted_period">Erwartete Periode</string>
+    <string name="legend_bleed">Abbruchblutung</string>
+    <string name="legend_expected_bleed">Erwartete Abbruchblutung</string>
+    <string name="legend_bleeding">Blutung</string>
+    <string name="legend_expected_bleeding">Erwartete Blutung</string>
+    <string name="legend_fertile">Geschätztes fruchtbares Fenster</string>
+    <string name="legend_ovulation">Geschätzter Eisprung</string>
+    <string name="legend_today">Heute</string>
+
+    <string name="bottom_sheet_handle">Ziehgriff</string>
+    <string name="bottom_sheet_expanded">Maximiert</string>
+    <string name="bottom_sheet_partially_expanded">Teilweise maximiert</string>
+    <string name="bottom_sheet_expand">Maximieren</string>
+    <string name="bottom_sheet_collapse">Minimieren</string>
+    <string name="bottom_sheet_dismiss">Schließen</string>
+
+    <string name="loading">Wird geladen</string>
+</resources>

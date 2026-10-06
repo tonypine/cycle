@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Describe her cycles without judging them: no "normal", "regular" or "irregular". -->
+    <string name="history_title">Histórico</string>
+
+    <!-- Before her first complete cycle. -->
+    <string name="history_empty_title">Nenhum ciclo ainda</string>
+    <string name="history_empty_body">Registre uma menstruação em Hoje e seus ciclos vão aparecer aqui.</string>
+    <string name="history_first_cycle_title">Seu primeiro ciclo ainda está em andamento</string>
+    <string name="history_first_cycle_body">Quando sua próxima menstruação começar, você vai ver quanto tempo este ciclo durou.</string>
+
+    <!-- Your typical cycle. -->
+    <string name="history_typical_title">Seu ciclo típico</string>
+    <string name="history_typical_cycle">Duração do ciclo</string>
+    <string name="history_typical_period">Duração da menstruação</string>
+    <!-- Shown only once she has logged a cycle, so never for 0, which Portuguese counts as "one". -->
+    <plurals name="history_typical_basis" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Do seu último ciclo</item>
+        <item quantity="many">A duração mediana dos seus últimos %1$d ciclos</item>
+        <item quantity="other">A duração mediana dos seus últimos %1$d ciclos</item>
+    </plurals>
+    <!-- Shown only once she has logged a cycle, so never for 0, which Portuguese counts as "one". -->
+    <plurals name="history_typical_basis_left_out" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Do seu último ciclo. O tempo com contracepção hormonal fica de fora.</item>
+        <item quantity="many">A duração mediana dos seus últimos %1$d ciclos. O tempo com contracepção hormonal fica de fora.</item>
+        <item quantity="other">A duração mediana dos seus últimos %1$d ciclos. O tempo com contracepção hormonal fica de fora.</item>
+    </plurals>
+    <plurals name="history_days">
+        <item quantity="one">%1$d dia</item>
+        <item quantity="many">%1$d dias</item>
+        <item quantity="other">%1$d dias</item>
+    </plurals>
+    <plurals name="history_range">
+        <item quantity="one">Do mais curto ao mais longo: %1$d a %2$d dia</item>
+        <item quantity="many">Do mais curto ao mais longo: %1$d a %2$d dias</item>
+        <item quantity="other">Do mais curto ao mais longo: %1$d a %2$d dias</item>
+    </plurals>
+
+    <!-- The list of cycles, the current one first. -->
+    <string name="history_cycles">Ciclos</string>
+    <string name="history_current_cycle">Ciclo atual</string>
+    <string name="history_since">Desde %1$s</string>
+    <!-- Alone on a line, and inside "sua menstruação de %1$s": "5 de agosto a 10 de agosto". -->
+    <string name="history_dates">%1$s a %2$s</string>
+    <string name="history_day_so_far">Dia %1$d até agora</string>
+    <plurals name="history_period_length">
+        <item quantity="one">Menstruação: %1$d dia</item>
+        <item quantity="many">Menstruação: %1$d dias</item>
+        <item quantity="other">Menstruação: %1$d dias</item>
+    </plurals>
+    <plurals name="history_period_so_far">
+        <item quantity="one">Menstruação: %1$d dia até agora</item>
+        <item quantity="many">Menstruação: %1$d dias até agora</item>
+        <item quantity="other">Menstruação: %1$d dias até agora</item>
+    </plurals>
+    <string name="history_open_cycle">ver detalhes</string>
+    <!-- A cycle that ended the day before she started a hormonal method. %2$s: how, below. -->
+    <plurals name="history_cut_short">
+        <item quantity="one">%1$d dia, interrompido %2$s. Não contado.</item>
+        <item quantity="many">%1$d dias, interrompido %2$s. Não contado.</item>
+        <item quantity="other">%1$d dias, interrompido %2$s. Não contado.</item>
+    </plurals>
+    <string name="history_cut_short_combined_pill">quando você começou a tomar a pílula</string>
+    <string name="history_cut_short_progestogen_pill">quando você começou a tomar a minipílula</string>
+    <string name="history_cut_short_patch">quando você começou a usar o adesivo</string>
+    <string name="history_cut_short_ring">quando você começou a usar o anel</string>
+    <string name="history_cut_short_implant">quando o implante foi colocado</string>
+    <string name="history_cut_short_iud">quando o DIU foi colocado</string>
+    <string name="history_cut_short_injection">quando você tomou a primeira injeção</string>
+
+    <!-- Her time on a hormonal method, one card. The label is the method's short name. -->
+    <string name="history_method_combined_pill">Pílula</string>
+    <string name="history_method_progestogen_pill">Minipílula</string>
+    <string name="history_method_patch">Adesivo</string>
+    <string name="history_method_ring">Anel</string>
+    <string name="history_method_implant">Implante</string>
+    <string name="history_method_hormonal_iud">DIU hormonal</string>
+    <string name="history_method_copper_iud">DIU de cobre</string>
+    <string name="history_method_injection">Injeção</string>
+    <string name="history_method_left_out">Não faz parte do seu ciclo típico.</string>
+    <!-- On a method with no estimate, her bleeding, in plain counts. %1$s: the days, "12 dias";
+         %2$s: the episodes, "4 episódios". -->
+    <string name="history_bleeding_last_90">Últimos 90 dias: você registrou sangramento ou escape em %1$s, em %2$s.</string>
+    <string name="history_bleeding_since">Desde %3$s: você registrou sangramento ou escape em %1$s, em %2$s.</string>
+    <string name="history_bleeding_stopped_last_90">Nos últimos 90 dias desse método, você registrou sangramento ou escape em %1$s, em %2$s.</string>
+    <string name="history_bleeding_stopped_all">Nesse período, você registrou sangramento ou escape em %1$s, em %2$s.</string>
+    <string name="history_bleeding_none_last_90">Últimos 90 dias: você não registrou sangramento nem escape.</string>
+    <string name="history_bleeding_none_since">Desde %1$s: você não registrou sangramento nem escape.</string>
+    <string name="history_bleeding_none_stopped_last_90">Nos últimos 90 dias desse método, você não registrou sangramento nem escape.</string>
+    <string name="history_bleeding_none_stopped_all">Nesse período, você não registrou sangramento nem escape.</string>
+    <plurals name="history_bleeding_days">
+        <item quantity="one">%1$d dia</item>
+        <item quantity="many">%1$d dias</item>
+        <item quantity="other">%1$d dias</item>
+    </plurals>
+    <plurals name="history_bleeding_episodes">
+        <item quantity="one">%1$d episódio</item>
+        <item quantity="many">%1$d episódios</item>
+        <item quantity="other">%1$d episódios</item>
+    </plurals>
+    <plurals name="history_bleeding_longest">
+        <item quantity="one">O mais longo durou %1$d dia.</item>
+        <item quantity="many">O mais longo durou %1$d dias.</item>
+        <item quantity="other">O mais longo durou %1$d dias.</item>
+    </plurals>
+    <!-- On a combined method with a break every month, the bleeds she logged on it. -->
+    <plurals name="history_bleeds">
+        <item quantity="one">Você registrou %1$d sangramento da pausa com esse método.</item>
+        <item quantity="many">Você registrou %1$d sangramentos da pausa com esse método.</item>
+        <item quantity="other">Você registrou %1$d sangramentos da pausa com esse método.</item>
+    </plurals>
+    <string name="history_bleeds_none">Você não registrou nenhum sangramento da pausa com esse método.</string>
+
+    <!-- One cycle's details. -->
+    <string name="cycle_title">Ciclo</string>
+    <string name="cycle_back">Voltar</string>
+    <string name="cycle_period">Menstruação</string>
+    <string name="cycle_flow">Fluxo</string>
+    <string name="cycle_flow_none">Sem fluxo</string>
+    <string name="cycle_flow_spotting">Escape</string>
+    <string name="cycle_flow_light">Leve</string>
+    <string name="cycle_flow_medium">Médio</string>
+    <string name="cycle_flow_heavy">Intenso</string>
+    <string name="cycle_flow_not_logged">Não registrado</string>
+    <!-- How she felt during the cycle, with the days of the cycle: "Dias 1, 2, 24–27". -->
+    <string name="cycle_felt">Como você se sentiu</string>
+    <plurals name="cycle_days">
+        <item quantity="one">Dia %1$s</item>
+        <item quantity="many">Dias %1$s</item>
+        <item quantity="other">Dias %1$s</item>
+    </plurals>
+    <string name="cycle_day_range">%1$d–%2$d</string>
+    <!-- What TalkBack reads for a range of days: "24 a 27". -->
+    <string name="cycle_day_range_spoken">%1$d a %2$d</string>
+    <string name="cycle_symptom_spoken">%1$s, %2$s</string>
+    <string name="cycle_notes">Anotações</string>
+    <string name="cycle_note_day">Dia %1$d</string>
+    <string name="cycle_see_in_calendar">Ver no calendário</string>
+    <!-- %1$s: how, "quando o implante foi colocado". -->
+    <string name="cycle_cut_short">Interrompido %1$s. Não faz parte do seu ciclo típico.</string>
+    <string name="cycle_missing_title">Este ciclo mudou</string>
+    <string name="cycle_missing_body">A menstruação dele foi editada, então o ciclo agora começa em outro dia. Volte para ver seus ciclos.</string>
+
+    <!-- Fixing a cycle's period. -->
+    <string name="period_edit">Editar datas da menstruação</string>
+    <string name="period_delete">Apagar esta menstruação</string>
+    <string name="period_delete_title">Apagar esta menstruação?</string>
+    <!-- %1$s: the period's dates, "5 de agosto a 10 de agosto". -->
+    <string name="period_delete_text">O Cycle esquece sua menstruação de %1$s e recalcula seus ciclos. Como você se sentiu e suas anotações continuam.</string>
+    <string name="period_delete_confirm">Apagar</string>
+    <string name="period_delete_keep">Manter</string>
+    <string name="period_edit_title">Datas da menstruação</string>
+    <string name="period_edit_picking">Dia a mudar</string>
+    <string name="period_edit_first_day">Primeiro dia</string>
+    <string name="period_edit_last_day">Último dia</string>
+    <string name="period_edit_pick_first">Toque no dia em que ela começou.</string>
+    <string name="period_edit_pick_last">Toque no dia em que ela terminou.</string>
+    <string name="period_edit_still_going">Ainda continua</string>
+    <string name="period_edit_still_going_body">Ela ainda não terminou.</string>
+    <string name="period_edit_save">Salvar</string>
+    <!-- %1$s: the other period's dates, "3 de março a 7 de março". -->
+    <string name="period_edit_too_close">Isso fica colado na sua menstruação de %1$s. Deixe pelo menos dois dias entre elas, ou apague essa menstruação primeiro.</string>
+    <string name="period_edit_after_today">Escolha dias até hoje.</string>
+    <string name="period_edit_end_before_start">O último dia não pode vir antes do primeiro.</string>
+    <string name="period_edit_gone">Esta menstruação mudou desde que você a abriu. Volte para vê-la.</string>
+</resources>

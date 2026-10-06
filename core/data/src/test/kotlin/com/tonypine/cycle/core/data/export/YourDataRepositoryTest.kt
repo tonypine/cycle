@@ -35,6 +35,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.util.Locale
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -46,6 +47,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
+import org.robolectric.RuntimeEnvironment
 
 /** Export, import and "Delete everything" on an in-memory database and a DataStore file. */
 @RunWith(AndroidJUnit4::class)
@@ -160,6 +162,56 @@ class YourDataRepositoryTest {
         assertEquals(stretchesBefore, stretches())
         assertEquals(settingsBefore, phone.settings.settings.first())
         assertEquals(exported.decodeToString(), phone.repository.exportBytes().decodeToString())
+    }
+
+    @Test
+    fun `a file exported in one language imports the same days in another, and is the same file in each`() = runTest {
+        val phone = phone()
+        logSyntheticHistory()
+        logSyntheticContraception()
+        phone.settings.saveSetup(cycleLength = 30, periodLength = 4)
+        val before = database.everything()
+        val stretchesBefore = stretches()
+        val settingsBefore = phone.settings.settings.first()
+
+        // Cycle in Spanish, then in each of its languages: the columns, codes and dates never change.
+        phone.language.setLanguage(Language("es"))
+        val exported = inLanguage(Language("es")) { phone.repository.exportBytes() }
+        Language.Supported.forEach { language ->
+            assertEquals(
+                language.tag,
+                exported.decodeToString(),
+                inLanguage(language) { phone.repository.exportBytes() }.decodeToString()
+            )
+        }
+
+        // A new phone in English.
+        phone.repository.deleteEverything()
+        val added = inLanguage(Language.English) {
+            val read = phone.repository.read(ByteArrayInputStream(exported)) as ImportRead.Ready
+            assertEquals(9, read.newDays)
+            phone.repository.import(read.file)
+        }
+
+        assertEquals(9, added)
+        assertEquals(before, database.everything())
+        assertEquals(stretchesBefore, stretches())
+        assertEquals(settingsBefore, phone.settings.settings.first())
+    }
+
+    /** Runs [block] as on a phone in [language]: its resources and the process's default locale. */
+    private inline fun <T> inLanguage(language: Language, block: () -> T): T {
+        val default = Locale.getDefault()
+        val locale = language.locale
+        RuntimeEnvironment.setQualifiers(
+            "+" + if (locale.country.isEmpty()) locale.language else "${locale.language}-r${locale.country}"
+        )
+        Locale.setDefault(locale)
+        try {
+            return block()
+        } finally {
+            Locale.setDefault(default)
+        }
     }
 
     @Test

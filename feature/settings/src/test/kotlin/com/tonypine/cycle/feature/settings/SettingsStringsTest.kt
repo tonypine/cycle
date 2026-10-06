@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 class SettingsStringsTest {
     @Test
     fun `no string says what the app never says`() {
-        val strings = assertNeverSaid(R.string::class.java)
+        val strings = assertNeverSaid(R.string::class.java, R.plurals::class.java)
 
         assertTrue("Found no strings to check", strings.getValue(Language.English).size > 10)
     }

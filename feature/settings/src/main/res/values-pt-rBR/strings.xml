@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <!-- The Settings tab: her cycle, what to log, her data, and about. -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_back">Voltar</string>
+    <string name="settings_your_cycle">Seu ciclo</string>
+    <!-- "Ciclo de 28 dias, menstruação de 5 dias". -->
+    <string name="settings_usual_lengths_body">%1$s, %2$s</string>
+    <plurals name="settings_usual_cycle">
+        <item quantity="one">Ciclo de %1$d dia</item>
+        <item quantity="many">Ciclo de %1$d dias</item>
+        <item quantity="other">Ciclo de %1$d dias</item>
+    </plurals>
+    <plurals name="settings_usual_period">
+        <item quantity="one">menstruação de %1$d dia</item>
+        <item quantity="many">menstruação de %1$d dias</item>
+        <item quantity="other">menstruação de %1$d dias</item>
+    </plurals>
+    <string name="settings_what_to_log_body">Escolha o que o registro do dia pergunta</string>
+    <string name="settings_your_data">Seus dados</string>
+    <string name="settings_on_this_phone_title">Tudo fica neste celular</string>
+    <string name="settings_on_this_phone_body">Sem conta, sem nuvem, sem rastreamento. Uma cópia só sai deste celular quando você exporta uma, para o lugar que escolher, ou no backup do Android, criptografado de ponta a ponta com o seu bloqueio de tela.</string>
+    <string name="settings_not_backed_up_title">O Cycle está sem backup</string>
+    <string name="settings_not_backed_up_body">O Android só faz backup do Cycle quando este celular tem bloqueio de tela, para que o backup seja criptografado de ponta a ponta. Até você definir um PIN, padrão ou senha nas configurações do celular, seus dias ficam só neste celular. Para guardar uma cópia, exporte seus dados.</string>
+    <string name="settings_not_backed_up_hide">Ocultar por enquanto</string>
+    <string name="settings_lock_title">Bloquear o Cycle</string>
+    <string name="settings_lock_body">Abra o Cycle com sua digital, seu rosto ou o bloqueio de tela.</string>
+    <string name="settings_lock_off_title">O bloqueio do Cycle está desativado</string>
+    <string name="settings_lock_off_body">Seu celular não tem mais bloqueio de tela, então o Cycle não pode pedir um e desativou o próprio bloqueio. Tudo o que você registrou continua aqui.</string>
+    <string name="settings_lock_off_ok">OK</string>
+    <string name="settings_export_title">Exportar meus dados</string>
+    <string name="settings_export_body">Salve um arquivo com todos os dias que você registrou</string>
+    <string name="settings_last_exported">Última exportação em %1$s</string>
+    <string name="settings_import_title">Importar de um arquivo</string>
+    <string name="settings_import_body">Adicione os dias de uma exportação do Cycle</string>
+    <plurals name="settings_imported">
+        <item quantity="one">%1$d dia adicionado</item>
+        <item quantity="many">%1$d dias adicionados</item>
+        <item quantity="other">%1$d dias adicionados</item>
+    </plurals>
+    <plurals name="settings_imported_methods">
+        <item quantity="one">%1$d método adicionado</item>
+        <item quantity="many">%1$d métodos adicionados</item>
+        <item quantity="other">%1$d métodos adicionados</item>
+    </plurals>
+    <string name="settings_delete_title">Apagar tudo</string>
+    <string name="settings_delete_body">Todos os dias que você registrou e todos os ajustes</string>
+    <string name="settings_about">Sobre</string>
+    <string name="settings_notices_body">As fontes e os ícones que o Cycle usa</string>
+    <string name="settings_disclaimer">Não é um contraceptivo nem um diagnóstico.</string>
+    <string name="settings_version">Versão %1$s</string>
+
+    <!-- Usual cycle and period: setup's second step, to change later. -->
+    <string name="usual_lengths_title">Ciclo e menstruação de costume</string>
+    <string name="usual_lengths_intro">O Cycle faz estimativas com estes números até você registrar menstruações suas.</string>
+    <string name="usual_lengths_save">Salvar</string>
+
+    <!-- Delete everything. -->
+    <string name="delete_everything_title">Apagar tudo?</string>
+    <string name="delete_everything_text">Todos os dias que você registrou e todos os seus ajustes saem deste celular, e o Cycle recomeça do zero. Isso não pode ser desfeito. Para guardar uma cópia, exporte seus dados antes.</string>
+    <string name="delete_everything_confirm">Apagar tudo</string>
+    <string name="delete_everything_keep">Manter</string>
+
+    <!-- Lock Cycle, on a phone with no screen lock, fingerprint or face to ask for. -->
+    <string name="no_screen_lock_title">Defina um bloqueio de tela primeiro</string>
+    <string name="no_screen_lock_text">“Bloquear o Cycle” usa a digital, o rosto ou o bloqueio de tela do seu celular, e este celular ainda não tem nenhum. Adicione um nas configurações do celular e depois ative esta opção.</string>
+
+    <!-- Import, from Settings or the welcome's "Restaurar de uma exportação do Cycle". -->
+    <plurals name="import_confirm_title">
+        <item quantity="one">Importar %1$d dia?</item>
+        <item quantity="many">Importar %1$d dias?</item>
+        <item quantity="other">Importar %1$d dias?</item>
+    </plurals>
+    <string name="import_confirm_text">Os dias já registrados neste celular continuam como estão.</string>
+    <string name="import_confirm_methods_text">Os dias e os métodos que já estão neste celular continuam como estão.</string>
+    <string name="import_lengths_title">Importar suas durações de costume?</string>
+    <string name="import_lengths_text">Este arquivo não tem dias novos, só as durações de costume do seu ciclo e da sua menstruação. O Cycle as usa nas estimativas.</string>
+    <plurals name="import_methods_title">
+        <item quantity="one">Importar %1$d método?</item>
+        <item quantity="many">Importar %1$d métodos?</item>
+        <item quantity="other">Importar %1$d métodos?</item>
+    </plurals>
+    <string name="import_methods_text">Este arquivo não tem dias novos, só métodos contraceptivos e as datas deles. O Cycle os usa nas estimativas.</string>
+    <string name="import_methods_and_lengths_text">Este arquivo não tem dias novos, só métodos contraceptivos e as durações de costume do seu ciclo e da sua menstruação. O Cycle os usa nas estimativas.</string>
+    <string name="import_confirm">Importar</string>
+    <string name="import_cancel">Cancelar</string>
+    <string name="import_nothing_title">Nada novo para importar</string>
+    <string name="import_nothing_text">Todos os dias deste arquivo já estão neste celular.</string>
+    <string name="import_nothing_methods_text">Tudo neste arquivo já está neste celular.</string>
+    <string name="import_ok">OK</string>
+    <string name="import_refused_title">Este arquivo não pode ser importado</string>
+
+    <!-- Why a file can't be imported: one sentence each. Column names, values and setting keys are
+         the export's own, the same in every language, and stay as they are. -->
+    <string name="import_problem_unreadable">O Cycle não conseguiu abrir este arquivo. Tente escolhê-lo de novo.</string>
+    <string name="import_problem_not_text">Este arquivo não é uma exportação do Cycle: não é texto.</string>
+    <string name="import_problem_too_large">Este arquivo é grande demais para ser uma exportação do Cycle.</string>
+    <string name="import_problem_empty">Este arquivo está vazio.</string>
+    <string name="import_problem_not_an_export">Este arquivo não é uma exportação do Cycle: a primeira linha não traz os nomes das colunas que o Cycle grava.</string>
+    <string name="import_problem_unclosed_quote">A linha %1$d abre aspas que nunca se fecham.</string>
+    <plurals name="import_problem_value_count">
+        <item quantity="one">A linha %2$d tem %1$d valor em vez de %3$d.</item>
+        <item quantity="many">A linha %2$d tem %1$d valores em vez de %3$d.</item>
+        <item quantity="other">A linha %2$d tem %1$d valores em vez de %3$d.</item>
+    </plurals>
+    <string name="import_problem_bad_date">A linha %1$d tem “%2$s” como data. As datas têm o formato 2027-03-02.</string>
+    <string name="import_problem_repeated_date">A linha %1$d é uma segunda linha para %2$s.</string>
+    <string name="import_problem_unknown_value">A linha %1$d tem “%2$s” na coluna %3$s, e isso não é algo que o Cycle registre ali.</string>
+    <string name="import_problem_pain_where">A linha %1$d diz onde doeu, mas não quanto.</string>
+    <string name="import_problem_note_too_long">A linha %1$d tem uma anotação com mais de %2$d caracteres.</string>
+    <string name="import_problem_bad_length">A linha %1$d tem “%2$s” como %3$s. O Cycle aceita um número de dias de %4$d a %5$d.</string>
+    <string name="import_problem_repeated_setting">A linha %1$d é uma segunda linha para %2$s.</string>
+    <string name="import_problem_one_usual_length">Este arquivo traz só um de usual_cycle_length e usual_period_length. Uma exportação do Cycle traz os dois ou nenhum.</string>
+    <string name="import_problem_missing_breaks">A linha %1$d tem uma pílula combinada, um adesivo ou um anel sem as pausas.</string>
+    <string name="import_problem_stops_before_starts">A linha %1$d tem um método que termina antes de começar.</string>
+    <string name="import_problem_overlapping_method">A linha %1$d tem um método cujas datas se sobrepõem às de um que já está neste celular.</string>
+    <string name="import_problem_overlapping_rows">As linhas %1$d e %2$d têm métodos cujas datas se sobrepõem.</string>
+
+    <!-- Export. -->
+    <string name="export_failed_title">Não foi possível salvar seus dados</string>
+    <string name="export_failed_text">O Cycle não conseguiu gravar nesse arquivo. Tente de novo ou escolha outro lugar para salvá-lo.</string>
+
+    <!-- What to log: a switch per day log category. Turning one off hides it, never deletes. -->
+    <string name="what_to_log_title">O que registrar</string>
+    <string name="what_to_log_intro">Desative o que você não acompanha. Isso some do registro do dia e de Hoje, e tudo o que você já registrou continua.</string>
+    <string name="what_to_log_flow">Fluxo e escape</string>
+    <string name="what_to_log_flow_body">Sempre ativo: as estimativas dependem dele</string>
+    <string name="what_to_log_pain">Dor</string>
+    <string name="what_to_log_pain_body">Quanto dói, e onde</string>
+    <string name="what_to_log_body">Corpo</string>
+    <string name="what_to_log_body_body">Inchaço, desejos de comida, ondas de calor e mais</string>
+    <string name="what_to_log_mood">Humor</string>
+    <string name="what_to_log_mood_body">Calma, ansiedade, irritação e mais</string>
+    <string name="what_to_log_energy">Energia</string>
+    <string name="what_to_log_energy_body">Baixa, normal ou alta</string>
+    <string name="what_to_log_sleep">Sono</string>
+    <string name="what_to_log_sleep_body">Dormiu bem ou mal</string>
+    <string name="what_to_log_sex">Sexo</string>
+    <string name="what_to_log_sex_body">Com ou sem proteção. Nunca aparece numa notificação.</string>
+    <string name="what_to_log_notes">Anotações</string>
+    <string name="what_to_log_notes_body">Qualquer outra coisa, guardada só neste celular</string>
+
+    <!-- Open-source notices. -->
+    <string name="notices_title">Avisos de código aberto</string>
+
+    <!-- Contraception. The method's own words are in core:ui, shared with setup. -->
+    <string name="contraception_title">Contracepção</string>
+    <string name="contraception_none">Nenhum</string>
+    <string name="contraception_row_since">%1$s, desde %2$s</string>
+    <string name="contraception_row_start_not_known">%1$s, início desconhecido</string>
+    <string name="contraception_now">Agora</string>
+    <string name="contraception_your_methods">Seus métodos</string>
+    <string name="contraception_since">Desde %1$s</string>
+    <string name="contraception_start_not_known">Início desconhecido</string>
+    <string name="contraception_with_breaks">%1$s · %2$s</string>
+    <string name="contraception_breaks_monthly">uma pausa todo mês</string>
+    <string name="contraception_breaks_every_few_packs">uma pausa a cada algumas cartelas</string>
+    <string name="contraception_breaks_none">sem pausas</string>
+    <string name="contraception_counts_until">O Cycle conta esse método até %1$s.</string>
+    <string name="contraception_counts_until_injection">O Cycle conta esse método até %1$s, 13 semanas depois da sua última injeção.</string>
+    <string name="contraception_add">Adicionar seu método</string>
+    <string name="contraception_change">Mudar de método</string>
+    <string name="contraception_stop">Marcar como interrompido</string>
+    <string name="contraception_note">O Cycle não é um contraceptivo e não dá conselhos sobre métodos. Dúvidas sobre o seu são para o seu farmacêutico, enfermeiro ou médico. Seu método fica neste celular.</string>
+
+    <!-- When to get help: docs/decisions/0007-urgent-symptoms-on-a-method.md, line by line, with its
+         back-translation there. Changes only with that record, in the same PR. No phone numbers and no
+         condition names. -->
+    <string name="get_help_title">Quando procurar ajuda</string>
+    <string name="get_help_intro_combined_pill">As clínicas passam estes sinais a todas as pessoas que usam a pílula combinada, o adesivo ou o anel.</string>
+    <string name="get_help_intro_patch">As clínicas passam estes sinais a todas as pessoas que usam o adesivo.</string>
+    <string name="get_help_intro_ring">As clínicas passam estes sinais a todas as pessoas que usam o anel.</string>
+    <string name="get_help_intro_iud">As clínicas passam estes sinais a todas as pessoas que usam um DIU.</string>
+    <string name="get_help_emergency">Procure atendimento de emergência agora se você tiver:</string>
+    <string name="get_help_urgent">Procure orientação médica urgente hoje se você tiver:</string>
+    <string name="get_help_combined_chest">dor no peito, ou falta de ar, ou tosse com sangue</string>
+    <string name="get_help_combined_weakness">fraqueza ou dormência repentina no rosto, em um braço ou em uma perna, ou dificuldade para falar</string>
+    <string name="get_help_combined_leg">dor, inchaço ou vermelhidão em uma perna, geralmente na panturrilha</string>
+    <string name="get_help_iud_painkillers">dor no pé da barriga que não passa com analgésicos</string>
+    <string name="get_help_iud_sudden_pain">dor repentina no pé da barriga que piora ou não passa</string>
+    <string name="get_help_iud_temperature">febre alta</string>
+    <string name="get_help_iud_discharge">corrimento fora do comum ou com mau cheiro</string>
+    <string name="get_help_iud_bleeding">sangramento muito intenso</string>
+    <string name="get_help_not_checked">O Cycle não verifica seu registro em busca destes sinais.</string>
+
+    <!-- Add your method, or change it: which method, since when, breaks. -->
+    <string name="add_method_which">Qual método?</string>
+    <string name="add_method_which_body">Alguns métodos mudam o sangramento, então o Cycle muda o que estima.</string>
+    <string name="add_method_next">Próximo</string>
+    <string name="add_method_save">Salvar</string>
+    <string name="add_method_done">Concluir</string>
+
+    <!-- Mark as stopped. -->
+    <string name="stop_method_save">Salvar</string>
+
+    <!-- A method's page: its dates, its breaks, and deleting them. -->
+    <string name="stretch_started">Início</string>
+    <string name="stretch_fitted">Colocado em</string>
+    <string name="stretch_first_injection">Primeira injeção</string>
+    <string name="stretch_stopped">Fim</string>
+    <string name="stretch_taken_out">Retirado em</string>
+    <string name="stretch_counted_until">Contado até</string>
+    <string name="stretch_not_known">Desconhecido</string>
+    <string name="stretch_still_in">Ainda colocado</string>
+    <string name="stretch_still_on_it">Ainda em uso</string>
+    <string name="stretch_counted_until_body">Qualquer dia até 13 semanas a partir de hoje.</string>
+    <string name="stretch_breaks">Pausas</string>
+    <string name="stretch_delete">Apagar estas datas</string>
+    <string name="stretch_delete_body">O Cycle esquece este método nestas datas. O que você registrou continua.</string>
+    <string name="stretch_save">Salvar</string>
+    <string name="stretch_delete_title">Apagar estas datas?</string>
+    <!-- %1$s: the method in full, with its article ("a pílula combinada"). -->
+    <string name="stretch_delete_from_to">O Cycle esquece que você usou %1$s de %2$s a %3$s. Os dias que você registrou continuam e voltam a contar como seu próprio ciclo.</string>
+    <string name="stretch_delete_since">O Cycle esquece que você usa %1$s desde %2$s. Os dias que você registrou continuam e voltam a contar como seu próprio ciclo.</string>
+    <string name="stretch_delete_until">O Cycle esquece que você usou %1$s até %2$s. Os dias que você registrou continuam e voltam a contar como seu próprio ciclo.</string>
+    <string name="stretch_delete_on">O Cycle esquece que você usou %1$s em %2$s. Os dias que você registrou continuam e voltam a contar como seu próprio ciclo.</string>
+    <string name="stretch_delete_ongoing">O Cycle esquece que você usa %1$s. Os dias que você registrou continuam e voltam a contar como seu próprio ciclo.</string>
+    <string name="stretch_delete_confirm">Apagar</string>
+    <string name="stretch_delete_keep">Manter</string>
+
+    <!-- When new dates overlap another method's. %1$s: the method, with its article. -->
+    <string name="move_end_title">Mudar a data em que %1$s termina?</string>
+    <string name="move_end_text">Para %1$s, o fim passaria para %2$s, em vez de %3$s, para que os dois não se sobreponham. O Cycle recalcula as estimativas.</string>
+    <string name="move_start_title">Mudar a data em que %1$s começa?</string>
+    <string name="move_start_text">Para %1$s, o início passaria para %2$s, em vez de %3$s, para que os dois não se sobreponham. O Cycle recalcula as estimativas.</string>
+    <string name="move_several_title">Mudar as datas dos seus outros métodos?</string>
+    <string name="move_end_line">Para %1$s, o fim passaria para %2$s, em vez de %3$s.</string>
+    <string name="move_start_line">Para %1$s, o início passaria para %2$s, em vez de %3$s.</string>
+    <string name="move_several_end">Assim, nenhum deles se sobrepõe. O Cycle recalcula as estimativas.</string>
+    <string name="move_confirm">Mudar</string>
+    <string name="move_cancel">Cancelar</string>
+
+    <!-- When the dates can't be saved. %1$s: the method, with its article. -->
+    <string name="refused_title">Escolha outro dia</string>
+    <string name="refused_ok">OK</string>
+    <string name="refused_after_today">Esse dia é depois de hoje. Escolha hoje ou um dia anterior.</string>
+    <string name="refused_before_current">Esse dia é antes de %2$s, quando você começou a usar %1$s. Escolha um dia posterior, ou mude primeiro as datas em que você usa %1$s.</string>
+    <string name="refused_covers_whole">Isso cobriria todo o tempo em que você usou %1$s. Apague primeiro as datas em que você usou %1$s, ou escolha um dia posterior.</string>
+    <string name="refused_stop_before_start">Esse dia é antes do início. Escolha um dia posterior.</string>
+    <string name="refused_stop_too_late">Escolha um dia até %1$s.</string>
+    <string name="refused_gone">Estas datas foram apagadas.</string>
+</resources>
