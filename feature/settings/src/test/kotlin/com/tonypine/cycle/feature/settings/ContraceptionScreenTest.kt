@@ -1,5 +1,8 @@
 package com.tonypine.cycle.feature.settings
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
@@ -157,6 +160,93 @@ class ContraceptionScreenTest {
             .assertExists()
         composeRule.onAllNodesWithText("Mark as stopped").assertCountEquals(0)
         assertEquals("Injection, Until 2 Nov 2027", spokenButtons().last())
+    }
+
+    /** Every text TalkBack can reach, in reading order, from "When to get help" to the section's end. */
+    private fun getHelpSection(): List<String> {
+        val texts = composeRule
+            .onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.Text), useUnmergedTree = true)
+            .fetchSemanticsNodes()
+            .flatMap { node -> node.config[SemanticsProperties.Text].map { it.text } }
+        val start = texts.indexOf("When to get help")
+        if (start < 0) return emptyList()
+        return texts.subList(start, texts.indexOf("Cycle does not check your log for these signs.") + 1)
+    }
+
+    @Test
+    fun `on the combined pill When to get help reads in full, its action lines as headings`() {
+        val current = pill.copy(stopped = null)
+        showPage(current, current)
+
+        composeRule.onNode(hasText("When to get help") and isHeading()).assertExists()
+        composeRule.onNode(hasText("Get emergency help now if you have:") and isHeading()).assertExists()
+        composeRule.onNode(hasText("Get urgent medical advice today if you have:") and isHeading()).assertExists()
+        assertEquals(
+            listOf(
+                "When to get help",
+                "Clinics give these signs to everyone who uses the combined pill, patch or ring.",
+                "Get emergency help now if you have:",
+                "chest pain, or you feel short of breath, or you cough up blood",
+                "sudden weakness or numbness in your face, an arm or a leg, or trouble speaking",
+                "Get urgent medical advice today if you have:",
+                "pain, swelling or redness in one leg, usually the calf",
+                "Cycle does not check your log for these signs."
+            ),
+            getHelpSection()
+        )
+        // Nothing on it can be tapped.
+        assertEquals(
+            listOf("Back", "Change method", "Mark as stopped", "Combined pill, Since 3 May 2027"),
+            spokenButtons()
+        )
+    }
+
+    @Test
+    fun `on the copper IUD When to get help reads the IUD signs`() {
+        val copper = ContraceptionStretch(ContraceptionMethod.COPPER_IUD, LocalDate.of(2027, 6, 15), id = 5)
+        showPage(copper, copper)
+
+        composeRule.onNode(hasText("Get urgent medical advice today if you have:") and isHeading()).assertExists()
+        composeRule.onAllNodesWithText("Get emergency help now if you have:").assertCountEquals(0)
+        assertEquals(
+            listOf(
+                "When to get help",
+                "Clinics give these signs to everyone who has an IUD.",
+                "Get urgent medical advice today if you have:",
+                "pain low in your tummy that painkillers do not help",
+                "sudden pain low in your tummy that gets worse or does not go away",
+                "a high temperature",
+                "unusual or smelly discharge",
+                "very heavy bleeding",
+                "Cycle does not check your log for these signs."
+            ),
+            getHelpSection()
+        )
+    }
+
+    @Test
+    fun `there is no When to get help on the progestogen-only pill, implant, injection or none`() {
+        val methods =
+            listOf(ContraceptionMethod.PROGESTOGEN_PILL, ContraceptionMethod.IMPLANT, ContraceptionMethod.INJECTION)
+        var current by mutableStateOf<ContraceptionStretch?>(null)
+        composeRule.setContent {
+            Themed {
+                ContraceptionScreen(
+                    ContraceptionUiState(today, current, listOfNotNull(current)),
+                    onBack = {},
+                    onAdd = {},
+                    onStop = {},
+                    onOpen = {}
+                )
+            }
+        }
+
+        (methods.map { ContraceptionStretch(it, LocalDate.of(2027, 6, 15), id = 6) } + null).forEach {
+            current = it
+            composeRule.waitForIdle()
+            composeRule.onAllNodesWithText("When to get help").assertCountEquals(0)
+            composeRule.onAllNodesWithText("Cycle does not check your log for these signs.").assertCountEquals(0)
+        }
     }
 
     @Test
