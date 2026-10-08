@@ -52,6 +52,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
@@ -133,9 +134,10 @@ fun NavigationBar(
 }
 
 /**
- * `labelSmall`, shrunk when the widest label does not fit in [slotWidth] (at a large font scale), so
- * every label stays whole and the same size. It never goes below its size at 100%; a label still too
- * wide there ends in an ellipsis. TalkBack always reads the whole label.
+ * `labelSmall`, shrunk when the widest label does not fit in [slotWidth] (a long word such as
+ * "Einstellungen", or a large font scale), so every label stays whole and the same size. It never
+ * goes below [NavigationBarLabelFloor] as it would read at 100%; a label still too wide there ends in
+ * an ellipsis. TalkBack always reads the whole label.
  */
 @Composable
 private fun rememberLabelStyle(destinations: List<NavigationDestination>, slotWidth: Dp): TextStyle {
@@ -145,7 +147,8 @@ private fun rememberLabelStyle(destinations: List<NavigationDestination>, slotWi
     return remember(destinations, slotWidth, style, density) {
         val widest = destinations.maxOf { measurer.measure(it.label, style, maxLines = 1).size.width }
         val fit = with(density) { slotWidth.toPx() } / widest
-        val smallest = 1f / maxOf(density.fontScale, 1f)
+        val floor = NavigationBarLabelFloor.value / style.fontSize.value
+        val smallest = minOf(floor / maxOf(density.fontScale, 1f), 1f)
         val scale = fit.coerceIn(smallest, 1f)
         style.copy(fontSize = style.fontSize * scale, letterSpacing = style.letterSpacing * scale)
     }
@@ -259,6 +262,13 @@ private fun Modifier.drawSelectionIndicator(
 
 /** How many destinations a [NavigationBar] holds. */
 val NavigationBarDestinationCount = 3..5
+
+/**
+ * The smallest a label shrinks to, as it reads at 100% font size: 11sp, a point under `labelSmall`, so
+ * German's "Einstellungen" (85dp at 12sp) stays whole in a 78dp slot on a phone 360dp wide
+ * (`docs/design/language.md`, Components).
+ */
+val NavigationBarLabelFloor = 11.sp
 
 private val IndicatorWidth = 56.dp
 private val IndicatorHeight = 32.dp

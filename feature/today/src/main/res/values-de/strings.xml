@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <!-- The big number on Today: her cycle day. -->
+    <string name="today_cycle_day">Tag %1$d</string>
+
+    <!-- The line of context under the cycle day. -->
+    <plurals name="today_context_between">
+        <item quantity="one">Deine nächste Periode wird in etwa %1$d Tag erwartet</item>
+        <item quantity="other">Deine nächste Periode wird in etwa %1$d Tagen erwartet</item>
+    </plurals>
+    <string name="today_context_due">Deine Periode könnte jeden Tag beginnen</string>
+    <plurals name="today_context_late">
+        <item quantity="one">Deine Periode ist %1$d Tag später als erwartet</item>
+        <item quantity="other">Deine Periode ist %1$d Tage später als erwartet</item>
+    </plurals>
+    <string name="today_context_started">Deine Periode hat heute begonnen</string>
+    <string name="today_context_on_period">Tag %1$d deiner Periode</string>
+    <plurals name="today_context_ended">
+        <item quantity="one">Deine Periode hat %1$d Tag gedauert</item>
+        <item quantity="other">Deine Periode hat %1$d Tage gedauert</item>
+    </plurals>
+
+    <!-- The one-tap period buttons and the day log. -->
+    <string name="today_period_started">Meine Periode hat begonnen</string>
+    <string name="today_period_ended">Meine Periode ist vorbei</string>
+    <string name="today_log_feelings">Eintragen, wie du dich fühlst</string>
+    <string name="today_log_flow_and_feelings">Blutung und Befinden eintragen</string>
+    <string name="today_undo">Rückgängig</string>
+    <string name="today_started_card">Periode heute begonnen</string>
+    <string name="today_ended_card">Periode heute beendet</string>
+
+    <!-- What she logged today. -->
+    <string name="today_logged_title">Heute eingetragen</string>
+    <string name="today_logged_note_only">Eine Notiz</string>
+    <string name="today_logged_edit">Bearbeiten</string>
+
+    <!-- Late: calm, no alarm. -->
+    <string name="today_late_title">Zyklen schwanken</string>
+    <string name="today_late_body">Zykluslängen ändern sich oft um ein paar Tage von einem Monat zum nächsten. Die Schätzung unten beginnt jetzt heute. Tippe auf „Meine Periode hat begonnen“, wenn es so weit ist.</string>
+
+    <!-- Still going? -->
+    <string name="today_still_going_title">Noch nicht vorbei?</string>
+    <plurals name="today_still_going_body">
+        <item quantity="one">Deine Periode dauert bisher %1$d Tag.</item>
+        <item quantity="other">Deine Periode dauert bisher %1$d Tage.</item>
+    </plurals>
+    <string name="today_still_going_yes">Noch nicht vorbei</string>
+    <string name="today_still_going_ended_earlier">Schon früher vorbei</string>
+    <string name="today_last_day_title">Wann war der letzte Tag?</string>
+    <string name="today_last_day_body">Wähle den letzten Tag deiner Periode.</string>
+    <string name="today_save">Speichern</string>
+
+    <!-- Missed a period? Calm: a forgotten log is the likeliest reason. Never "ausgeblieben", which
+         reads as a period that did not come. -->
+    <string name="today_missed_title">Eine Periode nicht eingetragen?</string>
+    <string name="today_missed_body">Du bist an Tag %1$d dieses Zyklus, viel länger als dein üblicher Zyklus. Wenn eine Periode kam und du sie nicht eingetragen hast, kannst du sie im Kalender nachtragen.</string>
+    <string name="today_missed_add">Frühere Periode nachtragen</string>
+    <string name="today_missed_no">Nein, keine vergessen</string>
+
+    <!-- The next period card. -->
+    <string name="today_next_period">Nächste Periode</string>
+    <string name="today_next_around">Um den %1$s</string>
+    <string name="today_next_between">Zwischen dem %1$s und dem %2$s</string>
+    <string name="today_basis_typical">Geschätzt aus einem typischen Zyklus von %1$d Tagen</string>
+    <string name="today_basis_setup">Geschätzt aus den Längen, die du angegeben hast</string>
+    <plurals name="today_basis_logged">
+        <item quantity="one">Geschätzt aus deinem letzten Zyklus</item>
+        <item quantity="other">Geschätzt aus deinen letzten %1$d Zyklen</item>
+    </plurals>
+    <string name="today_how_estimated">Wie wird das geschätzt?</string>
+
+    <!-- The "How is this estimated?" sheet, in plain words. -->
+    <string name="estimate_sheet_title">Wie wird das geschätzt?</string>
+    <string name="estimate_date">Deine nächste Periode wird um den %1$s erwartet, %3$d Tage, nachdem deine letzte am %2$s begonnen hat: %4$s.</string>
+    <string name="estimate_date_late">Deine Periode wurde um den %1$s erwartet: der erste Tag deiner letzten Periode, der %2$s, plus %3$d Tage, %4$s.</string>
+    <string name="estimate_cycle_typical">ein typischer Zyklus, bis du einen eigenen eingetragen hast</string>
+    <string name="estimate_cycle_setup">die übliche Zykluslänge, die du angegeben hast</string>
+    <plurals name="estimate_cycle_logged">
+        <item quantity="one">die Länge deines letzten Zyklus</item>
+        <item quantity="other">die mittlere Länge deiner letzten %1$d Zyklen</item>
+    </plurals>
+    <string name="estimate_range">Sie kann an jedem Tag zwischen dem %1$s und dem %2$s beginnen.</string>
+    <string name="estimate_range_typical">Zyklen ändern sich oft um ein paar Tage von einem zum nächsten, deshalb reicht der Zeitraum ein paar Tage in jede Richtung.</string>
+    <string name="estimate_range_logged">Der Zeitraum folgt, wie stark deine letzten Zyklen geschwankt haben, und bleibt ein paar Tage breit in jede Richtung, solange du erst wenige eingetragen hast.</string>
+    <plurals name="estimate_late">
+        <item quantity="one">Sie ist %1$d Tag später, deshalb beginnt die Schätzung jetzt heute.</item>
+        <item quantity="other">Sie ist %1$d Tage später, deshalb beginnt die Schätzung jetzt heute.</item>
+    </plurals>
+    <string name="estimate_late_range">Sie kann an jedem Tag von heute bis zum %1$s beginnen.</string>
+    <string name="estimate_closing">Das sind Schätzungen, keine Versprechen. Stress, Reisen und Krankheit können eine Periode verschieben, und je mehr Perioden du einträgst, desto genauer folgen die Schätzungen deinem eigenen Rhythmus.</string>
+    <string name="estimate_done">Verstanden</string>
+
+    <!-- No period logged yet, and the sheet to log the first one. -->
+    <string name="today_empty_title">Noch keine Perioden eingetragen</string>
+    <string name="today_empty_body">Trag den ersten Tag deiner letzten Periode ein, und Cycle schätzt die nächste.</string>
+    <string name="today_log_period">Periode eintragen</string>
+    <string name="log_period_title">Wann hat sie begonnen?</string>
+    <plurals name="log_period_body">
+        <item quantity="one">Wähle den ersten Tag deiner letzten Periode. Cycle zählt sie als %1$d Tag lang.</item>
+        <item quantity="other">Wähle den ersten Tag deiner letzten Periode. Cycle zählt sie als %1$d Tage lang.</item>
+    </plurals>
+    <string name="log_period_confirm">Eintragen</string>
+
+    <!-- On a method: "Abbruchblutung" for the scheduled bleed on a combined method with a break every
+         month, "Blutung" on every other hormonal method (0006, 0008's glossary). -->
+    <plurals name="today_context_bleed_between_first">
+        <item quantity="one">Deine erste Abbruchblutung wird in etwa %1$d Tag erwartet</item>
+        <item quantity="other">Deine erste Abbruchblutung wird in etwa %1$d Tagen erwartet</item>
+    </plurals>
+    <plurals name="today_context_bleed_between">
+        <item quantity="one">Deine nächste Abbruchblutung wird in etwa %1$d Tag erwartet</item>
+        <item quantity="other">Deine nächste Abbruchblutung wird in etwa %1$d Tagen erwartet</item>
+    </plurals>
+    <string name="today_context_bleed_due">Deine Abbruchblutung könnte jeden Tag beginnen</string>
+    <string name="today_context_bleed_started">Deine Abbruchblutung hat heute begonnen</string>
+    <string name="today_context_bleeding_started">Die Blutung hat heute begonnen</string>
+    <string name="today_context_on_bleed">Tag %1$d deiner Abbruchblutung</string>
+    <string name="today_context_on_bleeding">Tag %1$d der Blutung</string>
+    <plurals name="today_context_bleed_ended">
+        <item quantity="one">Deine Abbruchblutung hat %1$d Tag gedauert</item>
+        <item quantity="other">Deine Abbruchblutung hat %1$d Tage gedauert</item>
+    </plurals>
+    <plurals name="today_context_bleeding_ended">
+        <item quantity="one">Die Blutung hat %1$d Tag gedauert</item>
+        <item quantity="other">Die Blutung hat %1$d Tage gedauert</item>
+    </plurals>
+    <string name="today_context_first_bleed_to_log">Cycle schätzt deine nächste Abbruchblutung, sobald du eine eingetragen hast.</string>
+
+    <string name="today_bleed_started">Abbruchblutung hat begonnen</string>
+    <string name="today_bleed_ended">Abbruchblutung ist vorbei</string>
+    <string name="today_bleeding_started">Blutung hat begonnen</string>
+    <string name="today_bleeding_stopped">Blutung hat aufgehört</string>
+    <string name="today_bleed_started_card">Abbruchblutung heute begonnen</string>
+    <string name="today_bleed_ended_card">Abbruchblutung heute beendet</string>
+    <string name="today_bleeding_started_card">Blutung heute begonnen</string>
+    <string name="today_bleeding_stopped_card">Blutung heute aufgehört</string>
+
+    <string name="today_still_bleeding_title">Blutest du noch?</string>
+    <plurals name="today_still_going_bleed_body">
+        <item quantity="one">Deine Abbruchblutung dauert bisher %1$d Tag.</item>
+        <item quantity="other">Deine Abbruchblutung dauert bisher %1$d Tage.</item>
+    </plurals>
+    <plurals name="today_still_going_bleeding_body">
+        <item quantity="one">Du blutest seit %1$d Tag.</item>
+        <item quantity="other">Du blutest seit %1$d Tagen.</item>
+    </plurals>
+    <string name="today_last_day_bleed_body">Wähle den letzten Tag deiner Abbruchblutung.</string>
+    <string name="today_last_day_bleeding_body">Wähle den letzten Tag der Blutung.</string>
+
+    <!-- After stopping a method, until her first period: the days since, in place of a cycle day. -->
+    <plurals name="today_days_since">
+        <item quantity="one">%1$d Tag</item>
+        <item quantity="other">%1$d Tage</item>
+    </plurals>
+    <string name="today_since_pill">seit du die Pille abgesetzt hast</string>
+    <string name="today_since_mini_pill">seit du die Minipille abgesetzt hast</string>
+    <string name="today_since_patch">seit du das Pflaster abgesetzt hast</string>
+    <string name="today_since_ring">seit du den Ring abgesetzt hast</string>
+    <string name="today_since_implant">seit dein Implantat entfernt wurde</string>
+    <string name="today_since_iud">seit deine Spirale entfernt wurde</string>
+    <string name="today_since_injection">seit du die Dreimonatsspritze abgesetzt hast</string>
+    <string name="today_basis_usual">Geschätzt aus deinem üblichen Zyklus von %1$d Tagen</string>
+    <!-- A basis line above, then the settling sentence below. -->
+    <string name="today_basis_then_settling">%1$s. %2$s</string>
+    <!-- %1$s: the method, in the accusative with its article ("den Ring"). -->
+    <string name="today_basis_settling">Nachdem du aufgehört hast, %1$s zu verwenden, können sich Zyklen erst nach ein paar Monaten einpendeln, deshalb ist der Zeitraum breiter.</string>
+    <string name="today_after_injection">Nach der Dreimonatsspritze kann es mehrere Monate dauern, bis Perioden wiederkommen. Cycle schätzt wieder, sobald du eine eingetragen hast.</string>
+
+    <!-- The next bleed, on a combined method with a break every month. -->
+    <string name="today_next_bleed">Nächste Abbruchblutung</string>
+    <string name="today_next_bleed_range">%1$s bis %2$s</string>
+    <string name="today_bleed_basis_start_pill">In deiner ersten Pillenpause. Geschätzt ab dem Tag, an dem du mit der Pille angefangen hast.</string>
+    <string name="today_bleed_basis_start_patch">In deiner ersten pflasterfreien Woche. Geschätzt ab dem Tag, an dem du mit dem Pflaster angefangen hast.</string>
+    <string name="today_bleed_basis_start_ring">In deiner ersten ringfreien Woche. Geschätzt ab dem Tag, an dem du mit dem Ring angefangen hast.</string>
+    <string name="today_bleed_basis_start_later_pill">In deiner Pillenpause. Geschätzt ab dem Tag, an dem du mit der Pille angefangen hast.</string>
+    <string name="today_bleed_basis_start_later_patch">In deiner pflasterfreien Woche. Geschätzt ab dem Tag, an dem du mit dem Pflaster angefangen hast.</string>
+    <string name="today_bleed_basis_start_later_ring">In deiner ringfreien Woche. Geschätzt ab dem Tag, an dem du mit dem Ring angefangen hast.</string>
+    <string name="today_bleed_basis_last_pill">In deiner Pillenpause. Geschätzt aus deiner letzten Abbruchblutung unter der Pille.</string>
+    <string name="today_bleed_basis_last_patch">In deiner pflasterfreien Woche. Geschätzt aus deiner letzten Abbruchblutung mit dem Pflaster.</string>
+    <string name="today_bleed_basis_last_ring">In deiner ringfreien Woche. Geschätzt aus deiner letzten Abbruchblutung mit dem Ring.</string>
+    <string name="today_missed_break_title">In dieser Pause keine Abbruchblutung eingetragen</string>
+    <string name="today_missed_break_body">Manche Pausen vergehen ohne eine. Die nächste wird in deiner nächsten Pause erwartet.</string>
+
+    <!-- The bleeding card, on a method with no estimate: plain counts, never clinical labels. -->
+    <string name="today_bleeding_last_90_days">Letzte 90 Tage</string>
+    <string name="today_bleeding_since">Seit dem %1$s</string>
+    <plurals name="today_bleeding_days">
+        <item quantity="one">Du hast an %1$d Tag Blutung oder Schmierblutung eingetragen, in %2$s.</item>
+        <item quantity="other">Du hast an %1$d Tagen Blutung oder Schmierblutung eingetragen, in %2$s.</item>
+    </plurals>
+    <plurals name="today_bleeding_episodes">
+        <item quantity="one">%1$d Phase</item>
+        <item quantity="other">%1$d Phasen</item>
+    </plurals>
+    <plurals name="today_bleeding_longest">
+        <item quantity="one">Die längste hat %1$d Tag gedauert.</item>
+        <item quantity="other">Die längste hat %1$d Tage gedauert.</item>
+    </plurals>
+    <string name="today_bleeding_none">Du hast keine Blutung oder Schmierblutung eingetragen.</string>
+
+    <!-- The first-months line: expected, not a warning. -->
+    <string name="today_first_months_combined_monthly">Blutungen zwischen den Pausen sind in den ersten drei Monaten häufig und legen sich meist.</string>
+    <string name="today_first_months_combined">Blutungen zwischen den Pausen sind in den ersten Monaten häufig und legen sich meist.</string>
+    <string name="today_first_months_mini_pill">Unter der Minipille ändern sich Blutungen in den ersten Monaten oft.</string>
+    <string name="today_first_months_implant">In den ersten Monaten mit dem Implantat sind Blutungen oft unregelmäßig oder lang.</string>
+    <string name="today_first_months_hormonal_iud">In den ersten Monaten mit einer Hormonspirale sind Blutungen oft häufig oder lang. Im ersten Jahr werden sie meist schwächer.</string>
+    <string name="today_first_months_injection">In den ersten Monaten mit der Dreimonatsspritze sind Blutungen oft unregelmäßig oder lang. Mit der Zeit werden sie meist weniger.</string>
+
+    <!-- The copper IUD, for six months after fitting. -->
+    <string name="today_copper_iud_title">Perioden können anfangs stärker sein</string>
+    <string name="today_copper_iud_body">Mit einer Kupferspirale sind Perioden in den ersten 3 bis 6 Monaten oft stärker, länger oder schmerzhafter. Cycle schätzt sie weiter wie bisher.</string>
+    <string name="today_got_it">Verstanden</string>
+
+    <!-- What changes: the sheet on a method with no estimate. -->
+    <string name="method_sheet_button_pill">Was ändert sich unter der Pille?</string>
+    <string name="method_sheet_button_mini_pill">Was ändert sich unter der Minipille?</string>
+    <string name="method_sheet_button_patch">Was ändert sich mit dem Pflaster?</string>
+    <string name="method_sheet_button_ring">Was ändert sich mit dem Ring?</string>
+    <string name="method_sheet_button_implant">Was ändert sich mit dem Implantat?</string>
+    <string name="method_sheet_button_hormonal_iud">Was ändert sich mit einer Hormonspirale?</string>
+    <string name="method_sheet_button_injection">Was ändert sich mit der Dreimonatsspritze?</string>
+    <string name="method_sheet_title_pill">Blutungen unter der Pille</string>
+    <string name="method_sheet_title_mini_pill">Blutungen unter der Minipille</string>
+    <string name="method_sheet_title_patch">Blutungen mit dem Pflaster</string>
+    <string name="method_sheet_title_ring">Blutungen mit dem Ring</string>
+    <string name="method_sheet_title_implant">Blutungen mit dem Implantat</string>
+    <string name="method_sheet_title_hormonal_iud">Blutungen mit einer Hormonspirale</string>
+    <string name="method_sheet_title_injection">Blutungen mit der Dreimonatsspritze</string>
+    <!-- %1$s: the method, in the accusative with its article ("den Ring"). -->
+    <string name="method_sheet_combined">Wenn du %1$s verwendest, kommt eine Abbruchblutung meist in einer Pause. Mit Pausen nur alle paar Packungen oder ganz ohne Pausen können Blutungen auch zu anderen Zeiten kommen, und sie legen sich oft mit der Zeit.</string>
+    <string name="method_sheet_mini_pill">Die Minipille verändert bei vielen Menschen die Blutungen. Sie können unregelmäßig sein, kommen und gehen oder aufhören, und sie legen sich mit der Zeit vielleicht nicht.</string>
+    <string name="method_sheet_implant">Das Implantat verändert bei den meisten Menschen die Blutungen. Sie können schwächer oder länger sein, kommen und gehen oder aufhören, und das Muster kann sich jederzeit ändern.</string>
+    <string name="method_sheet_hormonal_iud">Eine Hormonspirale verändert bei den meisten Menschen die Blutungen. In den ersten Monaten sind sie oft häufig oder lang, danach meist schwächer, und bei manchen hören sie auf.</string>
+    <string name="method_sheet_injection">Die Dreimonatsspritze verändert bei den meisten Menschen die Blutungen. Anfangs sind sie oft unregelmäßig oder lang und werden meist weniger, je länger du sie verwendest. Bei vielen hören sie auf.</string>
+    <string name="method_sheet_what_cycle_does">Deshalb schätzt Cycle nicht, wann du blutest, zählt keine Zyklustage und sagt nie, dass etwas spät dran ist. Es zeigt die Tage, die du einträgst, und wie viel du in den letzten 90 Tagen geblutet hast.</string>
+    <string name="method_sheet_help">Wenn die Blutungen für dich zum Problem werden, können dir deine Frauenarztpraxis oder eine Beratungsstelle helfen.</string>
+
+    <!-- How is this estimated, for the next bleed. %1$s and %3$s: the method, in the accusative with
+         its article; %2$s: the break, "Pause", after "deiner". -->
+    <string name="bleed_sheet_why">Wenn du %1$s verwendest, kommt die Blutung in deiner %2$s, weil du die Hormone für ein paar Tage weglässt. Es ist eine Abbruchblutung durch %3$s, keine Periode.</string>
+    <string name="bleed_sheet_when">Cycle erwartet sie 28 Tage nach dem Beginn der letzten, plus oder minus 2 Tage. Bevor du eine eingetragen hast, erwartet Cycle sie in deiner ersten %1$s, 22 bis 28 Tage nach deinem Start.</string>
+    <string name="bleed_sheet_between">Blutungen zwischen den Pausen sind in den ersten Monaten häufig. Sie erscheinen in deinem Kalender, verschieben diese Schätzung aber nicht.</string>
+    <string name="bleed_sheet_closing">Das sind Schätzungen, keine Versprechen.</string>
+    <!-- The break, after "in deiner" and "in deiner ersten": feminine, dative. -->
+    <string name="bleed_break_pill">Pause</string>
+    <string name="bleed_break_patch">pflasterfreien Woche</string>
+    <string name="bleed_break_ring">ringfreien Woche</string>
+
+    <!-- How is this estimated, after stopping a method. %4$s: the method, in the accusative with its
+         article. -->
+    <string name="estimate_date_stopped">Deine nächste Periode wird um den %1$s erwartet, %3$d Tage, nachdem du am %2$s aufgehört hast, %4$s zu verwenden: %5$s.</string>
+    <string name="estimate_date_stopped_late">Deine Periode wurde um den %1$s erwartet, %3$d Tage, nachdem du am %2$s aufgehört hast, %4$s zu verwenden: %5$s.</string>
+    <string name="estimate_range_settling">Die ersten Zyklen nach dem Absetzen einer Methode können stärker schwanken, deshalb bleibt der Zeitraum mindestens 7 Tage breit in jede Richtung, bis du drei Zyklen eingetragen hast.</string>
+</resources>

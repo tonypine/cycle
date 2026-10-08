@@ -84,8 +84,8 @@ class CycleLocaleTest {
     }
 
     @Test
-    @Config(qualifiers = "de-rDE")
-    fun `on a German phone with no German strings yet, English dates and German weeks`() {
+    @Config(qualifiers = "fr-rFR")
+    fun `on a French phone, a language Cycle has no strings for, English dates and French weeks`() {
         lateinit var locale: Locale
         lateinit var firstDay: DayOfWeek
         compose.setContent {
@@ -94,13 +94,29 @@ class CycleLocaleTest {
         }
 
         compose.runOnIdle {
-            assertEquals(Locale.forLanguageTag("en-DE"), locale)
+            assertEquals(Locale.forLanguageTag("en-FR"), locale)
             assertEquals(DayOfWeek.MONDAY, firstDay)
         }
     }
 
     @Test
-    @Config(sdk = [29], qualifiers = "de-rDE")
+    @Config(qualifiers = "de-rDE")
+    fun `on a German phone, German dates and weeks`() {
+        lateinit var locale: Locale
+        lateinit var firstDay: DayOfWeek
+        compose.setContent {
+            locale = cycleLocale()
+            firstDay = firstDayOfWeek()
+        }
+
+        compose.runOnIdle {
+            assertEquals(Locale.forLanguageTag("de-DE"), locale)
+            assertEquals(DayOfWeek.MONDAY, firstDay)
+        }
+    }
+
+    @Test
+    @Config(sdk = [29], qualifiers = "fr-rFR")
     fun `below Android 13 the phone's languages come from the system`() {
         lateinit var locale: Locale
         lateinit var firstDay: DayOfWeek
@@ -110,13 +126,13 @@ class CycleLocaleTest {
         }
 
         compose.runOnIdle {
-            assertEquals(Locale.forLanguageTag("en-DE"), locale)
+            assertEquals(Locale.forLanguageTag("en-FR"), locale)
             assertEquals(DayOfWeek.MONDAY, firstDay)
         }
     }
 
     @Test
-    @Config(qualifiers = "de-rDE")
+    @Config(qualifiers = "fr-rFR")
     fun `a context without a LocaleManager, as in a preview, falls back to the system's languages`() {
         lateinit var locale: Locale
         lateinit var firstDay: DayOfWeek
@@ -128,9 +144,23 @@ class CycleLocaleTest {
         }
 
         compose.runOnIdle {
-            assertEquals(Locale.forLanguageTag("en-DE"), locale)
+            assertEquals(Locale.forLanguageTag("en-FR"), locale)
             assertEquals(DayOfWeek.MONDAY, firstDay)
         }
+    }
+
+    @Test
+    fun `a date that starts a line starts with a capital in every language`() {
+        fun monthTitle(tag: String): String {
+            val locale = Locale.forLanguageTag(tag)
+            val pattern = DateFormat.getBestDateTimePattern(locale, "MMMMyyyy")
+            return startingLine(DateTimeFormatter.ofPattern(pattern, locale).format(YearMonth.of(2027, 3)), locale)
+        }
+
+        assertEquals("Março de 2027", monthTitle("pt-BR"))
+        assertEquals("Marzo de 2027", monthTitle("es-ES"))
+        assertEquals("März 2027", monthTitle("de-DE"))
+        assertEquals("March 2027", monthTitle("en-US"))
     }
 
     private class NoLocaleManager(base: Context) : ContextWrapper(base) {

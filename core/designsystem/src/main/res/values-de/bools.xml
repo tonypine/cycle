@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- German's long compounds break at a syllable, with a hyphen ("Perioden-länge"). -->
+    <bool name="cycle_hyphenates">true</bool>
+</resources>

@@ -18,7 +18,7 @@ value class Language(val tag: String) {
          * The languages Cycle has strings for, as `localeConfig` and `localeFilters` list them. A
          * language is added here in the PR that adds its strings.
          */
-        val Supported: List<Language> = listOf(English)
+        val Supported: List<Language> = listOf(English, Language("pt-BR"), Language("es"), Language("de"))
 
         /**
          * What "the phone's language" is in Cycle: the first of the phone's [locales] that Cycle has,

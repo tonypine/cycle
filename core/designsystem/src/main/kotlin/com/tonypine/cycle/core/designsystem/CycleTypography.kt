@@ -6,6 +6,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 
@@ -80,3 +81,25 @@ val ZestTypography = CycleTypography(
     dayNumber = style(DmSans, 15, 20, 700),
     dayNumberEmphasized = style(DmSans, 15, 20, 900)
 )
+
+/**
+ * The same roles, hyphenating long words where a line breaks: for a language whose long compounds
+ * would otherwise break between any two letters on a narrow line, such as German's "Periodenlänge" at
+ * 200% font size. [CycleTheme] uses it where the language's `cycle_hyphenates` says so.
+ */
+internal fun CycleTypography.hyphenated(): CycleTypography = CycleTypography(
+    display = display.hyphenated(),
+    headline = headline.hyphenated(),
+    headlineEmphasized = headlineEmphasized.hyphenated(),
+    title = title.hyphenated(),
+    titleEmphasized = titleEmphasized.hyphenated(),
+    titleSmall = titleSmall.hyphenated(),
+    body = body.hyphenated(),
+    bodySmall = bodySmall.hyphenated(),
+    label = label.hyphenated(),
+    labelSmall = labelSmall.hyphenated(),
+    dayNumber = dayNumber.hyphenated(),
+    dayNumberEmphasized = dayNumberEmphasized.hyphenated()
+)
+
+private fun TextStyle.hyphenated() = copy(hyphens = Hyphens.Auto)

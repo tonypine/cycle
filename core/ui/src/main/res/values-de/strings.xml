@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <!-- The day log sheet, for any day up to today: flow, then how she feels. -->
+    <string name="day_log_flow">Blutung</string>
+    <string name="day_log_flow_none">Keine</string>
+    <string name="day_log_flow_spotting">Schmierblutung</string>
+    <string name="day_log_flow_light">Leicht</string>
+    <string name="day_log_flow_medium">Mittel</string>
+    <string name="day_log_flow_heavy">Stark</string>
+    <plurals name="day_log_fill">
+        <item quantity="one">Periode hat an diesem Tag begonnen: %1$d Tag ausfüllen</item>
+        <item quantity="other">Periode hat an diesem Tag begonnen: %1$d Tage ausfüllen</item>
+    </plurals>
+    <string name="day_log_clear">Diesen Tag leeren</string>
+
+    <!-- How she feels. -->
+    <string name="day_log_pain">Schmerzen</string>
+    <string name="day_log_pain_where">Wo?</string>
+    <string name="day_log_body">Körper</string>
+    <string name="day_log_mood">Stimmung</string>
+    <string name="day_log_energy">Energie</string>
+    <string name="day_log_sleep">Schlaf</string>
+    <string name="day_log_sex">Sex</string>
+    <string name="day_log_notes">Notizen</string>
+    <string name="day_log_note_label">Deine Notiz</string>
+    <string name="day_log_note_placeholder">Noch etwas? Schreib es hier auf.</string>
+    <string name="day_log_note_supporting">Nur auf diesem Telefon.</string>
+
+    <string name="pain_none">Keine</string>
+    <string name="pain_mild">Leicht</string>
+    <string name="pain_moderate">Mäßig</string>
+    <string name="pain_severe">Stark</string>
+    <string name="pain_cramps">Krämpfe</string>
+    <string name="pain_headache">Kopfschmerzen</string>
+    <string name="pain_lower_back">Unterer Rücken</string>
+    <string name="pain_breasts">Brüste</string>
+    <string name="pain_ovulation">Mittelschmerz</string>
+    <string name="pain_during_sex">Beim Sex</string>
+
+    <string name="body_bloating">Blähbauch</string>
+    <string name="body_tender_breasts">Empfindliche Brüste</string>
+    <string name="body_acne">Akne</string>
+    <string name="body_cravings">Heißhunger</string>
+    <string name="body_nausea">Übelkeit</string>
+    <string name="body_tired">Müdigkeit</string>
+    <string name="body_hot_flushes">Hitzewallungen</string>
+    <string name="body_night_sweats">Nachtschweiß</string>
+
+    <string name="mood_calm">Ruhig</string>
+    <string name="mood_happy">Glücklich</string>
+    <string name="mood_sensitive">Empfindlich</string>
+    <string name="mood_sad">Traurig</string>
+    <string name="mood_anxious">Ängstlich</string>
+    <string name="mood_irritable">Gereizt</string>
+    <string name="mood_angry">Wütend</string>
+    <string name="mood_low">Niedergeschlagen</string>
+    <string name="mood_mood_swings">Stimmungsschwankungen</string>
+
+    <string name="energy_low">Niedrig</string>
+    <string name="energy_normal">Normal</string>
+    <string name="energy_high">Hoch</string>
+    <string name="sleep_well">Gut geschlafen</string>
+    <string name="sleep_badly">Schlecht geschlafen</string>
+    <string name="sex_protected">Geschützt</string>
+    <string name="sex_unprotected">Ungeschützt</string>
+
+    <!-- A day in a few words, such as "Krämpfe, mäßig · Blähbauch · Wenig Energie". -->
+    <string name="summary_separator">" · "</string>
+    <string name="summary_pain_where">%1$s, %2$s</string>
+    <string name="summary_pain_mild">leicht</string>
+    <string name="summary_pain_moderate">mäßig</string>
+    <string name="summary_pain_severe">stark</string>
+    <string name="summary_pain_none">Keine Schmerzen</string>
+    <string name="summary_pain_mild_only">Leichte Schmerzen</string>
+    <string name="summary_pain_moderate_only">Mäßige Schmerzen</string>
+    <string name="summary_pain_severe_only">Starke Schmerzen</string>
+    <string name="summary_flow_none">Keine Blutung</string>
+    <string name="summary_flow_spotting">Schmierblutung</string>
+    <string name="summary_flow_light">Leichte Blutung</string>
+    <string name="summary_flow_medium">Mittlere Blutung</string>
+    <string name="summary_flow_heavy">Starke Blutung</string>
+    <string name="summary_energy_low">Wenig Energie</string>
+    <string name="summary_energy_normal">Normale Energie</string>
+    <string name="summary_energy_high">Viel Energie</string>
+    <string name="summary_sex_protected">Geschützter Sex</string>
+    <string name="summary_sex_unprotected">Ungeschützter Sex</string>
+    <string name="day_log_dismiss">Jetzt nicht</string>
+    <string name="day_log_save">Eintragen</string>
+
+    <!-- Clearing a day. %1$s: the day, "20. März". -->
+    <string name="day_log_clear_title">Den %1$s leeren?</string>
+    <string name="day_log_clear_period_body">Der %1$s zählt dann nicht mehr als Periodentag, und was du für ihn eingetragen hast, wird gelöscht. Die anderen Tage der Periode bleiben.</string>
+    <string name="day_log_clear_body">Was du für den %1$s eingetragen hast, wird gelöscht.</string>
+    <string name="day_log_clear_confirm">Leeren</string>
+    <string name="day_log_clear_keep">Behalten</string>
+
+    <!-- Her usual lengths, at setup and in Settings. -->
+    <string name="usual_cycle_length">Zykluslänge</string>
+    <string name="usual_cycle_length_supporting">Vom ersten Tag einer Periode bis zum ersten Tag der nächsten. Oft zwischen 21 und 35 Tagen.</string>
+    <string name="usual_cycle_length_shorter">Zyklus einen Tag kürzer</string>
+    <string name="usual_cycle_length_longer">Zyklus einen Tag länger</string>
+    <string name="usual_period_length">Periodenlänge</string>
+    <string name="usual_period_length_supporting">Die Tage, an denen du blutest. Oft zwischen 2 und 7 Tagen.</string>
+    <string name="usual_period_length_shorter">Periode einen Tag kürzer</string>
+    <string name="usual_period_length_longer">Periode einen Tag länger</string>
+    <plurals name="usual_length_days">
+        <item quantity="one">%1$d Tag</item>
+        <item quantity="other">%1$d Tage</item>
+    </plurals>
+
+    <!-- Contraception, shared by setup and Settings. -->
+    <string name="method_none">Keine</string>
+    <string name="method_none_line">Oder eine Barrieremethode wie Kondome</string>
+    <string name="method_combined_pill">Kombinationspille</string>
+    <string name="method_combined_pill_line">Zwei Hormone, oft mit einer Pause</string>
+    <string name="method_progestogen_pill">Gestagenpille</string>
+    <string name="method_progestogen_pill_line">Auch Minipille genannt</string>
+    <string name="method_patch">Pflaster</string>
+    <string name="method_patch_line">Jede Woche ein neues Pflaster</string>
+    <string name="method_ring">Vaginalring</string>
+    <string name="method_ring_line">Bleibt jeweils drei Wochen drin</string>
+    <string name="method_implant">Implantat</string>
+    <string name="method_implant_line">Ein Stäbchen im Arm, etwa Implanon NXT</string>
+    <string name="method_hormonal_iud">Hormonspirale</string>
+    <string name="method_hormonal_iud_line">Auch IUS genannt, etwa Mirena</string>
+    <string name="method_copper_iud">Kupferspirale</string>
+    <string name="method_copper_iud_line">Eine Spirale ohne Hormone</string>
+    <string name="method_injection">Dreimonatsspritze</string>
+    <string name="method_injection_line">Etwa Depo-Clinovir</string>
+    <string name="method_which_pill">Du weißt nicht, welche Pille du nimmst? Das steht im Beipackzettel.</string>
+
+    <!-- Short names, for Today's display and History's card: "Implantat". -->
+    <string name="method_short_combined_pill">Pille</string>
+    <string name="method_short_progestogen_pill">Minipille</string>
+    <string name="method_short_patch">Pflaster</string>
+    <string name="method_short_ring">Ring</string>
+    <string name="method_short_implant">Implantat</string>
+    <string name="method_short_hormonal_iud">Hormonspirale</string>
+    <string name="method_short_copper_iud">Kupferspirale</string>
+    <string name="method_short_injection">Spritze</string>
+
+    <!-- In a sentence, short, with its article in the accusative: "die Pille", "den Ring". Every
+         sentence that takes one takes it in the accusative (für, verwenden, absetzen), never first. -->
+    <string name="method_sentence_combined_pill">die Pille</string>
+    <string name="method_sentence_progestogen_pill">die Minipille</string>
+    <string name="method_sentence_patch">das Pflaster</string>
+    <string name="method_sentence_ring">den Ring</string>
+    <string name="method_sentence_implant">das Implantat</string>
+    <string name="method_sentence_hormonal_iud">die Hormonspirale</string>
+    <string name="method_sentence_copper_iud">die Kupferspirale</string>
+    <string name="method_sentence_injection">die Spritze</string>
+
+    <!-- In a sentence, in full, in the accusative with its article, under the same rules. -->
+    <string name="method_full_combined_pill">die Kombinationspille</string>
+    <string name="method_full_progestogen_pill">die Gestagenpille</string>
+    <string name="method_full_patch">das Pflaster</string>
+    <string name="method_full_ring">den Vaginalring</string>
+    <string name="method_full_implant">das Implantat</string>
+    <string name="method_full_hormonal_iud">die Hormonspirale</string>
+    <string name="method_full_copper_iud">die Kupferspirale</string>
+    <string name="method_full_injection">die Dreimonatsspritze</string>
+
+    <!-- Since when, and when she stops. -->
+    <string name="method_since_body">Ungefähr reicht.</string>
+    <string name="method_since_combined_pill">Wann hast du mit der Pille angefangen?</string>
+    <string name="method_since_progestogen_pill">Wann hast du mit der Minipille angefangen?</string>
+    <string name="method_since_patch">Wann hast du mit dem Pflaster angefangen?</string>
+    <string name="method_since_ring">Wann hast du mit dem Ring angefangen?</string>
+    <string name="method_since_implant">Wann wurde dein Implantat eingesetzt?</string>
+    <string name="method_since_iud">Wann wurde deine Spirale eingesetzt?</string>
+    <string name="method_since_injection">Wann hast du deine erste Spritze bekommen?</string>
+    <string name="method_stop_pill">Wann hast du deine letzte Pille genommen?</string>
+    <string name="method_stop_patch">Wann hast du dein letztes Pflaster abgenommen?</string>
+    <string name="method_stop_ring">Wann hast du deinen letzten Ring herausgenommen?</string>
+    <string name="method_stop_implant">Wann wurde dein Implantat entfernt?</string>
+    <string name="method_stop_iud">Wann wurde deine Spirale entfernt?</string>
+    <string name="method_stop_injection">Wann hast du deine letzte Spritze bekommen?</string>
+    <string name="method_stop_injection_body">Cycle zählt 13 Wochen ab diesem Tag.</string>
+
+    <!-- A stretch's dates, in "Deine Methoden" and History: "3. Mai 2027 bis 12. Sept. 2027". -->
+    <string name="stretch_since">Seit dem %1$s</string>
+    <string name="stretch_from_to">%1$s bis %2$s</string>
+    <string name="stretch_until">Bis zum %1$s</string>
+    <string name="stretch_start_not_known">Beginn unbekannt</string>
+
+    <!-- Breaks, on a combined pill, patch or ring. -->
+    <string name="breaks_question_pill">Machst du zwischen den Packungen eine Pause?</string>
+    <string name="breaks_question_patch">Hast du eine pflasterfreie Woche?</string>
+    <string name="breaks_question_ring">Hast du eine ringfreie Woche?</string>
+    <string name="breaks_monthly">Jeden Monat</string>
+    <string name="breaks_monthly_pill_line">Eine Woche Pause oder Pillen ohne Wirkstoff in jeder Packung</string>
+    <string name="breaks_monthly_patch_line">Eine pflasterfreie Woche nach drei Pflastern</string>
+    <string name="breaks_monthly_ring_line">Eine ringfreie Woche nach drei Wochen</string>
+    <string name="breaks_every_few_packs">Alle paar Packungen</string>
+    <string name="breaks_every_few_packs_line">Zwei oder mehr Packungen am Stück, dann eine Pause</string>
+    <string name="breaks_none">Keine Pausen</string>
+    <string name="breaks_none_line">Eine Packung direkt nach der anderen</string>
+
+    <!-- The calm line: what Cycle stops estimating on the method, and why. -->
+    <string name="calm_none">Cycle schätzt deine Perioden anhand deines eigenen Zyklus.</string>
+    <string name="calm_copper_iud">Dein Zyklus bleibt dein eigener, deshalb schätzt Cycle deine Perioden weiter. Anfangs können sie stärker oder länger sein.</string>
+    <string name="calm_pill_monthly">Die Pille bestimmt deine Blutungen, deshalb erwartet Cycle in jeder Pause eine und nennt sie Abbruchblutung, nicht Periode.</string>
+    <string name="calm_patch_monthly">Das Pflaster bestimmt deine Blutungen, deshalb erwartet Cycle in jeder pflasterfreien Woche eine und nennt sie Abbruchblutung, nicht Periode.</string>
+    <string name="calm_ring_monthly">Der Ring bestimmt deine Blutungen, deshalb erwartet Cycle in jeder ringfreien Woche eine und nennt sie Abbruchblutung, nicht Periode.</string>
+    <string name="calm_every_few_packs">Du bestimmst, wann deine Pausen kommen, deshalb schätzt Cycle deine nächste Abbruchblutung nicht.</string>
+    <string name="calm_no_breaks">Ohne Pausen ist keine Abbruchblutung zu erwarten, deshalb schätzt Cycle keine.</string>
+    <string name="calm_progestogen_pill">Unter der Minipille folgen Blutungen keinem Zyklus, deshalb schätzt Cycle sie nicht.</string>
+    <string name="calm_implant">Mit dem Implantat können Blutungen jederzeit kommen, deshalb schätzt Cycle sie nicht.</string>
+    <string name="calm_hormonal_iud">Mit einer Hormonspirale folgen Blutungen keinem Zyklus, auf den du dich verlassen kannst, deshalb schätzt Cycle sie nicht.</string>
+    <string name="calm_injection">Mit der Dreimonatsspritze folgen Blutungen keinem Zyklus, deshalb schätzt Cycle sie nicht.</string>
+</resources>

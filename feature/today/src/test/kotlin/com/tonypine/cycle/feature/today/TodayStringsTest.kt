@@ -17,23 +17,66 @@ class TodayStringsTest {
     @Test
     fun `no string says what the app never says`() {
         val strings =
-            assertNeverSaid(R.string::class.java, R.plurals::class.java, also = mapOf(Language.English to MoreWords))
+            assertNeverSaid(R.string::class.java, R.plurals::class.java, also = MoreWords)
 
         assertTrue("Found no strings to check", strings.getValue(Language.English).size > 20)
     }
 
     private companion object {
         // On a method too: never a safe or protected day, ovulation, advice on the method or a condition.
-        val MoreWords = listOf(
-            "ovulat",
-            "protected",
-            "low chance",
-            "should",
-            "consider",
-            "switch",
-            "amenorrh",
-            "infrequent",
-            "prolonged"
+        val MoreWords = mapOf(
+            Language.English to listOf(
+                "ovulat",
+                "protected",
+                "low chance",
+                "should",
+                "consider",
+                "switch",
+                "amenorrh",
+                "infrequent",
+                "prolonged"
+            ),
+            Language("pt-BR") to listOf(
+                "ovulaç",
+                "protegid",
+                "baixa chance",
+                "deveria",
+                "você deve",
+                "considere",
+                "troque",
+                "trocar de",
+                "amenorr",
+                "infrequente",
+                "prolongad"
+            ),
+            Language("es") to listOf(
+                "ovulac",
+                "protegid",
+                "pocas probabilidades",
+                "baja probabilidad",
+                "deberías",
+                "debes",
+                "considera",
+                "cambia de método",
+                "cambiar de método",
+                "amenorr",
+                "infrecuente",
+                "prolongad"
+            ),
+            Language("de") to listOf(
+                "eisprung",
+                "ovulation",
+                "geschützt",
+                "geringe chance",
+                "geringe wahrscheinlichkeit",
+                "solltest",
+                "sollte",
+                "erwäge",
+                "überleg",
+                "wechsle",
+                "amenorrh",
+                "verlängert"
+            )
         )
     }
 }

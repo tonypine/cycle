@@ -41,6 +41,14 @@ private val Destinations = listOf(
     NavigationDestination("Settings", CycleIcons.Settings)
 )
 
+// The app's tabs in German, the longest of Cycle's languages.
+private val LongDestinations = listOf(
+    NavigationDestination("Heute", CycleIcons.Today),
+    NavigationDestination("Kalender", CycleIcons.Calendar),
+    NavigationDestination("Verlauf", CycleIcons.History),
+    NavigationDestination("Einstellungen", CycleIcons.Settings)
+)
+
 @Composable
 internal fun AppBarsSection() {
     var selected by rememberSaveable { mutableIntStateOf(1) }
@@ -83,6 +91,12 @@ internal fun AppBarsSection() {
     }
     VariantStates("Three destinations", "The fewest a bar holds; five is the most.") {
         NavigationBar(Destinations.take(3), selectedIndex = 2, onSelect = {})
+    }
+    VariantStates(
+        "Long labels",
+        "German's tabs: every label shrinks together, to 11sp at the least, so \"Einstellungen\" stays whole."
+    ) {
+        NavigationBar(LongDestinations, selectedIndex = 3, onSelect = {})
     }
 }
 
