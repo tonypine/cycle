@@ -309,7 +309,8 @@ RadioRow(title = "Implant", selected = true, onClick = {}, body = "A rod in the 
 - `RadioGroup(options, selected, onSelect, title, modifier, body = { null }, enabled = true)` is the
   one to reach for: a `RadioRow` per option, `spacing.small` apart, with nothing selected while
   `selected` is null. The rows are one `selectableGroup` and a collection, so TalkBack reads each
-  row's place in it: "Implant, A rod in the arm, such as Nexplanon, radio button, selected, 6 of 9".
+  row's place in it: "Implant, A rod in the arm, such as Nexplanon, radio button, selected, 6 of
+  10".
 - `RadioRow(title, selected, onClick, modifier, body = null, enabled = true, interactionSource)` is
   one row: a full-width row on `surfaceContainer` with 24dp corners (`shapes.large`), the `title` in
   `titleSmall` `onSurface`, an optional one-line `body` in `bodySmall` `onSurfaceVariant`, and the
