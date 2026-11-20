@@ -98,7 +98,11 @@ class ContraceptionScreenshotTest(private val screen: Screen, private val appear
         }),
         StopCombinedInjection("stop_combined_injection", content = {
             StopMethodScreen(
-                StretchUiState.Ready(CombinedInjection, CombinedInjectionToday, CombinedInjectionToday.plusWeeks(4)),
+                StretchUiState.Ready(
+                    CombinedInjectionStretch,
+                    CombinedInjectionToday,
+                    CombinedInjectionToday.plusWeeks(4)
+                ),
                 {},
                 {},
                 {},
@@ -166,11 +170,11 @@ private val Ring = ContraceptionStretch(
     id = 5
 )
 private val CombinedInjectionToday = LocalDate.of(2027, 8, 10)
-private val CombinedInjection =
+private val CombinedInjectionStretch =
     ContraceptionStretch(ContraceptionMethod.COMBINED_INJECTION, LocalDate.of(2026, 11, 9), id = 5)
 
 /** The last monthly injection on 3 August: counted until 31 August. */
-private val OnCombinedInjection = CombinedInjection.copy(stopped = LocalDate.of(2027, 8, 31))
+private val OnCombinedInjection = CombinedInjectionStretch.copy(stopped = LocalDate.of(2027, 8, 31))
 private val OnInjection = ContraceptionStretch(
     ContraceptionMethod.INJECTION,
     LocalDate.of(2026, 11, 9),

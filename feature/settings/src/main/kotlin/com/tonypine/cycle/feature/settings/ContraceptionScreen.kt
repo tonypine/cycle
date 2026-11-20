@@ -153,7 +153,8 @@ private fun NowCard(current: ContraceptionStretch?) {
                 val until = formatDate(stopped, DAY_MONTH_AND_YEAR)
                 BasicText(
                     when (current.method) {
-                        ContraceptionMethod.INJECTION -> stringResource(R.string.contraception_counts_until_injection, until)
+                        ContraceptionMethod.INJECTION ->
+                            stringResource(R.string.contraception_counts_until_injection, until)
 
                         ContraceptionMethod.COMBINED_INJECTION ->
                             stringResource(R.string.contraception_counts_until_combined_injection, until)

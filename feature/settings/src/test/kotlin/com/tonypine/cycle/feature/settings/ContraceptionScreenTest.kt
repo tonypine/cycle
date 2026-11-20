@@ -183,7 +183,7 @@ class ContraceptionScreenTest {
             .assertExists()
         composeRule.onAllNodesWithText("Mark as stopped").assertCountEquals(0)
         composeRule.onAllNodesWithText("When to get help").assertCountEquals(0)
-        assertEquals("Monthly combined injection, 9 Nov 2026 to 30 Sep 2027", spokenButtons().last())
+        assertEquals("Monthly combined injection, 9 Nov 2026 to 30 Sept 2027", spokenButtons().last())
     }
 
     @Test

@@ -573,6 +573,7 @@ class TodayScreenTest {
             if (state.todayLog.isLogged) add("Edit")
             when (state.outlook) {
                 is NextPeriod, is NextBleed -> add("How is this estimated?")
+
                 is TodayOutlook.Bleeding -> add(
                     if (state.method?.method == ContraceptionMethod.COMBINED_INJECTION) {
                         "What changes on the monthly injection?"
