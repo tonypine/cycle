@@ -14,6 +14,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -39,6 +40,16 @@ class AppLanguage(private val languages: LanguageRepository, private val scope: 
 
     // Below 13: the process's default locale before Cycle set her language as the default.
     private var phoneDefault: Locale? = null
+
+    /**
+     * 13 and later: the latest copy of Android's per-app language into the settings, from the activity's
+     * `onStart`; done once it and every copy before it are done. Each copy waits for the one before, so
+     * one that read Android's language earlier never writes over a newer one. They run off the main
+     * thread: none of the reads and writes in it waits for the main thread to be free.
+     */
+    @Volatile
+    var synced: Job = Job().apply { complete() }
+        private set
 
     /** From `Application.onCreate`, before any activity. */
     fun onCreate() {
@@ -73,7 +84,11 @@ class AppLanguage(private val languages: LanguageRepository, private val scope: 
             activity.lifecycle.addObserver(
                 object : DefaultLifecycleObserver {
                     override fun onStart(owner: LifecycleOwner) {
-                        scope.launch { languages.syncWithPhone() }
+                        val before = synced
+                        synced = scope.launch(Dispatchers.IO) {
+                            before.join()
+                            languages.syncWithPhone()
+                        }
                     }
                 }
             )
