@@ -33,6 +33,7 @@ import com.tonypine.cycle.core.model.ContraceptionStretch
 import com.tonypine.cycle.core.model.Language
 import com.tonypine.cycle.core.testing.renderIn
 import java.time.LocalDate
+import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -52,6 +53,7 @@ class SettingsScreenTest {
     private val calls = mutableListOf<String>()
     private var state by mutableStateOf(SettingsUiState(28, 5, lastExported = null))
     private var showBackupNote by mutableStateOf(false)
+    private var language by mutableStateOf(LanguageUiState(chosen = null, phoneLanguage = Language.English))
 
     private fun show() = composeRule.setContent {
         Themed {
@@ -68,6 +70,8 @@ class SettingsScreenTest {
                 onConfirmImport = { calls += "confirm import" },
                 onDismissDialog = { calls += "dismiss" },
                 onDeleteEverything = { calls += "delete everything" },
+                language = language,
+                onLanguage = { calls += "language" },
                 onNotices = { calls += "notices" },
                 showBackupNote = showBackupNote,
                 onHideBackupNote = { calls += "hide backup note" }
@@ -85,7 +89,7 @@ class SettingsScreenTest {
         show()
 
         composeRule.onNode(hasText("Settings") and isHeading()).assertExists()
-        listOf("Your cycle", "Your data", "About").forEach {
+        listOf("Your cycle", "Your data", "App", "About").forEach {
             composeRule.onNode(hasText(it) and isHeading()).assertExists()
         }
         row("Usual cycle and period").assert(hasText("28-day cycle, 5-day period")).performClick()
@@ -93,9 +97,44 @@ class SettingsScreenTest {
         row("Contraception").assert(hasText("None")).performClick()
         row("Export my data").assert(hasText("Save a file with every day you logged")).performClick()
         row("Import from a file").performClick()
+        row("Language").assert(hasText("Phone's language, English")).performClick()
         row("Open-source notices").performClick()
 
-        assertEquals(listOf("usual lengths", "what to log", "contraception", "export", "import", "notices"), calls)
+        assertEquals(
+            listOf("usual lengths", "what to log", "contraception", "export", "import", "language", "notices"),
+            calls
+        )
+    }
+
+    @Test
+    fun `the Language row names what Cycle follows and the language it is in, under its own name`() {
+        // A phone in French: Cycle follows it in English.
+        language = LanguageUiState(chosen = null, phoneLanguage = Language.English, phoneLocale = Locale.FRANCE)
+        show()
+        row("Language").assert(hasText("Phone's language, English"))
+
+        language = LanguageUiState(chosen = Language("de"), phoneLanguage = Language.English)
+        row("Language").assert(hasText("Deutsch"))
+    }
+
+    @Test
+    fun `the Language row reads in Portuguese as the design gives it`() =
+        assertLanguageRow("pt-BR", title = "Idioma", line = "Idioma do celular, Português (Brasil)")
+
+    @Test
+    fun `the Language row reads in Spanish as the design gives it`() =
+        assertLanguageRow("es", title = "Idioma", line = "Idioma del teléfono, Español")
+
+    @Test
+    fun `the Language row reads in German as the design gives it`() =
+        assertLanguageRow("de", title = "Sprache", line = "Sprache des Telefons, Deutsch")
+
+    // Cycle follows a phone in the language [tag].
+    private fun assertLanguageRow(tag: String, title: String, line: String) {
+        renderIn(Language(tag))
+        language = LanguageUiState(chosen = null, phoneLanguage = Language(tag))
+        show()
+        row(title).assert(hasText(line))
     }
 
     @Test

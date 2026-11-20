@@ -35,6 +35,24 @@ class LanguageTest {
     }
 
     @Test
+    fun `a tag with a region, as Android's per-app page gives it, is the language Cycle has`() {
+        assertEquals(Language("es"), Language.ofTag("es-ES"))
+        assertEquals(Language("es"), Language.ofTag("es-US"))
+        assertEquals(Language("de"), Language.ofTag("de-DE"))
+        assertEquals(Language("de"), Language.ofTag("de-AT"))
+        assertEquals(Language("pt-BR"), Language.ofTag("pt-PT"))
+        assertEquals(Language("pt-BR"), Language.ofTag("pt-BR"))
+        assertEquals(Language.English, Language.ofTag("en-GB"))
+        assertEquals(Language("es"), Language.of(Locale.forLanguageTag("es-MX")))
+    }
+
+    @Test
+    fun `a tag Cycle has no strings for is none of its languages`() {
+        assertEquals(null, Language.ofTag("fr-FR"))
+        assertEquals(null, Language.ofTag(""))
+    }
+
+    @Test
     fun `English, the language of the default strings, is always one Cycle has`() {
         assertEquals(Language.English, Language.Supported.first())
         assertEquals(Locale.ENGLISH, Language.English.locale)

@@ -13,6 +13,7 @@ import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.github.takahirom.roborazzi.captureScreenRoboImage
 import com.tonypine.cycle.core.data.export.ImportProblem
+import com.tonypine.cycle.core.model.Language
 import java.time.LocalDate
 import org.junit.Rule
 import org.junit.Test
@@ -116,6 +117,8 @@ private fun Settings(dialog: DataDialog? = null, showBackupNote: Boolean = false
     onConfirmImport = {},
     onDismissDialog = {},
     onDeleteEverything = {},
+    language = LanguageUiState(chosen = null, phoneLanguage = Language.English),
+    onLanguage = {},
     onNotices = {},
     showBackupNote = showBackupNote,
     onHideBackupNote = {}

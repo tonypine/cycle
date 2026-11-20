@@ -243,4 +243,19 @@
     <string name="refused_stop_before_start">Eso es antes de que empezara. Elige un día posterior.</string>
     <string name="refused_stop_too_late">Elige un día hasta el %1$s.</string>
     <string name="refused_gone">Estas fechas se borraron.</string>
+    <!-- Settings › App › Language (docs/design/language.md). The language named in
+         settings_language_phone is the one Cycle is in, under its own name. -->
+    <string name="settings_app">Aplicación</string>
+    <string name="language_title">Idioma</string>
+    <string name="settings_language_phone">Idioma del teléfono, %1$s</string>
+    <string name="language_intro">Cambian las palabras y las fechas de Cycle. Tus registros se quedan como están, y tus notas conservan tus propias palabras.</string>
+    <string name="language_phone">Idioma del teléfono</string>
+    <!-- The phone's first language, as Android names it and capitalized, then the language this option
+         uses, as Android writes it mid-sentence. -->
+    <string name="language_phone_not_in_cycle">%1$s aún no está en Cycle, así que esta opción usa %2$s.</string>
+    <!-- Each language's name in this language, under its own name on the Language page. -->
+    <string name="language_name_en">Inglés</string>
+    <string name="language_name_pt_br">Portugués (Brasil)</string>
+    <string name="language_name_es">Español</string>
+    <string name="language_name_de">Alemán</string>
 </resources>

@@ -306,14 +306,18 @@ RadioGroup(
 RadioRow(title = "Implant", selected = true, onClick = {}, body = "A rod in the arm, such as Nexplanon")
 ```
 
-- `RadioGroup(options, selected, onSelect, title, modifier, body = { null }, enabled = true)` is the
-  one to reach for: a `RadioRow` per option, `spacing.small` apart, with nothing selected while
-  `selected` is null. The rows are one `selectableGroup` and a collection, so TalkBack reads each
-  row's place in it: "Implant, A rod in the arm, such as Nexplanon, radio button, selected, 6 of 10".
-- `RadioRow(title, selected, onClick, modifier, body = null, enabled = true, interactionSource)` is
-  one row: a full-width row on `surfaceContainer` with 24dp corners (`shapes.large`), the `title` in
-  `titleSmall` `onSurface`, an optional one-line `body` in `bodySmall` `onSurfaceVariant`, and the
-  radio at the end. The whole row is the target (`selectable`, `Role.RadioButton`), at least 56dp
+- `RadioGroup(options, selected, onSelect, title, modifier, body = { null }, enabled = true,
+  titleLocale = { null })` is the one to reach for: a `RadioRow` per option, `spacing.small` apart,
+  with nothing selected while `selected` is null. The rows are one `selectableGroup` and a
+  collection, so TalkBack reads each row's place in it: "Implant, A rod in the arm, such as
+  Nexplanon, radio button, selected, 6 of 10".
+- `RadioRow(title, selected, onClick, modifier, body = null, enabled = true, titleLocale = null,
+  interactionSource)` is one row: a full-width row on `surfaceContainer` with 24dp corners
+  (`shapes.large`), the `title` in `titleSmall` `onSurface`, an optional `body` in `bodySmall`
+  `onSurfaceVariant`, and the radio at the end. Title and body wrap to as many lines as they need,
+  never cut off, and the radio stays centred beside them. A `titleLocale` (a Compose `LocaleList`)
+  marks the title as written in that language, so TalkBack reads it in that language's voice and its
+  lines break by its rules: the Language page's options, "Deutsch" on an English phone. The whole row is the target (`selectable`, `Role.RadioButton`), at least 56dp
   tall. Pressed, focused and hovered come from `cycleIndication` in the row's shape.
 
 Selected, the row is `accentContainer` with `onAccentContainer` text and the radio is a 10dp `accent`

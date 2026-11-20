@@ -157,10 +157,12 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
 
     /**
      * Cycle's language, as the settings keep it: null for the phone's. [LanguageRepository] applies it
-     * and keeps it in step with Android's own per-app setting.
+     * and keeps it in step with Android's own per-app setting. A regional tag an earlier build stored
+     * from Android's page (`es-ES`) reads as its language (`es`); a tag Cycle has no strings for reads
+     * as the phone's.
      */
     val language: Flow<Language?> =
-        dataStore.data.map { preferences -> preferences[LANGUAGE]?.let(::Language) }.distinctUntilChanged()
+        dataStore.data.map { preferences -> preferences[LANGUAGE]?.let(Language::ofTag) }.distinctUntilChanged()
 
     suspend fun setLanguage(language: Language?) {
         dataStore.edit { if (language == null) it.remove(LANGUAGE) else it[LANGUAGE] = language.tag }

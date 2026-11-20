@@ -2,6 +2,7 @@ package com.tonypine.cycle.core.data.settings
 
 import com.tonypine.cycle.core.model.Language
 import java.io.File
+import java.util.Locale
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +40,12 @@ class LanguageRepository(
 
     /** What "the phone's language" is in Cycle now, among the languages it has: for the Settings row. */
     fun phoneLanguage(): Language = Language.ofPhone(phone.locales)
+
+    /**
+     * The phone's languages now, in her order, whatever language Cycle is in: for the Language page,
+     * which says when the first one isn't in Cycle.
+     */
+    fun phoneLocales(): List<Locale> = phone.locales
 
     /**
      * Whether [syncWithPhone] can run without the app waiting for it: always below Android 13, and on
