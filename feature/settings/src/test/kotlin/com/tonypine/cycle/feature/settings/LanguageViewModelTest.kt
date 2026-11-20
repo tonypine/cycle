@@ -126,16 +126,15 @@ class LanguageViewModelTest {
     }
 
     @Test
-    fun `on Android 13 and later a language chosen on Android's page shows once Cycle syncs on its return`() =
-        runTest {
-            val viewModel = languageViewModel()
-            languages.syncWithPhone()
+    fun `on Android 13 and later a language chosen on Android's page shows once Cycle syncs`() = runTest {
+        val viewModel = languageViewModel()
+        languages.syncWithPhone()
 
-            phone.appLanguage = spanish
-            languages.syncWithPhone()
+        phone.appLanguage = spanish
+        languages.syncWithPhone()
 
-            assertEquals(spanish, viewModel.uiState.first { it?.chosen == spanish }!!.current)
-        }
+        assertEquals(spanish, viewModel.uiState.first { it?.chosen == spanish }!!.current)
+    }
 
     @Test
     fun `switching languages changes nothing she logged, her notes included`() = runTest {

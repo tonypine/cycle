@@ -1,10 +1,10 @@
 package com.tonypine.cycle.core.designsystem
 
+import androidx.compose.ui.text.intl.LocaleList
 import com.tonypine.cycle.core.designsystem.testing.ComponentState
 import com.tonypine.cycle.core.designsystem.testing.ComponentStateMatrix
 import com.tonypine.cycle.core.designsystem.testing.ComponentStateMatrixRule
 import com.tonypine.cycle.core.designsystem.testing.MatrixCase
-import androidx.compose.ui.text.intl.LocaleList
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test

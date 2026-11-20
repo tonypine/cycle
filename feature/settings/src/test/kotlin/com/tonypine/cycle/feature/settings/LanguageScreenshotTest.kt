@@ -36,11 +36,7 @@ import org.robolectric.annotation.GraphicsMode
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(qualifiers = "w360dp-h800dp-mdpi")
-class LanguageScreenshotTest(
-    private val screen: String,
-    private val tag: String,
-    private val appearance: String
-) {
+class LanguageScreenshotTest(private val screen: String, private val tag: String, private val appearance: String) {
     // A tag rather than a Language: the runner cannot pass a value class to the constructor.
     private val language = Language(tag)
 
