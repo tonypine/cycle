@@ -128,6 +128,8 @@
     <string name="method_copper_iud_line">Eine Spirale ohne Hormone</string>
     <string name="method_injection">Dreimonatsspritze</string>
     <string name="method_injection_line">Etwa Depo-Clinovir</string>
+    <string name="method_combined_injection">Kombinierte Monatsspritze</string>
+    <string name="method_combined_injection_line">Zwei Hormone, alle 4 Wochen, etwa Cyclofem</string>
     <string name="method_which_pill">Du weißt nicht, welche Pille du nimmst? Das steht im Beipackzettel.</string>
 
     <!-- Short names, for Today's display and History's card: "Implantat". -->
@@ -139,6 +141,7 @@
     <string name="method_short_hormonal_iud">Hormonspirale</string>
     <string name="method_short_copper_iud">Kupferspirale</string>
     <string name="method_short_injection">Spritze</string>
+    <string name="method_short_combined_injection">Monatsspritze</string>
 
     <!-- In a sentence, short, with its article in the accusative: "die Pille", "den Ring". Every
          sentence that takes one takes it in the accusative (für, verwenden, absetzen), never first. -->
@@ -150,6 +153,7 @@
     <string name="method_sentence_hormonal_iud">die Hormonspirale</string>
     <string name="method_sentence_copper_iud">die Kupferspirale</string>
     <string name="method_sentence_injection">die Spritze</string>
+    <string name="method_sentence_combined_injection">die Monatsspritze</string>
 
     <!-- In a sentence, in full, in the accusative with its article, under the same rules. -->
     <string name="method_full_combined_pill">die Kombinationspille</string>
@@ -160,6 +164,7 @@
     <string name="method_full_hormonal_iud">die Hormonspirale</string>
     <string name="method_full_copper_iud">die Kupferspirale</string>
     <string name="method_full_injection">die Dreimonatsspritze</string>
+    <string name="method_full_combined_injection">die kombinierte Monatsspritze</string>
 
     <!-- Since when, and when she stops. -->
     <string name="method_since_body">Ungefähr reicht.</string>
@@ -170,6 +175,7 @@
     <string name="method_since_implant">Wann wurde dein Implantat eingesetzt?</string>
     <string name="method_since_iud">Wann wurde deine Spirale eingesetzt?</string>
     <string name="method_since_injection">Wann hast du deine erste Spritze bekommen?</string>
+    <string name="method_since_combined_injection">Wann hast du deine erste Monatsspritze bekommen?</string>
     <string name="method_stop_pill">Wann hast du deine letzte Pille genommen?</string>
     <string name="method_stop_patch">Wann hast du dein letztes Pflaster abgenommen?</string>
     <string name="method_stop_ring">Wann hast du deinen letzten Ring herausgenommen?</string>
@@ -177,6 +183,7 @@
     <string name="method_stop_iud">Wann wurde deine Spirale entfernt?</string>
     <string name="method_stop_injection">Wann hast du deine letzte Spritze bekommen?</string>
     <string name="method_stop_injection_body">Cycle zählt 13 Wochen ab diesem Tag.</string>
+    <string name="method_stop_combined_injection_body">Cycle zählt 4 Wochen ab diesem Tag.</string>
 
     <!-- A stretch's dates, in "Deine Methoden" and History: "3. Mai 2027 bis 12. Sept. 2027". -->
     <string name="stretch_since">Seit dem %1$s</string>
@@ -209,4 +216,5 @@
     <string name="calm_implant">Mit dem Implantat können Blutungen jederzeit kommen, deshalb schätzt Cycle sie nicht.</string>
     <string name="calm_hormonal_iud">Mit einer Hormonspirale folgen Blutungen keinem Zyklus, auf den du dich verlassen kannst, deshalb schätzt Cycle sie nicht.</string>
     <string name="calm_injection">Mit der Dreimonatsspritze folgen Blutungen keinem Zyklus, deshalb schätzt Cycle sie nicht.</string>
+    <string name="calm_combined_injection">Mit der Monatsspritze richten sich Blutungen nach deinen Spritzen, nicht nach einem Zyklus, und sie schwanken, deshalb schätzt Cycle sie nicht.</string>
 </resources>

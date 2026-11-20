@@ -15,4 +15,5 @@
     <string name="calendar_hint_none_implant">Cycle no estima el sangrado con el implante. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
     <string name="calendar_hint_none_hormonal_iud">Cycle no estima el sangrado con un DIU hormonal. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
     <string name="calendar_hint_none_injection">Cycle no estima el sangrado con la inyección. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
+    <string name="calendar_hint_none_combined_injection">Cycle no estima el sangrado con la inyección mensual. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
 </resources>

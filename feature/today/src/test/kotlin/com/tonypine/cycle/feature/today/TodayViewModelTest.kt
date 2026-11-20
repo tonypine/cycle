@@ -432,7 +432,54 @@ class TodayViewModelTest {
 
         val state = viewModel.awaitState<TodayUiState.Tracking> { it.display is TodayDisplay.DaysSince }
         assertEquals(TodayDisplay.DaysSince(days = 14, method = ContraceptionMethod.INJECTION), state.display)
-        assertEquals(TodayOutlook.AfterInjection, state.outlook)
+        assertEquals(TodayOutlook.AfterInjection(ContraceptionMethod.INJECTION), state.outlook)
+        assertEquals(TodayPhase.NoEstimate, state.phase)
+        (0L..60L).forEach { assertEquals(CycleDayState.Plain, state.dayState(today.plusDays(it))) }
+    }
+
+    @Test
+    fun `on the monthly injection Today shows the method, its bleeding and nothing expected`() = today { viewModel, _ ->
+        logPeriod(day("2027-01-01"), day("2027-01-05"))
+        contraception.start(
+            ContraceptionMethod.COMBINED_INJECTION,
+            breaks = null,
+            started = day("2027-01-20"),
+            today = today
+        )
+        logPeriod(day("2027-03-02"), day("2027-03-06"))
+
+        val state = viewModel.awaitState<TodayUiState.Tracking> {
+            (it.outlook as? TodayOutlook.Bleeding)?.summary?.days == 5
+        }
+        assertEquals(TodayDisplay.Method(ContraceptionMethod.COMBINED_INJECTION), state.display)
+        assertNull(state.cycleDay)
+        assertEquals(TodayPhase.NoEstimate, state.phase)
+        assertEquals(BleedingWord.BLEEDING, state.words)
+        assertNull(state.nextPeriod)
+        assertNull(state.missedPeriod)
+        assertEquals(
+            TodayMethod(ContraceptionMethod.COMBINED_INJECTION, breaks = null, firstMonths = true),
+            state.method
+        )
+        (0L..60L).forEach { assertEquals(CycleDayState.Plain, state.dayState(today.plusDays(it))) }
+    }
+
+    @Test
+    fun `after the monthly injection Today waits for her first period`() = today { viewModel, _ ->
+        logPeriod(day("2026-10-08"), day("2026-10-12"))
+        contraception.start(
+            ContraceptionMethod.COMBINED_INJECTION,
+            breaks = null,
+            started = day("2026-11-09"),
+            today = today
+        )
+        val injection = contraception.observeStretches().first().single()
+        // Last monthly injection on 6 February: counted until 6 March, 4 weeks later.
+        contraception.stop(injection.id, lastDay = day("2027-02-06"), today = today)
+
+        val state = viewModel.awaitState<TodayUiState.Tracking> { it.display is TodayDisplay.DaysSince }
+        assertEquals(TodayDisplay.DaysSince(days = 14, method = ContraceptionMethod.COMBINED_INJECTION), state.display)
+        assertEquals(TodayOutlook.AfterInjection(ContraceptionMethod.COMBINED_INJECTION), state.outlook)
         assertEquals(TodayPhase.NoEstimate, state.phase)
         (0L..60L).forEach { assertEquals(CycleDayState.Plain, state.dayState(today.plusDays(it))) }
     }

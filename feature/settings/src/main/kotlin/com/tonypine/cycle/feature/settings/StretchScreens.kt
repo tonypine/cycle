@@ -71,7 +71,7 @@ fun StopMethodRoute(viewModel: StretchViewModel, onBack: () -> Unit, modifier: M
 }
 
 /**
- * "When was your implant taken out?" (on the injection, "When was your last injection?" and that
+ * "When was your implant taken out?" (on an injection, "When was your last injection?" and that
  * Cycle counts 13 weeks from it), with a month of days from the method's start to today, and Save
  * once a day is picked. The day picked is kept through a configuration change.
  */
@@ -124,7 +124,7 @@ fun StretchRoute(viewModel: StretchViewModel, onBack: () -> Unit, modifier: Modi
 
 /**
  * One method's dates, under a top bar with its name: when it started ("Fitted · 13 September 2027",
- * or "Not known"), when it stopped ("Taken out · Still in"; on the injection "Counted until"), on a
+ * or "Not known"), when it stopped ("Taken out · Still in"; on an injection "Counted until"), on a
  * combined method its breaks, and "Delete these dates". Each row opens a sheet to change it, and
  * Save there saves at once; delete asks first. New dates that overlap another method ask to move its
  * edge, and dates that can't be saved say why, from [StretchUiState.Ready.dialog].
@@ -206,11 +206,16 @@ fun StretchScreen(
         isEnabled = { it <= state.today },
         onSave = { onEdit(stretch.copy(started = it)) }
     )
-    val injection = method == ContraceptionMethod.INJECTION
     DaySheet(
         sheet = stopSheet,
-        title = if (injection) stringResource(R.string.stretch_counted_until) else stopTitle(method),
-        body = stringResource(if (injection) R.string.stretch_counted_until_body else CoreUiR.string.method_since_body),
+        title = if (method.isInjection) stringResource(R.string.stretch_counted_until) else stopTitle(method),
+        body = stringResource(
+            when (method) {
+                ContraceptionMethod.INJECTION -> R.string.stretch_counted_until_body
+                ContraceptionMethod.COMBINED_INJECTION -> R.string.stretch_counted_until_combined_injection_body
+                else -> CoreUiR.string.method_since_body
+            }
+        ),
         today = state.today,
         initial = stretch.stopped,
         isEnabled = { it >= stretch.startKey && it <= state.latestStop },
@@ -423,13 +428,13 @@ private val ContraceptionMethod.isFitted: Boolean
         this == ContraceptionMethod.COPPER_IUD
 
 private fun startLabel(method: ContraceptionMethod): Int = when {
-    method == ContraceptionMethod.INJECTION -> R.string.stretch_first_injection
+    method.isInjection -> R.string.stretch_first_injection
     method.isFitted -> R.string.stretch_fitted
     else -> R.string.stretch_started
 }
 
 private fun stopLabel(method: ContraceptionMethod): Int = when {
-    method == ContraceptionMethod.INJECTION -> R.string.stretch_counted_until
+    method.isInjection -> R.string.stretch_counted_until
     method.isFitted -> R.string.stretch_taken_out
     else -> R.string.stretch_stopped
 }

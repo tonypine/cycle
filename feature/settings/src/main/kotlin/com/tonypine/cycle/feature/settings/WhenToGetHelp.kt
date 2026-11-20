@@ -15,6 +15,7 @@ import androidx.compose.ui.semantics.semantics
 import com.tonypine.cycle.core.designsystem.Card
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionMethod.COMBINED_INJECTION
 import com.tonypine.cycle.core.model.ContraceptionMethod.COMBINED_PILL
 import com.tonypine.cycle.core.model.ContraceptionMethod.COPPER_IUD
 import com.tonypine.cycle.core.model.ContraceptionMethod.HORMONAL_IUD
@@ -40,15 +41,16 @@ internal data class GetHelpAction(@StringRes val title: Int, val signs: List<Int
 
 /**
  * The section on [method]: on the combined pill, patch and ring, and on both IUDs. Null on the
- * progestogen-only pill, implant and injection, whose sources list no urgent signs, and on none. A
- * new method fails to compile here until `0007` decides whether it has one.
+ * progestogen-only pill, implant and injection, whose sources list no urgent signs, and on none. Null
+ * on the monthly combined injection too for now: its section is built in a ticket of its own. A new
+ * method fails to compile here until `0007` decides whether it has one.
  */
 internal fun getHelp(method: ContraceptionMethod?): GetHelp? = when (method) {
     COMBINED_PILL -> combined(R.string.get_help_intro_combined_pill)
     PATCH -> combined(R.string.get_help_intro_patch)
     RING -> combined(R.string.get_help_intro_ring)
     COPPER_IUD, HORMONAL_IUD -> GetHelp(R.string.get_help_intro_iud, listOf(IudUrgent))
-    PROGESTOGEN_PILL, IMPLANT, INJECTION, null -> null
+    PROGESTOGEN_PILL, IMPLANT, INJECTION, COMBINED_INJECTION, null -> null
 }
 
 private fun combined(@StringRes intro: Int) = GetHelp(intro, listOf(CombinedEmergency, CombinedUrgent))

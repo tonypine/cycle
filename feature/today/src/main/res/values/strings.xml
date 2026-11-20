@@ -163,11 +163,13 @@
     <string name="today_since_implant">since your implant came out</string>
     <string name="today_since_iud">since your IUD came out</string>
     <string name="today_since_injection">since you stopped the injection</string>
+    <string name="today_since_combined_injection">since you stopped the monthly injection</string>
     <string name="today_basis_usual">Estimated from your usual %1$d-day cycle</string>
     <!-- A basis line above, then the settling sentence below. -->
     <string name="today_basis_then_settling">%1$s. %2$s</string>
     <string name="today_basis_settling">Cycles can take a few months to settle after the %1$s, so the range is wider.</string>
     <string name="today_after_injection">Periods can take several months to come back after the injection. Cycle will estimate again once you log one.</string>
+    <string name="today_after_combined_injection">Periods can take a few months to come back after the monthly injection. Cycle will estimate again once you log one.</string>
 
     <!-- The next bleed, on a combined method with a break every month. -->
     <string name="today_next_bleed">Next bleed</string>
@@ -208,6 +210,7 @@
     <string name="today_first_months_implant">In the first months on the implant, bleeding is often irregular or long.</string>
     <string name="today_first_months_hormonal_iud">In the first months with a hormonal IUD, bleeding is often frequent or long. It usually gets lighter over the first year.</string>
     <string name="today_first_months_injection">In the first months on the injection, bleeding is often irregular or long. It usually lessens with time.</string>
+    <string name="today_first_months_combined_injection">In the first months on the monthly injection, bleeding is often irregular or long. It usually settles.</string>
 
     <!-- The copper IUD, for six months after fitting, until she taps Got it. -->
     <string name="today_copper_iud_title">Periods can be heavier at first</string>
@@ -223,6 +226,7 @@
     <string name="method_sheet_button_implant">What changes on the implant?</string>
     <string name="method_sheet_button_hormonal_iud">What changes with a hormonal IUD?</string>
     <string name="method_sheet_button_injection">What changes on the injection?</string>
+    <string name="method_sheet_button_combined_injection">What changes on the monthly injection?</string>
     <string name="method_sheet_title_pill">Bleeding on the pill</string>
     <string name="method_sheet_title_mini_pill">Bleeding on the mini pill</string>
     <string name="method_sheet_title_patch">Bleeding on the patch</string>
@@ -230,12 +234,15 @@
     <string name="method_sheet_title_implant">Bleeding on the implant</string>
     <string name="method_sheet_title_hormonal_iud">Bleeding with a hormonal IUD</string>
     <string name="method_sheet_title_injection">Bleeding on the injection</string>
+    <string name="method_sheet_title_combined_injection">Bleeding on the monthly injection</string>
     <string name="method_sheet_combined">On the %1$s, a bleed usually comes in a break. With breaks only every few packs, or none, bleeding can still come at other times, and it often settles with time.</string>
     <string name="method_sheet_mini_pill">The mini pill changes bleeding for many people. It can be irregular, come and go, or stop, and it may not settle with time.</string>
     <string name="method_sheet_implant">The implant changes bleeding for most people. It can be lighter, longer, come and go, or stop, and the pattern can change at any time.</string>
     <string name="method_sheet_hormonal_iud">A hormonal IUD changes bleeding for most people. It is often frequent or long in the first months, then usually gets lighter, and for some it stops.</string>
     <string name="method_sheet_injection">The injection changes bleeding for most people. It is often irregular or long at first, and usually lessens the longer you use it. For many, it stops.</string>
+    <string name="method_sheet_combined_injection">Most people bleed once between injections, about two to three weeks after each one. Bleeding can also come at other times, last longer, or not come at all, most often in the first months.</string>
     <string name="method_sheet_what_cycle_does">So Cycle doesn\'t estimate when you\'ll bleed, count cycle days or say anything is late. It shows the days you log, and how much you bled in the last 90 days.</string>
+    <string name="method_sheet_what_cycle_does_combined_injection">Cycle doesn\'t know when you have your injections, so it doesn\'t estimate when you\'ll bleed, count cycle days or say anything is late. It shows the days you log, and how much you bled in the last 90 days.</string>
     <string name="method_sheet_help">If the bleeding becomes a problem for you, a GP or sexual health clinic can help.</string>
 
     <!-- How is this estimated, for the next bleed. -->

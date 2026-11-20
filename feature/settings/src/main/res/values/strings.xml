@@ -155,6 +155,7 @@
     <string name="contraception_breaks_none">no breaks</string>
     <string name="contraception_counts_until">Cycle counts it until %1$s.</string>
     <string name="contraception_counts_until_injection">Cycle counts it until %1$s, 13 weeks after your last injection.</string>
+    <string name="contraception_counts_until_combined_injection">Cycle counts it until %1$s, 4 weeks after your last injection.</string>
     <string name="contraception_add">Add your method</string>
     <string name="contraception_change">Change method</string>
     <string name="contraception_stop">Mark as stopped</string>
@@ -216,6 +217,7 @@
     <string name="stretch_still_in">Still in</string>
     <string name="stretch_still_on_it">Still on it</string>
     <string name="stretch_counted_until_body">Any day up to 13 weeks from today.</string>
+    <string name="stretch_counted_until_combined_injection_body">Any day up to 4 weeks from today.</string>
     <string name="stretch_breaks">Breaks</string>
     <string name="stretch_delete">Delete these dates</string>
     <string name="stretch_delete_body">Cycle forgets this method for these dates. What you logged stays.</string>

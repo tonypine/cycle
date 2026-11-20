@@ -235,7 +235,7 @@ sealed interface StretchUiState {
     data object Loading : StretchUiState
 
     /**
-     * @property latestStop the latest stop date it can have: today, or 13 weeks ahead on the injection.
+     * @property latestStop the latest stop date it can have: today, or 13 weeks ahead on the injection, 4 on the monthly one.
      */
     data class Ready(
         val stretch: ContraceptionStretch,

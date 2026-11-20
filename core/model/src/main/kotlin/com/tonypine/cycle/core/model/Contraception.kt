@@ -9,9 +9,16 @@ import java.time.LocalDate
  *
  * @property isHormonal its bleeding is not a period, and its cycles leave her typical cycle.
  * @property isCombined a combined pill, patch or ring: it takes [Breaks], and a bleed in the 7 days
- *   after it stops is still its withdrawal bleed.
+ *   after it stops is still its withdrawal bleed. The monthly combined injection is not one.
+ * @property isInjection the 8- or 13-week injection or the monthly combined injection: stopping it
+ *   asks for her last injection and counts weeks on from it, and after it no estimate shows until
+ *   her first period.
  */
-enum class ContraceptionMethod(val isHormonal: Boolean, val isCombined: Boolean = false) {
+enum class ContraceptionMethod(
+    val isHormonal: Boolean,
+    val isCombined: Boolean = false,
+    val isInjection: Boolean = false
+) {
     COMBINED_PILL(isHormonal = true, isCombined = true),
     PROGESTOGEN_PILL(isHormonal = true),
     PATCH(isHormonal = true, isCombined = true),
@@ -19,7 +26,8 @@ enum class ContraceptionMethod(val isHormonal: Boolean, val isCombined: Boolean 
     IMPLANT(isHormonal = true),
     HORMONAL_IUD(isHormonal = true),
     COPPER_IUD(isHormonal = false),
-    INJECTION(isHormonal = true)
+    INJECTION(isHormonal = true, isInjection = true),
+    COMBINED_INJECTION(isHormonal = true, isInjection = true)
 }
 
 /** How she takes a combined pill, patch or ring. */
@@ -55,7 +63,7 @@ enum class BleedingWord { PERIOD, BLEED, BLEEDING }
  * @property started the first day on the method, or null when she skipped "since when" in setup:
  *   the stretch then covers every day before [stopped].
  * @property stopped the last day on the method, included, or null while she is still on it. Only an
- *   injection's can be after today: 13 weeks after her last injection.
+ *   injection's can be after today: 13 weeks after her last injection, or 4 after her last monthly one.
  * @property breaks for a combined method only, and always given for one.
  * @property id the stored row, or 0 before it is saved.
  */
@@ -103,7 +111,7 @@ enum class EstimateKind {
     /** The next scheduled bleed, on a combined method with a break every month. */
     NEXT_BLEED,
 
-    /** None: a method whose bleeding has no estimate, or after the injection until a period. */
+    /** None: a method whose bleeding has no estimate, or after an injection until a period. */
     NONE
 }
 
@@ -219,7 +227,7 @@ sealed interface StretchRefusal {
     /** A stop date before the start date. */
     data object StopBeforeStart : StretchRefusal
 
-    /** A stop date after [latest]: today, or 13 weeks after today on the injection. */
+    /** A stop date after [latest]: today, or 13 weeks (4 on the monthly injection) after today on an injection. */
     data class StopTooLate(val latest: LocalDate) : StretchRefusal
 
     /** The stretch is no longer stored. */

@@ -165,6 +165,29 @@ class YourDataRepositoryTest {
     }
 
     @Test
+    fun `a monthly combined injection, counted 4 weeks past today, round-trips as combined_injection`() = runTest {
+        val phone = phone()
+        contraception.start(ContraceptionMethod.COMBINED_INJECTION, null, day("2026-11-09"), today = day("2027-08-10"))
+        val injection = contraception.observeStretches().first().single()
+        // Last injection on 3 August: counted until 31 August, after the day she exports.
+        contraception.stop(injection.id, lastDay = day("2027-08-03"), today = day("2027-08-10"))
+        val before = stretches()
+        val exported = phone.repository.exportBytes()
+
+        phone.repository.deleteEverything()
+        val read = phone.repository.read(ByteArrayInputStream(exported)) as ImportRead.Ready
+        phone.repository.import(read.file)
+
+        assertEquals(
+            listOf(ContraceptionStretch(ContraceptionMethod.COMBINED_INJECTION, day("2026-11-09"), day("2027-08-31"))),
+            before
+        )
+        assertTrue(exported.decodeToString().contains("combined_injection,2026-11-09,2027-08-31,"))
+        assertEquals(1, read.newStretches)
+        assertEquals(before, stretches())
+    }
+
+    @Test
     fun `a file exported in one language imports the same days in another, and is the same file in each`() = runTest {
         val phone = phone()
         logSyntheticHistory()

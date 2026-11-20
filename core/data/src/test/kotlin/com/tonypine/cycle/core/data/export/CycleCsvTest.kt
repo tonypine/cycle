@@ -272,7 +272,8 @@ class CycleCsvTest {
                 "implant,2027-05-01,2027-05-21,",
                 "hormonal_iud,2027-06-01,2027-06-21,",
                 "copper_iud,2027-07-01,2027-07-21,",
-                "injection,2027-08-01,2027-08-21,"
+                "injection,2027-08-01,2027-08-21,",
+                "combined_injection,2027-09-01,2027-09-21,"
             ),
             csv.lines().drop(3).filter { it.isNotEmpty() }
         )

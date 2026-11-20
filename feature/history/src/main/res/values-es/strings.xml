@@ -76,6 +76,7 @@
     <string name="history_method_hormonal_iud">DIU hormonal</string>
     <string name="history_method_copper_iud">DIU de cobre</string>
     <string name="history_method_injection">Inyección</string>
+    <string name="history_method_combined_injection">Inyección mensual</string>
     <string name="history_method_left_out">No forma parte de tu ciclo típico.</string>
     <!-- On a method with no estimate, her bleeding, in plain counts. %1$s: the days, "12 días";
          %2$s: the episodes, "4 episodios". -->

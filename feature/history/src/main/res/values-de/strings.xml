@@ -69,6 +69,7 @@
     <string name="history_method_hormonal_iud">Hormonspirale</string>
     <string name="history_method_copper_iud">Kupferspirale</string>
     <string name="history_method_injection">Spritze</string>
+    <string name="history_method_combined_injection">Monatsspritze</string>
     <string name="history_method_left_out">Nicht Teil deines typischen Zyklus.</string>
     <!-- On a method with no estimate, her bleeding, in plain counts. %1$s: the days, after "an", so in
          the dative, "12 Tagen"; %2$s: the episodes, after "in", "4 Phasen". -->

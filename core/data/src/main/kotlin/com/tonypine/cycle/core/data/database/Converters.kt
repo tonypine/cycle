@@ -61,7 +61,8 @@ internal class Converters {
             ContraceptionMethod.IMPLANT to "implant",
             ContraceptionMethod.HORMONAL_IUD to "hormonal_iud",
             ContraceptionMethod.COPPER_IUD to "copper_iud",
-            ContraceptionMethod.INJECTION to "injection"
+            ContraceptionMethod.INJECTION to "injection",
+            ContraceptionMethod.COMBINED_INJECTION to "combined_injection"
         )
 
         /** The text each kind of breaks is stored and exported as (`0006`). */
