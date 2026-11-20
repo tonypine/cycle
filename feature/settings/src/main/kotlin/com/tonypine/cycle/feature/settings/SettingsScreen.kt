@@ -147,8 +147,16 @@ fun SettingsScreen(
                 title = stringResource(R.string.usual_lengths_title),
                 body = stringResource(
                     R.string.settings_usual_lengths_body,
-                    state.usualCycleLength,
-                    state.usualPeriodLength
+                    pluralStringResource(
+                        R.plurals.settings_usual_cycle,
+                        state.usualCycleLength,
+                        state.usualCycleLength
+                    ),
+                    pluralStringResource(
+                        R.plurals.settings_usual_period,
+                        state.usualPeriodLength,
+                        state.usualPeriodLength
+                    )
                 ),
                 onClick = onUsualLengths,
                 opensPage = true

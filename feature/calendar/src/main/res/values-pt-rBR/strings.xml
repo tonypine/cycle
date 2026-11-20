@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <string name="calendar_title">Calendário</string>
+    <string name="calendar_go_to_today">Ir para hoje</string>
+    <string name="calendar_hint">As menstruações previstas são estimativas. Toque em qualquer dia até hoje para registrá-lo ou alterá-lo.</string>
+
+    <string name="calendar_hint_bleeds">Os sangramentos da pausa previstos são estimativas. Toque em qualquer dia até hoje para registrá-lo ou alterá-lo.</string>
+    <string name="calendar_hint_first_bleed">O Cycle vai estimar seu próximo sangramento da pausa quando você registrar um. Toque em qualquer dia até hoje para registrá-lo ou alterá-lo.</string>
+    <string name="calendar_hint_after_injection">O Cycle vai estimar suas menstruações de novo quando você registrar uma. Toque em qualquer dia até hoje para registrá-lo ou alterá-lo.</string>
+    <string name="calendar_hint_none_pill">O Cycle não estima o sangramento com a pílula. Toque em qualquer dia até hoje para registrá-lo ou alterá-lo.</string>
+    <string name="calendar_hint_none_mini_pill">O Cycle não estima o sangramento com a minipílula. Toque em qualquer dia até hoje para registrá-lo ou alterá-lo.</string>
+    <string name="calendar_hint_none_patch">O Cycle não estima o sangramento com o adesivo. Toque em qualquer dia até hoje para registrá-lo ou alterá-lo.</string>
+    <string name="calendar_hint_none_ring">O Cycle não estima o sangramento com o anel. Toque em qualquer dia até hoje para registrá-lo ou alterá-lo.</string>
+    <string name="calendar_hint_none_implant">O Cycle não estima o sangramento com o implante. Toque em qualquer dia até hoje para registrá-lo ou alterá-lo.</string>
+    <string name="calendar_hint_none_hormonal_iud">O Cycle não estima o sangramento com um DIU hormonal. Toque em qualquer dia até hoje para registrá-lo ou alterá-lo.</string>
+    <string name="calendar_hint_none_injection">O Cycle não estima o sangramento com a injeção. Toque em qualquer dia até hoje para registrá-lo ou alterá-lo.</string>
+</resources>

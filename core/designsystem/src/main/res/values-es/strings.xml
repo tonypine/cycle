@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <!-- The language of these strings, as a BCP 47 tag (cycleLocale). Not shown. -->
+    <string name="cycle_language_tag">es</string>
+
+    <string name="cycle_text_field_counter">%1$d de %2$d caracteres</string>
+
+    <!-- Day cell content description parts, read by TalkBack after the date: "20 de marzo, hoy, periodo". -->
+    <string name="day_cell_today">hoy</string>
+    <string name="day_cell_period">periodo</string>
+    <string name="day_cell_predicted_period">periodo previsto</string>
+    <string name="day_cell_bleed">sangrado de la pausa</string>
+    <string name="day_cell_expected_bleed">sangrado de la pausa previsto</string>
+    <string name="day_cell_bleeding">sangrado</string>
+    <string name="day_cell_expected_bleeding">sangrado previsto</string>
+    <string name="day_cell_fertile">ventana fértil estimada</string>
+    <string name="day_cell_ovulation">ovulación estimada</string>
+
+    <string name="calendar_previous_month">Mes anterior</string>
+    <string name="calendar_next_month">Mes siguiente</string>
+
+    <string name="legend_period">Periodo</string>
+    <string name="legend_predicted_period">Periodo previsto</string>
+    <string name="legend_bleed">Sangrado de la pausa</string>
+    <string name="legend_expected_bleed">Sangrado de la pausa previsto</string>
+    <string name="legend_bleeding">Sangrado</string>
+    <string name="legend_expected_bleeding">Sangrado previsto</string>
+    <string name="legend_fertile">Ventana fértil estimada</string>
+    <string name="legend_ovulation">Ovulación estimada</string>
+    <string name="legend_today">Hoy</string>
+
+    <string name="bottom_sheet_handle">Controlador de arrastre</string>
+    <string name="bottom_sheet_expanded">Expandida</string>
+    <string name="bottom_sheet_partially_expanded">Expandida en parte</string>
+    <string name="bottom_sheet_expand">Expandir</string>
+    <string name="bottom_sheet_collapse">Contraer</string>
+    <string name="bottom_sheet_dismiss">Cerrar</string>
+
+    <string name="loading">Cargando</string>
+</resources>

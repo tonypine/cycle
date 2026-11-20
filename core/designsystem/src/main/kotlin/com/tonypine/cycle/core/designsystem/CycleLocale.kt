@@ -38,6 +38,13 @@ fun cycleLocale(): Locale {
 }
 
 /**
+ * [text], a formatted date that starts a title or a line, with its first letter capitalized by
+ * [locale]'s rules: Portuguese and Spanish write month and weekday names in lower case ("março de
+ * 2027"), but a line starts with a capital ("Março de 2027"). English and German are unchanged.
+ */
+fun startingLine(text: String, locale: Locale): String = text.replaceFirstChar { it.titlecase(locale) }
+
+/**
  * The first day of the week, from the phone whatever Cycle's language is: Android 14's "First day of
  * week" when she set one, otherwise the region of the phone's first locale. Cycle's calendar starts
  * its weeks where the phone's own calendar does.

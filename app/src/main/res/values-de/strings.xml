@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <!-- The navigation bar's tabs: one short word each. -->
+    <string name="tab_today">Heute</string>
+    <string name="tab_calendar">Kalender</string>
+    <string name="tab_history">Verlauf</string>
+    <string name="tab_settings">Einstellungen</string>
+
+    <!-- Lock Cycle: the lock screen, and the phone's prompt. -->
+    <string name="lock_title">Cycle ist gesperrt</string>
+    <string name="lock_body">Entsperre Cycle mit deinem Fingerabdruck, deinem Gesicht oder deiner Displaysperre.</string>
+    <string name="lock_unlock">Entsperren</string>
+    <string name="lock_prompt_title">Bestätige, dass du es bist</string>
+    <string name="lock_prompt_subtitle">Nutze deinen Fingerabdruck, dein Gesicht oder deine Displaysperre.</string>
+</resources>

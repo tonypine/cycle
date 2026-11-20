@@ -8,7 +8,7 @@ import com.android.build.api.dsl.ApplicationExtension
  * (docs/decisions/0008-languages.md). A language is added here in the PR that adds its strings, with
  * `localeConfig` and `Language.Supported`; `LanguagesTest` in `app` keeps the lists in step.
  */
-private val localeFilters = listOf("en")
+private val localeFilters = listOf("en", "pt-rBR", "es", "de")
 
 internal fun configureLocaleFilters(application: ApplicationExtension) {
     application.androidResources.localeFilters += localeFilters

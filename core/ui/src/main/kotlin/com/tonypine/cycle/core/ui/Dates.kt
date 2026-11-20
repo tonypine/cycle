@@ -4,6 +4,7 @@ import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.tonypine.cycle.core.designsystem.cycleLocale
+import com.tonypine.cycle.core.designsystem.startingLine
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -25,3 +26,11 @@ fun formatDate(date: LocalDate, skeleton: String = DAY_AND_MONTH): String {
     val formatter = remember(locale, skeleton) { dateFormatter(locale, skeleton) }
     return formatter.format(date)
 }
+
+/**
+ * [formatDate] for a date that starts a title or a line, capitalized as a line starts in Cycle's
+ * language: "Sábado, 20 de março" in Portuguese.
+ */
+@Composable
+fun formatDateStartingLine(date: LocalDate, skeleton: String = DAY_AND_MONTH): String =
+    startingLine(formatDate(date, skeleton), cycleLocale())

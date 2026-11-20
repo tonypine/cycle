@@ -7,8 +7,10 @@ import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.booleanResource
 
 val LocalCycleColors = staticCompositionLocalOf { LightCycleColors }
 val LocalCycleTypography = staticCompositionLocalOf { ZestTypography }
@@ -26,7 +28,8 @@ val LocalCycleStateAlpha = staticCompositionLocalOf { DefaultCycleStateAlpha }
  * colours text selection handles and highlights in `accent`.
  *
  * [reduceMotion] follows the system's animator duration scale; when it is on, every motion spec is
- * `snap()`.
+ * `snap()`. In a language whose long words need it (`cycle_hyphenates`, German), the type roles
+ * hyphenate where a line breaks.
  */
 @Composable
 fun CycleTheme(
@@ -36,9 +39,11 @@ fun CycleTheme(
 ) {
     val colors = if (darkTheme) DarkCycleColors else LightCycleColors
     val motion = ZestMotion.copy(reduceMotion = reduceMotion)
+    val hyphenates = booleanResource(R.bool.cycle_hyphenates)
+    val typography = remember(hyphenates) { if (hyphenates) ZestTypography.hyphenated() else ZestTypography }
     CompositionLocalProvider(
         LocalCycleColors provides colors,
-        LocalCycleTypography provides ZestTypography,
+        LocalCycleTypography provides typography,
         LocalCycleShapes provides ZestShapes,
         LocalCycleSpacing provides DefaultCycleSpacing,
         LocalCycleElevation provides DefaultCycleElevation,

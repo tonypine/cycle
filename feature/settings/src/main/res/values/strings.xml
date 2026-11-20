@@ -7,7 +7,17 @@
     <string name="settings_title">Settings</string>
     <string name="settings_back">Back</string>
     <string name="settings_your_cycle">Your cycle</string>
-    <string name="settings_usual_lengths_body">%1$d-day cycle, %2$d-day period</string>
+    <!-- "28-day cycle, 5-day period": each length is a plural of its own, since a period can last a
+         single day and other languages count it ("1 dia", "5 dias"). -->
+    <string name="settings_usual_lengths_body">%1$s, %2$s</string>
+    <plurals name="settings_usual_cycle">
+        <item quantity="one">%1$d-day cycle</item>
+        <item quantity="other">%1$d-day cycle</item>
+    </plurals>
+    <plurals name="settings_usual_period">
+        <item quantity="one">%1$d-day period</item>
+        <item quantity="other">%1$d-day period</item>
+    </plurals>
     <string name="settings_what_to_log_body">Choose what the day log asks about</string>
     <string name="settings_your_data">Your data</string>
     <string name="settings_on_this_phone_title">Everything stays on this phone</string>

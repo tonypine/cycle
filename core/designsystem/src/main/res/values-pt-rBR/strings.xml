@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <!-- The language of these strings, as a BCP 47 tag (cycleLocale). Not shown. -->
+    <string name="cycle_language_tag">pt-BR</string>
+
+    <string name="cycle_text_field_counter">%1$d de %2$d caracteres</string>
+
+    <!-- Day cell content description parts, read by TalkBack after the date: "20 de março, hoje, menstruação". -->
+    <string name="day_cell_today">hoje</string>
+    <string name="day_cell_period">menstruação</string>
+    <string name="day_cell_predicted_period">menstruação prevista</string>
+    <string name="day_cell_bleed">sangramento da pausa</string>
+    <string name="day_cell_expected_bleed">sangramento da pausa previsto</string>
+    <string name="day_cell_bleeding">sangramento</string>
+    <string name="day_cell_expected_bleeding">sangramento previsto</string>
+    <string name="day_cell_fertile">janela fértil estimada</string>
+    <string name="day_cell_ovulation">ovulação estimada</string>
+
+    <string name="calendar_previous_month">Mês anterior</string>
+    <string name="calendar_next_month">Próximo mês</string>
+
+    <string name="legend_period">Menstruação</string>
+    <string name="legend_predicted_period">Menstruação prevista</string>
+    <string name="legend_bleed">Sangramento da pausa</string>
+    <string name="legend_expected_bleed">Sangramento da pausa previsto</string>
+    <string name="legend_bleeding">Sangramento</string>
+    <string name="legend_expected_bleeding">Sangramento previsto</string>
+    <string name="legend_fertile">Janela fértil estimada</string>
+    <string name="legend_ovulation">Ovulação estimada</string>
+    <string name="legend_today">Hoje</string>
+
+    <string name="bottom_sheet_handle">Alça de arrastar</string>
+    <string name="bottom_sheet_expanded">Expandida</string>
+    <string name="bottom_sheet_partially_expanded">Parcialmente expandida</string>
+    <string name="bottom_sheet_expand">Expandir</string>
+    <string name="bottom_sheet_collapse">Recolher</string>
+    <string name="bottom_sheet_dismiss">Fechar</string>
+
+    <string name="loading">Carregando</string>
+</resources>
