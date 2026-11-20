@@ -56,9 +56,9 @@ language with `assertNeverSaid`. Dates and numbers use `cycleLocale()`, never
 
 ## Shared skills
 
-Reusable playbooks live under `.ai/skills/` and are shared between agents through symlinks:
+Reusable playbooks live under `.agents/skills/` and are shared between agents through symlinks:
 `.claude/skills/` and `.codex/skills/` both point there. Add new skills under
-`.ai/skills/<name>/SKILL.md`, never inside one agent's folder.
+`.agents/skills/<name>/SKILL.md`, never inside one agent's folder.
 
 ## Validation
 

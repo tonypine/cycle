@@ -373,7 +373,7 @@ private fun refusalSentence(reason: StretchRefusal): String = when (reason) {
             ?: stringResource(R.string.refused_covers_whole, methodInSentence(reason.current.method))
 
     is StretchRefusal.CoversWhole -> stringResource(
-        R.string.refused_covers_whole,
+        if (reason.endMovedLater) R.string.refused_covers_whole_earlier else R.string.refused_covers_whole,
         methodInSentence(reason.stretch.method)
     )
 

@@ -66,7 +66,7 @@ class ContraceptionScreenshotTest(private val screen: Screen, private val appear
                 captureScreenRoboImage(path)
             }
 
-            Screen.MoveDialog, Screen.RefusedDialog -> captureScreenRoboImage(path)
+            Screen.MoveDialog, Screen.RefusedDialog, Screen.RefusedEarlierDialog -> captureScreenRoboImage(path)
 
             else -> composeRule.onRoot().captureRoboImage(path)
         }
@@ -103,6 +103,9 @@ class ContraceptionScreenshotTest(private val screen: Screen, private val appear
         }),
         RefusedDialog("refused_dialog", content = {
             StretchPage(Iud, StretchDialog.Refused(StretchRefusal.CoversWhole(PillUntil12)))
+        }),
+        RefusedEarlierDialog("refused_earlier_dialog", content = {
+            StretchPage(StoppedImplant, StretchDialog.Refused(StretchRefusal.CoversWhole(Ring, endMovedLater = true)))
         }),
         DeleteDialog("delete_dialog", content = { StretchPage(PillUntil12) })
     }
@@ -142,6 +145,13 @@ private val PillUntil12 = Pill.copy(stopped = LocalDate.of(2027, 9, 12))
 private val Iud = ContraceptionStretch(ContraceptionMethod.HORMONAL_IUD, LocalDate.of(2027, 9, 13), id = 2)
 private val Implant = ContraceptionStretch(ContraceptionMethod.IMPLANT, LocalDate.of(2026, 11, 9), id = 3)
 private val StoppedImplant = Implant.copy(stopped = LocalDate.of(2027, 11, 3))
+private val Ring = ContraceptionStretch(
+    ContraceptionMethod.RING,
+    LocalDate.of(2027, 11, 20),
+    stopped = LocalDate.of(2028, 1, 10),
+    breaks = Breaks.MONTHLY,
+    id = 5
+)
 private val OnInjection = ContraceptionStretch(
     ContraceptionMethod.INJECTION,
     LocalDate.of(2026, 11, 9),

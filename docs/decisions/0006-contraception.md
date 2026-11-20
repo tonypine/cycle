@@ -1,6 +1,6 @@
 # 0006: Contraception: what Cycle records, says and estimates on each method
 
-**Status:** accepted, 2026-10-05. Amended 2026-10-06 for the monthly combined injection
+**Status:** accepted, 2026-10-05. Amended 2026-11-20 for the monthly combined injection
 ([MOT-85](https://linear.app/tonypine/issue/MOT-85)).
 [MOT-51](https://linear.app/tonypine/issue/MOT-51) stores the stretches and computes the estimates;
 the screens follow this record and [`contraception.md`](../design/contraception.md).
@@ -152,6 +152,20 @@ through `CycleMigrations.ALL` and `CycleDatabaseMigrationTest` like every schema
   change would overlap a neighbour, a dialog offers to move the neighbour's edge ("Move the end of
   your pill?"); a change that would swallow a neighbour entirely is refused with the dates to use.
   A stopped date before the started date is refused.
+- **An edit that reaches more than one neighbour.** A start moved earlier can only cut short the
+  stretch it lands in, and covers every stretch after that one whole; a stop moved later works the
+  same way forwards. Any stretch covered whole refuses the change, with no move dialog, even when
+  the new date also lies inside another. The refusal names the neighbour next to the edge she moved
+  (just before for a start, just after for a stop): it is covered whole whenever any stretch is,
+  and a day past its start (or before its stop) is as far as the edge can go. Implant 9 November
+  2026 to 3 November 2027, ring 20 November 2027 to 10 January 2028, pill since 11 January 2028;
+  today is 15 February 2028. She moves the pill's start to 1 November 2027: "That would cover all
+  of your time on the ring. Delete the ring's dates first, or pick a later day." Any start up to 20
+  November is refused the same way; from 21 November to 10 January, the dialog offers to move the
+  ring's end. She moves the implant's stop to 15 January 2028: "That would cover all of your time
+  on the ring. Delete the ring's dates first, or pick an earlier day." Any stop from 10 January is
+  refused the same way; from 20 November to 9 January, the dialog offers "Move the start of your
+  ring?"; up to 19 November, nothing overlaps.
 - **Delete.** Deleting a stretch forgets the method for those dates. The days she logged stay and
   count as her own cycle again.
 - **None** is no row: Cycle is on "none" on any day outside every stretch.
@@ -283,13 +297,12 @@ still ahead (an injection's weeks, above):
 - **Settings › Your cycle › Contraception** shows the current method with its calm line, "Mark as
   stopped" and "Change method", the earlier stretches, and each stretch's edit page (dates, breaks,
   delete). The flows and copy are in the design doc.
-- **When to get help.** On the combined pill, patch or ring, or either IUD, the same page shows
+- **When to get help.** On the combined pill, patch or ring, the monthly combined injection, or
+  either IUD, the same page shows
   "When to get help" under the current method and above the earlier stretches: fixed text with the
   signs clinics give every user of the method, in the words of
   [`0007`](0007-urgent-symptoms-on-a-method.md). It follows the method in force, never what she
-  logs, and appears nowhere else. Its layout is in the design doc. The monthly combined injection
-  has none for now: it has an oestrogen like the combined pill, but `0007` covers only the methods
-  whose urgent signs it found a source for, and adding one needs a source and a change to `0007`.
+  logs, and appears nowhere else. Its layout is in the design doc.
 
 ### Privacy
 
@@ -302,7 +315,11 @@ The method is health data and stays on the phone with the rest:
   other problems: "Line 7 has a method whose dates overlap one already on this phone." This
   replaces the current "Line 7 has a method whose dates overlap another one, in the file or already
   on this phone.", now that rows overlapping each other have their own copy, below. A null start
-  overlaps every stretch that starts on or before its stop, as above.
+  overlaps every stretch that starts on or before its stop, as above. A row that reaches several
+  stretches on the phone, even covering some whole, is refused the same way, with the same one-line
+  problem and no move dialog, and nothing from the file is added: unlike an edit, which names the
+  stretch in the way, the problem names only the line, so it stays one sentence like the file's
+  others and she reads the dates to fix in "Your methods".
 - **A stretch already on the phone.** A row with the same method and start as a stretch on the
   phone is that stretch, as a line for a date she already logged is that day: import skips it and
   the phone's copy stays as it is, whatever the row says about its stop or breaks. A null start
@@ -340,9 +357,9 @@ hormonal IUD) for the first-months line, and 6 months for the copper IUD note.
 - **A list of every method, including the injection and the patch.** Chosen over only the implant and
   the pill she asked about: the research covers them, the extra rows cost nothing, and a later switch
   needs no new screen. The diaphragm and condoms have no row: they leave her cycle as it is, which
-  is "None". The monthly combined injection, sold mainly outside the UK and US, was added once she
-  said she might use it ([`product-implications.md`](../research/product-implications.md), open
-  question 2).
+  is "None". The monthly combined injection, sold mainly outside the UK and US, was added once open
+  question 2 was answered yes (Tony's decision, 2026-11-20,
+  [`product-implications.md`](../research/product-implications.md)).
 - **A next-bleed estimate on the monthly combined injection**, from her injection dates once her
   bleeds follow them. The bleed does follow the injection, but 14 to 25 days after it, and it would
   need every injection logged and a rule for when her bleeds follow them (above). Left out until she
@@ -350,7 +367,7 @@ hormonal IUD) for the first-months line, and 6 months for the copper IUD note.
 - **Counting the next bleed on the monthly combined injection from her logged bleeds**, as on the
   pill after its first break. Without her injection dates, a range wide enough to hold an injection
   7 days late and a bleed 14 to 25 days after it says little more than "about a month".
-- **Calling the bleed after each monthly injection a bleed**, as the research does. Cycle would need
+- **Calling the bleed after each monthly injection a bleed**, as the research first proposed. Cycle would need
   her injection dates to tell that bleed from the rest; "bleeding" is accurate for both.
 - **Storing the method in DataStore with the settings.** Easy for the current method, but History
   needs the dates of every past method, and `0003` already says life stages are date ranges in their

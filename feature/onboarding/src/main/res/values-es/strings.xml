@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <!-- The welcome, until she finishes or skips setup. -->
+    <string name="welcome_title">¡Hola! Empecemos con tu ciclo</string>
+    <string name="welcome_body">Registra tu periodo y Cycle estima el siguiente. Todo se queda en este teléfono: sin cuenta, sin anuncios, sin rastreo.</string>
+    <string name="welcome_get_started">Empezar</string>
+    <string name="welcome_restore">Restaurar desde una exportación de Cycle</string>
+    <string name="welcome_skip">Omitir por ahora</string>
+
+    <!-- Every setup step. -->
+    <string name="setup_step">Paso %1$d de %2$d</string>
+    <string name="setup_back">Atrás</string>
+
+    <!-- Step 1: her last period. -->
+    <string name="setup_last_period_title">¿Cuándo empezó tu último periodo?</string>
+    <string name="setup_last_period_body">Basta con una fecha aproximada.</string>
+    <string name="setup_next">Siguiente</string>
+    <string name="setup_dont_remember">No me acuerdo</string>
+
+    <!-- Step 2: her usual lengths. -->
+    <string name="setup_lengths_title">¿Cuánto suelen durar?</string>
+    <string name="setup_lengths_body">Cycle hace sus estimaciones con estos datos hasta que registres periodos tuyos.</string>
+    <string name="setup_done">Listo</string>
+
+    <!-- Step 3, optional: her contraception. -->
+    <string name="setup_contraception_title">¿Usas algún anticonceptivo?</string>
+    <string name="setup_contraception_body">Algunos métodos cambian el sangrado, así que Cycle cambia lo que estima. Puedes cambiarlo más adelante en Ajustes.</string>
+    <string name="setup_skip">Omitir</string>
+</resources>

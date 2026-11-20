@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <string name="calendar_title">Kalender</string>
+    <string name="calendar_go_to_today">Zu heute springen</string>
+    <string name="calendar_hint">Erwartete Perioden sind Schätzungen. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
+
+    <string name="calendar_hint_bleeds">Erwartete Abbruchblutungen sind Schätzungen. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
+    <string name="calendar_hint_first_bleed">Cycle schätzt deine nächste Abbruchblutung, sobald du eine eingetragen hast. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
+    <string name="calendar_hint_after_injection">Cycle schätzt deine Perioden wieder, sobald du eine eingetragen hast. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
+    <string name="calendar_hint_none_pill">Cycle schätzt Blutungen unter der Pille nicht. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
+    <string name="calendar_hint_none_mini_pill">Cycle schätzt Blutungen unter der Minipille nicht. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
+    <string name="calendar_hint_none_patch">Cycle schätzt Blutungen mit dem Pflaster nicht. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
+    <string name="calendar_hint_none_ring">Cycle schätzt Blutungen mit dem Ring nicht. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
+    <string name="calendar_hint_none_implant">Cycle schätzt Blutungen mit dem Implantat nicht. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
+    <string name="calendar_hint_none_hormonal_iud">Cycle schätzt Blutungen mit einer Hormonspirale nicht. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
+    <string name="calendar_hint_none_injection">Cycle schätzt Blutungen mit der Spritze nicht. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
+</resources>

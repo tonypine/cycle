@@ -210,8 +210,11 @@ sealed interface StretchRefusal {
     /** A new start on or before the [current] method's start: "That's before you started the pill on 3 May." */
     data class NotAfterCurrentStart(val current: ContraceptionStretch) : StretchRefusal
 
-    /** The dates would cover all of [stretch], the latest one they cover whole. */
-    data class CoversWhole(val stretch: ContraceptionStretch) : StretchRefusal
+    /**
+     * The dates would cover all of [stretch]: the latest one they cover whole, or, when an edit's
+     * stop moved later ([endMovedLater]), the earliest, just after the stretch she edits.
+     */
+    data class CoversWhole(val stretch: ContraceptionStretch, val endMovedLater: Boolean = false) : StretchRefusal
 
     /** A stop date before the start date. */
     data object StopBeforeStart : StretchRefusal

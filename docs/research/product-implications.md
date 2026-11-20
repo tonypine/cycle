@@ -72,8 +72,7 @@ health signals need several cycles, a doctor summary needs the signals' data.
   that fit the method ([`contraception.md`](contraception.md)). Designed in
   [`docs/design/contraception.md`](../design/contraception.md) and decided in
   [`0006`](../decisions/0006-contraception.md) ([MOT-50](https://linear.app/tonypine/issue/MOT-50)),
-  whose method list includes the monthly combined injection since she said she might use it (open
-  question 2 below).
+  whose method list includes the monthly combined injection (open question 2 below).
 - **Other life-stage modes**: pregnant (predictions paused), after birth or breastfeeding
   (predictions paused until three regular cycles), perimenopause (wider ranges, no fertility
   estimates by default).
@@ -168,8 +167,8 @@ From [`contraception.md`](contraception.md):
   doctor.
 - **Expected changes read as expected**: in the first months on a method, unpredictable bleeding is
   common, and the copy says so calmly rather than flagging it.
-- **Urgent symptoms are fixed text, never alerts**: the combined pill, patch, ring and both IUDs
-  get a "When to get help" section in the words of
+- **Urgent symptoms are fixed text, never alerts**: the combined pill, patch, ring, monthly combined
+  injection and both IUDs get a "When to get help" section in the words of
   [`0007`](../decisions/0007-urgent-symptoms-on-a-method.md), with no phone numbers and nothing set
   off by what she logs.
 
@@ -188,7 +187,7 @@ next planning ticket.
    [`docs/design/contraception.md`](../design/contraception.md), and the decision, including a
    next-bleed estimate on the pill with a break every month and a 90-day summary on the others, is
    [`0006`](../decisions/0006-contraception.md). The monthly combined injection (sold mainly
-   outside the UK and US): answered "yes or maybe" (2026-10-06,
+   outside the UK and US): answered yes (Tony's decision, 2026-11-20,
    [MOT-85](https://linear.app/tonypine/issue/MOT-85)), so the method list has it, with no
    next-bleed estimate ([`0006`](../decisions/0006-contraception.md)). Still open: a pill or
    injection reminder; and whether "When to get help" should name her country's emergency numbers

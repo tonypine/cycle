@@ -60,7 +60,7 @@ class AppLanguageTest {
         waitForActivityIn(Locale.GERMAN)
 
         assertEquals(Locale.GERMAN, Locale.getDefault())
-        composeRule.onNode(hasText("Calendar") and isTab).assertIsSelected()
+        composeRule.onNode(hasText("Kalender") and isTab).assertIsSelected()
 
         // The phone's language again.
         runBlocking { languages.setLanguage(null) }

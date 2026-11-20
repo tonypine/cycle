@@ -81,7 +81,8 @@ object ContraceptionEdits {
     /**
      * Saves [edited] over the stretch with its id. A stop before the start, a start after today or a
      * stop after [latestStop] is refused. A change that would cover another stretch whole is refused,
-     * naming the latest one; one that overlaps a neighbour moves the neighbour's edge, once she
+     * naming the one next to the edge she moved (0006, "An edit that reaches more than one
+     * neighbour"); one that overlaps a neighbour moves the neighbour's edge, once she
      * confirms.
      */
     fun edit(stretches: List<ContraceptionStretch>, edited: ContraceptionStretch, today: LocalDate): StretchPlan {
@@ -102,13 +103,19 @@ object ContraceptionEdits {
     }
 
     /**
-     * Fits [stretch] among the others: refused if it covers one whole (naming the latest), else each
+     * Fits [stretch] among the others: refused if it covers one whole, naming the latest, or the
+     * earliest when every one covered lies after the stored stretch (its stop moved later), else each
      * one it overlaps gives way, the one before ending the day before it starts, the one after
      * starting the day after it stops.
      */
     private fun place(stretches: List<ContraceptionStretch>, stretch: ContraceptionStretch): StretchPlan {
         val others = stretches.filter { stretch.id == 0L || it.id != stretch.id }.filter { it.overlaps(stretch) }
-        others.filter { stretch.coversWhole(it) }.maxByOrNull { it.startKey }?.let {
+        val covered = others.filter { stretch.coversWhole(it) }
+        val stored = if (stretch.id == 0L) null else stretches.firstOrNull { it.id == stretch.id }
+        if (stored != null && covered.isNotEmpty() && covered.all { it.startKey > stored.startKey }) {
+            return StretchPlan.Refused(StretchRefusal.CoversWhole(covered.minBy { it.startKey }, endMovedLater = true))
+        }
+        covered.maxByOrNull { it.startKey }?.let {
             return StretchPlan.Refused(StretchRefusal.CoversWhole(it))
         }
         val moves = others.map { other ->

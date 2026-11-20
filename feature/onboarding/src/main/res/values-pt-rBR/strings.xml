@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <!-- The welcome, until she finishes or skips setup. -->
+    <string name="welcome_title">Oi! Vamos acompanhar seu ciclo</string>
+    <string name="welcome_body">Registre sua menstruação e o Cycle estima a próxima. Tudo fica neste celular: sem conta, sem anúncios, sem rastreamento.</string>
+    <string name="welcome_get_started">Começar</string>
+    <string name="welcome_restore">Restaurar de uma exportação do Cycle</string>
+    <string name="welcome_skip">Pular por enquanto</string>
+
+    <!-- Every setup step. -->
+    <string name="setup_step">Passo %1$d de %2$d</string>
+    <string name="setup_back">Voltar</string>
+
+    <!-- Step 1: her last period. -->
+    <string name="setup_last_period_title">Quando começou sua última menstruação?</string>
+    <string name="setup_last_period_body">Pode ser aproximado.</string>
+    <string name="setup_next">Próximo</string>
+    <string name="setup_dont_remember">Não lembro</string>
+
+    <!-- Step 2: her usual lengths. -->
+    <string name="setup_lengths_title">Quanto tempo elas costumam durar?</string>
+    <string name="setup_lengths_body">O Cycle faz estimativas com estes números até você registrar menstruações suas.</string>
+    <string name="setup_done">Concluir</string>
+
+    <!-- Step 3, optional: her contraception. -->
+    <string name="setup_contraception_title">Você usa algum método contraceptivo?</string>
+    <string name="setup_contraception_body">Alguns métodos mudam o sangramento, então o Cycle muda o que estima. Você pode mudar isso depois em Ajustes.</string>
+    <string name="setup_skip">Pular</string>
+</resources>

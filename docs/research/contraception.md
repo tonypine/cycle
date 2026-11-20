@@ -486,8 +486,8 @@ there is something to estimate, but less precisely: the sources put it anywhere 
 after the injection, and a third of users bleed irregularly. The injection itself must not follow
 the bleeding: the WHO and the label say to give it every 4 weeks whatever the bleeding does
 ([WHO FP Handbook, ch. 5, Q5](https://fphandbook.org/sites/default/files/JHU%20HBk22%20-%20Chapter%205.pdf),
-[Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)). She said
-she might use it (open question 2 in [`product-implications.md`](product-implications.md)), so
+[Lunelle label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)). Open
+question 2 in [`product-implications.md`](product-implications.md) was answered yes, so
 [`0006`](../decisions/0006-contraception.md) adds it to the method list, with no next bleed: one
 counted from her injection dates would need her to log every injection, and a rule for when her
 bleeds follow them. The useful date is the next injection, which she knows from her clinic. Fertile
@@ -506,6 +506,28 @@ ovulated 63 to 112 days after their third and last injection
 women who stopped Cyclofem to conceive, more than half were pregnant at 6 months and 82.9% at 12
 ([d'Arcangues and Snow, GFMER](https://www.gfmer.ch/Endo/Lectures_11/Arcangues.htm)). The bleed two
 to three weeks after the last injection is still a withdrawal bleed.
+
+**Urgent signs.** The Lunelle label's patient labeling gives every user a list of "WARNING
+SIGNALS" under "call your doctor immediately": sharp chest pain, coughing of blood or sudden
+shortness of breath; pain in the calf; crushing chest pain or heaviness in the chest; sudden severe
+headache or vomiting, dizziness or fainting, disturbances of vision or speech, weakness or numbness
+in an arm or leg; sudden loss of vision; breast lumps; severe pain or tenderness in the abdomen;
+trouble sleeping, lack of energy or a change in mood; jaundice; persistent pain, pus or bleeding at
+the injection site; unusually heavy bleeding ([Lunelle label, p. 30](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)). The first four are the
+urgent signs the FSRH gives for the combined pill, patch and ring
+([FSRH CHC 2019, Box 4](https://www.cosrh.org/Common/Uploaded%20files/documents/fsrh-guideline-combined-hormonal-contraception-october-2023.pdf)).
+The WHO Handbook gives monthly-injectable users no such list: it tells the provider to assure every
+client "that she is welcome to come back any time", including for "a major change in health
+status", and that "Anyone who suddenly feels that something is seriously wrong with her health
+should immediately seek medical care"
+([WHO FP Handbook, ch. 5](https://fphandbook.org/supporting-new-and-continuing-users-0)). Its signs
+of serious conditions such as clots in the legs or lungs and stroke are for the provider, who stops
+the injections and refers her
+([managing problems](https://fphandbook.org/managing-any-problems-1),
+[Appendix B](https://fphandbook.org/appendix-b-signs-and-symptoms-serious-health-conditions)). No
+Cyclofem or Mesigyna patient leaflet in English turned up; the leaflet in her pack is the one that
+applies to her. [`0007`](../decisions/0007-urgent-symptoms-on-a-method.md) gives the method the
+combined pill's "When to get help", sourced to the Lunelle label.
 
 **For Cycle.** No next-bleed estimate ([`0006`](../decisions/0006-contraception.md)); call what she
 logs bleeding, since without her injection dates Cycle cannot tell the bleed after each injection
@@ -559,7 +581,8 @@ Not signal cards: urgent symptoms the sources list, such as calf pain, chest pai
 pain low in the tummy ([FSRH CHC 2019, Box 4](https://www.cosrh.org/Common/Uploaded%20files/documents/fsrh-guideline-combined-hormonal-contraception-october-2023.pdf),
 [NHS](https://www.nhs.uk/contraception/methods-of-contraception/iud-coil/side-effects/)). Cycle is
 not a triage tool ([`health-signals.md`](health-signals.md)) and never raises them from what she
-logs. On the combined pill, patch and ring and on both IUDs, the method screen shows them as fixed
+logs. On the combined pill, patch and ring, the monthly combined injection and both IUDs, the
+method screen shows them as fixed
 "When to get help" text, in the wording decided in
 [`0007`](../decisions/0007-urgent-symptoms-on-a-method.md). Missed-pill rules and whether she is
 protected are questions for her pharmacist or clinic, not for Cycle.
@@ -617,7 +640,7 @@ protected are questions for her pharmacist or clinic, not for Cycle.
 - **Health signals change with the method**, as listed above. The thresholds and the method they
   apply to belong in one place in code with their sources, like the others.
 - **Urgent symptoms are reference text, not alerts.** The method screen of the combined pill, patch,
-  ring and both IUDs shows "When to get help" below what the method does to bleeding, the same for
+  ring, monthly combined injection and both IUDs shows "When to get help" below what the method does to bleeding, the same for
   every user of the method and never set off by her log
   ([`0007`](../decisions/0007-urgent-symptoms-on-a-method.md)).
 - **Synthetic data only.** Every example here uses made-up dates and numbers, like the rest of the

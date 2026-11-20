@@ -124,7 +124,10 @@ private const val DAYS_IN_WEEK = 7
 private fun MonthHeader(month: YearMonth, onPreviousMonth: () -> Unit, onNextMonth: () -> Unit) {
     val locale = cycleLocale()
     val name = remember(month, locale) {
-        DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "MMMMyyyy"), locale).format(month)
+        startingLine(
+            DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "MMMMyyyy"), locale).format(month),
+            locale
+        )
     }
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         IconButton(CycleIcons.ChevronStart, stringResource(R.string.calendar_previous_month), onPreviousMonth)

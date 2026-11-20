@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translation: draft, awaiting a native speaker's review. -->
+<resources>
+    <string name="calendar_title">Calendario</string>
+    <string name="calendar_go_to_today">Ir a hoy</string>
+    <string name="calendar_hint">Los periodos previstos son estimaciones. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
+
+    <string name="calendar_hint_bleeds">Los sangrados de la pausa previstos son estimaciones. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
+    <string name="calendar_hint_first_bleed">Cycle estimará tu próximo sangrado de la pausa cuando registres uno. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
+    <string name="calendar_hint_after_injection">Cycle volverá a estimar tus periodos cuando registres uno. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
+    <string name="calendar_hint_none_pill">Cycle no estima el sangrado con la píldora. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
+    <string name="calendar_hint_none_mini_pill">Cycle no estima el sangrado con la minipíldora. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
+    <string name="calendar_hint_none_patch">Cycle no estima el sangrado con el parche. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
+    <string name="calendar_hint_none_ring">Cycle no estima el sangrado con el anillo. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
+    <string name="calendar_hint_none_implant">Cycle no estima el sangrado con el implante. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
+    <string name="calendar_hint_none_hormonal_iud">Cycle no estima el sangrado con un DIU hormonal. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
+    <string name="calendar_hint_none_injection">Cycle no estima el sangrado con la inyección. Toca cualquier día hasta hoy para registrarlo o cambiarlo.</string>
+</resources>

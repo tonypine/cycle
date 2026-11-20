@@ -17,7 +17,7 @@ Every date and number here is synthetic.
 | Place | What changes |
 | -- | -- |
 | Setup | A third, optional step after her usual lengths: the method, since when, and breaks on a combined method. |
-| Settings › Your cycle › Contraception | A new row and page: her method now, "Mark as stopped", "Change method", every earlier method with its dates, and an edit page for each. On the combined pill, patch or ring or an IUD, "When to get help" under her method. |
+| Settings › Your cycle › Contraception | A new row and page: her method now, "Mark as stopped", "Change method", every earlier method with its dates, and an edit page for each. On the combined pill, patch or ring, the monthly injection or an IUD, "When to get help" under her method. |
 | Today | On a hormonal method, the method's name instead of "Day 19", a calm line, the next bleed (combined, a break every month) or the last 90 days (every other hormonal method). After stopping, the days since and a wider estimate. On a copper IUD, a card about heavier periods. |
 | Calendar | "Bleed" or "Bleeding" in the legend and for TalkBack; expected bleeds instead of predicted periods on a combined method with monthly breaks; nothing predicted on the others. |
 | History | The time on each hormonal method as one card, marked and left out of her typical cycle, with its last 90 days; the cycle a method cut short, marked. |
@@ -55,8 +55,8 @@ Refined against MOT-49. "Hormonal method" means everything except the copper IUD
    When a correction overlaps another method, Cycle offers to move that one's edge.
 10. **Private.** My method stays on the phone. It appears only in my export and Android's encrypted
     backup, never in a notification or widget.
-11. **Know when to get help.** On the combined pill, patch or ring, or with an IUD, my method's page
-    lists the signs clinics tell everyone on it to get help for, and what to do. It is the same for
+11. **Know when to get help.** On the combined pill, patch or ring, the monthly injection, or with
+    an IUD, my method's page lists the signs everyone on it is told to get help for, and what to do. It is the same for
     everyone on the method, it is there whenever I look, and it says Cycle does not check my log for
     them ([When to get help](#when-to-get-help)).
 12. **Monthly combined injection.** If I get an injection every 4 weeks, I can choose it apart from
@@ -224,12 +224,12 @@ estimate sheet instead:
 ## When to get help
 
 The fixed text decided in [`0007`](../decisions/0007-urgent-symptoms-on-a-method.md): the signs
-clinics give everyone on the method, under the action to take. It is reference text, the same for
+clinics or the method's leaflet give everyone on it, under the action to take. It is reference text, the same for
 every user of the method, and nothing she logs shows it, hides it or changes it.
 
 | | |
 | -- | -- |
-| Methods | Combined pill (with any breaks), patch and ring; copper IUD and hormonal IUD. None for the progestogen-only pill, the implant, the injection or no method. None for the monthly combined injection either, until `0007` has a source for its signs and adds it ([`0006`](../decisions/0006-contraception.md#setup-and-settings)). |
+| Methods | Combined pill (with any breaks), patch and ring; the monthly combined injection; copper IUD and hormonal IUD. None for the progestogen-only pill, the implant, the 8- or 13-week injection or no method. |
 | Where | Settings › Your cycle › Contraception, under the Now card, whose calm line says what the method does to bleeding, and above "Your methods". Shown in full for as long as the method is in force, also with "Start not known". Once she marks it as stopped, or changes to a method without it, the section goes. |
 | Never | On Today or its sheets, in setup, on a method's edit page, in History, a notification or a widget. |
 | Look | A section title "When to get help", like "Now" and "Your methods" (Settings' `SectionTitle`, a heading). Under it one `Card`: the intro line in `bodySmall` `onSurfaceVariant`; each action line in `titleSmall` `onSurface`, a heading; the signs in `body` `onSurface`, one per line, each after a bullet TalkBack skips; the last line in `bodySmall` `onSurfaceVariant`. No icon, no error colours, no button: nothing on it can be tapped or dismissed. |
@@ -244,6 +244,7 @@ line differs between methods:
 | Combined pill | Clinics give these signs to everyone who uses the combined pill, patch or ring. | Emergency help now (2 signs), urgent advice today (1 sign) |
 | Patch | Clinics give these signs to everyone who uses the patch. | The same |
 | Vaginal ring | Clinics give these signs to everyone who uses the ring. | The same |
+| Monthly combined injection | These signs are given to everyone who uses the monthly injection. | The same |
 | Copper IUD, hormonal IUD | Clinics give these signs to everyone who has an IUD. | Urgent advice today (5 signs) |
 
 ## Journeys
@@ -446,7 +447,11 @@ enters 13 September by mistake.
 Deleting dates asks first: "Delete these dates?" "Cycle forgets you used the combined pill from 3 May
 to 5 September 2027. The days you logged stay, and count as your own cycle again." Keep them ·
 **Delete**. A correction that would swallow another method whole is refused: "That would cover all
-of your time on the pill. Delete the pill's dates first, or pick a later day."
+of your time on the pill. Delete the pill's dates first, or pick a later day." So is one that lies
+inside one method and would swallow another, with no dialog: the refusal names the method next to
+the date she moved. A later end works the same way forwards: a day inside the next method offers
+"Move the start of your IUD?", and one that would swallow it ends "…or pick an earlier day." The
+example with three methods is in 0006 ([Stored](../decisions/0006-contraception.md#stored-dated-stretches)).
 
 ### F. Copper IUD
 
