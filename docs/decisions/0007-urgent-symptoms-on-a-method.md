@@ -1,6 +1,7 @@
 # 0007: Urgent symptoms on a contraceptive method
 
-**Status:** accepted, 2026-10-05
+**Status:** accepted, 2026-10-05; amended 2026-11-19 to add the monthly combined injection
+([MOT-101](https://linear.app/tonypine/issue/MOT-101))
 
 ## Context
 
@@ -28,7 +29,7 @@ needs help.
 | Area | Decision |
 | -- | -- |
 | Where | The method screen designed in [MOT-50](https://linear.app/tonypine/issue/MOT-50) (Settings › Your cycle › Contraception), below what the method does to bleeding: under the Now card and its calm line, above her earlier methods ([design](../design/contraception.md#when-to-get-help)). Shown in full, not folded away, for as long as the method is set. |
-| Which methods | Combined pill, patch and ring; copper IUD and hormonal IUD. No section for the progestogen-only pill, implant or injection, and none without a method: the research found no urgent-symptom list for them, and adding one needs a source and a change to this record. |
+| Which methods | Combined pill, patch and ring; the monthly combined injection; copper IUD and hormonal IUD. No section for the progestogen-only pill, implant or progestogen-only injection, and none without a method: the research found no urgent-symptom list for them, and adding one needs a source and a change to this record. |
 | What it is | Reference text: one optional intro line, then the signs under the action to take, in the words below. Every user of the method sees the same text. |
 | What it never is | Not a notification, a signal card, a banner, a pop-up or a step in setting the method. Never shown because of something she logged, and never hidden because of it. No symptom checker and no questions. |
 | Look | The design system's normal body text and headings, in the calm treatment of the signal cards. No error red, no warning icon. The two action lines are headings for TalkBack, which reads the same words. |
@@ -36,7 +37,7 @@ needs help.
 | What Cycle does not watch | The section ends by saying so, so its silence elsewhere is never read as "all clear". |
 | In code | The strings live in one place, each with its source in a comment, like the signal thresholds. A test pins each method's text. Changing a word means changing this record in the same PR. |
 
-### Combined pill, patch and ring
+### Combined pill, patch, ring and monthly combined injection
 
 > **When to get help**
 >
@@ -53,13 +54,36 @@ needs help.
 >
 > Cycle does not check your log for these signs.
 
-On the patch or ring screen, the intro line names that method only.
+On the patch or ring screen, the intro line names that method only. On the monthly combined
+injection it reads "These signs are given to everyone who uses the monthly injection.", and the rest
+is the same text.
 
 | Line | Source |
 | -- | -- |
 | Chest pain, breathlessness, coughing up blood: emergency help | FSRH Box 4, urgent review: "Chest pain and/or breathlessness and/or coughing up blood". The NHS says to call 999 or go to A&E with symptoms of a clot in the leg and shortness of breath or chest pain ([NHS, DVT](https://www.nhs.uk/conditions/blood-clots/)). |
 | Weakness, numbness, trouble speaking: emergency help | FSRH Box 4, urgent review: "Loss of motor or sensory function". The NHS's stroke signs (face, arm, speech) and its "Call 999 now" ([NHS, stroke](https://www.nhs.uk/conditions/stroke/symptoms/)). |
 | Pain, swelling or redness in one leg: urgent advice today | FSRH Box 4, urgent review: "Calf pain, swelling and/or redness". The NHS: pain or swelling in one leg, usually in the calf or thigh, and red or darkened skin; ask for an urgent GP appointment or call 111 ([NHS, DVT](https://www.nhs.uk/conditions/blood-clots/)). |
+
+The FSRH guideline covers the pill, patch and ring, not the monthly combined injection. For the
+injection, each line comes from the Lunelle label's "WARNING SIGNALS", which its patient labeling
+gives every user under "call your doctor immediately" ([Lunelle label, p. 30](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)):
+
+| Line | Lunelle label |
+| -- | -- |
+| Chest pain, breathlessness, coughing up blood | "Sharp chest pain, coughing of blood, or sudden shortness of breath"; "Crushing chest pain or heaviness in the chest" |
+| Weakness, numbness, trouble speaking | "Sudden severe headache or vomiting, dizziness or fainting, disturbances of vision or speech, weakness, or numbness in an arm or leg" |
+| Pain, swelling or redness in one leg | "Pain in the calf" |
+
+The label puts every sign under one action. The split into emergency help now and urgent advice
+today is the NHS's, which does not depend on the method ([NHS, DVT](https://www.nhs.uk/conditions/blood-clots/),
+[NHS, stroke](https://www.nhs.uk/conditions/stroke/symptoms/)), as on the pill. The intro line does
+not say "clinics": the WHO Handbook gives monthly-injectable users no list of signs, only "come back
+any time" and "Anyone who suddenly feels that something is seriously wrong with her health should
+immediately seek medical care" ([WHO FP Handbook, ch. 5](https://fphandbook.org/supporting-new-and-continuing-users-0)),
+and its list of serious conditions is for the provider ([Appendix B](https://fphandbook.org/appendix-b-signs-and-symptoms-serious-health-conditions)).
+The label is what every user is handed. It is from 2000 and Lunelle is no longer sold, but it is the
+only monthly-injectable patient labeling the research found in English: no Cyclofem or Mesigyna
+leaflet turned up ([`contraception.md`](../research/contraception.md#monthly-combined-injection)).
 
 ### Copper IUD and hormonal IUD
 
@@ -169,6 +193,12 @@ changes this record in the same PR.
 - **The FSRH's new diagnoses that call for a review of the method** (high blood pressure, a past
   clot, migraine with aura and so on). Acting on them means advising on her method, which Cycle never
   does.
+- **The rest of the Lunelle label's warning signals**: sudden loss of vision, a breast lump,
+  severe pain in the tummy, low mood or trouble sleeping, yellow skin or eyes, pain or pus where the
+  injection went in, and unusually heavy bleeding ([Lunelle label, p. 30](https://www.accessdata.fda.gov/drugsatfda_docs/label/2000/20874lbl.pdf)).
+  The text stays the combined pill's, whose urgent list the FSRH sets, so the same oestrogen gets the
+  same signs. Heavy bleeding already has its signs in
+  [`health-signals.md`](../research/health-signals.md).
 - **"Stop taking the pill"** or any other step about the method itself. Where to get help is the
   whole message.
 - **The names of the conditions** (a blood clot, a stroke, an infection). The signs and the action
@@ -194,6 +224,8 @@ changes this record in the same PR.
 
 - Nothing ships with this record. The section is built with the method screen
   ([MOT-50](https://linear.app/tonypine/issue/MOT-50)).
+- The monthly combined injection's section is built with the method itself, once it is in Cycle's
+  method list ([`0006`](0006-contraception.md)), in a ticket of its own.
 - Another method gets a section only with a source and a change to this record, as does any change
   to the wording.
 - If she lives in one country and would like its numbers (999 and 111 in the UK), that is a one-line

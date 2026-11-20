@@ -167,8 +167,8 @@ From [`contraception.md`](contraception.md):
   doctor.
 - **Expected changes read as expected**: in the first months on a method, unpredictable bleeding is
   common, and the copy says so calmly rather than flagging it.
-- **Urgent symptoms are fixed text, never alerts**: the combined pill, patch, ring and both IUDs
-  get a "When to get help" section in the words of
+- **Urgent symptoms are fixed text, never alerts**: the combined pill, patch, ring, monthly combined
+  injection and both IUDs get a "When to get help" section in the words of
   [`0007`](../decisions/0007-urgent-symptoms-on-a-method.md), with no phone numbers and nothing set
   off by what she logs.
 
