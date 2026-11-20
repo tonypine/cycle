@@ -17,4 +17,5 @@
     <string name="calendar_hint_none_implant">Cycle doesn\'t estimate bleeding on the implant. Tap any day up to today to log or change it.</string>
     <string name="calendar_hint_none_hormonal_iud">Cycle doesn\'t estimate bleeding with a hormonal IUD. Tap any day up to today to log or change it.</string>
     <string name="calendar_hint_none_injection">Cycle doesn\'t estimate bleeding on the injection. Tap any day up to today to log or change it.</string>
+    <string name="calendar_hint_none_combined_injection">Cycle doesn\'t estimate bleeding on the monthly injection. Tap any day up to today to log or change it.</string>
 </resources>

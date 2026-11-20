@@ -159,6 +159,7 @@
     <string name="contraception_breaks_none">sem pausas</string>
     <string name="contraception_counts_until">O Cycle conta esse método até %1$s.</string>
     <string name="contraception_counts_until_injection">O Cycle conta esse método até %1$s, 13 semanas depois da sua última injeção.</string>
+    <string name="contraception_counts_until_combined_injection">O Cycle conta esse método até %1$s, 4 semanas depois da sua última injeção.</string>
     <string name="contraception_add">Adicionar seu método</string>
     <string name="contraception_change">Mudar de método</string>
     <string name="contraception_stop">Marcar como interrompido</string>
@@ -205,6 +206,7 @@
     <string name="stretch_still_in">Ainda colocado</string>
     <string name="stretch_still_on_it">Ainda em uso</string>
     <string name="stretch_counted_until_body">Qualquer dia até 13 semanas a partir de hoje.</string>
+    <string name="stretch_counted_until_combined_injection_body">Qualquer dia até 4 semanas a partir de hoje.</string>
     <string name="stretch_breaks">Pausas</string>
     <string name="stretch_delete">Apagar estas datas</string>
     <string name="stretch_delete_body">O Cycle esquece este método nestas datas. O que você registrou continua.</string>

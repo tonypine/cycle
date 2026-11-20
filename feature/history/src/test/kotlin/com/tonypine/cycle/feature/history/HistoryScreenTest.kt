@@ -197,6 +197,36 @@ class HistoryScreenTest {
     }
 
     @Test
+    fun `the monthly injection's card is labelled Monthly injection, with its last 90 days`() {
+        val today = LocalDate.of(2027, 10, 10)
+        val monthly =
+            ContraceptionStretch(ContraceptionMethod.COMBINED_INJECTION, started = LocalDate.of(2026, 11, 9), id = 1)
+        showHistory(
+            HistoryUiState.Cycles(
+                today = today,
+                typicalCycle = null,
+                typicalPeriod = null,
+                entries = listOf(
+                    MethodSummary(
+                        monthly,
+                        isCurrent = true,
+                        today,
+                        MethodBleeding.Days(
+                            BleedingSummary(today.minusDays(89), today, false, days = 4, episodes = 1, longest = 4)
+                        )
+                    )
+                ),
+                leftOut = true
+            )
+        )
+
+        composeRule.onNode(
+            hasText("Monthly injection") and
+                hasText("Last 90 days: you logged bleeding or spotting on 4 days, in 1 episode.", substring = true)
+        ).assertExists()
+    }
+
+    @Test
     fun `each method's card counts what fits it`() {
         val today = LocalDate.of(2027, 10, 10)
         val pill = ContraceptionStretch(

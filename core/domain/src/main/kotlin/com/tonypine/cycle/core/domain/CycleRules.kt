@@ -110,6 +110,12 @@ object CycleRules {
     const val INJECTION_WEEKS = 13L
 
     /**
+     * The monthly combined injection counts this many weeks after the last one: its interval, "every
+     * 4 weeks" (WHO FP Handbook, ch. 5; `contraception.md`, "Monthly combined injection").
+     */
+    const val COMBINED_INJECTION_WEEKS = 4L
+
+    /**
      * Bleeding on a no-estimate method is described over this many days: the WHO's reference period
      * (`contraception.md`, "Describing bleeding that does not follow a cycle").
      */

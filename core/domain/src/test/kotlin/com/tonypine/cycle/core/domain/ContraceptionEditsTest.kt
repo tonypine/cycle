@@ -161,6 +161,28 @@ class ContraceptionEditsTest {
     }
 
     @Test
+    fun `the monthly combined injection stops 4 weeks after her last one, and can end up to 4 weeks ahead`() {
+        val monthly = stretch(ContraceptionMethod.COMBINED_INJECTION, "2026-11-09", id = 1)
+        val counted = monthly.copy(stopped = day("2027-08-31"))
+
+        // Last injection on 3 August: counted until 31 August.
+        assertEquals(
+            StretchPlan.Ready(listOf(counted)),
+            ContraceptionEdits.stop(listOf(monthly), 1, day("2027-08-03"), day("2027-08-10"))
+        )
+        assertEquals(day("2027-08-31"), ContraceptionEdits.stopDate(monthly.method, day("2027-08-03")))
+        assertEquals(day("2027-09-07"), ContraceptionEdits.latestStop(monthly.method, day("2027-08-10")))
+        // Her method until 31 August, also on the day she marks it, then none.
+        assertEquals(counted, ContraceptionEdits.current(listOf(counted), day("2027-08-10")))
+        assertEquals(counted, ContraceptionEdits.current(listOf(counted), day("2027-08-31")))
+        assertEquals(null, ContraceptionEdits.current(listOf(counted), day("2027-09-01")))
+        assertEquals(
+            refused(StretchRefusal.StopTooLate(day("2027-09-07"))),
+            ContraceptionEdits.edit(listOf(counted), counted.copy(stopped = day("2027-09-08")), day("2027-08-10"))
+        )
+    }
+
+    @Test
     fun `stopping before the start or after today is refused`() {
         val current = listOf(pill)
 

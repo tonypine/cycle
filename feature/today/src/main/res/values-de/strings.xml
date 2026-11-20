@@ -160,12 +160,14 @@
     <string name="today_since_implant">seit dein Implantat entfernt wurde</string>
     <string name="today_since_iud">seit deine Spirale entfernt wurde</string>
     <string name="today_since_injection">seit du die Dreimonatsspritze abgesetzt hast</string>
+    <string name="today_since_combined_injection">seit du die Monatsspritze abgesetzt hast</string>
     <string name="today_basis_usual">Geschätzt aus deinem üblichen Zyklus von %1$d Tagen</string>
     <!-- A basis line above, then the settling sentence below. -->
     <string name="today_basis_then_settling">%1$s. %2$s</string>
     <!-- %1$s: the method, in the accusative with its article ("den Ring"). -->
     <string name="today_basis_settling">Nachdem du aufgehört hast, %1$s zu verwenden, können sich Zyklen erst nach ein paar Monaten einpendeln, deshalb ist der Zeitraum breiter.</string>
     <string name="today_after_injection">Nach der Dreimonatsspritze kann es mehrere Monate dauern, bis Perioden wiederkommen. Cycle schätzt wieder, sobald du eine eingetragen hast.</string>
+    <string name="today_after_combined_injection">Nach der Monatsspritze kann es ein paar Monate dauern, bis Perioden wiederkommen. Cycle schätzt wieder, sobald du eine eingetragen hast.</string>
 
     <!-- The next bleed, on a combined method with a break every month. -->
     <string name="today_next_bleed">Nächste Abbruchblutung</string>
@@ -206,6 +208,7 @@
     <string name="today_first_months_implant">In den ersten Monaten mit dem Implantat sind Blutungen oft unregelmäßig oder lang.</string>
     <string name="today_first_months_hormonal_iud">In den ersten Monaten mit einer Hormonspirale sind Blutungen oft häufig oder lang. Im ersten Jahr werden sie meist schwächer.</string>
     <string name="today_first_months_injection">In den ersten Monaten mit der Dreimonatsspritze sind Blutungen oft unregelmäßig oder lang. Mit der Zeit werden sie meist weniger.</string>
+    <string name="today_first_months_combined_injection">In den ersten Monaten mit der Monatsspritze sind Blutungen oft unregelmäßig oder lang. Meist pendeln sie sich ein.</string>
 
     <!-- The copper IUD, for six months after fitting. -->
     <string name="today_copper_iud_title">Perioden können anfangs stärker sein</string>
@@ -220,6 +223,7 @@
     <string name="method_sheet_button_implant">Was ändert sich mit dem Implantat?</string>
     <string name="method_sheet_button_hormonal_iud">Was ändert sich mit einer Hormonspirale?</string>
     <string name="method_sheet_button_injection">Was ändert sich mit der Dreimonatsspritze?</string>
+    <string name="method_sheet_button_combined_injection">Was ändert sich mit der Monatsspritze?</string>
     <string name="method_sheet_title_pill">Blutungen unter der Pille</string>
     <string name="method_sheet_title_mini_pill">Blutungen unter der Minipille</string>
     <string name="method_sheet_title_patch">Blutungen mit dem Pflaster</string>
@@ -227,13 +231,16 @@
     <string name="method_sheet_title_implant">Blutungen mit dem Implantat</string>
     <string name="method_sheet_title_hormonal_iud">Blutungen mit einer Hormonspirale</string>
     <string name="method_sheet_title_injection">Blutungen mit der Dreimonatsspritze</string>
+    <string name="method_sheet_title_combined_injection">Blutungen mit der Monatsspritze</string>
     <!-- %1$s: the method, in the accusative with its article ("den Ring"). -->
     <string name="method_sheet_combined">Wenn du %1$s verwendest, kommt eine Abbruchblutung meist in einer Pause. Mit Pausen nur alle paar Packungen oder ganz ohne Pausen können Blutungen auch zu anderen Zeiten kommen, und sie legen sich oft mit der Zeit.</string>
     <string name="method_sheet_mini_pill">Die Minipille verändert bei vielen Menschen die Blutungen. Sie können unregelmäßig sein, kommen und gehen oder aufhören, und sie legen sich mit der Zeit vielleicht nicht.</string>
     <string name="method_sheet_implant">Das Implantat verändert bei den meisten Menschen die Blutungen. Sie können schwächer oder länger sein, kommen und gehen oder aufhören, und das Muster kann sich jederzeit ändern.</string>
     <string name="method_sheet_hormonal_iud">Eine Hormonspirale verändert bei den meisten Menschen die Blutungen. In den ersten Monaten sind sie oft häufig oder lang, danach meist schwächer, und bei manchen hören sie auf.</string>
     <string name="method_sheet_injection">Die Dreimonatsspritze verändert bei den meisten Menschen die Blutungen. Anfangs sind sie oft unregelmäßig oder lang und werden meist weniger, je länger du sie verwendest. Bei vielen hören sie auf.</string>
+    <string name="method_sheet_combined_injection">Die meisten Menschen bluten einmal zwischen zwei Spritzen, etwa zwei bis drei Wochen nach jeder. Blutungen können auch zu anderen Zeiten kommen, länger dauern oder ganz ausbleiben, am häufigsten in den ersten Monaten.</string>
     <string name="method_sheet_what_cycle_does">Deshalb schätzt Cycle nicht, wann du blutest, zählt keine Zyklustage und sagt nie, dass etwas spät dran ist. Es zeigt die Tage, die du einträgst, und wie viel du in den letzten 90 Tagen geblutet hast.</string>
+    <string name="method_sheet_what_cycle_does_combined_injection">Cycle weiß nicht, wann du deine Spritzen bekommst, deshalb schätzt es nicht, wann du blutest, zählt keine Zyklustage und sagt nie, dass etwas spät dran ist. Es zeigt die Tage, die du einträgst, und wie viel du in den letzten 90 Tagen geblutet hast.</string>
     <string name="method_sheet_help">Wenn die Blutungen für dich zum Problem werden, können dir deine Frauenarztpraxis oder eine Beratungsstelle helfen.</string>
 
     <!-- How is this estimated, for the next bleed. %1$s and %3$s: the method, in the accusative with

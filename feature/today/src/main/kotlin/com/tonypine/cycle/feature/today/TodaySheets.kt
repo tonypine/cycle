@@ -142,10 +142,19 @@ internal fun MethodSheet(sheet: CycleBottomSheetState, method: ContraceptionMeth
                 ContraceptionMethod.IMPLANT -> stringResource(R.string.method_sheet_implant)
                 ContraceptionMethod.HORMONAL_IUD -> stringResource(R.string.method_sheet_hormonal_iud)
                 ContraceptionMethod.INJECTION -> stringResource(R.string.method_sheet_injection)
+                ContraceptionMethod.COMBINED_INJECTION -> stringResource(R.string.method_sheet_combined_injection)
                 else -> stringResource(R.string.method_sheet_combined, methodInSentence(method))
             }
         )
-        SheetText(stringResource(R.string.method_sheet_what_cycle_does))
+        SheetText(
+            stringResource(
+                if (method == ContraceptionMethod.COMBINED_INJECTION) {
+                    R.string.method_sheet_what_cycle_does_combined_injection
+                } else {
+                    R.string.method_sheet_what_cycle_does
+                }
+            )
+        )
         SheetText(stringResource(R.string.method_sheet_help))
         FilledButton(
             text = stringResource(R.string.estimate_done),

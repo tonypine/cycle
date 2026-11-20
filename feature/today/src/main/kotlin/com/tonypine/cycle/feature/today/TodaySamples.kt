@@ -195,6 +195,19 @@ internal object TodaySamples {
         )
     )
 
+    private val monthlyInjection =
+        ContraceptionStretch(ContraceptionMethod.COMBINED_INJECTION, LocalDate.parse("2026-11-09"))
+
+    /** On the monthly combined injection since November: like C1, in its own words. */
+    val onCombinedInjection = onImplant.copy(
+        display = TodayDisplay.Method(ContraceptionMethod.COMBINED_INJECTION),
+        days = onImplant.days.copy(
+            periods = listOf(period("2027-03-02", "2027-03-06", stretch = monthlyInjection)),
+            stretches = listOf(monthlyInjection)
+        ),
+        method = TodayMethod(ContraceptionMethod.COMBINED_INJECTION, breaks = null, firstMonths = false)
+    )
+
     private val pill = ContraceptionStretch(
         ContraceptionMethod.COMBINED_PILL,
         LocalDate.parse("2027-03-06"),
@@ -271,7 +284,13 @@ internal object TodaySamples {
         display = TodayDisplay.DaysSince(days = 12, method = ContraceptionMethod.INJECTION),
         phase = TodayPhase.NoEstimate,
         days = stoppedImplant.days.copy(predicted = emptyList()),
-        outlook = TodayOutlook.AfterInjection
+        outlook = TodayOutlook.AfterInjection(ContraceptionMethod.INJECTION)
+    )
+
+    /** After the monthly combined injection: no estimate until her first period either. */
+    val stoppedCombinedInjection = stoppedInjection.copy(
+        display = TodayDisplay.DaysSince(days = 12, method = ContraceptionMethod.COMBINED_INJECTION),
+        outlook = TodayOutlook.AfterInjection(ContraceptionMethod.COMBINED_INJECTION)
     )
 
     /** F5: a copper IUD fitted a week ago keeps the estimates, with its heavier-periods card. */
@@ -302,10 +321,12 @@ internal object TodaySamples {
         "logged_today" to loggedToday,
         "on_implant" to onImplant,
         "implant_bleeding_started" to implantBleedingStarted,
+        "on_combined_injection" to onCombinedInjection,
         "pill_first_break" to pillFirstBreak,
         "pill_next_bleed" to pillNextBleed,
         "stopped_implant" to stoppedImplant,
         "stopped_injection" to stoppedInjection,
+        "stopped_combined_injection" to stoppedCombinedInjection,
         "copper_iud" to copperIud
     )
 

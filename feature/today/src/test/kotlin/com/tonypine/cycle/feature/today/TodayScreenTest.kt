@@ -286,6 +286,37 @@ class TodayScreenTest {
     }
 
     @Test
+    fun `on the monthly injection Today names it, says why nothing is estimated and counts her bleeding`() {
+        show(TodaySamples.onCombinedInjection)
+
+        composeRule.onNodeWithText("Monthly injection").assert(isHeading())
+        composeRule.onNodeWithText(
+            "Bleeding on the monthly injection follows your injections, not a cycle, and it varies, so Cycle " +
+                "doesn't estimate it."
+        ).assertIsDisplayed()
+        composeRule.onNode(hasText("Last 90 days", substring = true)).assertExists()
+        listOf("Day ", "Next period", "Next bleed", "Predicted", "later than expected", "Missed a period?").forEach {
+            composeRule.onNodeWithText(it, substring = true).assertDoesNotExist()
+        }
+        composeRule.onNodeWithText("Bleeding started").performClick()
+        assertEquals(listOf("started"), calls)
+    }
+
+    @Test
+    fun `what changes on the monthly injection says Cycle does not know her injections`() {
+        show(TodaySamples.onCombinedInjection)
+        composeRule.onNodeWithText("What changes on the monthly injection?").performScrollTo().performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText("Bleeding on the monthly injection").assertExists()
+        composeRule.onNodeWithText("Most people bleed once between injections", substring = true).assertExists()
+        composeRule.onNodeWithText("Cycle doesn't know when you have your injections", substring = true).assertExists()
+        composeRule.onNodeWithText("a GP or sexual health clinic can help", substring = true).assertExists()
+        composeRule.waitForIdle()
+        captureScreenRoboImage("src/test/screenshots/today_sheet_method_combined_injection.png")
+    }
+
+    @Test
     fun `on the pill the first bleed is a range in the first break`() {
         show(TodaySamples.pillFirstBreak)
 
@@ -430,6 +461,18 @@ class TodayScreenTest {
     }
 
     @Test
+    fun `after the monthly injection Today says periods can take a few months to come back`() {
+        show(TodaySamples.stoppedCombinedInjection)
+
+        composeRule.onNodeWithText("since you stopped the monthly injection").assertIsDisplayed()
+        composeRule.onNodeWithText(
+            "Periods can take a few months to come back after the monthly injection. Cycle will estimate again " +
+                "once you log one."
+        ).assertExists()
+        composeRule.onNodeWithText("Around", substring = true).assertDoesNotExist()
+    }
+
+    @Test
     fun `on a copper IUD the heavier-periods card goes with Got it`() {
         show(TodaySamples.copperIud)
 
@@ -530,8 +573,16 @@ class TodayScreenTest {
             if (state.todayLog.isLogged) add("Edit")
             when (state.outlook) {
                 is NextPeriod, is NextBleed -> add("How is this estimated?")
-                is TodayOutlook.Bleeding -> add("What changes on the implant?")
-                TodayOutlook.AfterInjection, TodayOutlook.FirstBleedToLog -> Unit
+
+                is TodayOutlook.Bleeding -> add(
+                    if (state.method?.method == ContraceptionMethod.COMBINED_INJECTION) {
+                        "What changes on the monthly injection?"
+                    } else {
+                        "What changes on the implant?"
+                    }
+                )
+
+                is TodayOutlook.AfterInjection, TodayOutlook.FirstBleedToLog -> Unit
             }
         }
     }

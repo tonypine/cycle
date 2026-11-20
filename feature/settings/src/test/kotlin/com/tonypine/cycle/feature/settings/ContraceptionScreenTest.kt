@@ -16,6 +16,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -162,6 +163,42 @@ class ContraceptionScreenTest {
         assertEquals("Injection, Until 2 Nov 2027", spokenButtons().last())
     }
 
+    @Test
+    fun `the monthly injection in its 4 weeks says until when Cycle counts it, with its calm line`() {
+        // Last injection on 2 September: counted until 30 September.
+        val monthly = ContraceptionStretch(
+            ContraceptionMethod.COMBINED_INJECTION,
+            started = LocalDate.of(2026, 11, 9),
+            stopped = LocalDate.of(2027, 9, 30),
+            id = 4
+        )
+        showPage(monthly, monthly)
+
+        composeRule.onAllNodesWithText("Monthly combined injection").onFirst().assertExists()
+        composeRule.onNodeWithText(
+            "Bleeding on the monthly injection follows your injections, not a cycle, and it varies, so Cycle " +
+                "doesn't estimate it."
+        ).assertExists()
+        composeRule.onNodeWithText("Cycle counts it until 30 September 2027, 4 weeks after your last injection.")
+            .assertExists()
+        composeRule.onAllNodesWithText("Mark as stopped").assertCountEquals(0)
+        composeRule.onAllNodesWithText("When to get help").assertCountEquals(0)
+        assertEquals("Monthly combined injection, 9 Nov 2026 to 30 Sept 2027", spokenButtons().last())
+    }
+
+    @Test
+    fun `marking the monthly injection as stopped asks for the last injection and counts 4 weeks from it`() {
+        val monthly = ContraceptionStretch(ContraceptionMethod.COMBINED_INJECTION, LocalDate.of(2026, 11, 9), id = 4)
+        composeRule.setContent {
+            Themed {
+                StopMethodScreen(StretchUiState.Ready(monthly, today, today.plusWeeks(4)), {}, {}, {}, {})
+            }
+        }
+
+        composeRule.onNodeWithText("When was your last injection?").assertExists()
+        composeRule.onNodeWithText("Cycle counts 4 weeks from it.").assertExists()
+    }
+
     /** Every text TalkBack can reach, in reading order, from "When to get help" to the section's end. */
     private fun getHelpSection(): List<String> {
         val texts = composeRule
@@ -225,9 +262,14 @@ class ContraceptionScreenTest {
     }
 
     @Test
-    fun `there is no When to get help on the progestogen-only pill, implant, injection or none`() {
-        val methods =
-            listOf(ContraceptionMethod.PROGESTOGEN_PILL, ContraceptionMethod.IMPLANT, ContraceptionMethod.INJECTION)
+    fun `there is no When to get help on the progestogen-only pill, implant, either injection or none`() {
+        // The monthly combined injection's section is built in a ticket of its own (`0007`, Consequences).
+        val methods = listOf(
+            ContraceptionMethod.PROGESTOGEN_PILL,
+            ContraceptionMethod.IMPLANT,
+            ContraceptionMethod.INJECTION,
+            ContraceptionMethod.COMBINED_INJECTION
+        )
         var current by mutableStateOf<ContraceptionStretch?>(null)
         composeRule.setContent {
             Themed {
@@ -255,7 +297,22 @@ class ContraceptionScreenTest {
 
         composeRule.onNode(hasText("Which method?") and isHeading()).assertExists()
         val isRadio = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.RadioButton)
-        composeRule.onAllNodes(isRadio).assertCountEquals(9)
+        composeRule.onAllNodes(isRadio).assertCountEquals(10)
+        // The monthly combined injection is last: "… 10 of 10".
+        composeRule.onNode(isRadio and hasText("Monthly combined injection"))
+            .performScrollTo()
+            .assert(hasText("Two hormones, every 4 weeks, such as Cyclofem"))
+            .assert(
+                SemanticsMatcher("the tenth of ten rows") {
+                    it.config.getOrNull(SemanticsProperties.CollectionItemInfo)?.rowIndex == 9
+                }
+            )
+        composeRule.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
+            .assert(
+                SemanticsMatcher("a collection of 10 rows") {
+                    it.config.getOrNull(SemanticsProperties.CollectionInfo)?.rowCount == 10
+                }
+            )
         composeRule.onNode(isRadio and hasText("Implant"))
             .assert(hasText("A rod in the arm, such as Nexplanon"))
             .performClick()

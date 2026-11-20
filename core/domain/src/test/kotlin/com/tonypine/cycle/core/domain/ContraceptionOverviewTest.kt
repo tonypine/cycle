@@ -34,6 +34,7 @@ class ContraceptionOverviewTest {
             stretch(ContraceptionMethod.IMPLANT, "2027-02-01") to EstimateKind.NONE,
             stretch(ContraceptionMethod.HORMONAL_IUD, "2027-02-01") to EstimateKind.NONE,
             stretch(ContraceptionMethod.INJECTION, "2027-02-01") to EstimateKind.NONE,
+            stretch(ContraceptionMethod.COMBINED_INJECTION, "2027-02-01") to EstimateKind.NONE,
             stretch(ContraceptionMethod.COPPER_IUD, "2027-02-01") to EstimateKind.PERIOD
         )
 

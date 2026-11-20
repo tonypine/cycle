@@ -145,6 +145,30 @@ class AfterStoppingTest {
     }
 
     @Test
+    fun `after the monthly combined injection there is no estimate until she logs a period`() {
+        // Last injection on 3 August, counted until 31 August.
+        val monthly = stretch(ContraceptionMethod.COMBINED_INJECTION, "2026-11-09", "2027-08-31")
+
+        val during = CycleCalculator.overview(bleed(day("2027-08-19")), setUp(29), day("2027-08-25"), listOf(monthly))
+        val waiting = CycleCalculator.overview(emptyList(), setUp(29), day("2027-09-12"), listOf(monthly))
+        val period = CycleCalculator.overview(bleed(day("2027-09-20")), setUp(29), day("2027-09-25"), listOf(monthly))
+
+        // The bleed two to three weeks after her last injection is still bleeding on it.
+        assertEquals(monthly, during.contraception.current)
+        assertEquals(EstimateKind.NONE, during.contraception.estimates)
+        assertEquals(monthly.method, during.periods.single().stretch?.method)
+        assertNull(during.contraception.stopped)
+        assertEquals(EstimateKind.NONE, waiting.contraception.estimates)
+        assertEquals(12, waiting.contraception.stopped?.days)
+        assertEquals(false, waiting.contraception.stopped?.withdrawalWindow)
+        assertNull(waiting.contraception.current)
+        assertNull(waiting.estimate)
+        assertNull(waiting.cycleDay)
+        assertEquals(EstimateKind.PERIOD, period.contraception.estimates)
+        assertEquals(ContraceptionMethod.COMBINED_INJECTION, period.estimate?.settlingAfter)
+    }
+
+    @Test
     fun `stopping a copper IUD changes nothing about her estimates`() {
         val copper = stretch(ContraceptionMethod.COPPER_IUD, "2027-01-15", "2027-06-01")
         val logs = cycles(29, 29, 29, lastStart = day("2027-05-20"))

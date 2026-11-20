@@ -337,6 +337,7 @@ private fun methodName(method: ContraceptionMethod): String = stringResource(
         ContraceptionMethod.HORMONAL_IUD -> R.string.history_method_hormonal_iud
         ContraceptionMethod.COPPER_IUD -> R.string.history_method_copper_iud
         ContraceptionMethod.INJECTION -> R.string.history_method_injection
+        ContraceptionMethod.COMBINED_INJECTION -> R.string.history_method_combined_injection
     }
 )
 
@@ -357,7 +358,8 @@ internal fun cutShort(method: ContraceptionMethod): String = stringResource(
         // A copper IUD never cuts a cycle short: its cycles are her own.
         ContraceptionMethod.HORMONAL_IUD, ContraceptionMethod.COPPER_IUD -> R.string.history_cut_short_iud
 
-        ContraceptionMethod.INJECTION -> R.string.history_cut_short_injection
+        // "When you had your first injection", on either injection.
+        ContraceptionMethod.INJECTION, ContraceptionMethod.COMBINED_INJECTION -> R.string.history_cut_short_injection
     }
 )
 

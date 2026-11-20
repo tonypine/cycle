@@ -171,4 +171,17 @@ class ContraceptionRepositoryTest {
 
         assertEquals(day("2027-11-02"), repository.observeStretches().first().single().stopped)
     }
+
+    @Test
+    fun `stopping the monthly combined injection counts 4 weeks from the last one, stored as combined_injection`() =
+        runTest {
+            repository.start(ContraceptionMethod.COMBINED_INJECTION, null, day("2026-11-09"), today = day("2027-08-10"))
+            val injection = repository.observeStretches().first().single()
+
+            repository.stop(injection.id, day("2027-08-03"), today = day("2027-08-10"))
+
+            val stored = repository.observeStretches().first().single()
+            assertEquals(ContraceptionMethod.COMBINED_INJECTION, stored.method)
+            assertEquals(day("2027-08-31"), stored.stopped)
+        }
 }

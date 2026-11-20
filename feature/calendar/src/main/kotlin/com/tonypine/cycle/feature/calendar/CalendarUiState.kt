@@ -89,6 +89,6 @@ sealed interface CalendarHint {
     /** "Cycle doesn't estimate bleeding on the implant." */
     data class NoEstimate(val method: ContraceptionMethod) : CalendarHint
 
-    /** After the injection, until her first period. */
+    /** After either injection, until her first period. */
     data object AfterInjection : CalendarHint
 }
