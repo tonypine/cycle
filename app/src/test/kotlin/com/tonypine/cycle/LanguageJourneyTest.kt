@@ -99,12 +99,28 @@ class LanguageJourneyTest {
         tab("Settings").performClick()
         row("Language", "Phone's language, English")
 
-        // 7. Android Settings › Apps › Cycle › Language: Español. Back to Cycle, the activity starts again.
-        app.getSystemService(LocaleManager::class.java).applicationLocales = LocaleList.forLanguageTags("es")
+        // 7. Android Settings › Apps › Cycle › Language: Español, which Android's page only gives with a
+        // region (España). Back to Cycle, the activity starts again.
+        app.getSystemService(LocaleManager::class.java).applicationLocales = LocaleList.forLanguageTags("es-ES")
         composeRule.activityRule.scenario.recreate()
 
         row("Español").performClick()
         option("Español").assertIsSelected()
+        assertEquals(Language("es"), runBlocking { app.data.languageRepository.language.first() })
+    }
+
+    @Test
+    fun `on Android 13 and later Português (Portugal) from Android's page is Cycle's Portuguese`() {
+        skipWelcome()
+        tab("Settings").performClick()
+        row("Language", "Phone's language, English")
+
+        app.getSystemService(LocaleManager::class.java).applicationLocales = LocaleList.forLanguageTags("pt-PT")
+        composeRule.activityRule.scenario.recreate()
+
+        row("Português (Brasil)").performClick()
+        option("Português (Brasil)").assertIsSelected()
+        assertEquals(Language("pt-BR"), runBlocking { app.data.languageRepository.language.first() })
     }
 
     private fun tab(label: String): SemanticsNodeInteraction {

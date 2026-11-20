@@ -51,9 +51,10 @@ private object PerAppLanguage {
     fun systemLocales(context: Context): List<Locale> =
         localeManager(context)?.systemLocales?.toList() ?: Resources.getSystem().configuration.locales.toList()
 
-    // One language, as Android's page and Cycle set it.
+    // One language, as Android's page and Cycle set it. Android's page gives a region with it (es-ES,
+    // de-AT, pt-PT), which is one of Cycle's languages in any region; one Cycle doesn't have is none.
     fun get(context: Context): Language? =
-        localeManager(context)?.applicationLocales?.toList()?.firstOrNull()?.let { Language(it.toLanguageTag()) }
+        localeManager(context)?.applicationLocales?.toList()?.firstOrNull()?.let { Language.of(it) }
 
     fun set(context: Context, language: Language?) {
         localeManager(context)?.applicationLocales =

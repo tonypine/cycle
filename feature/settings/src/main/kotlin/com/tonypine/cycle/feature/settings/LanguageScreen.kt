@@ -99,7 +99,7 @@ fun LanguageScreen(
             )
             RadioGroup(
                 options = LanguageOptions,
-                selected = LanguageOption(state.chosen),
+                selected = LanguageOption(state.chosen?.supported),
                 onSelect = { onSelect(it.language) },
                 title = { option ->
                     option.language?.let { stringResource(it.ownName) } ?: stringResource(R.string.language_phone)
@@ -154,26 +154,30 @@ private val LanguageOptions: List<LanguageOption> = listOf(LanguageOption(null))
         .sortedBy { it.locale.getDisplayName(it.locale).lowercase(Locale.ROOT) }
         .map(::LanguageOption)
 
+// The one of Cycle's languages this is, in any region (es-ES is Español), so a tag from Android's
+// per-app page never leaves Settings without a name. Cycle has no other: those are in English.
+private val Language.supported: Language get() = Language.ofTag(tag) ?: Language.English
+
 /** The language's name in itself, the same in every language: "Deutsch". */
 @get:StringRes
 internal val Language.ownName: Int
-    get() = when (tag) {
+    get() = when (supported.tag) {
         "en" -> R.string.language_own_name_en
         "pt-BR" -> R.string.language_own_name_pt_br
         "es" -> R.string.language_own_name_es
         "de" -> R.string.language_own_name_de
-        else -> error("No name for the language $tag")
+        else -> R.string.language_own_name_en
     }
 
 /** The language's name in Cycle's language: "German". */
 @get:StringRes
 internal val Language.translatedName: Int
-    get() = when (tag) {
+    get() = when (supported.tag) {
         "en" -> R.string.language_name_en
         "pt-BR" -> R.string.language_name_pt_br
         "es" -> R.string.language_name_es
         "de" -> R.string.language_name_de
-        else -> error("No name for the language $tag")
+        else -> R.string.language_name_en
     }
 
 @Preview

@@ -108,6 +108,17 @@ class LanguageScreenTest {
     }
 
     @Test
+    fun `a language with a region, as Android's per-app page gives it, selects its option`() {
+        for ((tag, name) in listOf("es-US" to "Español", "de-AT" to "Deutsch", "pt-PT" to "Português (Brasil)")) {
+            state = LanguageUiState(chosen = Language(tag), phoneLanguage = Language("de-DE"))
+            if (tag == "es-US") show()
+            composeRule.waitForIdle()
+
+            option(name).assertIsSelected()
+        }
+    }
+
+    @Test
     fun `a phone in French says Phone's language uses English`() {
         state = LanguageUiState(chosen = null, phoneLanguage = Language.English, phoneLocale = Locale.FRANCE)
         show()

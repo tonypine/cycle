@@ -60,6 +60,27 @@ class AndroidPhoneLanguagesTest {
     }
 
     @Test
+    fun `on Android 13 and later a regional language from Android's page is the one Cycle has`() = runTest {
+        val localeManager = context.getSystemService(LocaleManager::class.java)
+        val languages = LanguageRepository(
+            settingsRepository(folder.root, backgroundScope),
+            phone,
+            File(folder.root, "language_handed_over")
+        )
+        languages.syncWithPhone()
+
+        for ((android, cycle) in listOf("es-ES" to "es", "es-US" to "es", "de-AT" to "de", "pt-PT" to "pt-BR")) {
+            localeManager.applicationLocales = LocaleList.forLanguageTags(android)
+            languages.syncWithPhone()
+
+            assertEquals(Language(cycle), phone.appLanguage)
+            assertEquals(Language(cycle), languages.language.first())
+            // Android keeps its region, for dates.
+            assertEquals(LocaleList.forLanguageTags(android), localeManager.applicationLocales)
+        }
+    }
+
+    @Test
     @Config(sdk = [29], qualifiers = "fr-rFR")
     fun `below Android 13 there is no per-app setting, and the phone's languages are the system's`() {
         assertFalse(phone.hasAppLanguage)

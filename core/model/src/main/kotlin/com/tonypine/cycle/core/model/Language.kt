@@ -26,7 +26,20 @@ value class Language(val tag: String) {
          * as Android picks the strings. English when it has none of them.
          */
         fun ofPhone(locales: List<Locale>, supported: List<Language> = Supported): Language =
-            locales.firstNotNullOfOrNull { phone -> supported.firstOrNull { it.locale.language == phone.language } }
-                ?: English
+            locales.firstNotNullOfOrNull { of(it, supported) } ?: English
+
+        /**
+         * The one of [supported] that [locale] is, in any region, as Android picks the strings: Android's
+         * per-app page gives `es-ES` or `es-US` for Español, `de-AT` for Deutsch (Österreich) and
+         * `pt-PT` for Português (Portugal), which are Spanish, German and Brazilian Portuguese in Cycle.
+         * The exact tag first, so `pt-BR` stays `pt-BR`. Null when Cycle doesn't have the language.
+         */
+        fun of(locale: Locale, supported: List<Language> = Supported): Language? =
+            supported.firstOrNull { it.locale == locale }
+                ?: supported.firstOrNull { it.locale.language == locale.language }
+
+        /** [of] for a BCP 47 tag, as the settings keep it: a stored `es-ES` is [Supported]'s `es`. */
+        fun ofTag(tag: String, supported: List<Language> = Supported): Language? =
+            of(Locale.forLanguageTag(tag), supported)
     }
 }

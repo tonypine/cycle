@@ -5,6 +5,7 @@ import com.tonypine.cycle.core.data.day
 import com.tonypine.cycle.core.data.settingsRepository
 import com.tonypine.cycle.core.model.CyclePrompt
 import com.tonypine.cycle.core.model.CycleSettings
+import com.tonypine.cycle.core.model.Language
 import com.tonypine.cycle.core.model.LogCategory
 import java.time.LocalDate
 import kotlinx.coroutines.flow.first
@@ -193,5 +194,19 @@ class SettingsRepositoryTest {
         settings.clear()
 
         assertFalse(settings.appLock.first())
+    }
+
+    @Test
+    fun `a regional language an earlier build stored from Android's page reads as Cycle's`() = runTest {
+        val settings = settingsRepository(folder.root, backgroundScope)
+
+        settings.setLanguage(Language("es-ES"))
+        assertEquals(Language("es"), settings.language.first())
+
+        settings.setLanguage(Language("pt-PT"))
+        assertEquals(Language("pt-BR"), settings.language.first())
+
+        settings.setLanguage(Language("fr-FR"))
+        assertEquals(null, settings.language.first())
     }
 }
