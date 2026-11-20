@@ -38,6 +38,7 @@ import com.tonypine.cycle.core.designsystem.LoadingState
 import com.tonypine.cycle.core.designsystem.SwitchRow
 import com.tonypine.cycle.core.designsystem.TextButton
 import com.tonypine.cycle.core.designsystem.TopAppBar
+import com.tonypine.cycle.core.model.Language
 import com.tonypine.cycle.core.ui.DAY_MONTH_AND_YEAR
 import com.tonypine.cycle.core.ui.formatDate
 import java.time.LocalDate
@@ -46,6 +47,9 @@ import java.time.LocalDate
  * The Settings tab, wired to its [viewModel]: Export my data opens Android's save screen and Import
  * from a file its file picker. [versionName] is the app's version, if known.
  *
+ * [languageViewModel] gives the Language row its line, read again each time Cycle comes back to the
+ * front, so a language chosen on Android's own page shows on her return.
+ *
  * The note that Cycle isn't backed up shows while the phone has no screen lock, checked each time
  * Cycle comes back to the front. "Hide for now" hides it until Cycle next opens, so it comes back
  * while the phone still has no lock.
@@ -53,20 +57,23 @@ import java.time.LocalDate
 @Composable
 fun SettingsRoute(
     viewModel: SettingsViewModel,
+    languageViewModel: LanguageViewModel,
     versionName: String?,
     onUsualLengths: () -> Unit,
     onWhatToLog: () -> Unit,
     onContraception: () -> Unit,
+    onLanguage: () -> Unit,
     onNotices: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val language = rememberLanguageState(languageViewModel)
     val export = rememberExportLauncher(viewModel)
     val import = rememberImportLauncher(viewModel)
     val hasScreenLock = rememberHasScreenLock()
     var backupNoteHidden by rememberSaveable { mutableStateOf(false) }
     val shown = state
-    if (shown == null) {
+    if (shown == null || language == null) {
         Column(modifier.fillMaxSize()) {
             TopAppBar(title = stringResource(R.string.settings_title))
             LoadingState(Modifier.fillMaxSize())
@@ -86,6 +93,8 @@ fun SettingsRoute(
         onConfirmImport = { viewModel.onConfirmImport() },
         onDismissDialog = viewModel::onDismissDialog,
         onDeleteEverything = viewModel::onDeleteEverything,
+        language = language,
+        onLanguage = onLanguage,
         onNotices = onNotices,
         showBackupNote = !hasScreenLock && !backupNoteHidden,
         onHideBackupNote = { backupNoteHidden = true },
@@ -94,7 +103,7 @@ fun SettingsRoute(
 }
 
 /**
- * Settings, in four sections:
+ * Settings, in five sections:
  * - Your cycle: "Usual cycle and period", "What to log" and "Contraception", with her method today
  *   or "None", each opening its page.
  * - Your data: a card saying everything stays on this phone, then, when [showBackupNote], a note
@@ -102,6 +111,7 @@ fun SettingsRoute(
  *   asks for the phone's lock before it turns on or off, with the note when Cycle turned it off
  *   itself; then Export my data, with the day of the last export, Import from a file, and Delete
  *   everything, which asks first.
+ * - App: Language, with what Cycle follows and the language it is in ([language]), opening its page.
  * - About: the open-source notices, then that Cycle is not a contraceptive or a diagnosis, and the
  *   version.
  *
@@ -122,6 +132,8 @@ fun SettingsScreen(
     onConfirmImport: () -> Unit,
     onDismissDialog: () -> Unit,
     onDeleteEverything: () -> Unit,
+    language: LanguageUiState,
+    onLanguage: () -> Unit,
     onNotices: () -> Unit,
     showBackupNote: Boolean,
     onHideBackupNote: () -> Unit,
@@ -216,6 +228,15 @@ fun SettingsScreen(
                 body = stringResource(R.string.settings_delete_body),
                 onClick = { confirmDelete = true },
                 iconTint = colors.error
+            )
+
+            SectionTitle(stringResource(R.string.settings_app))
+            SettingsRow(
+                icon = CycleIcons.Language,
+                title = stringResource(R.string.language_title),
+                body = languageSummary(language),
+                onClick = onLanguage,
+                opensPage = true
             )
 
             SectionTitle(stringResource(R.string.settings_about))
@@ -369,6 +390,8 @@ private fun SettingsPreview() {
             onConfirmImport = {},
             onDismissDialog = {},
             onDeleteEverything = {},
+            language = LanguageUiState(chosen = null, phoneLanguage = Language.English),
+            onLanguage = {},
             onNotices = {},
             showBackupNote = true,
             onHideBackupNote = {}

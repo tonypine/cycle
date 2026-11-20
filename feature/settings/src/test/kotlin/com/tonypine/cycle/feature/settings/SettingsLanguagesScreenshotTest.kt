@@ -64,6 +64,8 @@ class SettingsLanguagesScreenshotTest(
                         onConfirmImport = {},
                         onDismissDialog = {},
                         onDeleteEverything = {},
+                        language = LanguageUiState(chosen = null, phoneLanguage = language),
+                        onLanguage = {},
                         onNotices = {},
                         showBackupNote = false,
                         onHideBackupNote = {}

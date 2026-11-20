@@ -68,6 +68,16 @@ class LanguageRepositoryTest {
     }
 
     @Test
+    fun `the phone's languages are hers, in her order, whatever she chose`() = runTest {
+        val frenchThenSpanish = listOf(Locale.forLanguageTag("fr-FR"), Locale.forLanguageTag("es-ES"))
+        val languages = languages(FakePhoneLanguages(frenchThenSpanish))
+
+        languages.setLanguage(german)
+
+        assertEquals(frenchThenSpanish, languages.phoneLocales())
+    }
+
+    @Test
     fun `below Android 13 the choice stays Cycle's own`() = runTest {
         val phone = FakePhoneLanguages(hasAppLanguage = false)
         val languages = languages(phone)

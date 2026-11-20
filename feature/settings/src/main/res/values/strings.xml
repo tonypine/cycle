@@ -251,4 +251,24 @@
     <string name="refused_stop_before_start">That\'s before it started. Pick a later day.</string>
     <string name="refused_stop_too_late">Pick a day up to %1$s.</string>
     <string name="refused_gone">These dates have been deleted.</string>
+    <!-- Settings › App › Language (docs/design/language.md). The language named in
+         settings_language_phone is the one Cycle is in, under its own name. -->
+    <string name="settings_app">App</string>
+    <string name="language_title">Language</string>
+    <string name="settings_language_phone">Phone\'s language, %1$s</string>
+    <string name="language_intro">Cycle\'s words and dates change. Everything you logged stays, and your notes keep your own words.</string>
+    <string name="language_phone">Phone\'s language</string>
+    <!-- The phone's first language, as Android names it and capitalized, then the language this option
+         uses, as Android writes it mid-sentence. -->
+    <string name="language_phone_not_in_cycle">%1$s isn\'t in Cycle yet, so this option uses %2$s.</string>
+    <!-- Each language's name in this language, under its own name on the Language page. -->
+    <string name="language_name_en">English</string>
+    <string name="language_name_pt_br">Portuguese (Brazil)</string>
+    <string name="language_name_es">Spanish</string>
+    <string name="language_name_de">German</string>
+    <!-- Each language under its own name, the same in every language. -->
+    <string name="language_own_name_en" translatable="false">English</string>
+    <string name="language_own_name_pt_br" translatable="false">Português (Brasil)</string>
+    <string name="language_own_name_es" translatable="false">Español</string>
+    <string name="language_own_name_de" translatable="false">Deutsch</string>
 </resources>

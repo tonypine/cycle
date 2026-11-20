@@ -31,12 +31,20 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.collectionInfo
 import androidx.compose.ui.semantics.collectionItemInfo
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 /**
- * One choice of several, such as a contraception method: the [title] and an optional one-line
- * [body], with a radio at the end, on `surfaceContainer` with 24dp corners
+ * One choice of several, such as a contraception method: the [title] and an optional [body], with
+ * a radio at the end. Both wrap to as many lines as they need, never cut off, and the row grows with
+ * the radio centred beside them. A [titleLocale] marks the title as written in that language, such as
+ * "Deutsch" among the language options, so TalkBack reads it in that language's voice and its lines
+ * break by its rules. The row sits on `surfaceContainer` with 24dp corners
  * (`CycleTheme.shapes.large`). Selected, the row turns `accentContainer` with `onAccentContainer`
  * text, and the radio fills with an `accent` dot inside an `accent` ring; otherwise the radio is an
  * `outline` ring. The colours change on the default effects spring, and jump under reduce motion.
@@ -58,6 +66,7 @@ fun RadioRow(
     modifier: Modifier = Modifier,
     body: String? = null,
     enabled: Boolean = true,
+    titleLocale: LocaleList? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val colors = CycleTheme.colors
@@ -99,7 +108,14 @@ fun RadioRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(Modifier.weight(1f)) {
-            BasicText(title, style = typography.titleSmall.copy(color = titleColor))
+            val titleText = remember(title, titleLocale) {
+                if (titleLocale == null) {
+                    AnnotatedString(title)
+                } else {
+                    buildAnnotatedString { withStyle(SpanStyle(localeList = titleLocale)) { append(title) } }
+                }
+            }
+            BasicText(titleText, style = typography.titleSmall.copy(color = titleColor))
             if (body != null) BasicText(body, style = typography.bodySmall.copy(color = bodyColor))
         }
         Radio(selected = selected, enabled = enabled)
@@ -109,7 +125,8 @@ fun RadioRow(
 /**
  * The [RadioRow]s of one question, one under the other with `spacing.small` between them: one row
  * per option, titled by [title] with an optional [body], [selected] marked, and [onSelect] called
- * with the option tapped. Nothing is selected while [selected] is null. TalkBack reads the rows as one
+ * with the option tapped, its title in [titleLocale]'s language when it gives one. Nothing is
+ * selected while [selected] is null. TalkBack reads the rows as one
  * group of as many items as [options], and each row's place in it: "Implant, A rod in the arm, radio
  * button, selected, 6 of 9".
  */
@@ -121,7 +138,8 @@ fun <T> RadioGroup(
     title: @Composable (T) -> String,
     modifier: Modifier = Modifier,
     body: @Composable (T) -> String? = { null },
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    titleLocale: (T) -> LocaleList? = { null }
 ) {
     Column(
         modifier = modifier
@@ -143,7 +161,8 @@ fun <T> RadioGroup(
                     )
                 },
                 body = body(option),
-                enabled = enabled
+                enabled = enabled,
+                titleLocale = titleLocale(option)
             )
         }
     }

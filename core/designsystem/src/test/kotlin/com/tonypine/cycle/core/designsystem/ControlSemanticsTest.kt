@@ -45,6 +45,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.unit.dp
 import com.tonypine.cycle.core.designsystem.testing.Appearance
 import com.tonypine.cycle.core.designsystem.testing.Themed
@@ -381,6 +382,16 @@ class ControlSemanticsTest {
         row.performTouchInput { click(centerLeft + Offset(8f, 0f)) }
         row.assertIsSelected()
         assertEquals(true, selected)
+    }
+
+    @Test
+    fun aRadioRowsTitleLocaleMarksOnlyItsTitleInThatLanguage() {
+        show { RadioRow("Deutsch", selected = false, {}, body = "German", titleLocale = LocaleList("de")) }
+        val text = composeRule.onNode(hasClickAction()).fetchSemanticsNode().config[SemanticsProperties.Text]
+
+        val title = text.single { it.text == "Deutsch" }
+        assertEquals(listOf(LocaleList("de")), title.spanStyles.map { it.item.localeList })
+        assertEquals(emptyList<Any>(), text.single { it.text == "German" }.spanStyles)
     }
 
     @Test

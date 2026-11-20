@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.intl.LocaleList
 import com.tonypine.cycle.core.designsystem.CycleTheme
 import com.tonypine.cycle.core.designsystem.RadioGroup
 import com.tonypine.cycle.core.designsystem.RadioRow
@@ -43,6 +44,23 @@ internal fun RadioRowsSection() {
         RadioRow("Disabled", selected = false, {}, body = "Ignores taps.", enabled = false)
         RadioRow("Disabled, selected", selected = true, {}, enabled = false)
     }
+
+    SubsectionTitle("A title in its own language")
+    CatalogText(
+        "titleLocale marks the title's language, so TalkBack reads \"Deutsch\" in a German voice on any " +
+            "phone. Title and body wrap to every line they need.",
+        CycleTheme.typography.bodySmall,
+        color = CycleTheme.colors.onSurfaceVariant
+    )
+    var language by rememberSaveable { mutableStateOf<String?>("Phone's language") }
+    RadioGroup(
+        options = Languages.keys.toList(),
+        selected = language,
+        onSelect = { language = it },
+        title = { it },
+        body = { Languages.getValue(it).first },
+        titleLocale = { option -> Languages.getValue(option).second?.let { tag -> LocaleList(tag) } }
+    )
     CatalogText(
         "In a RadioGroup, TalkBack reads each row's place: \"Every month, radio button, selected, 1 of 3\".",
         CycleTheme.typography.bodySmall,
@@ -54,4 +72,13 @@ private val Breaks = linkedMapOf(
     "Every month" to "A week off, or dummy pills, in every pack",
     "Every few packs" to "Two or more packs in a row, then a break",
     "No breaks" to "One pack straight after another"
+)
+
+// Title to its body and the language of the title, as on Settings › Language in English.
+private val Languages = linkedMapOf(
+    "Phone's language" to ("French isn't in Cycle yet, so this option uses English." to null),
+    "Deutsch" to ("German" to "de"),
+    "English" to (null to "en"),
+    "Español" to ("Spanish" to "es"),
+    "Português (Brasil)" to ("Portuguese (Brazil)" to "pt-BR")
 )

@@ -51,6 +51,8 @@ import com.tonypine.cycle.feature.settings.AddMethodRoute
 import com.tonypine.cycle.feature.settings.AddMethodViewModel
 import com.tonypine.cycle.feature.settings.ContraceptionRoute
 import com.tonypine.cycle.feature.settings.ContraceptionViewModel
+import com.tonypine.cycle.feature.settings.LanguageRoute
+import com.tonypine.cycle.feature.settings.LanguageViewModel
 import com.tonypine.cycle.feature.settings.OpenSourceNoticeScreen
 import com.tonypine.cycle.feature.settings.OpenSourceNoticesScreen
 import com.tonypine.cycle.feature.settings.SettingsRoute
@@ -234,10 +236,12 @@ private fun CycleTabs(
                                 today
                             )
                         },
+                        languageViewModel = viewModel { LanguageViewModel(data.languageRepository) },
                         versionName = versionName,
                         onUsualLengths = { navController.navigate(USUAL_LENGTHS_ROUTE) },
                         onWhatToLog = { navController.navigate(WHAT_TO_LOG_ROUTE) },
                         onContraception = { navController.navigate(CONTRACEPTION_ROUTE) },
+                        onLanguage = { navController.navigate(LANGUAGE_ROUTE) },
                         onNotices = { navController.navigate(NOTICES_ROUTE) }
                     )
                 }
@@ -288,6 +292,13 @@ private fun CycleTabs(
                         onBack = { navController.popBackStack() }
                     )
                 }
+                // Choosing a language recreates the activity: the back stack, this page and the tab stay.
+                composable(LANGUAGE_ROUTE) {
+                    LanguageRoute(
+                        viewModel { LanguageViewModel(data.languageRepository) },
+                        onBack = { navController.popBackStack() }
+                    )
+                }
                 composable(NOTICES_ROUTE) {
                     OpenSourceNoticesScreen(
                         onOpen = { index -> navController.navigate("$NOTICE_PREFIX$index") },
@@ -314,6 +325,7 @@ private const val SETTINGS_HOME_ROUTE = "settings/home"
 private const val USUAL_LENGTHS_ROUTE = "settings/usual_lengths"
 private const val WHAT_TO_LOG_ROUTE = "settings/what_to_log"
 private const val NOTICES_ROUTE = "settings/notices"
+private const val LANGUAGE_ROUTE = "settings/language"
 private const val CONTRACEPTION_ROUTE = "settings/contraception"
 private const val ADD_METHOD_ROUTE = "settings/contraception/add"
 private const val INDEX_ARG = "index"
