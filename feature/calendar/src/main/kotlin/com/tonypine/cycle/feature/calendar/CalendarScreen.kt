@@ -183,6 +183,8 @@ private fun hint(hint: CalendarHint): String = stringResource(
 
             ContraceptionMethod.INJECTION -> R.string.calendar_hint_none_injection
 
+            ContraceptionMethod.COMBINED_INJECTION -> R.string.calendar_hint_none_combined_injection
+
             // A copper IUD keeps her estimates, so never comes here.
             ContraceptionMethod.COPPER_IUD -> R.string.calendar_hint
         }

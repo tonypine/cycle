@@ -73,6 +73,7 @@
     <string name="history_method_hormonal_iud">Hormonal IUD</string>
     <string name="history_method_copper_iud">Copper IUD</string>
     <string name="history_method_injection">Injection</string>
+    <string name="history_method_combined_injection">Monthly injection</string>
     <string name="history_method_left_out">Not part of your typical cycle.</string>
     <!-- On a method with no estimate, her bleeding over its last 90 days, in plain counts. %1$s: the
          days, "12 days"; %2$s: the episodes, "4 episodes". While she is on it, "Last 90 days", or

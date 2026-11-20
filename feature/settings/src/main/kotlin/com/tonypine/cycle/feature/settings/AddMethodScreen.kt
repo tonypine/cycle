@@ -87,7 +87,7 @@ fun AddMethodRoute(
  * - "Which method?": the method list, nothing chosen at first, with the leaflet line under it after
  *   choosing a pill. Next waits for a choice. On None, Next opens "Mark as stopped" for her method
  *   through [onStop]; with no method, or one that already has a stop date (an injection in its 13
- *   weeks, a method stopped today), it reads Done and calls [onDone], as there is nothing to stop.
+ *   or 4 weeks, a method stopped today), it reads Done and calls [onDone], as there is nothing to stop.
  * - Since when: "When did you start the pill?", "Roughly is fine.", and a month of days up to today.
  *   Next on a combined method, Save on the others, once a day is picked.
  * - On a combined pill, patch or ring, its breaks, every month to start with, and Save.

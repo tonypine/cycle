@@ -174,12 +174,14 @@
     <string name="today_since_implant">desde que te quitaron el implante</string>
     <string name="today_since_iud">desde que te quitaron el DIU</string>
     <string name="today_since_injection">desde que dejaste la inyección</string>
+    <string name="today_since_combined_injection">desde que dejaste la inyección mensual</string>
     <string name="today_basis_usual">Estimado a partir de tu ciclo habitual de %1$d días</string>
     <!-- A basis line above, then the settling sentence below. -->
     <string name="today_basis_then_settling">%1$s. %2$s</string>
     <!-- %1$s: the method, with its article ("la píldora"). -->
     <string name="today_basis_settling">Los ciclos pueden tardar unos meses en asentarse después de dejar %1$s, así que el margen es más amplio.</string>
     <string name="today_after_injection">El periodo puede tardar varios meses en volver después de la inyección. Cycle volverá a estimar cuando registres uno.</string>
+    <string name="today_after_combined_injection">El periodo puede tardar unos meses en volver después de la inyección mensual. Cycle volverá a estimar cuando registres uno.</string>
 
     <!-- The next bleed, on a combined method with a break every month. -->
     <string name="today_next_bleed">Próximo sangrado de la pausa</string>
@@ -224,6 +226,7 @@
     <string name="today_first_months_implant">En los primeros meses con el implante, el sangrado a menudo es irregular o largo.</string>
     <string name="today_first_months_hormonal_iud">En los primeros meses con un DIU hormonal, el sangrado a menudo es frecuente o largo. Suele hacerse más ligero durante el primer año.</string>
     <string name="today_first_months_injection">En los primeros meses con la inyección, el sangrado a menudo es irregular o largo. Suele disminuir con el tiempo.</string>
+    <string name="today_first_months_combined_injection">En los primeros meses con la inyección mensual, el sangrado a menudo es irregular o largo. Suele estabilizarse.</string>
 
     <!-- The copper IUD, for six months after fitting. -->
     <string name="today_copper_iud_title">Al principio, los periodos pueden ser más abundantes</string>
@@ -238,6 +241,7 @@
     <string name="method_sheet_button_implant">¿Qué cambia con el implante?</string>
     <string name="method_sheet_button_hormonal_iud">¿Qué cambia con un DIU hormonal?</string>
     <string name="method_sheet_button_injection">¿Qué cambia con la inyección?</string>
+    <string name="method_sheet_button_combined_injection">¿Qué cambia con la inyección mensual?</string>
     <string name="method_sheet_title_pill">Sangrado con la píldora</string>
     <string name="method_sheet_title_mini_pill">Sangrado con la minipíldora</string>
     <string name="method_sheet_title_patch">Sangrado con el parche</string>
@@ -245,13 +249,16 @@
     <string name="method_sheet_title_implant">Sangrado con el implante</string>
     <string name="method_sheet_title_hormonal_iud">Sangrado con un DIU hormonal</string>
     <string name="method_sheet_title_injection">Sangrado con la inyección</string>
+    <string name="method_sheet_title_combined_injection">Sangrado con la inyección mensual</string>
     <!-- %1$s: the method, with its article ("la píldora"). -->
     <string name="method_sheet_combined">Con %1$s, el sangrado de la pausa suele llegar durante una pausa. Con pausas solo cada pocos envases, o sin pausas, el sangrado puede llegar también en otros momentos, y a menudo se calma con el tiempo.</string>
     <string name="method_sheet_mini_pill">La minipíldora cambia el sangrado de muchas personas. Puede ser irregular, ir y venir o desaparecer, y puede que no se calme con el tiempo.</string>
     <string name="method_sheet_implant">El implante cambia el sangrado de la mayoría de las personas. Puede ser más ligero, más largo, ir y venir o desaparecer, y el patrón puede cambiar en cualquier momento.</string>
     <string name="method_sheet_hormonal_iud">Un DIU hormonal cambia el sangrado de la mayoría de las personas. A menudo es frecuente o largo en los primeros meses, luego suele hacerse más ligero, y en algunas personas desaparece.</string>
     <string name="method_sheet_injection">La inyección cambia el sangrado de la mayoría de las personas. Al principio a menudo es irregular o largo, y suele disminuir cuanto más tiempo la usas. En muchas personas desaparece.</string>
+    <string name="method_sheet_combined_injection">La mayoría de las personas sangra una vez entre inyecciones, unas dos o tres semanas después de cada una. El sangrado también puede venir en otros momentos, durar más o no venir, sobre todo en los primeros meses.</string>
     <string name="method_sheet_what_cycle_does">Por eso Cycle no estima cuándo vas a sangrar, no cuenta días del ciclo ni dice que algo se retrasa. Muestra los días que registras y cuánto sangraste en los últimos 90 días.</string>
+    <string name="method_sheet_what_cycle_does_combined_injection">Cycle no sabe cuándo te pones las inyecciones, así que no estima cuándo vas a sangrar, no cuenta días del ciclo ni dice que algo se retrasa. Muestra los días que registras y cuánto sangraste en los últimos 90 días.</string>
     <string name="method_sheet_help">Si el sangrado se vuelve un problema para ti, un médico o un centro de salud sexual puede ayudarte.</string>
 
     <!-- How is this estimated, for the next bleed. %1$s and %3$s: the method, with its article;

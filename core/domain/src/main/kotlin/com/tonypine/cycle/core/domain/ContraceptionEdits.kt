@@ -1,5 +1,6 @@
 package com.tonypine.cycle.core.domain
 
+import com.tonypine.cycle.core.domain.CycleRules.COMBINED_INJECTION_WEEKS
 import com.tonypine.cycle.core.domain.CycleRules.INJECTION_WEEKS
 import com.tonypine.cycle.core.model.Breaks
 import com.tonypine.cycle.core.model.ContraceptionMethod
@@ -28,18 +29,27 @@ sealed interface StretchPlan {
 object ContraceptionEdits {
     /**
      * Her method now, on [today]: the stretch that covers it, unless she marked it as stopped today.
-     * Today is still that stretch's last day, but she is on none from the moment she says so. The
+     * Today is still that stretch's last day, but she is on none from the moment she says so. Either
      * injection stays her method until the date Cycle counts it until has passed. At most one is.
      */
     fun current(stretches: List<ContraceptionStretch>, today: LocalDate): ContraceptionStretch? =
-        stretches.lastOrNull { today in it && !(it.stopped == today && it.method != ContraceptionMethod.INJECTION) }
+        stretches.lastOrNull { today in it && !(it.stopped == today && !it.method.isInjection) }
 
     /**
-     * The stop date of [method] when the last day she gives is [lastDay]: that day, or for the
-     * injection [INJECTION_WEEKS] weeks after her last one.
+     * The stop date of [method] when the last day she gives is [lastDay]: that day, or for an
+     * injection the weeks it counts after her last one ([countedWeeks]).
      */
-    fun stopDate(method: ContraceptionMethod, lastDay: LocalDate): LocalDate =
-        if (method == ContraceptionMethod.INJECTION) lastDay.plusWeeks(INJECTION_WEEKS) else lastDay
+    fun stopDate(method: ContraceptionMethod, lastDay: LocalDate): LocalDate = lastDay.plusWeeks(countedWeeks(method))
+
+    /**
+     * The weeks [method] counts after the last day she gives: [INJECTION_WEEKS] on the injection,
+     * [COMBINED_INJECTION_WEEKS] on the monthly combined injection, none on every other method.
+     */
+    fun countedWeeks(method: ContraceptionMethod): Long = when (method) {
+        ContraceptionMethod.INJECTION -> INJECTION_WEEKS
+        ContraceptionMethod.COMBINED_INJECTION -> COMBINED_INJECTION_WEEKS
+        else -> 0L
+    }
 
     /** The latest stop date [method] can have on [today]. */
     fun latestStop(method: ContraceptionMethod, today: LocalDate): LocalDate = stopDate(method, today)
@@ -68,7 +78,7 @@ object ContraceptionEdits {
 
     /**
      * "Mark as stopped": stretch [id] stops on the last day she gives, [lastDay] (her last
-     * injection: the stretch then runs [INJECTION_WEEKS] weeks more). [lastDay] must lie between
+     * injection: the stretch then runs [countedWeeks] weeks more). [lastDay] must lie between
      * its start and [today].
      */
     fun stop(stretches: List<ContraceptionStretch>, id: Long, lastDay: LocalDate, today: LocalDate): StretchPlan {

@@ -15,4 +15,5 @@
     <string name="calendar_hint_none_implant">Cycle schätzt Blutungen mit dem Implantat nicht. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
     <string name="calendar_hint_none_hormonal_iud">Cycle schätzt Blutungen mit einer Hormonspirale nicht. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
     <string name="calendar_hint_none_injection">Cycle schätzt Blutungen mit der Spritze nicht. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
+    <string name="calendar_hint_none_combined_injection">Cycle schätzt Blutungen mit der Monatsspritze nicht. Tippe auf einen Tag bis heute, um ihn einzutragen oder zu ändern.</string>
 </resources>

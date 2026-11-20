@@ -131,6 +131,8 @@
     <string name="method_copper_iud_line">Copper coil, with no hormones</string>
     <string name="method_injection">Injection</string>
     <string name="method_injection_line">Such as Depo-Provera</string>
+    <string name="method_combined_injection">Monthly combined injection</string>
+    <string name="method_combined_injection_line">Two hormones, every 4 weeks, such as Cyclofem</string>
     <string name="method_which_pill">Not sure which pill you take? The leaflet in the pack says.</string>
 
     <!-- Short names, for Today's display and History's card: "Implant". -->
@@ -142,6 +144,7 @@
     <string name="method_short_hormonal_iud">Hormonal IUD</string>
     <string name="method_short_copper_iud">Copper IUD</string>
     <string name="method_short_injection">Injection</string>
+    <string name="method_short_combined_injection">Monthly injection</string>
 
     <!-- In a sentence, short: "Move the end of your pill?", "the implant's dates". -->
     <string name="method_sentence_combined_pill">pill</string>
@@ -152,6 +155,7 @@
     <string name="method_sentence_hormonal_iud">hormonal IUD</string>
     <string name="method_sentence_copper_iud">copper IUD</string>
     <string name="method_sentence_injection">injection</string>
+    <string name="method_sentence_combined_injection">monthly injection</string>
 
     <!-- In a sentence, in full: "Your combined pill would end on 5 September". -->
     <string name="method_full_combined_pill">combined pill</string>
@@ -162,6 +166,7 @@
     <string name="method_full_hormonal_iud">hormonal IUD</string>
     <string name="method_full_copper_iud">copper IUD</string>
     <string name="method_full_injection">injection</string>
+    <string name="method_full_combined_injection">monthly combined injection</string>
 
     <!-- Since when, and when she stops. -->
     <string name="method_since_body">Roughly is fine.</string>
@@ -172,6 +177,7 @@
     <string name="method_since_implant">When was your implant fitted?</string>
     <string name="method_since_iud">When was your IUD fitted?</string>
     <string name="method_since_injection">When was your first injection?</string>
+    <string name="method_since_combined_injection">When was your first monthly injection?</string>
     <string name="method_stop_pill">When did you take your last pill?</string>
     <string name="method_stop_patch">When did you take off your last patch?</string>
     <string name="method_stop_ring">When did you take out your last ring?</string>
@@ -179,6 +185,7 @@
     <string name="method_stop_iud">When was your IUD taken out?</string>
     <string name="method_stop_injection">When was your last injection?</string>
     <string name="method_stop_injection_body">Cycle counts 13 weeks from it.</string>
+    <string name="method_stop_combined_injection_body">Cycle counts 4 weeks from it.</string>
 
     <!-- A stretch's dates, in "Your methods" and History: "3 May to 12 Sep 2027". -->
     <string name="stretch_since">Since %1$s</string>
@@ -211,4 +218,5 @@
     <string name="calm_implant">Bleeding on the implant can come at any time, so Cycle doesn\'t estimate it.</string>
     <string name="calm_hormonal_iud">Bleeding with a hormonal IUD doesn\'t follow a cycle you can count on, so Cycle doesn\'t estimate it.</string>
     <string name="calm_injection">Bleeding on the injection doesn\'t follow a cycle, so Cycle doesn\'t estimate it.</string>
+    <string name="calm_combined_injection">Bleeding on the monthly injection follows your injections, not a cycle, and it varies, so Cycle doesn\'t estimate it.</string>
 </resources>

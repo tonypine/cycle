@@ -7,6 +7,7 @@ import androidx.compose.ui.res.stringResource
 import com.tonypine.cycle.core.designsystem.RadioGroup
 import com.tonypine.cycle.core.model.Breaks
 import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionMethod.COMBINED_INJECTION
 import com.tonypine.cycle.core.model.ContraceptionMethod.COMBINED_PILL
 import com.tonypine.cycle.core.model.ContraceptionMethod.COPPER_IUD
 import com.tonypine.cycle.core.model.ContraceptionMethod.HORMONAL_IUD
@@ -86,6 +87,7 @@ fun methodTitle(method: ContraceptionMethod): String = stringResource(
         HORMONAL_IUD -> R.string.method_hormonal_iud
         COPPER_IUD -> R.string.method_copper_iud
         INJECTION -> R.string.method_injection
+        COMBINED_INJECTION -> R.string.method_combined_injection
     }
 )
 
@@ -101,6 +103,7 @@ fun methodShortName(method: ContraceptionMethod): String = stringResource(
         HORMONAL_IUD -> R.string.method_short_hormonal_iud
         COPPER_IUD -> R.string.method_short_copper_iud
         INJECTION -> R.string.method_short_injection
+        COMBINED_INJECTION -> R.string.method_short_combined_injection
     }
 )
 
@@ -116,6 +119,7 @@ fun methodInSentence(method: ContraceptionMethod): String = stringResource(
         HORMONAL_IUD -> R.string.method_sentence_hormonal_iud
         COPPER_IUD -> R.string.method_sentence_copper_iud
         INJECTION -> R.string.method_sentence_injection
+        COMBINED_INJECTION -> R.string.method_sentence_combined_injection
     }
 )
 
@@ -131,6 +135,7 @@ fun methodInFull(method: ContraceptionMethod): String = stringResource(
         HORMONAL_IUD -> R.string.method_full_hormonal_iud
         COPPER_IUD -> R.string.method_full_copper_iud
         INJECTION -> R.string.method_full_injection
+        COMBINED_INJECTION -> R.string.method_full_combined_injection
     }
 )
 
@@ -145,6 +150,7 @@ fun sinceWhenTitle(method: ContraceptionMethod): String = stringResource(
         IMPLANT -> R.string.method_since_implant
         HORMONAL_IUD, COPPER_IUD -> R.string.method_since_iud
         INJECTION -> R.string.method_since_injection
+        COMBINED_INJECTION -> R.string.method_since_combined_injection
     }
 )
 
@@ -157,14 +163,22 @@ fun stopTitle(method: ContraceptionMethod): String = stringResource(
         RING -> R.string.method_stop_ring
         IMPLANT -> R.string.method_stop_implant
         HORMONAL_IUD, COPPER_IUD -> R.string.method_stop_iud
-        INJECTION -> R.string.method_stop_injection
+        INJECTION, COMBINED_INJECTION -> R.string.method_stop_injection
     }
 )
 
-/** The line under [stopTitle]: "Roughly is fine.", or on the injection that Cycle counts 13 weeks. */
+/**
+ * The line under [stopTitle]: "Roughly is fine.", or on an injection that Cycle counts 13 weeks (4 on
+ * the monthly one) from it.
+ */
 @Composable
-fun stopBody(method: ContraceptionMethod): String =
-    stringResource(if (method == INJECTION) R.string.method_stop_injection_body else R.string.method_since_body)
+fun stopBody(method: ContraceptionMethod): String = stringResource(
+    when (method) {
+        INJECTION -> R.string.method_stop_injection_body
+        COMBINED_INJECTION -> R.string.method_stop_combined_injection_body
+        else -> R.string.method_since_body
+    }
+)
 
 /** "Do you take a break between packs?", or the patch's and the ring's own question. */
 @Composable
@@ -199,6 +213,8 @@ fun calmLine(method: ContraceptionMethod?, breaks: Breaks?): String = stringReso
 
         INJECTION -> R.string.calm_injection
 
+        COMBINED_INJECTION -> R.string.calm_combined_injection
+
         COMBINED_PILL, PATCH, RING -> when (breaks) {
             Breaks.EVERY_FEW_PACKS -> R.string.calm_every_few_packs
 
@@ -227,6 +243,7 @@ private val MethodChoice.line: Int
             HORMONAL_IUD -> R.string.method_hormonal_iud_line
             COPPER_IUD -> R.string.method_copper_iud_line
             INJECTION -> R.string.method_injection_line
+            COMBINED_INJECTION -> R.string.method_combined_injection_line
         }
     }
 

@@ -336,6 +336,21 @@ class ContraceptionViewModelTest {
     }
 
     @Test
+    fun `marking the monthly combined injection as stopped counts 4 weeks, and it stays her method until then`() =
+        runTest {
+            // The last monthly injection on 3 August, marked on 10 August: counted until 31 August.
+            today = LocalDate.of(2027, 8, 10)
+            contraception.start(ContraceptionMethod.COMBINED_INJECTION, null, LocalDate.of(2026, 11, 9), today)
+            val injection = stretch(stored().single().id)
+            assertEquals(LocalDate.of(2027, 9, 7), injection.ready().latestStop)
+            injection.onStop(LocalDate.of(2027, 8, 3))
+
+            injection.await { it == StretchUiState.Closed }
+            assertEquals(LocalDate.of(2027, 8, 31), stored().single().stopped)
+            assertEquals(stored().single(), page().await().current)
+        }
+
+    @Test
     fun `deleting a stretch forgets it and closes its page, and the others stay`() = runTest {
         today = LocalDate.of(2027, 9, 17)
         storedPill(LocalDate.of(2027, 5, 3))

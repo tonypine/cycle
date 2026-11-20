@@ -10,6 +10,7 @@ import com.tonypine.cycle.core.model.BleedingSummary
 import com.tonypine.cycle.core.model.BleedingWord
 import com.tonypine.cycle.core.model.Breaks
 import com.tonypine.cycle.core.model.ContraceptionMethod
+import com.tonypine.cycle.core.model.ContraceptionMethod.COMBINED_INJECTION
 import com.tonypine.cycle.core.model.ContraceptionMethod.COMBINED_PILL
 import com.tonypine.cycle.core.model.ContraceptionMethod.COPPER_IUD
 import com.tonypine.cycle.core.model.ContraceptionMethod.HORMONAL_IUD
@@ -114,6 +115,7 @@ internal fun sinceLine(method: ContraceptionMethod): String = stringResource(
         IMPLANT -> R.string.today_since_implant
         HORMONAL_IUD, COPPER_IUD -> R.string.today_since_iud
         INJECTION -> R.string.today_since_injection
+        COMBINED_INJECTION -> R.string.today_since_combined_injection
     }
 )
 
@@ -168,6 +170,8 @@ internal fun firstMonthsLine(method: ContraceptionMethod, breaks: Breaks?): Stri
 
     INJECTION -> R.string.today_first_months_injection
 
+    COMBINED_INJECTION -> R.string.today_first_months_combined_injection
+
     // The copper IUD has its own card.
     COPPER_IUD -> null
 }?.let { stringResource(it) }
@@ -183,6 +187,7 @@ internal fun methodSheetButton(method: ContraceptionMethod): String = stringReso
         IMPLANT -> R.string.method_sheet_button_implant
         HORMONAL_IUD, COPPER_IUD -> R.string.method_sheet_button_hormonal_iud
         INJECTION -> R.string.method_sheet_button_injection
+        COMBINED_INJECTION -> R.string.method_sheet_button_combined_injection
     }
 )
 
@@ -197,6 +202,7 @@ internal fun methodSheetTitle(method: ContraceptionMethod): String = stringResou
         IMPLANT -> R.string.method_sheet_title_implant
         HORMONAL_IUD, COPPER_IUD -> R.string.method_sheet_title_hormonal_iud
         INJECTION -> R.string.method_sheet_title_injection
+        COMBINED_INJECTION -> R.string.method_sheet_title_combined_injection
     }
 )
 

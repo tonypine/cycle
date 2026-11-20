@@ -24,6 +24,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
+import com.tonypine.cycle.core.model.ContraceptionMethod
 import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -130,6 +131,16 @@ class CalendarScreenTest {
         composeRule.onNodeWithText("Predicted period").assertDoesNotExist()
         composeRule.onNodeWithText(
             "Cycle will estimate your next bleed once you log one. Tap any day up to today to log or change it."
+        ).assertIsDisplayed()
+    }
+
+    @Test
+    fun `on the monthly injection the hint says Cycle doesn't estimate its bleeding`() {
+        show(CalendarSamples.implantMarch.copy(hint = CalendarHint.NoEstimate(ContraceptionMethod.COMBINED_INJECTION)))
+
+        composeRule.onNodeWithText("Predicted period").assertDoesNotExist()
+        composeRule.onNodeWithText(
+            "Cycle doesn't estimate bleeding on the monthly injection. Tap any day up to today to log or change it."
         ).assertIsDisplayed()
     }
 

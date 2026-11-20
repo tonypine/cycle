@@ -26,7 +26,8 @@ class ContraceptionCyclesTest {
         stretch(ContraceptionMethod.PROGESTOGEN_PILL, "2027-01-15"),
         stretch(ContraceptionMethod.IMPLANT, "2027-01-15"),
         stretch(ContraceptionMethod.HORMONAL_IUD, "2027-01-15"),
-        stretch(ContraceptionMethod.INJECTION, "2027-01-15")
+        stretch(ContraceptionMethod.INJECTION, "2027-01-15"),
+        stretch(ContraceptionMethod.COMBINED_INJECTION, "2027-01-15")
     )
 
     @Test

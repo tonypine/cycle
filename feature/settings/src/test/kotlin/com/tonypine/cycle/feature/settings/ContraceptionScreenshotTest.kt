@@ -29,7 +29,8 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * Settings › Contraception in each state, in light, dark and at 200% font scale: on none, on the pill
  * (E1) and on the hormonal IUD after the pill (E4), each with its "When to get help", on none after the
- * implant (D4) and on the injection in its 13 weeks; then the steps of adding a method (B3 to B5), "Mark as stopped" (D3), a method's
+ * implant (D4), on the injection in its 13 weeks and the monthly injection in its 4; then the steps of adding a method
+ * (B3 to B5), "Mark as stopped" (D3) and on the monthly injection, a method's
  * page (E5), its date sheet (E6), and its dialogs: moving the pill's end (E7), a refusal and deleting dates. Each records
  * `src/test/screenshots/contraception_<screen>_<appearance>.png`, on a screen tall enough for the
  * whole page. Synthetic dates only.
@@ -80,6 +81,9 @@ class ContraceptionScreenshotTest(private val screen: Screen, private val appear
         Injection("injection", tall = true, content = {
             Page(current = OnInjection, OnInjection, today = LocalDate.of(2027, 8, 20))
         }),
+        CombinedInjection("combined_injection", tall = true, content = {
+            Page(current = OnCombinedInjection, OnCombinedInjection, today = LocalDate.of(2027, 8, 10))
+        }),
         AddMethod("add_method", tall = true, content = {
             Add(AddMethodStep.Method, MethodChoice.Method(ContraceptionMethod.COMBINED_PILL))
         }),
@@ -91,6 +95,15 @@ class ContraceptionScreenshotTest(private val screen: Screen, private val appear
         }),
         Stop("stop", content = {
             StopMethodScreen(StretchUiState.Ready(Implant, ImplantToday, ImplantToday), {}, {}, {}, {})
+        }),
+        StopCombinedInjection("stop_combined_injection", content = {
+            StopMethodScreen(
+                StretchUiState.Ready(CombinedInjection, CombinedInjectionToday, CombinedInjectionToday.plusWeeks(4)),
+                {},
+                {},
+                {},
+                {}
+            )
         }),
         Stretch("stretch", content = { StretchPage(Iud) }),
         PillStretch("pill_stretch", content = { StretchPage(PillUntil12) }),
@@ -152,6 +165,12 @@ private val Ring = ContraceptionStretch(
     breaks = Breaks.MONTHLY,
     id = 5
 )
+private val CombinedInjectionToday = LocalDate.of(2027, 8, 10)
+private val CombinedInjection =
+    ContraceptionStretch(ContraceptionMethod.COMBINED_INJECTION, LocalDate.of(2026, 11, 9), id = 5)
+
+/** The last monthly injection on 3 August: counted until 31 August. */
+private val OnCombinedInjection = CombinedInjection.copy(stopped = LocalDate.of(2027, 8, 31))
 private val OnInjection = ContraceptionStretch(
     ContraceptionMethod.INJECTION,
     LocalDate.of(2026, 11, 9),

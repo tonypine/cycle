@@ -78,7 +78,7 @@ object CycleCalculator {
         val estimates = when {
             current?.behaviour == MethodBehaviour.SCHEDULED_BLEED -> EstimateKind.NEXT_BLEED
             current?.behaviour == MethodBehaviour.NO_ESTIMATE -> EstimateKind.NONE
-            stopped?.stretch?.method == ContraceptionMethod.INJECTION -> EstimateKind.NONE
+            stopped?.stretch?.method?.isInjection == true -> EstimateKind.NONE
             else -> EstimateKind.PERIOD
         }
         val contraception = ContraceptionOverview(

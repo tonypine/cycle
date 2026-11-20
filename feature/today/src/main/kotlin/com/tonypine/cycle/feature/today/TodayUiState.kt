@@ -103,7 +103,8 @@ sealed interface TodayUiState {
                         TodayOutlook.FirstBleedToLog
                     }
 
-                EstimateKind.NONE -> contraception.bleeding?.let(TodayOutlook::Bleeding) ?: TodayOutlook.AfterInjection
+                EstimateKind.NONE -> contraception.bleeding?.let(TodayOutlook::Bleeding)
+                    ?: TodayOutlook.AfterInjection(stopped?.stretch?.method ?: ContraceptionMethod.INJECTION)
 
                 EstimateKind.PERIOD -> estimate?.let { NextPeriod.from(it, overview.periods, stopped) } ?: return empty
             }
@@ -236,8 +237,8 @@ sealed interface TodayOutlook {
     /** A combined method with a break every month and no start date: nothing until she logs a bleed. */
     data object FirstBleedToLog : TodayOutlook
 
-    /** After the injection, nothing until her first period. */
-    data object AfterInjection : TodayOutlook
+    /** After stopping [method], the 8- or 13-week or the monthly injection: nothing until her first period. */
+    data class AfterInjection(val method: ContraceptionMethod) : TodayOutlook
 }
 
 /**

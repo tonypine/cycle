@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
  * draw at the disabled alphas and it ignores taps.
  *
  * Put the rows of one question in a [RadioGroup], which makes them one group for TalkBack and reads
- * each row's place in it ("6 of 9"). For a setting that is on or off, use [SwitchRow]; for two to
+ * each row's place in it ("6 of 10"). For a setting that is on or off, use [SwitchRow]; for two to
  * five short options side by side, [ButtonGroup].
  */
 @Composable
@@ -111,7 +111,7 @@ fun RadioRow(
  * per option, titled by [title] with an optional [body], [selected] marked, and [onSelect] called
  * with the option tapped. Nothing is selected while [selected] is null. TalkBack reads the rows as one
  * group of as many items as [options], and each row's place in it: "Implant, A rod in the arm, radio
- * button, selected, 6 of 9".
+ * button, selected, 6 of 10".
  */
 @Composable
 fun <T> RadioGroup(

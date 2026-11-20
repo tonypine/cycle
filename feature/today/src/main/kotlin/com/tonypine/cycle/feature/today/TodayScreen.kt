@@ -44,6 +44,7 @@ import com.tonypine.cycle.core.designsystem.WeekRow
 import com.tonypine.cycle.core.designsystem.cycleLocale
 import com.tonypine.cycle.core.designsystem.rememberCycleBottomSheetState
 import com.tonypine.cycle.core.model.BleedBasis
+import com.tonypine.cycle.core.model.ContraceptionMethod
 import com.tonypine.cycle.core.model.DayFeelings
 import com.tonypine.cycle.core.model.EstimateBasis
 import com.tonypine.cycle.core.model.FlowLevel
@@ -428,10 +429,16 @@ private fun OutlookCard(
 
         is TodayOutlook.Bleeding -> state.method?.let { BleedingCard(outlook, it, onWhatChanges, modifier) }
 
-        TodayOutlook.AfterInjection -> EstimateCard(modifier) {
+        is TodayOutlook.AfterInjection -> EstimateCard(modifier) {
             CardLabel(stringResource(R.string.today_next_period))
             BasicText(
-                text = stringResource(R.string.today_after_injection),
+                text = stringResource(
+                    if (outlook.method == ContraceptionMethod.COMBINED_INJECTION) {
+                        R.string.today_after_combined_injection
+                    } else {
+                        R.string.today_after_injection
+                    }
+                ),
                 style = CycleTheme.typography.body.copy(color = CycleTheme.colors.onSurface)
             )
         }

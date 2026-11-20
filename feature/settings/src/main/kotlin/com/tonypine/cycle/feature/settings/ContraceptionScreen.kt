@@ -59,7 +59,7 @@ fun ContraceptionRoute(
 /**
  * Her contraception: "Now", a card with her method today, since when (with its breaks on a combined
  * method) and its calm line, then "Mark as stopped" and "Change method", or on none "Add your method".
- * A method whose stop date is still ahead, such as the injection's 13 weeks, says until when Cycle
+ * A method whose stop date is still ahead, such as an injection's 13 or 4 weeks, says until when Cycle
  * counts it and has no "Mark as stopped". On the combined pill, patch or ring, or an IUD, "When to get
  * help" follows, in full. Then "Your methods", every stretch, the latest first, each a row with the
  * method and its dates that opens its page, and a note that Cycle doesn't advise on methods. Section
@@ -152,10 +152,13 @@ private fun NowCard(current: ContraceptionStretch?) {
             if (stopped != null) {
                 val until = formatDate(stopped, DAY_MONTH_AND_YEAR)
                 BasicText(
-                    if (current.method == ContraceptionMethod.INJECTION) {
-                        stringResource(R.string.contraception_counts_until_injection, until)
-                    } else {
-                        stringResource(R.string.contraception_counts_until, until)
+                    when (current.method) {
+                        ContraceptionMethod.INJECTION -> stringResource(R.string.contraception_counts_until_injection, until)
+
+                        ContraceptionMethod.COMBINED_INJECTION ->
+                            stringResource(R.string.contraception_counts_until_combined_injection, until)
+
+                        else -> stringResource(R.string.contraception_counts_until, until)
                     },
                     style = typography.body.copy(color = colors.onSurface)
                 )

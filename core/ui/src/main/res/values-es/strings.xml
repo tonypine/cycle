@@ -130,6 +130,8 @@
     <string name="method_copper_iud_line">DIU sin hormonas</string>
     <string name="method_injection">Inyección</string>
     <string name="method_injection_line">Como Depo-Provera</string>
+    <string name="method_combined_injection">Inyección mensual combinada</string>
+    <string name="method_combined_injection_line">Dos hormonas, cada 4 semanas, como Cyclofem</string>
     <string name="method_which_pill">¿No sabes qué píldora tomas? Lo dice el prospecto.</string>
 
     <!-- Short names, for Today's display and History's card: "Implante". -->
@@ -141,6 +143,7 @@
     <string name="method_short_hormonal_iud">DIU hormonal</string>
     <string name="method_short_copper_iud">DIU de cobre</string>
     <string name="method_short_injection">Inyección</string>
+    <string name="method_short_combined_injection">Inyección mensual</string>
 
     <!-- In a sentence, short, with its article: "la píldora", "el implante". Every sentence that takes
          one puts it where the article needs no contraction (never after "de" or "a"), and never first,
@@ -153,6 +156,7 @@
     <string name="method_sentence_hormonal_iud">el DIU hormonal</string>
     <string name="method_sentence_copper_iud">el DIU de cobre</string>
     <string name="method_sentence_injection">la inyección</string>
+    <string name="method_sentence_combined_injection">la inyección mensual</string>
 
     <!-- In a sentence, in full, with its article, under the same rules: "la píldora combinada". -->
     <string name="method_full_combined_pill">la píldora combinada</string>
@@ -163,6 +167,7 @@
     <string name="method_full_hormonal_iud">el DIU hormonal</string>
     <string name="method_full_copper_iud">el DIU de cobre</string>
     <string name="method_full_injection">la inyección</string>
+    <string name="method_full_combined_injection">la inyección mensual combinada</string>
 
     <!-- Since when, and when she stops. -->
     <string name="method_since_body">Basta con una fecha aproximada.</string>
@@ -173,6 +178,7 @@
     <string name="method_since_implant">¿Cuándo te pusieron el implante?</string>
     <string name="method_since_iud">¿Cuándo te pusieron el DIU?</string>
     <string name="method_since_injection">¿Cuándo fue tu primera inyección?</string>
+    <string name="method_since_combined_injection">¿Cuándo fue tu primera inyección mensual?</string>
     <string name="method_stop_pill">¿Cuándo tomaste tu última píldora?</string>
     <string name="method_stop_patch">¿Cuándo te quitaste tu último parche?</string>
     <string name="method_stop_ring">¿Cuándo te quitaste tu último anillo?</string>
@@ -180,6 +186,7 @@
     <string name="method_stop_iud">¿Cuándo te quitaron el DIU?</string>
     <string name="method_stop_injection">¿Cuándo fue tu última inyección?</string>
     <string name="method_stop_injection_body">Cycle cuenta 13 semanas desde ella.</string>
+    <string name="method_stop_combined_injection_body">Cycle cuenta 4 semanas desde ella.</string>
 
     <!-- A stretch's dates, in "Tus métodos" and History: "Del 3 may 2027 al 12 sept 2027". -->
     <string name="stretch_since">Desde el %1$s</string>
@@ -212,4 +219,5 @@
     <string name="calm_implant">Con el implante, el sangrado puede llegar en cualquier momento, así que Cycle no lo estima.</string>
     <string name="calm_hormonal_iud">Con un DIU hormonal, el sangrado no sigue un ciclo con el que puedas contar, así que Cycle no lo estima.</string>
     <string name="calm_injection">Con la inyección, el sangrado no sigue un ciclo, así que Cycle no lo estima.</string>
+    <string name="calm_combined_injection">Con la inyección mensual, el sangrado sigue tus inyecciones, no un ciclo, y varía, así que Cycle no lo estima.</string>
 </resources>
