@@ -81,6 +81,16 @@ class SettingsViewModelTest {
 
     private suspend fun SettingsViewModel.awaitDialog(): DataDialog? = uiState.first { it?.dialog != null }?.dialog
 
+    /**
+     * Closes the dialog and waits until [SettingsViewModel.uiState] shows it closed. The state
+     * catches up with the dismiss only once its combine runs, which can be on another thread (the
+     * file read's or Room's): without the wait, the next [awaitDialog] can return the old dialog.
+     */
+    private suspend fun SettingsViewModel.dismissDialog() {
+        onDismissDialog()
+        uiState.first { it?.dialog == null }
+    }
+
     private suspend fun logTwoDays() {
         dayLogs.setPeriodStarted(LocalDate.of(2027, 3, 2), started = true)
         dayLogs.setFlow(LocalDate.of(2027, 3, 3), FlowLevel.HEAVY)
@@ -124,7 +134,7 @@ class SettingsViewModelTest {
 
         viewModel.onExport { broken }
         assertEquals(DataDialog.ExportFailed, viewModel.awaitDialog())
-        viewModel.onDismissDialog()
+        viewModel.dismissDialog()
 
         viewModel.onExport { throw FileNotFoundException("Synthetic failure") }
         assertEquals(DataDialog.ExportFailed, viewModel.awaitDialog())
@@ -166,7 +176,7 @@ class SettingsViewModelTest {
 
         viewModel.onImport { ByteArrayInputStream(export) }
         viewModel.awaitDialog()
-        viewModel.onDismissDialog()
+        viewModel.dismissDialog()
         viewModel.onConfirmImport()
 
         assertEquals(listOf(LocalDate.of(2027, 3, 2)), dayLogs.observeDayLogs().first().map { it.date })
@@ -261,11 +271,11 @@ class SettingsViewModelTest {
 
         viewModel.onImport { ByteArrayInputStream("Date,Flow\n2027-03-02,light\n".encodeToByteArray()) }
         assertEquals(DataDialog.ImportRefused(ImportProblem.NotAnExport), viewModel.awaitDialog())
-        viewModel.onDismissDialog()
+        viewModel.dismissDialog()
 
         viewModel.onImport { throw FileNotFoundException("Synthetic failure") }
         assertEquals(DataDialog.ImportRefused(ImportProblem.Unreadable), viewModel.awaitDialog())
-        viewModel.onDismissDialog()
+        viewModel.dismissDialog()
 
         viewModel.onImport { null }
         assertEquals(DataDialog.ImportRefused(ImportProblem.Unreadable), viewModel.awaitDialog())
