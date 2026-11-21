@@ -96,10 +96,11 @@ class AppLanguageTest {
     fun `on Android 13 and later a language set on Android's page is what the repository reports`() {
         localeManager().applicationLocales = LocaleList.forLanguageTags("de")
 
-        // Back to the front: the activity starts again.
+        // Back to the front: the activity starts again, and its onStart copies Android's language.
         composeRule.activityRule.scenario.recreate()
+        runBlocking { app.language.synced.join() }
 
-        composeRule.waitUntil(WAIT_MILLIS) { runBlocking { languages.language.first() } == german }
+        assertEquals(german, runBlocking { languages.language.first() })
     }
 
     @Test

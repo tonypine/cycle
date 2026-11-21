@@ -103,6 +103,7 @@ class LanguageJourneyTest {
         // region (España). Back to Cycle, the activity starts again.
         app.getSystemService(LocaleManager::class.java).applicationLocales = LocaleList.forLanguageTags("es-ES")
         composeRule.activityRule.scenario.recreate()
+        runBlocking { app.language.synced.join() }
 
         row("Español").performClick()
         option("Español").assertIsSelected()
@@ -117,6 +118,7 @@ class LanguageJourneyTest {
 
         app.getSystemService(LocaleManager::class.java).applicationLocales = LocaleList.forLanguageTags("pt-PT")
         composeRule.activityRule.scenario.recreate()
+        runBlocking { app.language.synced.join() }
 
         row("Português (Brasil)").performClick()
         option("Português (Brasil)").assertIsSelected()
